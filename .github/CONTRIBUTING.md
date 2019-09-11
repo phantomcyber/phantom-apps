@@ -20,8 +20,6 @@ Make sure you have a [GitHub Account](https://www.github.com)
 ## Project Details
 To successfully contribute, you should spend a little time familiarizing yourself with the following key topics.
 
-- Repo Layout  
-<TODO: What layout did we choose?>
 - [Coding Conventions](https://about:blank) - How we expect to see code formatted
 - [Naming Conventions](https://about:blank) - How Issues, Branches, and PRs should be named
 - [Certified vs Standard App](https://about:blank) definitions and differences
@@ -31,11 +29,11 @@ To successfully contribute, you should spend a little time familiarizing yoursel
 ## Notifying us of Issues
 If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the `Issues` section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
 
-![Issues Templates]()
+![Issues Templates](Images/Github-Issue-Templates.png)
 
 All you have to do is fill out the form...
 
-![Bug Report]() 
+![Bug Report](Images/Github-Bug-Template.png) 
 
 ...and it'll get reviewed and priortized by our developers and maybe even someone in our community.
 
