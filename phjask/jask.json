@@ -1,0 +1,76 @@
+{
+    "appid": "6096a528-d8e1-41cc-94ef-53796b6c74ba",
+    "name": "JASK",
+    "description": "This app implements ingest action for fetching alerts on JASK ASOC Platform",
+    "type": "siem",
+    "product_vendor": "JASK",
+    "logo": "logo_jask.svg",
+    "logo_dark": "logo_jask_dark.svg",
+    "product_name": "ASOC Platform",
+    "product_version_regex": ".*",
+    "publisher": "JASK Labs Inc",
+    "license": "Copyright JASK Labs Inc 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2018-02-09T21:47:15.372732Z",
+    "package_name": "phantom_jask",
+    "main_module": "jask_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_user": {
+            "description": "API Username",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "description": "User API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "login_url": {
+            "description": "Login URL",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
