@@ -33,7 +33,7 @@ Of course before you do this, you should definitely check if there is already an
 ---
 
 ## Contributing
-If you would like to contribute to our Apps directly, please have a look at our [Contribution Guide](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONTRIBUTING.md)
+If you would like to contribute to our Apps directly, please have a look at our [Contribution Guide](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CONTRIBUTING.md)
 
 ---
 

@@ -26,19 +26,6 @@ To successfully contribute, you should spend a little time familiarizing yoursel
 - [Typical developer workflow](https://about:blank) - Configuring your dev environment
 - [Testing Details](https://about:blank) - How we test apps & playbooks
 
-## Notifying us of Issues
-If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the `Issues` section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
-
-![Issues Templates](Images/Github-Issue-Templates.png)
-
-All you have to do is fill out the form...
-
-![Bug Report](Images/Github-Bug-Template.png) 
-
-...and it'll get reviewed and priortized by our developers and maybe even someone in our community.
-
-Of course before you do this, you should definitely check if there is already an open issue and if so, add a thumbs-up reaction to it so we can get a sense of how to prioritize it.
-
 
 ## Contributing Bug-fixes
 If you've found a bug and wish to fix it, the first thing to do is 
