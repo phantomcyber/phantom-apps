@@ -20,11 +20,10 @@ Make sure you have a [GitHub Account](https://www.github.com)
 ## Project Details
 To successfully contribute, you should spend a little time familiarizing yourself with the following key topics.
 
-- [Coding Conventions](https://about:blank) - How we expect to see code formatted
-- [Naming Conventions](https://about:blank) - How Issues, Branches, and PRs should be named
-- [Certified vs Standard App](https://about:blank) definitions and differences
-- [Typical developer workflow](https://about:blank) - Configuring your dev environment
-- [Testing Details](https://about:blank) - How we test apps & playbooks
+- [Coding & Naming Conventions](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CODING_CONVENTIONS.md) - How we expect to see code formatted
+- [Certified vs Standard App](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CERTIFIED_V_UNCERTIFIED.md) definitions and differences
+- [Typical developer workflow](https://github.com/phantomcyber/phantom-apps/blob/master/.github/DEV_WORKFLOW.md) - Configuring your dev environment
+- [Testing Details](https://github.com/phantomcyber/phantom-apps/blob/master/.github/TESTING.md) - How we test apps & playbooks
 
 
 ## Contributing Bug-fixes
@@ -32,7 +31,7 @@ If you've found a bug and wish to fix it, the first thing to do is
 
 1. If one does not already exist, create an Issue (otherwise we'll use the existing one)
 1. [Fork](https://guides.github.com/activities/forking/) the project
-1. Create a branch for the issue (following our [Naming Conventions](https://(about:blank)))
+1. Create a branch for the issue (following our [Naming Conventions](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CODING_CONVENTIONS.md)
 1. Make your changes on your branch
 1. Thoroughly test your changes
 1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch. 
