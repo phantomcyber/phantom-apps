@@ -1,0 +1,635 @@
+{
+    "appid": "8e235e70-57eb-4292-9b7c-6cc44847d837",
+    "name": "Sumo Logic",
+    "description": "This app integrates with the Sumo Logic cloud platform to implement investigative actions",
+    "publisher": "Splunk",
+    "type": "siem",
+    "main_module": "sumologic_connector.pyc",
+    "app_version": "2.0.13",
+    "utctime_updated": "2019-03-21T16:56:50.000000Z",
+    "package_name": "phantom_sumologic",
+    "product_name": "Sumo Logic",
+    "product_vendor": "Sumo Logic",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.0.1068",
+    "logo": "logo_sumologic.svg",
+    "logo_dark": "logo_sumologic_dark.svg",
+    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "sumologic",
+                "input_file": "wheels/sumologic_sdk-0.1.7-py2-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "environment": {
+            "description": "Environment Pod",
+            "data_type": "string",
+            "order": 0,
+            "required": true,
+            "value_list": [
+                "us1",
+                "us2",
+                "eu",
+                "au"
+            ]
+        },
+        "access_id": {
+            "description": "Access ID",
+            "data_type": "string",
+            "order": 1,
+            "required": true
+        },
+        "access_key": {
+            "description": "Access Key",
+            "data_type": "password",
+            "order": 2,
+            "required": true
+        },
+        "timezone": {
+            "description": "Sumo Logic Timezone",
+            "data_type": "timezone",
+            "order": 3,
+            "required": true
+        },
+        "delete_job_when_finished": {
+            "description": "Delete search job when finished",
+            "data_type": "boolean",
+            "order": 4,
+            "default": false,
+            "required": false
+        },
+        "max_messages": {
+            "description": "Max messages to poll for",
+            "data_type": "numeric",
+            "order": 5,
+            "required": false
+        },
+        "on_poll_query": {
+            "description": "Query to use during polling",
+            "data_type": "string",
+            "order": 6,
+            "default": "*",
+            "required": false
+        },
+        "type": {
+            "description": "Poll for messages or records",
+            "data_type": "string",
+            "order": 7,
+            "required": false,
+            "default": "messages",
+            "value_list": [
+                "messages",
+                "records"
+            ]
+        },
+        "message_parser": {
+            "description": "Python file containing a message parsing method",
+            "data_type": "file",
+            "order": 8,
+            "required": false
+        },
+        "first_run_previous_days": {
+            "description": "Start polling from this many days back (minimum 1 day)",
+            "data_type": "numeric",
+            "order": 9,
+            "required": false,
+            "default": 5
+        },
+        "search_by_receipt_time": {
+            "description": "set byReceiptTime flag when creating search job",
+            "data_type": "boolean",
+            "order": 10,
+            "default": false,
+            "required": false
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "validate the asset configuration for connectivity",
+            "verbose": "This action uses the unique access ID and access key to send a request to the Sumo Logic API to retrieve a single collector.",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Run a query on Sumo Logic and ingest the results",
+            "verbose": "This will run a search for logs that have occurred since the end of the scheduled poll. Since there is a limit of 10,000 messages, if there would be more than 10,000 results in the specified job search, the oldest ones will be discarded.<br>When running <b>POLL NOW</b>, it will run from the time of the last scheduled poll, but will not change which messages the next scheduled poll will receive.</br></br>In order to use this action, a parser method should be provided as a Python file, since almost every log will be different. Provided below is a file which will be used as a fallback and can also serve as starting point. In order to properly work, the provided file needs a few things.<ul><li>There must be a function named <b>message_parser</b></li><li>It must accept two parameters<ul><li>A response, which will be returned by the endpoints to either get messages or records from a search job (more info <a href=\"https://help.sumologic.com/APIs/About-the-Search-Job-API\">here</a>)</li><li>The query string, which will be the same one from the asset config</li></ul></li><li>It must return a list of dictionaries. Each dictionary will have a container and a list of artifacts to add to that container. These should match the JSON objects that a POST to <b>/rest/container</b> and <b>/rest/artifact</b> expect</li></ul><br><a href=\"/app_resource/sumologic_8e235e70-57eb-4292-9b7c-6cc44847d837/sumologic_parser.py\">Here is the (default) aforementioned parser file</a>.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of messages to check",
+                    "required": false,
+                    "default": 100
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get results",
+            "description": "Retrieves the result of a search job",
+            "verbose": "<p>This action takes a Search Job ID as its primary parameter.</p><p>This is useful if the search job times out in run query.  It is not, however, guaranteed to return if the Search Job had already finished - once a Search Job has been completed, the Sumo Logic platform deletes the Search Job after an unknown amount of time, resulting in the action failing even though the search job ID may be correct.</p>",
+            "type": "investigate",
+            "identifier": "get_results",
+            "read_only": true,
+            "parameters": {
+                "search_id": {
+                    "description": "Search id",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "search id"
+                    ],
+                    "example_values": [
+                        "177C7C195542A613"
+                    ]
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Results",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.search_id",
+                    "data_type": "string",
+                    "contains": [
+                        "search id"
+                    ],
+                    "example_values": [
+                        "177C7C195542A613"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.fieldType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.keyField",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._blockid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._collector",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._collectorid",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Collector ID"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._format",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messagecount",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messageid",
+                    "data_type": "string",
+                    "column_order": 5,
+                    "column_name": "Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messagetime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._receipttime",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "Receipt Time"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._source",
+                    "data_type": "string",
+                    "column_order": 6,
+                    "column_name": "Source"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcecategory",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Source"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcehost",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourceid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcename",
+                    "data_type": "string",
+                    "column_order": 4,
+                    "column_name": "Source Name"
+                },
+                {
+                    "data_path": "action_result.summary.search_id",
+                    "data_type": "string",
+                    "contains": [
+                        "search id"
+                    ],
+                    "example_values": [
+                        "177C7C195542A613"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "Runs a search query on the Sumo Logic platform",
+            "verbose": "<p>Run Query takes advantage of the Search Job API.</p><p><b>PLEASE NOTE:</b>  If you do not have an Enterprise license with Sumo Logic, the Search Job API is not available to you.  This action will only work if the accessId and the accessKey are associated with an Enterprise-level account.</p><p><b>Run Query</b> takes five different parameters.  Some notes:</p><ul><li><b>query</b> - text does not have to be escaped.</li><li><b>from_time</b> - Must be UNIX timestamp.  Default value is five days ago.</li><li><b>to_time</b> - Must be UNIX timestamp.  Default value is the current time.</li><li><b>limit</b> - Limiting the messages can be ideal if the query returns a large amount.  The default limit is 100.</li><li><b>type</b> - Either <i>messages</i> or an aggregate <i>record</i>.  Record will be significantly smaller.  If none is specified, it will default to <i>messages</i>.</li></ul><p>The Search Job API is asynchronous and requires polling.  The <b>run query</b> action will poll for up to 60 seconds.</p><ul><li>If the query finishes before the time limit, the action will succeed and the data will be added to the action result.</li><li>If the query does not finish before the time limit, the action will still succeed - but the search job ID (action_result.summary.search_id) will be added to the summary.  This Search Job ID can then be used in <b>get results</b>.</li></ul>",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Query to run",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sumo logic query"
+                    ]
+                },
+                "from_time": {
+                    "description": "UNIX start time for search",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "required": false,
+                    "primary": false
+                },
+                "to_time": {
+                    "description": "UNIX end time for search",
+                    "data_type": "numeric",
+                    "order": 3,
+                    "required": false,
+                    "primary": false
+                },
+                "limit": {
+                    "description": "Upper limit of message response results",
+                    "data_type": "numeric",
+                    "order": 4,
+                    "required": false,
+                    "primary": false,
+                    "default": 100
+                },
+                "type": {
+                    "description": "Type of response to receive",
+                    "data_type": "string",
+                    "order": 5,
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "messages",
+                        "records"
+                    ],
+                    "default": "messages"
+                }
+            },
+            "render": {
+                "type": "json",
+                "width": 12,
+                "height": 5,
+                "title": "Search Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from_time",
+                    "data_type": "string",
+                    "example_values": [
+                        1545301292
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "contains": [
+                        "sumo logic query"
+                    ],
+                    "example_values": [
+                        "_sourceCategory=\"uploads/linux/system\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to_time",
+                    "data_type": "string",
+                    "example_values": [
+                        1545819692
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "messages"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.fieldType",
+                    "data_type": "string",
+                    "example_values": [
+                        "long"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.keyField",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "_blockid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._blockid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._collector",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "Collector"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._collectorid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._format",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messagecount",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messageid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._messagetime",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Message Time (MS)"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._raw",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "Raw"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._receipttime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._size",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Size"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._source",
+                    "data_type": "string",
+                    "column_order": 4,
+                    "column_name": "Source"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcecategory",
+                    "data_type": "string",
+                    "column_order": 5,
+                    "column_name": "Source Category"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcehost",
+                    "data_type": "string",
+                    "column_order": 6,
+                    "column_name": "Source Host",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourceid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messages.*.map._sourcename",
+                    "data_type": "string",
+                    "column_order": 7,
+                    "column_name": "Source Name"
+                },
+                {
+                    "data_path": "action_result.summary.search_id",
+                    "data_type": "string",
+                    "contains": [
+                        "search id"
+                    ],
+                    "example_values": [
+                        "177C7C195542A613"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total objects: 0, Search id: 177C7C195542A613"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete job",
+            "description": "delete a search job",
+            "verbose": "<p>This action takes a Search Job ID as its primary parameter.</p><p>This action deletes any existing Search Job. The Sumo Logic platform deletes the Search Job after an unknown amount of time, resulting in the action failing even though the search job ID may be correct.</p>",
+            "type": "generic",
+            "identifier": "delete_job",
+            "read_only": false,
+            "parameters": {
+                "search_id": {
+                    "description": "Search id",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "search id"
+                    ]
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Delete Job",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary.search_id",
+                    "data_type": "string",
+                    "contains": [
+                        "search id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.search_id",
+                    "data_type": "string",
+                    "contains": [
+                        "search id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.search_id",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
