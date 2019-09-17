@@ -1,0 +1,530 @@
+{
+    "appid": "fd4d574e-541b-4661-82d6-5e01ecfa8332",
+    "name": "ipinfo.io",
+    "description": "Uses ipinfo.io to lookup IP addresses and Autonomous System Numbers",
+    "type": "information",
+    "product_vendor": "ipinfo.io",
+    "logo": "ipinfo.svg",
+    "logo_dark": "ipinfo_dark.svg",
+    "product_name": "ipinfo.io",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
+    "app_version": "1.0.3",
+    "utctime_updated": "2018-12-07T01:42:05.000000Z",
+    "package_name": "phantom_ipinfo",
+    "main_module": "ipinfo_connector.pyc",
+    "min_phantom_version": "3.0.284",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "token": {
+            "description": "IPInfo API token",
+            "data_type": "password",
+            "required": false,
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Lookup the details of an IP address",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "map_info": "IP Address"
+                },
+                {
+                    "data_path": "action_result.data.*.asn.asn",
+                    "data_type": "string",
+                    "contains": [
+                        "asn"
+                    ],
+                    "example_values": [
+                        "AS15169"
+                    ],
+                    "map_info": "ASN"
+                },
+                {
+                    "data_path": "action_result.data.*.asn.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "google.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "hosting"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.carrier.mcc",
+                    "data_type": "string",
+                    "example_values": [
+                        "310"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.carrier.mnc",
+                    "data_type": "string",
+                    "example_values": [
+                        "150"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.carrier.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AT&T"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.company.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "google.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ],
+                    "map_info": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.company.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google LLC"
+                    ],
+                    "map_info": "Company"
+                },
+                {
+                    "data_path": "action_result.data.*.company.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "hosting"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ],
+                    "map_info": "Country"
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "google-public-dns-a.google.com"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "map_info": "name"
+                },
+                {
+                    "data_path": "action_result.data.*.loc.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "37.3860"
+                    ],
+                    "map_info": "latitude"
+                },
+                {
+                    "data_path": "action_result.data.*.loc.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-122.0840"
+                    ],
+                    "map_info": "longitude"
+                },
+                {
+                    "data_path": "action_result.data.*.phone",
+                    "data_type": "string",
+                    "example_values": [
+                        "650"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.postal",
+                    "data_type": "string",
+                    "example_values": [
+                        "94035"
+                    ],
+                    "map_info": "Postal"
+                },
+                {
+                    "data_path": "action_result.data.*.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "California"
+                    ],
+                    "map_info": "Region"
+                },
+                {
+                    "data_path": "action_result.summary.carrier_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AT&T"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.company_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "google.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.company_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.company_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "hosting"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "California"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Company type: hosting, Company domain: google.com, Company name: Google LLC"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "map"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup asn",
+            "identifier": "lookup_asn",
+            "description": "Lookup the details of an Autonomous System Number",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "asn": {
+                    "description": "ASN to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "asn"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.asn",
+                    "data_type": "string",
+                    "contains": [
+                        "asn"
+                    ],
+                    "example_values": [
+                        "AS7922"
+                    ],
+                    "column_name": "ASN",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.allocated",
+                    "data_type": "string",
+                    "example_values": [
+                        "1997-02-14"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string",
+                    "contains": [
+                        "asn"
+                    ],
+                    "example_values": [
+                        "AS7922"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ],
+                    "column_name": "Country",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "comcast.net"
+                    ],
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Comcast Cable Communications, LLC"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.num_ips",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71211264
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "AKAMAI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Akamai Technologies, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes.*.netblock",
+                    "data_type": "string",
+                    "example_values": [
+                        "104.109.53.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMCAST6NET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Comcast Cable Communications, LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prefixes6.*.netblock",
+                    "data_type": "string",
+                    "example_values": [
+                        "2001:558::/29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registry",
+                    "data_type": "string",
+                    "example_values": [
+                        "arin"
+                    ],
+                    "column_name": "Registry",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Comcast Cable Communications, LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_ips",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71211264
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num ips: 71211264, Name: Comcast Cable Communications, LLC"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
