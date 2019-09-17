@@ -1,0 +1,594 @@
+{
+    "appid": "547cf94d-0e3f-4789-acfa-b563e55732cb",
+    "name": "Symantec ATP",
+    "description": "This app integrates with a Symantec ATP (Advanced Threat Protection) device to implement ingestion, investigative and containment actions",
+    "publisher": "Splunk",
+    "package_name": "phantom_symantecatp",
+    "type": "endpoint",
+    "license": "Copyright (c) 2017-2019 Splunk Inc.",
+    "main_module": "symantecatp_connector.pyc",
+    "app_version": "1.0.11",
+    "utctime_updated": "2019-03-25T22:18:10.000000Z",
+    "product_vendor": "Symantec",
+    "product_name": "Symantec ATP",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.0.1068",
+    "logo": "logo_symantec.svg",
+    "logo_dark": "logo_symantec_dark.svg",
+    "configuration": {
+        "server": {
+            "required": true,
+            "description": "URL",
+            "data_type": "string",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "default": false,
+            "required": true,
+            "order": 1,
+            "description": "Verify server certificate",
+            "data_type": "boolean"
+        },
+        "client_id": {
+            "required": true,
+            "order": 2,
+            "data_type": "string",
+            "description": "OAuth client ID"
+        },
+        "client_secret": {
+            "required": true,
+            "order": 3,
+            "data_type": "password",
+            "description": "OAuth client secret key"
+        },
+        "first_scheduled_ingestion_span": {
+            "default": 10,
+            "required": false,
+            "order": 6,
+            "data_type": "numeric",
+            "description": "Limit last n days for first scheduled polling"
+        },
+        "first_scheduled_ingestion_limit": {
+            "default": 20,
+            "required": false,
+            "order": 5,
+            "data_type": "numeric",
+            "description": "Limit last n incidents for first scheduled polling"
+        },
+        "poll_now_ingestion_span": {
+            "default": 10,
+            "required": false,
+            "order": 4,
+            "data_type": "numeric",
+            "description": "Limit last n days for 'Poll Now'"
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate credentials provided for connectivity",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "type": "ingest",
+            "read_only": true,
+            "description": "Ingest incidents",
+            "verbose": "For the first poll, ingest all the atp incidents during past number of days set in <b>first_scheduled_ingestion_span</b>, not more than the limit set in <b>first_scheduled_ingestion_limit</b>. Subsequent polls ingest new or updated incidents. The incidents are sorted in descending order based on the priority and updated time.<table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>externalAddress, internalAddress, deviceAddress, destinationAddress, sourcefileAddress, dataSourceIPAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha256, fileName</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>sourceDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>dataSourceURL, intrusionURL</td></tr><tr><td>Endpoint</td><td>Endpoint Artifact</td><td>deviceUid</td></tr><tr><td>Email</td><td>Email Artifact</td><td>sourceEmailAddress, sourceAddress, receiverAddress</td></tbody></table>",
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of containers to ingest",
+                    "data_type": "numeric"
+                },
+                "container_id": {
+                    "description": "Comma (',') separated container IDs",
+                    "data_type": "string",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "required": false
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 3,
+                    "required": false
+                }
+            },
+            "versions": "EQ(*)",
+            "output": []
+        },
+        {
+            "action": "delete file",
+            "description": "Delete a file from an endpoint",
+            "type": "contain",
+            "identifier": "delete_file",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "verbose": "This action supports deleting multiple files on the endpoint. If any of the hash does not belong to the device_uid, the action would fail.",
+            "parameters": {
+                "hash": {
+                    "required": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "description": "Comma separated (',') SHA256 of the files",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true
+                },
+                "device_uid": {
+                    "required": true,
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ],
+                    "description": "Device UID",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 5,
+                "view": "symantecatp_view.display_targets",
+                "title": "Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "quarantine device",
+            "description": "Quarantine an endpoint",
+            "type": "contain",
+            "identifier": "quarantine_endpoint",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "verbose": "This action may take time to isolate the endpoint. To check status of action, execute <b>get status</b> using the resulting <b>command_id</b>.",
+            "parameters": {
+                "targets": {
+                    "required": true,
+                    "data_type": "string",
+                    "description": "Comma (',') separated targets to isolate",
+                    "order": 0,
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ],
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 5,
+                "view": "symantecatp_view.display_targets",
+                "title": "Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.targets",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "unquarantine device",
+            "description": "Unquarantine an endpoint",
+            "type": "correct",
+            "identifier": "unquarantine_endpoint",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "verbose": "This action may take time to rejoin the endpoint. To check status of action, execute <b>get status</b> using the resulting <b>command_id</b>.",
+            "parameters": {
+                "targets": {
+                    "required": true,
+                    "description": "Comma (',') separated targets to rejoin",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ],
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 5,
+                "view": "symantecatp_view.display_targets",
+                "title": "Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.targets",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "check status",
+            "description": "Check the status of an action",
+            "type": "investigate",
+            "identifier": "check_status",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "parameters": {
+                "command_id": {
+                    "required": true,
+                    "contains": [
+                        "symantecatp command id"
+                    ],
+                    "description": "Command ID of action",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 5,
+                "view": "symantecatp_view.display_report",
+                "title": "Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status.*.state",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status.*.target",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp target endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status.*.error_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecatp command id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.target_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "hunt file",
+            "description": "Retrieve information about a file",
+            "type": "investigate",
+            "identifier": "hunt_file",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "parameters": {
+                "hash": {
+                    "description": "Hash of file (MD5 or SHA256)",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "hash"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "f618862c3754c54581b0db78cb46c788a27104422cf42c7981849d18a96f9d64"
+                    ],
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.file_age",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.file_health",
+                    "data_type": "numeric",
+                    "column_name": "Health",
+                    "column_order": 4,
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.file_instances.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "d2.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 1,
+                    "example_values": [
+                        "1d5731cbee22dbad79ae45ea378ffef9"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.mime_type",
+                    "data_type": "string",
+                    "column_name": "Mime Type",
+                    "column_order": 2,
+                    "example_values": [
+                        "application/x-dosexec"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.prevalence_band",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.reputation_band",
+                    "data_type": "numeric",
+                    "column_name": "Reputation",
+                    "column_order": 3,
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.sha2",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 0,
+                    "example_values": [
+                        "f618862c3754c54581b0db78cb46c788a27104422cf42c7981849d18a96f9d64"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.targeted_attack",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_list.*.threat_name",
+                    "data_type": "string",
+                    "column_name": "Threat",
+                    "column_order": 5,
+                    "example_values": [
+                        "W32.Golroted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.files_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Files found: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        }
+    ]
+}
