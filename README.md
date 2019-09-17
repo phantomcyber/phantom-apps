@@ -18,7 +18,7 @@ If you'd like to join our community chat, head over to [https://my.phantom.us](h
 ---
 
 ## Reporting Issues
-If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the `Issues` section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
+If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the [Issues](https://github.com/phantomcyber/phantom-apps/issues) section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
 
 ![Issues Templates](.github/Images/Github-Issue-Templates.png)
 
