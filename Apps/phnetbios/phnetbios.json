@@ -1,0 +1,115 @@
+{
+    "appid": "146f07fb-3862-4736-b28d-77204b57234c",
+    "name": "NetBIOS",
+    "publisher": "Phantom",
+    "description": "This app implements various investigative actions using the NetBIOS protocol",
+    "type": "endpoint",
+    "main_module": "phnetbios_connector.pyc",
+    "app_version": "1.0.12",
+    "utctime_updated": "2019-01-24T21:51:17.000000Z",
+    "package_name": "phantom_netbios",
+    "product_vendor": "Generic",
+    "product_name": "NetBIOS",
+    "logo": "logo_phantom.svg",
+    "logo_dark": "logo_phantom_dark.svg",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.251",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
+    "configuration": {
+        "ip": {
+            "description": "IP to Lookup (for TEST CONNECTIVITY)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        }
+    },
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "pysmb",
+                "input_file": "wheels/pysmb-1.1.22.zip"
+            },
+            {
+                "module": "pyasn1",
+                "input_file": "wheels/pyasn1-0.3.7-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "This action runs a lookup ip action to test connection",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "description": "Attempts a lookup of the hostname for the provided IP",
+            "type": "investigate",
+            "identifier": "lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "IP to resolve",
+                    "contains": [
+                        "ip"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "port": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Port number",
+                    "required": false
+                },
+                "timeout": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "Seconds before timeout (Default: 30)",
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.hostnames.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
