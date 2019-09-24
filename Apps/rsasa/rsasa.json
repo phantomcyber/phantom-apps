@@ -1,0 +1,1018 @@
+{
+    "appid": "0bea98e9-a480-4638-923d-67aecb612e4f",
+    "name": "RSA Security Analytics",
+    "description": "This App supports ingestion and investigative actions on RSA Security Analytics",
+    "publisher": "Phantom",
+    "package_name": "phantom_rsasa",
+    "type": "siem",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2017-2018",
+    "main_module": "rsasa_connector.pyc",
+    "app_version": "1.0.36",
+    "utctime_updated": "2019-01-24T21:21:06.000000Z",
+    "product_vendor": "RSA",
+    "product_name": "RSA Security Analytics",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.190",
+    "logo": "logo_rsa.svg",
+    "logo_dark": "logo_rsa_dark.svg",
+    "configuration": {
+        "url": {
+            "required": true,
+            "description": "URL",
+            "data_type": "string",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
+            "required": false,
+            "order": 1,
+            "default": false
+        },
+        "username": {
+            "required": true,
+            "description": "Username",
+            "data_type": "string",
+            "order": 2
+        },
+        "password": {
+            "required": true,
+            "description": "Password",
+            "data_type": "password",
+            "order": 3
+        },
+        "poll_now_ingestion_span": {
+            "default": 15,
+            "required": true,
+            "data_type": "numeric",
+            "description": "Poll last n days for 'Poll Now'",
+            "order": 4
+        },
+        "first_scheduled_ingestion_span": {
+            "default": 10,
+            "required": true,
+            "data_type": "numeric",
+            "description": "Poll last n days for first scheduled polling",
+            "order": 5
+        },
+        "max_incidents": {
+            "default": 100,
+            "required": true,
+            "data_type": "numeric",
+            "description": "Maximum number of incidents to ingest for scheduled polling",
+            "order": 7
+        },
+        "incident_manager": {
+            "required": true,
+            "description": "Name of Incident Manager",
+            "data_type": "string",
+            "order": 6
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the credentials provided for connectivity",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Ingest incidents from RSA Security Analytics",
+            "verbose": "Basic configuration parameters for this action are available in asset configuration.<br><br>The app ingests incidents in ascending order by create time. Therefore, each polling interval, if <b>max_incidents</b> is set to <b>n</b>, the app will return the next <b>n</b> created incidents.<br><br>The <b>poll_now_ingestion_span</b> parameter dictates how far back, in days, the app will search to ingest incidents when running a poll now.<br><br>The <b>first_scheduled_ingestion_span</b> parameter decides how far back, in days, the app will search to ingest incidents during the first polling interval. The app will ingest incidents starting with the beginning of this span.<br><br>The <b>incident_manager</b> parameter is required for ingestion.<br><br>During ingestion, a container is created for each incident. In each container, an artifact is created for each alert and each event associated with the incident.<br><br>For each container, the source ID will be set to the incident ID. All data retrieved from RSA Security Analytics will be saved in the data section of the container.<br><br>For each artifact created for an alert, the source ID will be set to the alert ID. These artifacts will contain the following CEF fields (as well as others):<ul><li>incidentId</li><li>alertId</li><li>name</li><li>numEvents</li><li>events</li><li>partOfIncident</li><li>risk_score</li><li>severity</li></ul><br>For each artifact created for an event, the source ID will be set to the session ID that the event resulted from. These artifacts will contain the following CEF fields (as well as others):<ul><li>sessionId</li><li>type</li></ul>",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter ignored in this app"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of incidents to ingest during poll now",
+                    "required": false,
+                    "default": 10
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "restart service",
+            "description": "DEPRECATED",
+            "verbose": "Please use the NetWitness Logs and Packets 'restart device' action instead.",
+            "type": "generic",
+            "identifier": "restart_service",
+            "read_only": false,
+            "deprecated": true,
+            "parameters": {
+                "device": {
+                    "required": true,
+                    "primary": true,
+                    "description": "Device ID/Name",
+                    "data_type": "string",
+                    "contains": [
+                        "rsa sa device"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.device",
+                    "data_type": "string",
+                    "contains": [
+                        "rsa sa device"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list incidents",
+            "description": "List incidents within a time frame",
+            "verbose": "If <b>start_time</b> is not specified, the app will use the epoch.<br><br>If <b>end_time</b> is not specified, the app will use the current time.<br><br>The app searches in descending order by create time. Therefore if <b>limit</b> is set to <b>n</b>, the app will return the <b>n</b> most recently created incidents. If the <b>limit</b> parameter is left unspecified, it will default to 100.",
+            "type": "investigate",
+            "identifier": "list_incidents",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "required": false,
+                    "description": "Start time in format YYYY-MM-DD HH:MM:SS (UTC)",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "end_time": {
+                    "required": false,
+                    "description": "End time in format YYYY-MM-DD HH:MM:SS (UTC)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Maximum number of incidents to list",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Incidents",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "Incident ID",
+                    "column_order": 0,
+                    "contains": [
+                        "rsa incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.sources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.assignee.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.assignee.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.assignee.login",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.assignee.emailAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.riskScore",
+                    "data_type": "numeric",
+                    "column_name": "Risk Score",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.alertCount",
+                    "data_type": "numeric",
+                    "column_name": "Alert Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.lastUpdated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.firstAlertTime",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.breachExportStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.hasRemediationTasks",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.*.averageAlertRiskScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.lastUpdatedByUserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.openRemediationTaskCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.totalRemediationTaskCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.author",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.milestone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.notes.*.lastUpdated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_incidents",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "description": "List alerts for an incident",
+            "verbose": "The app searches in descending order by create time. Therefore if <b>limit</b> is set to <b>n</b>, the app will return the <b>n</b> most recently created alerts. If the <b>limit</b> parameter is left unspecified, it will default to 100.",
+            "type": "investigate",
+            "identifier": "list_alerts",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "required": false,
+                    "primary": true,
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "rsa incident id"
+                    ]
+                },
+                "limit": {
+                    "required": false,
+                    "default": 100,
+                    "description": "Maximum number of alerts to list",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Alerts",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "Alert ID",
+                    "column_order": 0,
+                    "contains": [
+                        "rsa alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.numEvents",
+                    "data_type": "numeric",
+                    "column_name": "Number of Events",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.timestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.incidentId",
+                    "data_type": "string",
+                    "contains": [
+                        "rsa incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.risk_score",
+                    "data_type": "numeric",
+                    "column_name": "Risk Score",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.host_summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.signature_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.user_summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.related_links.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.related_links.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.partOfIncident",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_data_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_source_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination_country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_detector_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_destination_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_source_country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_source_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_destination_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupby_destination_country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_alerts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rsa incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list events",
+            "description": "List events for an alert",
+            "verbose": "The app searches in descending order by create time. Therefore if <b>limit</b> is set to <b>n</b>, the app will return the <b>n</b> most recently created alerts. If the <b>limit</b> parameter is left unspecified, it will default to 100.",
+            "type": "investigate",
+            "identifier": "list_events",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "primary": true,
+                    "description": "Alert ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "rsa alert id"
+                    ]
+                },
+                "limit": {
+                    "required": false,
+                    "default": 100,
+                    "description": "Maximum number of events to list",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Events",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "Session ID",
+                    "column_order": 0,
+                    "contains": [
+                        "netwitness session ids"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.to",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.data.*.hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.data.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.data.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.from",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.user.username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.user.ad_domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.user.ad_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.user.email_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.facility",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.asset_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.ip_address",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.criticality",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.geolocation.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.geolocation.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.geolocation.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.geolocation.organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.mac_address",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.netbios_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.business_unit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.source.device.compliance_rating",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.detector.ip_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.detector.device_class",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.detector.product_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.enrichment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.user.username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.user.ad_domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.user.ad_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.user.email_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.facility",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.asset_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.ip_address",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.criticality",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.latitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.longitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.geolocation.organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.mac_address",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.netbios_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.business_unit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.destination.device.compliance_rating",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.detected_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.related_links.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.related_links.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_events",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rsa alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list devices",
+            "description": "List devices connected to RSA Security Analytics",
+            "type": "investigate",
+            "identifier": "list_devices",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "width": 12,
+                "title": "List Alerts",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Device ID",
+                    "column_order": 1,
+                    "contains": [
+                        "rsa sa device"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.host",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.baseType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.licensed",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.*.username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.enableSSL",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.*.validated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.deviceType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.displayName",
+                    "data_type": "string",
+                    "column_name": "Device Name",
+                    "column_order": 0,
+                    "contains": [
+                        "rsa sa device"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.displayType",
+                    "data_type": "string",
+                    "column_name": "Device Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.deviceFamily",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.deviceVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.systemUpdateStatusDesc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.systemUpdatesStatusFeedback",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_devices",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
