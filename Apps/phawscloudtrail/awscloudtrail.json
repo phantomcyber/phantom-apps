@@ -1,0 +1,1298 @@
+{
+    "appid": "53b09b9e-143b-4dd3-8fac-03abeabaa835",
+    "name": "AWS CloudTrail",
+    "description": "This app integrates with AWS CloudTrail to perform various investigative actions",
+    "type": "generic",
+    "product_vendor": "AWS",
+    "logo": "logo_awscloudtrail.svg",
+    "logo_dark": "logo_awscloudtrail_dark.svg",
+    "product_name": "CloudTrail",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2019-07-31T20:11:04.000000Z",
+    "package_name": "phantom_awscloudtrail",
+    "main_module": "awscloudtrail_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "Access Key": {
+            "description": "AWS Access Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "Secret Key": {
+            "description": "AWS Secret Key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "Region": {
+            "description": "AWS Region",
+            "data_type": "string",
+            "required": true,
+            "value_list": [
+                "US East (Ohio)",
+                "US East (N. Virginia)",
+                "US West (N. California)",
+                "US West (Oregon)",
+                "Asia Pacific (Hong Kong)",
+                "Canada (Central)",
+                "Asia Pacific (Mumbai)",
+                "Asia Pacific (Osaka-Local)",
+                "Asia Pacific (Seoul)",
+                "Asia Pacific (Singapore)",
+                "Asia Pacific (Sydney)",
+                "Asia Pacific (Tokyo)",
+                "China (Beijing)",
+                "China (Ningxia)",
+                "EU (Frankfurt)",
+                "EU (Stockholm)",
+                "EU (Ireland)",
+                "EU (London)",
+                "EU (Paris)",
+                "Middle East (Bahrain)",
+                "AWS GovCloud (US-East)",
+                "AWS GovCloud (US-West)",
+                "South America (S\u00e3o Paulo)"
+            ],
+            "order": 2
+        }
+    },
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "futures",
+                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
+            },
+            {
+                "module": "docutils",
+                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "describe trails",
+            "identifier": "describe_trails",
+            "description": "Retrieve settings for trails associated with the current region and the multi-region trails",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "include_shadow_trails": {
+                    "description": "Inform command to include shadow trails",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.include_shadow_trails",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.HasCustomEventSelectors",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.HomeRegion",
+                    "data_type": "string",
+                    "column_name": "Home Region",
+                    "column_order": 3,
+                    "example_values": [
+                        "us-east-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IncludeGlobalServiceEvents",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IsMultiRegionTrail",
+                    "data_type": "boolean",
+                    "column_name": "Is Multi Region",
+                    "column_order": 1,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IsOrganizationTrail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LogFileValidationEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "column_name": "Trail Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "splunk-cloudtrail-fors3monitoring"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.S3BucketName",
+                    "data_type": "string",
+                    "column_name": "S3 Bucket",
+                    "column_order": 2,
+                    "example_values": [
+                        "splunk-test-cloudtrail-fors3monitoring"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SnsTopicARN",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sns:us-west-2:849257271967:test-splunk-aws-addon-sns-notifications"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SnsTopicName",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sns:us-west-2:849257271967:test-splunk-aws-addon-sns-notifications"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.TrailARN",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:cloudtrail:us-east-1:849257271967:trail/splunk-cloudtrail-fors3monitoring"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Received 3 trails"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message: Received 3 trails"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Lookup the management events captured by CloudTrail",
+            "parameters": {
+                "attribute_key": {
+                    "description": "Select an Attribute to query on (or blank)",
+                    "data_type": "string",
+                    "required": false,
+                    "value_list": [
+                        "EventId",
+                        "EventName",
+                        "ReadOnly",
+                        "Username",
+                        "ResourceType",
+                        "ResourceName",
+                        "EventSource",
+                        "AccessKeyId"
+                    ],
+                    "order": 0
+                },
+                "attribute_value": {
+                    "description": "Select the Value by which to search. Note that true/false values must be lower-case",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "start_date": {
+                    "description": "Start date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "end_date": {
+                    "description": "End date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "max_results": {
+                    "description": "Max results to return",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 50,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attribute_key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.attribute_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AccessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASIA4LO5NSKPZOLJOMTH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EventId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1652c189-2fb0-490d-a30c-c9afc10e5f2c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EventName",
+                    "data_type": "string",
+                    "example_values": [
+                        "LookupEvents"
+                    ],
+                    "column_name": "Event Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.EventSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloudtrail.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EventTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-07-30 10:48:04"
+                    ],
+                    "column_name": "Event Time",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.apiVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-02-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.awsRegion",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.errorCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "AccessDenied"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.errorMessage",
+                    "data_type": "string",
+                    "example_values": [
+                        "User: arn:aws:sts::849257271967:assumed-role/genericlambdarole/parseSplunkRegistrationEmailBase64 is not authorized to perform: logs:CreateLogStream on resource: arn:aws:logs:us-east-1:849257271967:log-group:/aws/lambda/parseSplunkRegistrationEmailBase64:log-stream:2019/07/30/[$LATEST]dbe0ed5d1b6e4bf8844eef4b41f74e6b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventID",
+                    "data_type": "string",
+                    "example_values": [
+                        "1652c189-2fb0-490d-a30c-c9afc10e5f2c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventName",
+                    "data_type": "string",
+                    "example_values": [
+                        "LookupEvents"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloudtrail.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-07-30T10:48:04Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AwsApiCall"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.readOnly",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.recipientAccountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestID",
+                    "data_type": "string",
+                    "example_values": [
+                        "a4ff6465-eacd-45cc-9d00-54d156f1046a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.Filters.UpdatedAt.*.End",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-07-30T10:47:25.908919Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.Filters.UpdatedAt.*.Start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-07-30T10:46:25.888382Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.MaxResults",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.agentName",
+                    "data_type": "string",
+                    "example_values": [
+                        "amazon-ssm-agent"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.agentStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.agentVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.3.542.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.computerName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip-172-31-92-126.ec2.internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.defaultOnly",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.encryptionContext.aws:lambda:FunctionArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:lambda:us-east-1:849257271967:function:test-test-printoutput3-LambdaImportAssets-F2X87UKSD8EW"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.endTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 30, 2019 10:32:45 AM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.environmentId",
+                    "data_type": "string",
+                    "example_values": [
+                        "e-ef2b3m54ec"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.externalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "qrmVcjiYGE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.fileSystemId",
+                    "data_type": "string",
+                    "example_values": [
+                        "fs-5ca579bf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.iPAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.92.126"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.instanceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0ea1454477403286d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.lookupAttributes.*.attributeKey",
+                    "data_type": "string",
+                    "example_values": [
+                        "ReadOnly"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.lookupAttributes.*.attributeValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.marker",
+                    "data_type": "string",
+                    "example_values": [
+                        "lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZkGsDz1LI7e+TWIc3wm1hIW/c4h0kdS55OYMM4o/jpTjHbLNqsrBsgR/ee2eXoJp0e6ORRUuOVOaR5nxZmGTGQADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5Qvo3bzKGVTASYpusBX+bSTmSHOiGxLITL+mvpL/sXfkK+8MMwtRyKS4b64do4cE7mPFzUUluuj8W69Cm74OK1NgiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWcWzbQhxtGas3WJ8MmCebU1auV7TUkBvPVomaBnFP+5l4rh7OjJMy7bcV+dw0TAkgzMHloQ5dXhvm751bUYR7A85kKM4EcBK3HokqBzefLfgRU99q0jOYJVftlPhUGWp+T8EoO4fBXNHqRXmq4aLpzPpQMzMc5vGlkrP7x7GF9emA="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.maxItems",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.maxRecords",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.maxResults",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.mountTargetId",
+                    "data_type": "string",
+                    "example_values": [
+                        "fsmt-32b8e1d3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.networkInterfaceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "eni-09ad7f9cb3ffac70d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.platformName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.platformType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.platformVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.policyArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:policy/redlock-lab-access"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.requestContext.awsAccountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resource",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:lambda:us-east-1:849257271967:function:test_26"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resourceArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:elasticbeanstalk:us-east-1:849257271967:environment/proyer-target-web-workload/ProyerTargetWebWorkload-env"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-kwmt2wtsb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "RedLockReadOnly"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleSessionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "redlock"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.stackName",
+                    "data_type": "string",
+                    "example_values": [
+                        "awseb-e-ef2b3m54ec-stack"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.startTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 30, 2019 10:24:27 AM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.topicArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sns:us-east-1:849257271967:test-cleaningup-code-SNSTopic-DDW8O4QNOPLH"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.versionId",
+                    "data_type": "string",
+                    "example_values": [
+                        "v1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.resources.*.ARN",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.resources.*.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.resources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS::IAM::Role"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.Message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User: arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock is not authorized to perform: eks:ListClusters on resource: arn:aws:eks:us-east-1:849257271967:cluster/*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.assumedRoleUser.arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.assumedRoleUser.assumedRoleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AROAIYE5WYDZKPDJAFLLA:redlock"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.credentials.accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASIA4LO5NSKPZOLJOMTH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.credentials.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 30, 2019 11:47:45 AM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.credentials.sessionToken",
+                    "data_type": "string",
+                    "example_values": [
+                        "AgoJb3JpZ2luX2VjEBMaCXVzLWVhc3QtMSJGMEQCIGmmjSmuKp8Dk8AmEx1yuMYYFSpD7h8tuqJDX0BdawM1AiBOV74zA4lnwD6uo5aj50a6pTmrDDFxsI9Gz7B+wg+96iqXAgiM//////////8BEAAaDDg0OTI1NzI3MTk2NyIMIyw/uI5w04fo9r5LKusB05HceTN5TJRBkLrVOK+yGMXURedACeF1kXJ0rID3FC18eDZg16wFAVWVy4cQ/l77qDKR7HIjFrhaCGMzWWIDZXdv8uDjgq+TDfWOuS02BnnSq6sZ89PFLn32tXnshrEHKomzqqhW+7ObRY+z3OxoMIWw4vCIkJauWmygzXYTn4Evskv8lpf4sTQ6q2FySLQm+U8afbVSJ4wyztmYphwcfHDHNRTz04Q8hr6L4Fk6+xg+gqC9h5cNKqrUV+PW9SZQ+yePFRe7w5viJimsl9C5A6Av5YUMul0gfVtd8/s6JudVLf/GQ0EI72pIDTDRwIDqBTq1AXJX4J9YqaODMiUjBePvsGZdwpvUh0jK/QuSJtj2314Mieo61MxDBzCRnkpGglhRoGyQsBsU39GVowbmyGuh9Ptn5rd5/qWXnjKTfWUXsxoxl2r7tc/j8gIbcmiHFtAM05KUaehB4d5u1m+Yz1jxItWpEi9rBxs4OFxQqPoXrLwGKY8nqunAsTjKF/bgMoj7PBeaLq2b8yhaAiTUUUDrb70Isl0RGE7EQSdSn7fu33OgK+j/Ak8="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.alias",
+                    "data_type": "string",
+                    "example_values": [
+                        "d-90671a8129"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.customerUserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Administrator"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.directoryId",
+                    "data_type": "string",
+                    "example_values": [
+                        "d-90671a8129"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.directoryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "corp.amazonworkspaces.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.directoryType",
+                    "data_type": "string",
+                    "example_values": [
+                        "SIMPLE_AD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.dnsIpAddresses",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.16.1.208"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.iamRoleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:role/workspaces_DefaultRole"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.registrationCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "SLiad+CF835G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "REGISTERED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.subnetIds",
+                    "data_type": "string",
+                    "example_values": [
+                        "subnet-0536482e450ca6918"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.workspaceCreationProperties.enableInternetAccess",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.workspaceCreationProperties.enableWorkDocs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.workspaceCreationProperties.userEnabledAsLocalAdministrator",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.workspaceSecurityGroupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "sg-0c070d01ec8dbb279"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:logical-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "LambdaImportAssets"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:stack-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:cloudformation:us-east-1:849257271967:stack/test-test-18/e3f92bc0-946b-11e9-91eb-0a9ef6cbb06a"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:stack-name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-test-18"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.bundleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "wsb-3t36q0xfc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.computerName",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP-C6137C1F"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.directoryId",
+                    "data_type": "string",
+                    "example_values": [
+                        "d-90671a8129"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.16.1.107"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "STOPPED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.subnetId",
+                    "data_type": "string",
+                    "example_values": [
+                        "subnet-0536482e450ca6918"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.userName",
+                    "data_type": "string",
+                    "example_values": [
+                        "code42"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-kwmt2wtsb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceProperties.computeTypeName",
+                    "data_type": "string",
+                    "example_values": [
+                        "STANDARD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceProperties.rootVolumeSizeGib",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceProperties.runningMode",
+                    "data_type": "string",
+                    "example_values": [
+                        "AUTO_STOP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceProperties.runningModeAutoStopTimeoutInMinutes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        60
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceProperties.userVolumeSizeGib",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.sharedEventID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2d4c5f4f-dbd9-43a1-aa15-07bbf3053ac3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.sourceIPAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "34.199.10.120"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Source IP",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userAgent",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws-sdk-java/1.11.569 Linux/4.14.128-87.105.amzn1.x86_64 Java_HotSpot(TM)_64-Bit_Server_VM/25.202-b08 java/1.8.0_202 groovy/2.4.15 vendor/Oracle_Corporation"
+                    ],
+                    "column_name": "User Agent",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASIA4LO5NSKPZOLJOMTH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.invokedBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "lambda.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AROAIYE5WYDZKPDJAFLLA:redlock"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.attributes.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-07-30T10:47:45Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.attributes.mfaAuthenticated",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                    ],
+                    "contains": [
+                        "aws arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AROAIYE5WYDZKPDJAFLLA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Role"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.userName",
+                    "data_type": "string",
+                    "example_values": [
+                        "RedLockReadOnly"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "AssumedRole"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.userName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@splunk.us"
+                    ],
+                    "contains": [
+                        "email",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ReadOnly",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ResourceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASIA4LO5NSKPZOLJOMTH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ResourceType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS::IAM::AccessKey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Username",
+                    "data_type": "string",
+                    "example_values": [
+                        "redlock"
+                    ],
+                    "contains": [
+                        "email",
+                        "user name"
+                    ],
+                    "column_name": "User Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_lookup_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total lookup events: 123"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

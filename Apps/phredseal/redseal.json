@@ -1,0 +1,1456 @@
+{
+    "appid": "ccbfef59-4c04-46fb-9a9b-f7a999105630",
+    "name": "RedSeal",
+    "description": "This app integrates with RedSeal to implement investigative and polling actions",
+    "type": "endpoint",
+    "product_vendor": "RedSeal",
+    "logo": "logo_redseal.svg",
+    "logo_dark": "logo_redseal_dark.svg",
+    "product_name": "RedSeal",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.6",
+    "utctime_updated": "2019-03-13T20:36:05.000000Z",
+    "package_name": "phantom_redseal",
+    "main_module": "redseal_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "server_url": {
+            "description": "Server URL (eg: https://10.10.10.10)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Submit a query to fetch security impact, access details and threat details between two endpoints",
+            "verbose": "For run query, &quotsource&quot and &quotdestination&quot parameter takes input as described:<br><ul><li>For types <b>All Subnets</b>, <b>All Trusted Subnets</b> and <b>All Untrusted Subnets</b>, no input parameter needs to be provided for &quotsource&quot and &quotdestination&quot</li><br><li>For types <b>Host</b> and <b>Device</b>, <i>Tree ID</i> needs to be provided for &quotsource&quot and &quotdestination&quot</li><br><li>For type <b>Subnet</b>, <i>ID</i> needs to be provided for &quotsource&quot and &quotdestination&quot</li><br><li>For type <b>Group</b>, <i>redseal data path</i> needs to be provided for &quotsource&quot and &quotdestination&quot eg. &quotSubnet/Trusted&quot, &quotPrimary Capability/Host&quot</li><br><li>For type <b>Address range</b>, parameter can be provided as IP, Netmask and Address Range for &quotsource&quot and &quotdestination&quot<br><ul>eg. <li>&quot10.10.10.1&quot</li><li>&quot10.10.1.15/24&quot</li><li>&quot10.10.1.1-10.10.2.255&quot</li></li></ul>",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "source_type": {
+                    "description": "Source type (Default: Address Range)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Address Range",
+                        "All Subnets",
+                        "All Trusted Subnets",
+                        "All Untrusted Subnets",
+                        "Device",
+                        "Group",
+                        "Host",
+                        "Subnet"
+                    ],
+                    "default": "Address Range",
+                    "order": 0
+                },
+                "source": {
+                    "description": "Source target",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "redseal tree id",
+                        "ip",
+                        "redseal address range",
+                        "redseal group path"
+                    ],
+                    "order": 1
+                },
+                "destination_type": {
+                    "description": "Destination type (Default: Address Range)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Address Range",
+                        "All Subnets",
+                        "All Trusted Subnets",
+                        "All Untrusted Subnets",
+                        "Device",
+                        "Group",
+                        "Host",
+                        "Subnet"
+                    ],
+                    "default": "Address Range",
+                    "order": 2
+                },
+                "destination": {
+                    "description": "Destination target",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "redseal tree id",
+                        "ip",
+                        "redseal address range",
+                        "redseal group path"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb04fe5d5468",
+                        "10.100.111.20"
+                    ],
+                    "contains": [
+                        "redseal tree id",
+                        "ip",
+                        "redseal address range",
+                        "redseal group path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Address Range",
+                        "All Subnets",
+                        "All Trusted Subnets",
+                        "All Untrusted Subnets",
+                        "Device",
+                        "Group",
+                        "Host",
+                        "Subnet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb04fe5d5468"
+                    ],
+                    "contains": [
+                        "redseal tree id",
+                        "ip",
+                        "redseal address range",
+                        "redseal group path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Address Range",
+                        "All Subnets",
+                        "All Trusted Subnets",
+                        "All Untrusted Subnets",
+                        "Device",
+                        "Group",
+                        "Host",
+                        "Subnet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.CIDR",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.0/24"
+                    ],
+                    "contains": [
+                        "redseal address range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "connected to finance1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.GivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955eebf9d034f"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.TrustLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Destination.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Numbered"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.CIDR",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.0/24"
+                    ],
+                    "contains": [
+                        "redseal address range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Checkpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.GivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955eebf9d034f"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.TrustLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Source.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Numbered"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Traffic.*.DestinationIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.9"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Traffic.*.DestinationPort",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Traffic.*.Protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Traffic.*.SourceIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.2"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access.*.Traffic.*.SourcePort",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.CollectiveImpact",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACIS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.ExposedVulnerabilities",
+                    "data_type": "string",
+                    "example_values": [
+                        "76"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.LeapFrog",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.MaxCVSS",
+                    "data_type": "string",
+                    "example_values": [
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.NumberOfHosts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.OldestScan",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 16, 2016 11:00:51 AM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.Destination.UniqueVulnerabilities",
+                    "data_type": "string",
+                    "example_values": [
+                        "64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DestinationExposureType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Indirect"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.IPs",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.Ports",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.Restrict",
+                    "data_type": "string",
+                    "example_values": [
+                        "ONLY_COMPUTER_SYSTEMS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.Targets.Target.*.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb05007067e5"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.Targets.Target.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "All Trusted Subnets"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Destinations.Targets.Target.*.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "AllTrustedSubnets"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.DirectMode",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.NoDetails",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.IPs",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.Ports",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.Restrict",
+                    "data_type": "string",
+                    "example_values": [
+                        "NONE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.Targets.Target.*.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb05007067e5"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.Targets.Target.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "lynette.lab.redseal.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Sources.Targets.Target.*.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Track",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.DownstreamQuery.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "NETMAP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.DownStream.ReachableHosts",
+                    "data_type": "string",
+                    "example_values": [
+                        "109"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.PathStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "OPEN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.impact.SourceExposureType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Untrusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.CIDR",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.102.4.0/24"
+                    ],
+                    "contains": [
+                        "redseal address range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "connected to finance1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.GivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "FTP-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955eead0f0229"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.TrustLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Destination.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Numbered"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.LinkStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.CIDR",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.0/24"
+                    ],
+                    "contains": [
+                        "redseal address range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "connected to finance1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.GivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955eebf9d034f"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.TrustLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Source.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Numbered"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.Application",
+                    "data_type": "string",
+                    "example_values": [
+                        "Web server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.DestinationIPs.string",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.102.4.9"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.DestinationPorts.string",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.FromMultiHome",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-2004-2320"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.Protocols.string",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Applications.Threats.*.SourceIPs.string",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.9"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Groups",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.IPAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.102.4.9"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.L2Connections",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Metrics.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "lynette.lab.redseal.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Metrics.TreeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb0503c801f1"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Metrics.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.17.1.84/data/metrics/host/2c9090a556eaeeac0156eb0503c801f1"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "lynette.lab.redseal.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.RepositoryTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 15, 2016 1:09:00 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.TreeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb0503c801f1"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.17.1.84/data/host/id/2c9090a556eaeeac0156eb0503c801f1"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Destination.UniqueApplicationNames.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.Groups",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.IPAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.111.9"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.L2Connections",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "lynette.lab.redseal.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.RepositoryTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 23, 2016 4:31:28 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.TreeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9090a556eaeeac0156eb04fe6e54e1"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.17.1.84/data/host/id/2c9090a556eaeeac0156eb04fe6e54e1"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.Threat.*.Source.UniqueApplicationNames.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.highVulnCount",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.lowVulnCount",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.medVulnCount",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threats.*.totalRowCount",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Impact details found. Access details found. Threat details found."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "redseal_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "type": "ingest",
+            "read_only": true,
+            "description": "Ingest data to phantom",
+            "verbose": "Action will add all the &quotZone Pair Access Details&quot for which &quotZone Pair Status&quot is <b>Warning</b> or <b>Fail</b> and &quotZone Pair Access Details&quot status is not <b>APPROVED</b>.",
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of containers to ingest",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "container_id": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "start_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "required": false
+                },
+                "end_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 3,
+                    "required": false
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list subnets",
+            "identifier": "list_subnets",
+            "description": "List all subnets of a given type",
+            "verbose": "For type <b>Unmapped Hosts</b>, the &quotTree ID&quot obtained has to be used as input parameter for query actions with type <b>Host</b>.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "type": {
+                    "description": "Type of subnets (Default: Infrastructure)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Infrastructure",
+                        "Known Compromises",
+                        "Trusted",
+                        "Unmapped Hosts"
+                    ],
+                    "default": "Infrastructure",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Infrastructure",
+                        "Known Compromises",
+                        "Trusted",
+                        "Unmapped Hosts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CIDR",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.0.0/30"
+                    ],
+                    "contains": [
+                        "redseal address range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "connected to Core-2-ios"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.GivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local - Finance 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955eecbc2047c"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.IPAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.100.111.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.L2Connections",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastImportedDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 10, 2015 1:33:45 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastModifiedDate.#text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 10, 2015 1:33:45 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastModifiedDate.@defined-in",
+                    "data_type": "string",
+                    "example_values": [
+                        "Computer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.0.0/30"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.PrimaryCapability",
+                    "data_type": "string",
+                    "example_values": [
+                        "FIREWALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RepositoryTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 6, 2011 1:40:26 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.TreeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955ee92630157"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ],
+                    "column_name": "Tree ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.TrustLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trusted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Numbered"
+                    ],
+                    "column_name": "Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.17.1.84/data/subnet/id/2c9080ff3955cfbc013955eecbc2047c"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.UniqueApplicationNames.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_subnets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        115
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total subnets: 115"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list devices",
+            "identifier": "list_devices",
+            "description": "List all devices of a given type",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "type": {
+                    "description": "Type of device (Default: Firewall)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Firewall",
+                        "Host",
+                        "Load Balancer",
+                        "Router",
+                        "Switch",
+                        "Wireless Controller"
+                    ],
+                    "default": "Firewall",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Firewall",
+                        "Host",
+                        "Load Balancer",
+                        "Router",
+                        "Switch",
+                        "Wireless Controller"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DeviceType",
+                    "data_type": "string",
+                    "example_values": [
+                        "NetScreen"
+                    ],
+                    "column_name": "Device type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.Groups",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IPAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.100.111.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.L2Connections",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastImportedDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 10, 2015 1:33:45 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastModifiedDate.#text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Aug 10, 2015 1:33:45 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastModifiedDate.@defined-in",
+                    "data_type": "string",
+                    "example_values": [
+                        "Computer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Campus-lab-FW-MFE"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.PrimaryCapability",
+                    "data_type": "string",
+                    "example_values": [
+                        "FIREWALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RepositoryTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jul 6, 2011 1:40:26 PM UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.TreeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2c9080ff3955cfbc013955ee92630157"
+                    ],
+                    "contains": [
+                        "redseal tree id"
+                    ],
+                    "column_name": "Tree ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ],
+                    "column_name": "type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.17.1.84/data/device/id/2c9080ff3955cfbc013955ee92630157"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.UniqueApplicationNames.@class",
+                    "data_type": "string",
+                    "example_values": [
+                        "list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        518
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 518"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

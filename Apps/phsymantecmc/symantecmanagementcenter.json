@@ -1,0 +1,623 @@
+{
+    "appid": "74c03f8e-2b23-4426-afa9-838d450b914a",
+    "name": "Symantec Management Center",
+    "description": "This app connects to Symantec Management Center to perform actions against BlueCoat SG Proxies",
+    "type": "network security",
+    "product_vendor": "Symantec",
+    "logo": "logo_symantecmanagementcenter.svg",
+    "logo_dark": "logo_symantecmanagementcenter_dark.svg",
+    "product_name": "Symantec Management Center",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.2",
+    "utctime_updated": "2019-09-05T20:54:48.000000Z",
+    "package_name": "phantom_symantecmanagementcenter",
+    "main_module": "symantecmanagementcenter_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Hostname or IP",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_token": {
+            "description": "API Token",
+            "data_type": "password",
+            "required": false,
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": false,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": false,
+            "order": 3
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "required": false,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get version",
+            "identifier": "get_version",
+            "description": "Get Symantec Management Center version",
+            "read_only": true,
+            "type": "investigate",
+            "parameters": {},
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.buildNumber",
+                    "data_type": "string",
+                    "column_name": "Build Number",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "column_name": "Version",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "identifier": "list_policies",
+            "description": "Get Symantec Management Center policies",
+            "read_only": true,
+            "type": "investigate",
+            "parameters": {
+                "content_type": {
+                    "description": "Content-type of the policies",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.author",
+                    "data_type": "string",
+                    "column_name": "Author",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.contentType",
+                    "data_type": "string",
+                    "column_name": "Content-type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.name",
+                    "data_type": "string",
+                    "column_name": "Policy Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.referenceId",
+                    "data_type": "string",
+                    "column_name": "Reference ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.replaceVariables",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.shared",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.tenant",
+                    "data_type": "string",
+                    "column_name": "Tenant",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get policy",
+            "identifier": "get_policy",
+            "description": "Get Symantec Management Center policy",
+            "read_only": true,
+            "type": "investigate",
+            "parameters": {
+                "uuid": {
+                    "description": "UUID",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ],
+                    "order": 0
+                },
+                "name": {
+                    "description": "Policy name",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "reference_id": {
+                    "description": "Policy reference ID",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.reference_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.author",
+                    "data_type": "string",
+                    "column_name": "Author",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.contentType",
+                    "data_type": "string",
+                    "column_name": "Content-type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.name",
+                    "data_type": "string",
+                    "column_name": "Policy Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.author",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.entries.*.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.entries.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.entries.*.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "column_name": "Category Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.revisionDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.revisionDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.revisionInfo.revisionNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_details.schemaVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.referenceId",
+                    "data_type": "string",
+                    "column_name": "Reference ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.replaceVariables",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.shared",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.tenant",
+                    "data_type": "string",
+                    "column_name": "Tenant",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add listitem",
+            "identifier": "add_url",
+            "description": "Add url/category to local database file",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "URL to add to local database file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "url list"
+                    ],
+                    "order": 0
+                },
+                "category": {
+                    "description": "URL category to add",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "required": true,
+                    "order": 1
+                },
+                "uuid": {
+                    "description": "Policy UUID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ],
+                    "required": true,
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "add_category": {
+                    "description": "Add category",
+                    "data_type": "boolean",
+                    "required": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.add_category",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "url list"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.action_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.app_run_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove listitem",
+            "identifier": "remove_url",
+            "description": "Remove url/category from local database file",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "URL to remove from local database file",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "url list"
+                    ],
+                    "order": 0
+                },
+                "category": {
+                    "description": "URL category to remove",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "required": false,
+                    "order": 1
+                },
+                "uuid": {
+                    "description": "Policy UUID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ],
+                    "required": true,
+                    "order": 2
+                },
+                "delete_all": {
+                    "description": "Delete all occurences of URL",
+                    "data_type": "boolean",
+                    "required": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.delete_all",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "url list"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "symantecmc policy uuid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

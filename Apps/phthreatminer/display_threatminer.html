@@ -1,0 +1,337 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+
+<style>
+
+    table#http-traffic td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#http-traffic td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#mutants td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#mutants td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#metadata td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#metadata td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#samples td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#samples td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#registry-keys td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#registry-keys td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#report-tagging td:first-child {
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    
+}
+
+    table#report-tagging td:nth-child(2) {
+    padding: 5px 15px 5px 15px;
+    
+}
+
+
+    #hosts-domains,
+    #av-detections,
+    #http-traffic,
+    #mutants,
+    #registry-keys,
+    #metadata
+    #samples
+    #report-tagging
+{
+    border: 1px solid #777;
+}
+
+#hosts-domains th{
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+}
+
+.threat-miner a:hover {
+  text-decoration:underline;
+}
+
+
+
+</style>
+<div class="threat-miner" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    <!-- loop for each result -->
+    {% for result in results %}
+        <!-- If domains exist  -->
+        {% if result.hosts_domains_and_ips.domains %}
+        <h3>Hosts, Domains and IP's</h3>
+        <table id="hosts-domains" style="min-width: 100%; margin: 5px;">
+            <thead>
+                <th>IP Address</th>
+                <th>Domain</th>
+            </thead>
+            <tbody>
+                {% for result00 in result.hosts_domains_and_ips.domains %}
+                <tr>
+                    {% for key00, value00 in result00.items %}
+                    {% if key00 == "ip" %}
+                    <td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                    {% endif %}    
+
+                    {% if key00 == "domain" %}
+                    <td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                    {% endif %}    
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+        {% endif %}   
+            </tbody>    
+        </table>
+        {% if result.hosts_domains_and_ips.hosts %}
+        <table id="hosts-domains" style="min-width: 100%; margin: 5px;">
+            <thead>
+                <th>IP Address</th>
+            </thead>
+            <tbody>
+                {% for result01 in result.hosts_domains_and_ips.hosts %}
+                <tr>
+                    <td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ result01|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ result01 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                </tr>
+                {% endfor %}
+        </table>
+        {% endif %} 
+
+        {% if result.av_detections.av_detections %}
+        <h3>AV Detections</h3>
+        <table id="av-detections" style="min-width: 100%; margin: 5px;">
+            <thead>
+                <th>Detection</th>
+                <th>Antivirus Vendor</th>
+            </thead>
+            <tbody>
+                {% for result02 in result.av_detections.av_detections %}
+                <tr>
+                    {% for key00, value00 in result02.items %}
+                    {% if key00 == "detection" %}
+                    <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['avdetection'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                    {% endif %}    
+                    {% if key00 == "av" %}
+                    <td> {{ value00 }}</td>
+                    {% endif %}    
+                    {% endfor %}
+                </tr> 
+                {% endfor %}
+            </tbody>    
+            </table>
+        {% endif %}   
+        
+        {% if result.http_traffic %}
+         <!-- For each result that has domains  -->
+        <h3>HTTP Traffic</h3>
+                {% for result03 in result.http_traffic.http_traffic %}
+                <table id="http-traffic" style="min-width: 100%; margin: 5px;">
+                        <tbody>
+                    {% for key00, value00 in result03.items %}
+                    {% if key00 == "domain" %}
+                    <tr><td>Domain</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                    {% endif %}    
+                    {% if key00 == "source" %}
+                    <tr><td>Source</td><td> {{ value00 }}</td></tr>
+                    {% endif %}    
+                    {% if key00 == "url" %}
+                    <tr><td>URL</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                    {% endif %}  
+                    {% if key00 == "ip" %}
+                    <tr><td>IP</td> <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                    {% endif %}
+                    {% if key00 == "method" %}
+                    <tr><td>Method</td><td> {{ value00 }}</td></tr>
+                    {% endif %}
+                    {% if key00 == "raw" %}
+                    <tr><td>Raw</td><td> {{ value00 }}</td></tr>
+                    {% endif %} 
+                    {% if key00 == "user_agent" %}
+                    <tr><td>User-Agent</td><td> {{ value00 }}</td></tr>
+                    {% endif %}   
+                    {% if key00 == "port" %}
+                    <tr><td>Port</td><td> {{ value00 }}</td></tr>
+                    {% endif %}        
+                    {% endfor %}
+                </tbody>    
+                </table>
+                </br>
+                {% endfor %}
+        
+        {% endif %}  
+
+        <!-- For each result that has registry traffic  -->
+        {% if result.registry_keys %}
+        <h3>Registry Keys</h3>
+        <table id="registry-keys" style="min-width: 100%; margin: 5px;">
+            <thead>
+                    <th>Registry</th>
+            </thead>
+            <tbody>
+                {% for result04 in result.registry_keys.registry_keys %}
+                
+                <tr>
+                    
+                    <td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['registry'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ result04 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>    
+            </table>
+        {% endif %}  
+        <!-- End Mutants  -->
+
+    <!-- For each result that has mutants traffic  -->
+        {% if result.mutants.mutants %}
+        <h3>Mutants</h3>
+        <table id="mutants" style="min-width: 100%; margin: 5px;">
+            <thead>
+                <th>Mutants</th>
+            </thead>
+            <tbody>
+                {% for result05 in result.mutants.mutants %}
+                <tr>
+                    <td> {{ result05 }}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>    
+            </table>
+        {% endif %}   
+
+
+
+        {% if result.metadata %}
+        <h3>Metadata</h3>
+        <table id="metadata" style="min-width: 100%; margin: 5px;">
+
+                <tbody>
+        {% for result06 in result.metadata %}
+        
+                {% for key00, value00 in result06 %}
+                {% if key00 == "authentihash" %}
+                <tr><td>Authentihash</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['hash'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                {% endif %}    
+                {% if key00 == "sha1" %}
+                <tr><td>SHA1</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}    
+                {% if key00 == "file_type" %}
+                <tr><td>File Type</td><td> {{ value00 }}</td></tr>
+                {% endif %}  
+                {% if key00 == "imphash" %}
+                <tr><td>IMPHASH</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['imphash'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}
+                {% if key00 == "file_size" %}
+                <tr><td>File Size</td><td> {{ value00 }}</td></tr>
+                {% endif %}
+                {% if key00 == "date_analysed" %}
+                <tr><td>Date Analysed</td><td> {{ value00 }}</td></tr>
+                {% endif %} 
+                {% if key00 == "architecture" %}
+                <tr><td>Architecture</td><td> {{ value00 }}</td></tr>
+                {% endif %}   
+                {% if key00 == "file_name" %}
+                <tr><td>File Name</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}        
+                {% if key00 == "ssdeep" %}
+                <tr><td>SSDEEP</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ssdeep'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}        
+                {% if key00 == "sha256" %}
+                <tr><td>SHA256</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}        
+                {% if key00 == "sha512" %}
+                <tr><td>SHA512</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha512'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}        
+                {% if key00 == "md5" %}
+                <tr><td>MD5</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td></tr>
+                {% endif %}        
+
+
+        {% endfor %}
+        {% endfor %}
+        </tbody>    
+    </table>
+        {% endif %}
+
+        {% if result.samples %}
+        <h3>Samples</h3>
+        <table id="samples" style="min-width: 100%; margin: 5px;">
+
+                <tbody>
+        {% for result07 in result.samples %}
+                {% for key00, value00 in result07.items %}
+                <tr><td>File Hash</td><td> <a href="javascript:;" onclick="context_menu(this, [{'contains': ['hash'], 'value': '{{ value00|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ value00 }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a></td>
+                {% endfor %}
+        {% endfor %}
+        </tbody>    
+    </table>
+        {% endif %}
+
+        {% if result.report_tagging %}
+        <h3>Report Tagging</h3>
+        <table id="report-tagging" style="min-width: 100%; margin: 5px;">
+
+                <tbody>
+        {% for result07 in result.report_tagging %}
+                {% for key00, value00 in result07 %}
+                <tr><td>{{ key00 }} </td><td> {{ value00 }}</td>
+                {% endfor %}
+        {% endfor %}
+        </tbody>    
+    </table>
+        {% endif %}
+
+
+<!-- Ending Main For -->
+{% endfor %}
+<!-- Main Div -->
+</div> 
+<!-- End Main Start Block -->
+{% endblock %} 

@@ -1,0 +1,451 @@
+{
+    "appid": "263d4875-bc20-4e93-aed3-e7f156ecea3b",
+    "name": "DarkPoint",
+    "description": "This app supports executing investigative actions on the DarkPoint sandbox",
+    "type": "sandbox",
+    "product_vendor": "CyberPoint",
+    "logo": "logo_darkpoint.svg",
+    "logo_dark": "logo_darkpoint_dark.svg",
+    "product_name": "DarkPoint",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2019-08-13T22:39:10.000000Z",
+    "package_name": "phantom_darkpoint",
+    "main_module": "darkpoint_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "unirest",
+                "input_file": "wheels/Unirest-1.1.7-py2-none-any.whl"
+            },
+            {
+                "module": "poster",
+                "input_file": "wheels/poster-0.8.1-py2-none-any.whl"
+            },
+            {
+                "module": "darkpoint",
+                "input_file": "wheels/darkpointrest-3.8_221-py27-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "base_url": {
+            "description": "Base URL to DarkPoint Service",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "detonate_timeout": {
+            "description": "Detonate Timeout in Minutes",
+            "data_type": "numeric",
+            "required": false,
+            "default": 10,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "identifier": "detonate_file",
+            "description": "Run the file in the sandbox and retrieve the analysis results",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id",
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "order": 0
+                },
+                "file_name": {
+                    "description": "Filename to use",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id",
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.report.darkpointScore",
+                    "data_type": "numeric",
+                    "column_name": "DarkPoint Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.report.descendents",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPacker",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPackerChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirus",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasRemediation",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.highestMalwareRating",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.processed",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.darkpointScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "identifier": "detonate_url",
+            "description": "Send a URL to DarkPoint and retrieve the analysis results",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.report.darkpointScore",
+                    "data_type": "numeric",
+                    "column_name": "DarkPoint Score",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.report.descendents",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPacker",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPackerChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirus",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasRemediation",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.highestMalwareRating",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.processed",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.darkpointScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "description": "Query for results of an already completed detonation",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Detonation ID to get the report of",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.report.darkpointScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.descendents",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPacker",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPackerChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirus",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasPotentialVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasRemediation",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.hasVirusChild",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.highestMalwareRating",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.processed",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.darkpointScore",
+                    "data_type": "numeric",
+                    "column_name": "DarkPoint Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
