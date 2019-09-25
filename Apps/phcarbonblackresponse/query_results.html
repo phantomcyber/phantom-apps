@@ -1,0 +1,82 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{% if not title_logo %}{{ title1 }}{% endif %}{% endblock %}
+{% block title2 %}{% if not title_logo %}{{ title2 }}{% endif %}{% endblock %}
+{% block widget_content %}
+
+<!-- File: query_results.html
+  Copyright (c) 2016-2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+
+<script src="/inc/datatable/js/jquery.dataTables.min.js"></script>
+
+<div class="row-fluid" onwidgetupdate="handle_update(update_data, {{ app_id }}, this);" onwidgetresize="phantom_generic_table_resize(this);">
+
+  {% for table in tables %}
+
+  <table onwidgetload="phantom_generic_table_init(this);" style="min-width: 100%; margin: 0;">
+  <thead>
+  <tr>
+    {% for header in table.headers %}
+      <th class="widget-th" style="border: none; font-weight: normal; max-width:600px;">{{ header|upper }}</th>
+    {% endfor %}
+  </tr>
+  </thead>
+  <tbody>
+  {% for row in table.rows %}
+    <tr>
+      {% for cell in row %}
+        <td class="widget-td" style="border-bottom: 1px solid; white-space: {% if cell.value|length and value|length > 100 %}normal{% else %}nowrap{% endif %}; max-width:600px;">
+          {% if cell.contains and cell.value and cell.value != None %}
+            <a href="javascript:;" onclick="context_menu(this, {{ cell.id }}, {{ container.id }}, '{{ cell.data_path|escapejs }}', {{ cell.contains|jslist }}, {{ cell.offset|default:0 }}, boundry);">
+               {{ cell.value }}
+               &nbsp;<span class="fa fa-caret-down"></span>
+            </a>
+          {% else %}
+            {% if forloop.counter0 in allow_links and cell.value|startswith:'http' %}
+              <a href="{{ cell.value }}" target="_blank">{{ cell.value }}</a>
+            {% else %}
+              {{ cell.value }}
+            {% endif %}
+          {% endif %}
+        </td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+</div>
+
+<script>
+function phantom_generic_table_init(caller) {
+  $(caller).parent().parent().css('overflow', 'auto');
+  $(caller).parent()[0].ph_datatable = $(caller).dataTable({
+    scrollX: 1,
+    scrollY: 2,
+    paging: false,
+    searching: false,
+    order: [],
+    bAutoWidth: false,
+    infoCallback: function() { return ''; }
+  });
+
+  var top = get_my_container(caller);
+  $(top).find('[onwidgetresize]').each(function () {
+    eval($(this).attr('onwidgetresize'));
+  });
+}
+
+function phantom_generic_table_resize(parent) {
+  var head_height = $(parent).find('table tr th').outerHeight();
+  $(parent).find('.dataTables_scrollBody').css('height', 'auto');
+  $(parent).find('table').css('width', $(parent).parent().width());// + parseInt($(parent).parent().css('padding-right')));
+  parent.ph_datatable.fnAdjustColumnSizing();
+}
+</script>
+{% endblock %}
