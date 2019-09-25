@@ -1,0 +1,2489 @@
+{
+    "appid": "b78a6350-b304-478c-b1c7-612a84e0511a",
+    "name": "DomainTools",
+    "description": "Use DomainTools to query various current and historical data regarding domain names, domain registration and IPs",
+    "publisher": "Phantom",
+    "package_name": "phantom_domaintools",
+    "type": "information",
+    "license": "Copyright (c) 2016-2018 Splunk Inc.",
+    "main_module": "domaintools_connector.pyc",
+    "app_version": "1.0.46",
+    "utctime_updated": "2018-12-18T23:13:24.000000Z",
+    "product_vendor": "DomainTools",
+    "product_name": "DomainTools",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.5.210",
+    "logo": "logo_domaintools.svg",
+    "logo_dark": "logo_domaintools_dark.svg",
+    "configuration": {
+        "username": {
+            "description": "User Name",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Evaluates the risk of a given domain",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "domain_reputation",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "use_risk_api": {
+                    "description": "Use Risk/Evidence API",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "*.splunk.com",
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_risk_api",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Domain",
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.risk_score",
+                    "data_type": "numeric",
+                    "column_order": 1,
+                    "column_name": "Risk Score",
+                    "example_values": [
+                        5.12
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.risk_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5.12
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Risk score: 5.12"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "recent domains",
+            "description": "Search for new domains containing a word",
+            "type": "investigate",
+            "identifier": "brand_monitor",
+            "read_only": true,
+            "verbose": "If the <b>days_back</b> parameter is not set, the data for the current day is returned, else data of the particular day in the past is retrieved.",
+            "parameters": {
+                "query": {
+                    "description": "Word to look for in a domain name",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "days_back": {
+                    "description": "Number of days back to search for (1-6)",
+                    "data_type": "string",
+                    "primary": false,
+                    "order": 1
+                },
+                "status": {
+                    "description": "Status of the domain",
+                    "data_type": "string",
+                    "primary": false,
+                    "value_list": [
+                        " ",
+                        "new",
+                        "on-hold"
+                    ],
+                    "default": "new",
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Brand Monitor"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.days_back",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "column_name": "Query",
+                    "column_order": 0,
+                    "example_values": [
+                        "domain",
+                        "test4.test@splunk.com",
+                        "splunk.com",
+                        "splunk.com.test"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 1,
+                    "example_values": [
+                        "0000.domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "new"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-25",
+                        "2018-10-24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.new",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.on-hold",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain",
+                        "test1@splunk.com",
+                        "splunk.com",
+                        "splunk.com.test"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        306,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.utf8",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric",
+                    "example_values": [
+                        306,
+                        0
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total domains: 306",
+                        "Total domains: 0"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reverse domain",
+            "description": "Find IPs that point to this domain and other domain names that share the same IP",
+            "type": "investigate",
+            "identifier": "reverse_lookup_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Reverse Domain"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.*.domain_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4,
+                        200204
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.*.domain_names",
+                    "data_type": "string",
+                    "column_name": "Related Domain Names",
+                    "column_order": 2,
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "splunk.COM",
+                        "TEST.NL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.*.ip_address",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "example_values": [
+                        "203.187.192.6",
+                        "72.52.10.14"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_ips",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total ips: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reverse ip",
+            "description": "Find domain names that share an IP",
+            "type": "investigate",
+            "identifier": "reverse_lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP address to query",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Reverse IP"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "Query IP",
+                    "column_order": 1,
+                    "example_values": [
+                        "52.91.186.198",
+                        "8.8.8.8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.domain_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8044
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.domain_names",
+                    "data_type": "string",
+                    "column_name": "Related Domain Names",
+                    "column_order": 2,
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "TEST.TODAY"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addresses.ip_address",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "example_values": [
+                        "8.8.8.8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        8044
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No Reverse IP data found for that IP / domain name.",
+                        "Total domains: 8044"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reverse email",
+            "description": "Find domains with an email in their Whois record",
+            "type": "investigate",
+            "identifier": "reverse_whois_email",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "description": "email query",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "include_history": {
+                    "description": "Include historical whois matches",
+                    "data_type": "boolean",
+                    "primary": false,
+                    "required": false,
+                    "order": 1,
+                    "default": false
+                },
+                "ph": {
+                    "data_type": "ph",
+                    "order": 2
+                },
+                "count_only": {
+                    "description": "Only return count of matched records",
+                    "data_type": "boolean",
+                    "primary": false,
+                    "required": false,
+                    "order": 3,
+                    "default": false
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Reverse Whois Emails"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "failed",
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.count_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "network.splunk.comm.$#@$@$",
+                        "network@splunk.com",
+                        "network@splunk.com.",
+                        "network@splunk.com?",
+                        "gr.sridhar@splunk.com",
+                        "network@splunk.comm.$#@$@$",
+                        "abuse@test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.include_history",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain_count.current",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain_count.historic",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.report_cost.current",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_cost.historic",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_price.current",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_price.historic",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Parameter 'email' failed validation",
+                        "Total domains: 0"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hosting history",
+            "description": "Obtain changes to registrar, IP, etc",
+            "type": "investigate",
+            "identifier": "hosting_history",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Hosting History"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain_name",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain Name",
+                    "column_order": 5,
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "N"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.action_in_words",
+                    "data_type": "string",
+                    "column_name": "Action",
+                    "column_order": 3,
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.actiondate",
+                    "data_type": "string",
+                    "column_name": "Action Date",
+                    "column_order": 4,
+                    "example_values": [
+                        "2004-06-12",
+                        "2013-07-19",
+                        "2006-06-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.post_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "Post IP",
+                    "column_order": 7,
+                    "example_values": [
+                        "216.239.51.107",
+                        "184.168.221.62",
+                        "202.71.128.225"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip_history.*.pre_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "Pre IP",
+                    "column_order": 6,
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "T",
+                        "N"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.action_in_words",
+                    "data_type": "string",
+                    "example_values": [
+                        "Transfer",
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.actiondate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2004-03-27",
+                        "2013-07-05",
+                        "2006-04-25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.post_mns",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameserver_history.*.pre_mns",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk.com",
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.date_created",
+                    "data_type": "string",
+                    "example_values": [
+                        "1995-08-13",
+                        "2013-07-04",
+                        "2006-06-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.date_expires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2003-08-12",
+                        "2014-07-04",
+                        "2007-06-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.date_lastchecked",
+                    "data_type": "string",
+                    "example_values": [
+                        "2003-06-28",
+                        "2013-07-16",
+                        "2006-06-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.date_updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2002-06-26",
+                        "2013-07-04",
+                        "2006-06-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.registrar",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrar_history.*.registrartag",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test.COM",
+                        "Test Software Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.ip_history_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        280,
+                        5,
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.nameserver_history_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2,
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.registrar_history_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3,
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip history count: 280, Registrar history count: 3, Nameserver history count: 2",
+                        "Ip history count: 5, Registrar history count: 1, Nameserver history count: 2",
+                        "Ip history count: 3, Registrar history count: 2, Nameserver history count: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois history",
+            "description": "Obtain historic whois records for a domain name",
+            "type": "investigate",
+            "identifier": "whois_history",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois History"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.date",
+                    "data_type": "string",
+                    "column_name": "Whois Data On",
+                    "column_order": 0,
+                    "example_values": [
+                        "2013-07-05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.is_private",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.name_servers",
+                    "data_type": "string",
+                    "column_name": "Name Servers",
+                    "column_order": 4,
+                    "example_values": [
+                        "NS7.TEST.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.record",
+                    "data_type": "string",
+                    "example_values": [
+                        "Registered through: Test.com, LLC (http://www.test.com)\n   Domain Name: PHANTOMCYBER.COM\n      Created on: 04-Jul-13\n      Expires on: 04-Jul-14\n      Last Updated on: 04-Jul-13\n\n   Registrant:\n   Domains By Proxy, LLC\n   DomainsByProxy.com\n   14747 N Northsight Blvd Suite 111, PMB 309\n   Scottsdale, Arizona 85260\n   United States\n\n   Administrative Contact:\n      Private, Registration  PHANTOMCYBER.COM@domainsbyproxy.com\n      Domains By Proxy, LLC\n      DomainsByProxy.com\n      14747 N Northsight Blvd Suite 111, PMB 309\n      Scottsdale, Arizona 85260\n      United States\n      (480) 624-2599      Fax -- (480) 624-2598\n\n   Technical Contact:\n      Private, Registration  PHANTOMCYBER.COM@domainsbyproxy.com\n      Domains By Proxy, LLC\n      DomainsByProxy.com\n      14747 N Northsight Blvd Suite 111, PMB 309\n      Scottsdale, Arizona 85260\n      United States\n      (480) 624-2599      Fax -- (480) 624-2598\n\n   Domain servers in listed order:\n      NS67.DOMAINCONTROL.COM\n      NS68.DOMAINCONTROL.COM\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registrant",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domains By Proxy, LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registration.created",
+                    "data_type": "string",
+                    "column_name": "Created",
+                    "column_order": 1,
+                    "example_values": [
+                        "2013-07-04"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registration.expires",
+                    "data_type": "string",
+                    "column_name": "Expires",
+                    "column_order": 2,
+                    "example_values": [
+                        "2014-07-04"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registration.registrar",
+                    "data_type": "string",
+                    "column_name": "Registrant",
+                    "column_order": 3,
+                    "example_values": [
+                        "TEST.COM, LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registration.statuses",
+                    "data_type": "string",
+                    "example_values": [
+                        "clientUpdateProhibited"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.registration.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2013-07-04"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.whois.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "whois.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.record_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        24
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.record_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        24
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Record count: 24"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois ip",
+            "description": "Execute whois lookup on the given IP address",
+            "type": "investigate",
+            "identifier": "whois_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois Details"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "example_values": [
+                        "1.1.1.1",
+                        "203.88.139.34",
+                        "10.0.1.20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.abuse_mailbox",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@test.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "Australia",
+                        "India",
+                        "90292"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.address.0",
+                    "data_type": "string",
+                    "column_name": "Address",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.address.1",
+                    "data_type": "string",
+                    "column_name": "City",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.address.2",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.address.3",
+                    "data_type": "string",
+                    "column_name": "Postal Code",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.contact_keys.abuse",
+                    "data_type": "string",
+                    "example_values": [
+                        "IANA-IP-ARIN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.contact_keys.admin",
+                    "data_type": "string",
+                    "example_values": [
+                        "AH256-AP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.contact_keys.noc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.contact_keys.tech",
+                    "data_type": "string",
+                    "example_values": [
+                        "AH256-AP",
+                        "IANA-IP-ARIN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.country",
+                    "data_type": "string",
+                    "column_name": "Country",
+                    "column_order": 8,
+                    "example_values": [
+                        "",
+                        "in",
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.created_date",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "email",
+                    "column_order": 5,
+                    "example_values": [
+                        "research@test.net",
+                        "test@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.fax",
+                    "data_type": "string",
+                    "example_values": [
+                        "61738583199",
+                        "912612789501"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "IRT-APNICRANDNET-AU",
+                        "NI23-AP",
+                        "IANA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.mnt_keys.by",
+                    "data_type": "string",
+                    "example_values": [
+                        "MAINT-APNIC-AP",
+                        "MAINT-IN-YOU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.mnt_keys.ref",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC-HM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 10,
+                    "example_values": [
+                        "",
+                        "NOC IQARA",
+                        "Internet Assigned Numbers Authority"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.other.auth",
+                    "data_type": "string",
+                    "example_values": [
+                        "# Filtered"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.phone",
+                    "data_type": "string",
+                    "example_values": [
+                        "61738583188",
+                        "912612789500",
+                        "13103015820"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.ref",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "",
+                        "https://rdap.arin.net/registry/entity/IANA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.remarks",
+                    "data_type": "string",
+                    "example_values": [
+                        "-----------------------------------------"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC",
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "irt",
+                        "person",
+                        "organization"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.*.updated_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-09-22T03:53:02+00:00",
+                        "2010-04-07T10:10:28+00:00",
+                        "2012-08-31T00:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.contact_keys.abuse",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.contact_keys.admin",
+                    "data_type": "string",
+                    "example_values": [
+                        "AR302-AP",
+                        "SG135-AP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.contact_keys.noc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.contact_keys.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "IANA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.contact_keys.tech",
+                    "data_type": "string",
+                    "example_values": [
+                        "AR302-AP",
+                        "NI23-AP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "au",
+                        "in",
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.created_date",
+                    "data_type": "string",
+                    "column_name": "Created Date",
+                    "column_order": 4,
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.customer",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.descr",
+                    "data_type": "string",
+                    "example_values": [
+                        "Research prefix for APNIC Labs",
+                        "YOU Telecom India Pvt Ltd",
+                        "http://datatracker.ietf.org/doc/rfc1918"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "",
+                        "NET-10-0-0-0-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.mnt_keys.by",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC-HM",
+                        "MAINT-IN-YOU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.mnt_keys.irt",
+                    "data_type": "string",
+                    "example_values": [
+                        "IRT-APNICRANDNET-AU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.mnt_keys.routes",
+                    "data_type": "string",
+                    "example_values": [
+                        "MAINT-AU-APNIC-GM85-AP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC-LABS",
+                        "YOUTELE",
+                        "PRIVATE-ADDRESS-ABLK-RFC1918-IANA-RESERVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.org",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 9,
+                    "example_values": [
+                        "ORG-ARAD1-AP",
+                        "",
+                        "Internet Assigned Numbers Authority (IANA)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.parent",
+                    "data_type": "string",
+                    "example_values": [
+                        "",
+                        "()"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.parent_id",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.range.cidr",
+                    "data_type": "string",
+                    "column_name": "CIDR",
+                    "column_order": 3,
+                    "example_values": [
+                        "1.1.1.0/24",
+                        "203.88.128.0/20",
+                        "10.0.0.0/8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.range.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        256,
+                        4096,
+                        16777216
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.range.from",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "Range Low",
+                    "column_order": 13,
+                    "example_values": [
+                        "1.1.1.0",
+                        "203.88.128.0",
+                        "10.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.range.to",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "Range Low",
+                    "column_order": 14,
+                    "example_values": [
+                        "1.1.1.255",
+                        "203.88.143.255",
+                        "10.255.255.255"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.ref",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "",
+                        "https://rdap.arin.net/registry/ip/10.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.remarks",
+                    "data_type": "string",
+                    "example_values": [
+                        "---------------"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC",
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASSIGNED PORTABLE",
+                        "ASSIGNED NON-PORTABLE",
+                        "IANA Special Use"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.networks.*.updated_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-03-30T01:51:28+00:00",
+                        "2009-12-10T05:27:14+00:00",
+                        "2013-08-30T00:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "AS13335",
+                        "AS18207"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.created_date",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.descr",
+                    "data_type": "string",
+                    "example_values": [
+                        "6 Cordelia St",
+                        "Splunk Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.0/24",
+                        "203.88.128.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.mnt_keys.by",
+                    "data_type": "string",
+                    "example_values": [
+                        "MAINT-AU-APNIC-GM85-AP",
+                        "MAINT-IN-YOU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.mnt_keys.lower",
+                    "data_type": "string",
+                    "example_values": [
+                        "MAINT-IN-YOU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.mnt_keys.routes",
+                    "data_type": "string",
+                    "example_values": [
+                        "MAINT-IN-YOU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.ref",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.routes.*.updated_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-03-16T16:58:06+00:00",
+                        "2011-12-03T11:08:14+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.record_source",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "example_values": [
+                        "1.1.1.1",
+                        "203.88.128.214",
+                        "10.3.88.37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrant",
+                    "data_type": "string",
+                    "example_values": [
+                        "ORG-ARAD1-AP",
+                        "YOUTELE",
+                        "Internet Assigned Numbers Authority (IANA)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "APNIC",
+                        "ARIN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-23",
+                        "2018-10-07"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.record",
+                    "data_type": "string",
+                    "example_values": [
+                        "inetnum:        1.1.1.0 - 1.1.1.255\nnetname:        APNIC-LABS\ndescr:          APNIC and Cloudflare DNS Resolver project\ndescr:          Routed globally by AS13335/Cloudflare\ndescr:          Research prefix for APNIC Labs\ncountry:        AU\norg:            ORG-ARAD1-AP\nadmin-c:        AR302-AP\ntech-c:         AR302-AP\nmnt-by:         APNIC-HM\nmnt-routes:     MAINT-AU-APNIC-GM85-AP\nmnt-irt:        IRT-APNICRANDNET-AU\nstatus:         ASSIGNED PORTABLE\nremarks:        ---------------\nremarks:        All Cloudflare abuse reporting can be done via\nremarks:        resolver-abuse@cloudflare.com\nremarks:        ---------------\nlast-modified:  2018-03-30T01:51:28Z\nsource:         APNIC\n\nirt:            IRT-APNICRANDNET-AU\naddress:        PO Box 3646\naddress:        South Brisbane, QLD 4101\naddress:        Australia\ne-mail:         abuse@apnic.net\nabuse-mailbox:  abuse@apnic.net\nadmin-c:        AR302-AP\ntech-c:         AR302-AP\nauth:           # Filtered\nmnt-by:         MAINT-AU-APNIC-GM85-AP\nlast-modified:  2011-09-22T03:53:02Z\nsource:         APNIC\n\norganisation:   ORG-ARAD1-AP\norg-name:       APNIC Research and Development\ncountry:        AU\naddress:        6 Cordelia St\nphone:          +61-7-38583100\nfax-no:         +61-7-38583199\ne-mail:         helpdesk@apnic.net\nmnt-ref:        APNIC-HM\nmnt-by:         APNIC-HM\nlast-modified:  2017-10-11T01:28:39Z\nsource:         APNIC\n\nrole:           APNIC RESEARCH\naddress:        PO Box 3646\naddress:        South Brisbane, QLD 4101\naddress:        Australia\ncountry:        AU\nphone:          +61-7-3858-3188\nfax-no:         +61-7-3858-3199\ne-mail:         research@apnic.net\nnic-hdl:        AR302-AP\ntech-c:         AH256-AP\nadmin-c:        AH256-AP\nmnt-by:         MAINT-APNIC-AP\nlast-modified:  2018-04-04T04:26:04Z\nsource:         APNIC\n\nroute:          1.1.1.0/24\norigin:         AS13335\ndescr:          APNIC Research and Development\n                6 Cordelia St\nmnt-by:         MAINT-AU-APNIC-GM85-AP\nlast-modified:  2018-03-16T16:58:06Z\nsource:         APNIC\n",
+                        "inetnum:        203.88.128.0 - 203.88.143.255\nnetname:        YOUTELE\ndescr:          Splunk Inc\ncountry:        US\nadmin-c:        SG135-AP\ntech-c:         NI23-AP\nstatus:         ASSIGNED NON-PORTABLE\nmnt-by:         MAINT-IN-YOU\nlast-modified:  2009-12-10T05:27:14Z\nsource:         APNIC\n\nperson:         NOC IQARA\nnic-hdl:        NI23-AP\ne-mail:         network@SPLUNK.COM\naddress:        Splunk Inc.\naddress:        Iqara Center\naddress:        San-Jose\naddress:        San jose\nphone:          +1-261-2789500\nfax-no:         +1-261-2789501\ncountry:        US\nmnt-by:         MAINT-US-YOU\nlast-modified:  2010-04-07T10:10:28Z\nsource:         APNIC\n\nperson:         SRIDHAR G\nnic-hdl:        SG135-AP\ne-mail:         test@splunk.com\nremarks:        -----------------------------------------\nremarks:        send abuse and spam report to\nremarks:        test@splunk.com or test@splunk.com\nremarks:        -----------------------------------------\naddress:        Splunk Inc.\naddress:        Millenium Arcade, 2nd floor\naddress:        San Jose\naddress:        CA\naddress:        US\nphone:          +91-261-2789500\nfax-no:         +91-261-2789501\ncountry:        IN\nmnt-by:         MAINT-IN-YOU\nlast-modified:  2010-05-13T04:40:07Z\nsource:         APNIC\n\nroute:          203.88.128.0/24\ndescr:          Splunk Inc.\norigin:         AS18207\nmnt-lower:      MAINT-IN-YOU\nmnt-routes:     MAINT-IN-YOU\nmnt-by:         MAINT-IN-YOU\nlast-modified:  2011-12-03T11:08:14Z\nsource:         APNIC\n",
+                        "NetRange:       10.0.0.0 - 10.255.255.255\nCIDR:           10.0.0.0/8\nNetName:        PRIVATE-ADDRESS-ABLK-RFC1918-IANA-RESERVED\nNetHandle:      NET-10-0-0-0-1\nParent:          ()\nNetType:        IANA Special Use\nOriginAS:       \nOrganization:   Internet Assigned Numbers Authority (IANA)\nRegDate:        \nUpdated:        2013-08-30\nComment:        These addresses are in use by many millions of independently operated networks, which might be as small as a single computer connected to a home gateway, and are automatically configured in hundreds of millions of devices.  They are only intended for use within a private context  and traffic that needs to cross the Internet will need to use a different, unique address.\nComment:        \nComment:        These addresses can be used by anyone without any need to coordinate with IANA or an Internet registry.  The traffic from these addresses does not come from ICANN or IANA.  We are not the source of activity you may see on logs or in e-mail records.  Please refer to http://www.iana.org/abuse/answers\nComment:        \nComment:        These addresses were assigned by the IETF, the organization that develops Internet protocols, in the Best Current Practice document, RFC 1918 which can be found at:\nComment:        http://datatracker.ietf.org/doc/rfc1918\nRef:            https://rdap.arin.net/registry/ip/10.0.0.0\n\nOrgName:        Internet Assigned Numbers Authority\nOrgId:          IANA\nAddress:        12025 Waterfront Drive\nAddress:        Suite 300\nCity:           Los Angeles\nStateProv:      CA\nPostalCode:     90292\nCountry:        US\nRegDate:        \nUpdated:        2012-08-31\nRef:            https://rdap.arin.net/registry/entity/IANA\n\nOrgAbuseHandle: IANA-IP-ARIN\nOrgAbuseName:   ICANN\nOrgAbusePhone:  +1-310-301-5820 \nOrgAbuseEmail:  abuse@iana.org\nOrgAbuseRef:    https://rdap.arin.net/registry/entity/IANA-IP-ARIN\n\nOrgTechHandle: IANA-IP-ARIN\nOrgTechName:   ICANN\nOrgTechPhone:  +1-310-301-5820 \nOrgTechEmail:  abuse@iana.org\nOrgTechRef:    https://rdap.arin.net/registry/entity/IANA-IP-ARIN\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.city",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "",
+                        "in",
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "ORG-ARAD1-AP",
+                        "YOUTELE",
+                        "Internet Assigned Numbers Authority (IANA)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization: ORG-ARAD1-AP, City: None, Country: ",
+                        "Organization: YOUTELE, City: None, Country: in",
+                        "Organization: Internet Assigned Numbers Authority (IANA), City: None, Country: us"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois domain",
+            "description": "Execute whois lookup on the given domain",
+            "type": "investigate",
+            "identifier": "whois_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois Details"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name_servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "NS4.SPLUNK.US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.city",
+                    "data_type": "string",
+                    "column_name": "Admin City",
+                    "column_order": 3,
+                    "example_values": [
+                        "San Jose"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.country",
+                    "data_type": "string",
+                    "column_name": "Admin Country",
+                    "column_order": 4,
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Admin Email",
+                    "column_order": 5,
+                    "example_values": [
+                        "idc@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.fax",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.name",
+                    "data_type": "string",
+                    "column_name": "Admin Name",
+                    "column_order": 6,
+                    "example_values": [
+                        "Jhon Smith"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.org",
+                    "data_type": "string",
+                    "column_name": "Admin Organization",
+                    "column_order": 7,
+                    "example_values": [
+                        "Splunk Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.phone",
+                    "data_type": "string",
+                    "example_values": [
+                        "866-434-1111"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.postal",
+                    "data_type": "string",
+                    "example_values": [
+                        "94086"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.admin.street",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.city",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.fax",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.name",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.org",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.phone",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.postal",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.billing.state",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.city",
+                    "data_type": "string",
+                    "column_name": "Registrant City",
+                    "column_order": 8,
+                    "example_values": [
+                        "San Jose"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.country",
+                    "data_type": "string",
+                    "column_name": "Registrant Country",
+                    "column_order": 9,
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Registrant Email",
+                    "column_order": 10,
+                    "example_values": [
+                        "idc@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.fax",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.name",
+                    "data_type": "string",
+                    "column_name": "Registrant Name",
+                    "column_order": 11,
+                    "example_values": [
+                        "Jhon Smith"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.org",
+                    "data_type": "string",
+                    "column_name": "Registrant Organization",
+                    "column_order": 12,
+                    "example_values": [
+                        "Splunk Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.phone",
+                    "data_type": "string",
+                    "column_name": "Registrant Phone",
+                    "column_order": 13,
+                    "example_values": [
+                        "866-434-9121"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.postal",
+                    "data_type": "string",
+                    "example_values": [
+                        "94088"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.registrant.street",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "San Jose"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "idc@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.fax",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jhon smith"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.phone",
+                    "data_type": "string",
+                    "example_values": [
+                        "861-111-1211"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.postal",
+                    "data_type": "string",
+                    "example_values": [
+                        "94088"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.contacts.tech.street",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.created_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-06-20T12:49:22+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.expired_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-20T12:49:22+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.name_servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "ns4.splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.other_properties.dnssec",
+                    "data_type": "string",
+                    "example_values": [
+                        "unsignedDelegation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.other_properties.domain_domain_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok https://icann.org/epp#ok"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.other_properties.registry_domain_id",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "491960245_DOMAIN_COM-VRSN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.abuse_contact_email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "abuse@net4.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.abuse_contact_phone",
+                    "data_type": "string",
+                    "example_values": [
+                        "911204323500"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.iana_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1007"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Net 4 Test Limited"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://www.net4.us/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.registrar.whois_server",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "example_values": [
+                        "whois.net4domains.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.statuses",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_whois.updated_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-21T08:29:46+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.record_source",
+                    "data_type": "string",
+                    "example_values": [
+                        "SPLUNK.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrant",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registration.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-06-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registration.expires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registration.registrar",
+                    "data_type": "string",
+                    "example_values": [
+                        "Net 4 Test Limited"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registration.statuses",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registration.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-21"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.record",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Name: SPLUNK.COM\nRegistry Domain ID: 491960245_DOMAIN_COM-VRSN\nRegistrar WHOIS Server: whois.net4domains.com\nRegistrar URL: http://www.net4.in/\nUpdated Date: 2018-06-21T08:29:46Z\nCreation Date: 2006-06-20T12:49:22Z\nRegistrar Registration Expiration Date: 2019-06-20T12:49:22Z\nRegistrar: Net 4 India Limited\nRegistrar IANA ID: 1007\nRegistrar Abuse Contact Email: abuse@net4.com\nRegistrar Abuse Contact Phone: +1.9661231111\nDomain Domain Status: ok https://icann.org/epp#ok\nRegistry Registrant ID: \nRegistrant Name: Jhon Smith\nRegistrant Organization: Splunk Inc\nRegistrant Street: ,\nRegistrant City: San Jose\nRegistrant State/Province: CA\nRegistrant Postal Code: 94088\nRegistrant Country: US\nRegistrant Phone: +91.2612789500\nRegistrant Phone Ext:\nRegistrant Fax: \nRegistrant Fax Ext:\nRegistrant Email: idc@splunk.com\nRegistry Admin ID: \nAdmin Name: Jhon Smith\nAdmin Organization: Splunk Inc\nAdmin Street: ,\nAdmin City: San Jose\nAdmin State/Province: CA\nAdmin Postal Code: 94088\nAdmin Country: US\nAdmin Phone: +1.9661231111\nAdmin Phone Ext:\nAdmin Fax: \nAdmin Fax Ext:\nAdmin Email: idc@splunk.com\nRegistry Tech ID: \nTech Name: Jhon Smith\nTech Organization: Splunk Inc\nTech Street: ,\nTech City: San Jose\nTech State/Province: CA\nTech Postal Code: 94088\nTech Country: IN\nTech Phone: +1.9661231111\nTech Phone Ext:\nTech Fax: \nTech Fax Ext:\nTech Email: idc@splunk.com\nName Server: NS1.SPLUNK.COM\nName Server: NS2.SPLUNK.COM\nName Server: NS3.SPLUNK.COM\nName Server: NS4.SPLUNK.COM\nDNSSEC: unsignedDelegation\nURL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "San Jose"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization: Splunk Inc."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
