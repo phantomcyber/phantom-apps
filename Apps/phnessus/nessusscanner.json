@@ -1,0 +1,443 @@
+{
+    "appid": "5e5815d7-bedc-410e-bea2-c7df1b44297e",
+    "name": "Nessus",
+    "description": "This app integrates with Tenable's Nessus scanner to provide endpoint-based investigative actions",
+    "publisher": "Phantom",
+    "package_name": "phantom_nessus",
+    "type": "information",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
+    "main_module": "nessusscanner_connector.pyc",
+    "app_version": "1.0.11",
+    "utctime_updated": "2018-12-07T01:33:35.000000Z",
+    "product_vendor": "Tenable",
+    "product_name": "Nessus",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.284",
+    "logo": "logo_nessus.svg",
+    "logo_dark": "logo_nessus_dark.svg",
+    "configuration": {
+        "nessus_server": {
+            "description": "Nessus server IP/hostname",
+            "data_type": "string",
+            "order": 0,
+            "required": true
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": false,
+            "required": false,
+            "order": 1
+        },
+        "listen_port": {
+            "description": "Port that the Nessus server is listening on",
+            "data_type": "string",
+            "default": "8834",
+            "order": 2,
+            "required": true
+        },
+        "placeholder": {
+            "data_type": "ph",
+            "order": 3
+        },
+        "access_key": {
+            "description": "Access Key from user's api screen",
+            "data_type": "string",
+            "order": 4,
+            "required": true
+        },
+        "secret_key": {
+            "description": "Secret Key from user's api screen",
+            "data_type": "password",
+            "order": 5,
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration using api tokens",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "description": "List the available scan policies",
+            "type": "investigate",
+            "identifier": "list_policies",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "width": 12,
+                "title": "List Policies",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creation_date",
+                    "data_type": "numeric",
+                    "column_name": "Creation Date",
+                    "column_order": 2,
+                    "example_values": [
+                        1500907246
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "data_type": "string",
+                    "contains": [
+                        "nessus policy id"
+                    ],
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_modification_date",
+                    "data_type": "numeric",
+                    "column_name": "Last Modified",
+                    "column_order": 2,
+                    "example_values": [
+                        1500907264
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Policy for basic network test - Herman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.no_target",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.shared",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.template_uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "731a8e52-3ea6-a291-ec0a-d2ff0619c19d7bd788d6be818b65"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_permissions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        128
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.visibility",
+                    "data_type": "string",
+                    "example_values": [
+                        "shared"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.policy_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy count: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "scan endpoint",
+            "description": "Scans a host using the selected scan policy ID",
+            "verbose": "This action requires the ID of the scan policy to be used in the scan. Note, the scan may take 10-15 minutes.",
+            "type": "investigate",
+            "identifier": "scan_host",
+            "read_only": true,
+            "parameters": {
+                "target_to_scan": {
+                    "description": "IP of host to scan",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "hostname"
+                    ],
+                    "required": true
+                },
+                "policy_id": {
+                    "description": "ID of the scan policy to use",
+                    "data_type": "string",
+                    "contains": [
+                        "nessus policy id"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Scan Endpoint",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_id",
+                    "data_type": "string",
+                    "contains": [
+                        "nessus policy id"
+                    ],
+                    "example_values": [
+                        "4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.target_to_scan",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.16.54.130"
+                    ],
+                    "contains": [
+                        "ip",
+                        "hostname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.critical",
+                    "data_type": "numeric",
+                    "column_name": "Critical Vulns",
+                    "column_order": 5,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.high",
+                    "data_type": "numeric",
+                    "column_name": "High Vulns",
+                    "column_order": 4,
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_index",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
+                    "data_type": "string",
+                    "column_name": "Host Scanned",
+                    "column_order": 0,
+                    "example_values": [
+                        "172.16.54.130"
+                    ],
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.info",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.low",
+                    "data_type": "numeric",
+                    "column_name": "Low Vulns",
+                    "column_order": 2,
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.medium",
+                    "data_type": "numeric",
+                    "column_name": "Medium Vulns",
+                    "column_order": 3,
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.numchecksconsidered",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4139
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.progress",
+                    "data_type": "string",
+                    "example_values": [
+                        "4139-4139/91296-91296"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scanprogresscurrent",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4139
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scanprogresstotal",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4139
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric",
+                    "column_name": "Host Score",
+                    "column_order": 1,
+                    "example_values": [
+                        14791
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        85
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severitycount.item.*.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severitycount.item.*.severitylevel",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.totalchecksconsidered",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4139
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_vulns",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total vulns: 14"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
