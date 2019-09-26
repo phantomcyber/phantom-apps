@@ -1,0 +1,417 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!--
+File: view_results.html
+
+Copyright (c) 2014-2019 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+-->
+
+
+<style>
+
+.cuckoo-report .wildfire-display-report a:hover {
+  text-decoration:underline;
+}
+
+
+.cuckoo-report .wildfire-display-report .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.cuckoo-report .wildfire-display-report .wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.cuckoo-report .wildfire-display-report .wf-table-horizontal {
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.cuckoo-report .wildfire-display-report .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.cuckoo-report .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+}
+
+.cuckoo-report .wf-h3-style {
+  font-size : 20px
+}
+
+.cuckoo-report .wf-h4-style {
+  font-size : 16px
+}
+
+.cuckoo-report .wf-h5-style {
+  font-size : 14px
+}
+
+.cuckoo-report .wf-subheader-style {
+  font-size : 12px
+}
+
+.cuckoo-report .sandbox-info {
+  min-width: 250px;
+  display: inline-block;
+  padding-right: 30px;
+  white-space: nowrap;
+  height: 2em;
+  text-align: left;
+}
+
+</style>
+
+<div class="cuckoo-report" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+  {% for result in results %}
+  <ul class="nav nav-tabs" role="tablist">
+    <li {% if forloop.first  %} class="active" {% endif %}>
+      <a data-toggle="tab" href="#report{{ forloop.counter0 }}">Report {{ result.data.report.info.id }}</a>
+    </li>
+  </ul>
+
+  <div class="tab-content" style="z-index: 1;">
+    <div id="report{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
+
+      <ul class="nav nav-tabs" role="tablist">
+      {% for key in result.data.report %}
+        {% if key|length > 0 %}  <!-- Check to make sure it's not an empty dict -->
+        <li{% if key == "info" %} class="active"{% endif %}>
+          <a data-toggle="tab" href="#{{ key }}{{ forloop.parentloop.counter0 }}">{{ key }}</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+      </ul>
+      <div class="tab-content" style="z-index: 1;">
+
+
+        <div id="info{{ forloop.counter0 }}" class="tab-pane fade active in" role="tabpanel">
+          {% with item=result.data.report.info %}
+          <div class="panel">
+            <div class="panel-title">
+              <h3>{{ info.category|title }} Analysis</h3>
+            </div>
+            <div class="panel-body">
+              <div class="sandbox-info"><b>Started ON:</b> &nbsp;{{ item.started|human_datetime }}</div>
+              <div class="sandbox-info"><b>Ended:</b> {{ item.ended|human_datetime }}</div>
+              <div class="sandbox-info"><b>Duration:</b> {{ item.duration }} seconds</div>
+              <div class="sandbox-info"><b>Custom flags:</b> &nbsp;{{ item.custom|default:'No custom options.' }}</div>
+              <div class="sandbox-info"><b>Manager:</b> &nbsp;{{ item.machine.manager }}</div>
+              <div class="sandbox-info"><b>VM Label:</b> &nbsp;{{ item.machine.label }}</div>
+              <div class="sandbox-info"><b>Configured Name:</b> &nbsp;{{ item.machine.name }}</div>
+              <div class="sandbox-info"><b>Version:</b> &nbsp;{{ item.version }}</div>
+              {% if result.summary.results_url %}
+              <div>
+                <b>Source Link:</b> &nbsp;
+                <a href="{{ result.summary.results_url }}" target="_blank">
+                  Task {{ item.id }}
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endwith %}
+        </div> <!-- End Info -->
+
+
+        {% if result.data.report.static %}
+        <div id="static{{ forloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          {% with item=result.data.report.static %}
+          <div style="overflow: auto; height: 100%; width: 100%;">
+
+            {% if item.pe_imports %}
+            <h3>PE Imports <button class="btn btn-phantom" type"button"
+                            onclick="$(this).parent().next().toggleClass('hidden');
+                            $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-pe-imports" style="min-width: 100%; margin: 0px;" onwidgetresize="cuckoo_behavior_resize_table(this);">
+              <thead>
+                <th>IMPORT NAME</th>
+                <th>DLL NAME</th>
+                <th>ADDRESS</th>
+              </thead>
+              <tbody>
+                {% for dll in item.pe_imports|dictsort:'dll' %}
+                  {% for import in dll.imports %}
+                    <tr>
+                      <td>{{ import.name }}</td>
+                      <td>{{ dll.dll }}</td>
+                      <td>{{ import.address }}</td>
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+            {% if item.pe_exports %}
+            <h3>PE Exports <button class="btn btn-phantom" type"button"
+                            onclick="$(this).parent().next().toggleClass('hidden');
+                            $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-pe-exports" style="min-width: 100%; margin: 0px;" onwidgetresize="cuckoo_behavior_resize_table(this);">
+              <thead>
+                <th>DLL NAME</th>
+                <th>EXPORT NAME</th>
+                <th>ADDRESS</th>
+              </thead>
+              <tbody>
+                {% for dll in item.pe_exports|dictsort:'dll' %}
+                  {% for import in dll.imports %}
+                    <tr>
+                      <td>{{ dll.dll }}</td>
+                      <td>{{ import.name }}</td>
+                      <td>{{ import.address }}</td>
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+            <!--
+            <h3>PE Resources <button class="btn btn-phantom" type"button"
+                              onclick="$(this).parent().next().toggleClass('hidden');
+                              $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            -->
+
+            {% if item.pe_sections %}
+            <h3>PE Sections <button class="btn btn-phantom" type"button"
+                             onclick="$(this).parent().next().toggleClass('hidden');
+                             $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-pe-sections" style="min-width: 100%; margin: 0px;" onwidgetresize="cuckoo_behavior_resize_table(this);">
+              <thead>
+                <th>NAME</th>
+                <th>SIZE OF DATA</th>
+                <th>VIRTUAL SIZE</th>
+                <th>VIRTUAL ADDRESS</th>
+                <th>ENTROPY</th>
+              </thead>
+              <tbody>
+                {% for section in item.pe_sections|dictsort:'name' %}
+                  <tr>
+                    <td>{{ section.name }}</td>
+                    <td>{{ section.size_of_data }}</td>
+                    <td>{{ section.virtual_size }}</td>
+                    <td>{{ section.virtual_address }}</td>
+                    <td>{{ section.entropy }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+            {% if item.pe_versioninfo %}
+            <h3>PE Version Info <button class="btn btn-phantom" type"button"
+                                 onclick="$(this).parent().next().toggleClass('hidden');
+                                 $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-pe-versioninfo" style="min-width: 100%; margin: 0px;" onwidgetresize="cuckoo_behavior_resize_table(this);">
+              <thead>
+                <th>NAME</th>
+                <th>VALUE</th>
+              </thead>
+              <tbody>
+                {% for info in item.pe_versioninfo|dictsort:'name' %}
+                  <tr>
+                    <td>{{ info.name }}</td>
+                    <td>{{ info.value }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+          </div>
+          {% endwith %}
+        </div> <!-- End Static -->
+        {% endif %}
+
+
+        {% if result.data.report.behavior %}
+        <div id="behavior{{ forloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          {% with item=result.data.report.behavior %}
+          <div style="overflow: auto; width: 100%; height: 100%;">
+
+            {% if item.processes %}
+            <h3>Processes <button class="btn btn-phantom" type"button"
+                           onclick="$(this).parent().next().toggleClass('hidden');
+                           $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-processes" style="min-width: 100%; margin: 0px;">
+              <thead>
+                <th>API</th>
+                <th>PROCESS NAME</th>
+                <th>PID</th>
+                <th>PARENT PID</th>
+                <th>FIRST SEEN</th>
+                <th>THREAD_ID</th>
+                <th>TIME STAMP</th>
+              </thead>
+              <tbody>
+                {% for process in item.processes|dictsort:'process_name' %}
+                  {% for api in process.calls %}
+                    <tr>
+                      <td>{{ api.api }}</td>
+                      <td>{{ process.process_name }}</td>
+                      <td>{{ process.process_id }}</td>
+                      <td>{{ process.parent_id }}</td>
+                      <td>{{ process.first_seen|human_datetime }}</td>
+                      <td>{{ api.thread_id }}</td>
+                      <td>{{ api.timestamp }}</td>
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+            {% if item.enhanced %}
+            <h3>Object Access <button class="btn btn-phantom" type"button"
+                               onclick="$(this).parent().next().toggleClass('hidden');
+                               $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-object" style="min-width: 100%; margin: 0px;">
+              <thead>
+                <th>TYPE</th>
+                <th>NAME</th>
+                <th>ACCESS</th>
+                <th>TIME STAMP</th>
+              </thead>
+              <tbody>
+                {% for obj in item.enhanced|dictsort:'timestamp' %}
+                  <tr>
+                    <td>{{ obj.object }}</td>
+                    <td>{% if obj.object == 'registry' %}{{ obj.data.regkey }}{% elif obj.object == 'library' %}{{ obj.data.file }}{% endif %}</td>
+                    <td>{{ obj.event }}</td>
+                    <td>{{ obj.timestamp }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+            {% if item.processtree %}
+            <h3>Object Process Tree <button class="btn btn-phantom" type"button"
+                                     onclick="$(this).parent().next().toggleClass('hidden');
+                                     $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button>
+            </h3>
+            <table id="cuckoo-tree" style="min-width: 100%; margin: 0px;">
+              <thead>
+                <th>NAME</th>
+                <th>PID</th>
+                <th>PARENT PID</th>
+              </thead>
+              <tbody>
+                {% for proc in item.processtree|dictsort:'pid' %}
+                  <tr>
+                    <td>{{ proc.name }}</td>
+                    <td>{{ proc.pid }}</td>
+                    <td>{{ proc.parent_id }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+
+          </div>
+          {% endwith %}
+        </div> <!-- End Behavior -->
+        {% endif %}
+
+
+        {% if result.data.report.debug %}
+        <div id="debug{{ forloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          {% with item=result.data.report.debug %}
+          <div style="overflow:auto; width: 100%; height: 100%;">
+            {% if item.errors %}
+              <pre>{{ item.errors }}</pre>
+            {% endif %}
+            {% if item.log %}
+              <pre>{{ item.log }}</pre>
+            {% endif %}
+          </div>
+          {% endwith %}
+        </div> <!-- End Debug -->
+        {% endif %}
+
+        {% if result.data.report.target %}
+        <div id="target{{ forloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          {% with item=result.data.report.target %}
+          <div style="overflow:auto; width: 100%; height: 100%;">
+            <h3> {{ item.category|title }}  {{ item.file.name }}{{ item.url }}</h3>
+            {% if item.phantom_info %}
+            <div class="sandbox-info"><b>SIZE:</b> &nbsp;{{ item.phantom_info.size }}</div>
+            <div class="sandbox-info"><b>MD5:</b> &nbsp;{{ item.phantom_info.md5 }}</div>
+            <div class="sandbox-info"><b>CRC32:</b> &nbsp;{{ item.phantom_info.crc32 }}</div><br>
+            <div class="sandbox-info"><b>TYPE:</b> &nbsp;{{ item.phantom_info.type }}</div><br>
+            <div class="sandbox-info"><b>SHA1:</b> &nbsp;{{ item.phantom_info.sha1 }}</div><br>
+            <div class="sandbox-info"><b>SHA256:</b> &nbsp;{{ item.phantom_info.sha256 }}</div><br>
+            <div class="sandbox-info"><b>SHA512:</b> &nbsp;{{ item.phantom_info.sha512 }}</div><br>
+            <div class="sandbox-info"><b>SSDEEP:</b> &nbsp;{{ item.phantom_info.ssdeep }}</div><br>
+            {% endif %}
+          </div>
+          {% if item.phantom_info.yara %}
+          <div class="panel" style="padding: 5px;">
+            <div class="panel-title">
+              <h3>Yara</h3>
+            </div>
+            <div class="panel-body">
+              <pre>{{ item.phantom_info.yara }}</pre>
+            </div>
+          </div>
+          {% endif %}
+          {% endwith %}
+        </div> <!-- End Target -->
+        {% endif %}
+
+        {% if result.data.report.strings %}
+        <div id="strings{{ forloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          {% with item=result.data.report.strings %}
+          <div style="overflow:auto; width: 100%; height: 100%;">
+            <h3>Strings</h3>
+            <pre>{{ item }}</pre>
+          </div>
+          {% endwith %}
+        </div>
+        {% endif %}
+
+        {% for key, value in result.data.report.items %}
+        {% if key not in result.formatted_sections %}
+        <div id="{{ key }}{{ forloop.parentloop.counter0 }}" class="tab-pane fade" role="tabpanel">
+          <pre>{{ value }}</pre>
+        </div> <!-- End {{ key }} -->
+        {% endif %}
+        {% endfor %}
+
+
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,384 @@
+{
+    "appid": "d170371a-1249-4003-985f-438288f64bc3",
+    "name": "Intezer Analyze",
+    "description": "This app supports the investigate actions on the Intezer platform. Intezer's technology enables your security team to go beyond behavioral analysis. Its solutions diagnose every piece of code quickly and accurately with DNA mapping from Intezer-an industry first enabling your team to address real threats immediately",
+    "type": "sandbox",
+    "product_vendor": "Intezer",
+    "logo": "logo_intezeranalyze.svg",
+    "logo_dark": "logo_intezeranalyze_dark.svg",
+    "product_name": "Analyze",
+    "product_version_regex": ".*",
+    "publisher": "Domenico Perre",
+    "license": "Copyright (c) Domenico Perre, 2019",
+    "app_version": "1.1.0",
+    "utctime_updated": "2018-05-28T21:59:05.044159Z",
+    "package_name": "phantom_intezeranalyze",
+    "main_module": "intezeranalyze_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.1.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL for API request",
+            "data_type": "string",
+            "required": true,
+            "default": "https://analyze.intezer.com/api/",
+            "order": 0
+        },
+        "apiKey": {
+            "description": "API Key for submitting samples",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "identifier": "detonate_file",
+            "description": "Run the file in the sandbox and retrieve the analysis results",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "order": 0
+                },
+                "file_name": {
+                    "description": "Filename to use",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 7,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_id",
+                    "data_type": "string",
+                    "column_name": "Analysis ID",
+                    "contains": [
+                        "id"
+                    ],
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_url",
+                    "data_type": "string",
+                    "column_name": "Analysis URL",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.result.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "SHA256",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.result.sub_verdict",
+                    "data_type": "string",
+                    "column_name": "Sub Verdict",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.verdict",
+                    "data_type": "string",
+                    "column_name": "Verdict",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "description": "Query for results of an already completed detonation",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Detonation ID to get the report of",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 7,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_id",
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ],
+                    "column_name": "Analysis ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_url",
+                    "data_type": "string",
+                    "column_name": "Analysis URL",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.result.family",
+                    "data_type": "string",
+                    "column_name": "Family",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "SHA256",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.result.sub_verdict",
+                    "data_type": "string",
+                    "column_name": "Sub Verdict",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.verdict",
+                    "data_type": "string",
+                    "column_name": "Verdict",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file reputation",
+            "identifier": "file_reputation",
+            "description": "Queries for file info",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "File hash to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 7,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_id",
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ],
+                    "column_name": "Analysis ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.result.analysis_url",
+                    "data_type": "string",
+                    "column_name": "Analysis URL",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.result.family",
+                    "data_type": "string",
+                    "column_name": "Family",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "SHA256",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.result.sub_verdict",
+                    "data_type": "string",
+                    "column_name": "Sub Verdict",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.verdict",
+                    "data_type": "string",
+                    "column_name": "Verdict",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

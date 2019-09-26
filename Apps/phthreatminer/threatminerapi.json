@@ -1,0 +1,1572 @@
+{
+    "appid": "f53cf8b3-5456-46db-b158-438978df7789",
+    "name": "ThreatMiner API",
+    "description": "This app integrates with the ThreatMiner API to provide investigation activities",
+    "type": "information",
+    "product_vendor": "ThreatMiner",
+    "logo": "logo_threatminerapi.svg",
+    "logo_dark": "logo_threatminerapi_dark.svg",
+    "product_name": "API",
+    "product_version_regex": ".*",
+    "publisher": "Domenico Perre",
+    "license": "Copyright (c) Domenico Perre, 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2018-06-09T13:04:31.843101Z",
+    "package_name": "phantom_threatminerapi",
+    "main_module": "threatminerapi_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL for api request",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "https://api.threatminer.org/v2/",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup domain",
+            "identifier": "lookup_domain",
+            "description": "Check for the presence of a domain in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "www.Threatminer.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.first_seen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 4,
+                    "example_values": [
+                        "2019-02-25 12:13:23"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "IP Address",
+                    "column_order": 3,
+                    "example_values": [
+                        "160.153.136.3",
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.last_seen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 5,
+                    "example_values": [
+                        "2019-02-25 12:13:23"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200",
+                        "404"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found.",
+                        "No results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "www.Threatminer.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found.",
+                        "No results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain: www.Threatminer.com, Status message: Results found."
+                    ]
+                },
+                {
+                    "data_path": "summary.status_message",
+                    "data_type": "string",
+                    "column_name": "Status Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup hash",
+            "identifier": "lookup_hash",
+            "description": "Check for the presence of a hash in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "Hash to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "example_values": [
+                        "494303294715f5ffad7ad3f43b73b00b",
+                        "6c1948f7edf115cd1f13cd170b882077930be150",
+                        "27ce020f7cdb4b775b80bd6e3ef1d16079401e0d45cfd28ffbd8c63ff2ddf7d7"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "hash_type": {
+                    "description": "Cryptographic Hash, Imphash or SSDEEP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "hash",
+                        "ssdeep",
+                        "imphash"
+                    ],
+                    "value_list": [
+                        "cryptographic_hash",
+                        "ssdeep",
+                        "imphash"
+                    ],
+                    "default": "cryptographic_hash",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "example_values": [
+                        "494303294715f5ffad7ad3f43b73b00b",
+                        "6c1948f7edf115cd1f13cd170b882077930be150",
+                        "27ce020f7cdb4b775b80bd6e3ef1d16079401e0d45cfd28ffbd8c63ff2ddf7d7"
+                    ],
+                    "column_name": "hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.hash_type",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "ssdeep",
+                        "imphash"
+                    ],
+                    "column_name": "hash_type",
+                    "column_order": 1,
+                    "example_values": [
+                        "cryptographic_hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.av_detections.results.*.av_detections.*.av",
+                    "data_type": "string",
+                    "example_values": [
+                        "MicroWorld-eScan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.av_detections.results.*.av_detections.*.detection",
+                    "data_type": "string",
+                    "example_values": [
+                        "Gen:Variant.Symmi.44235"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.av_detections.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.av_detections.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hosts_domains_and_ips",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "Threatminer.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.http_traffic",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.architecture",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.authentihash",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.date_analysed",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-04-06 14:50:28"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.file_size",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.imphash",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "fa101bee034e93a1fa8e8f08d1bf76e7"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "6d484daba3927fc0744b1bbd7981a56ebef95790"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "239a25ac2b38f0be9392ceeaeab0d64cb239f033af07ed56565ba9d6a7ddcf1f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.results.*.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mutants",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.registry_keys",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.threatminer.org/report.php?q=CmstarDownloader_Lurid_Enfal_Cousin.pdf&y=2015"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "CmstarDownloader_Lurid_Enfal_Cousin.pdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.year",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "fa101bee034e93a1fa8e8f08d1bf76e7",
+                        "239a25ac2b38f0be9392ceeaeab0d64cb239f033af07ed56565ba9d6a7ddcf1f"
+                    ],
+                    "contains": [
+                        "md5",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status message: Results found, Hash: fa101bee034e93a1fa8e8f08d1bf76e7",
+                        "Status message: Results found, Hash: 239a25ac2b38f0be9392ceeaeab0d64cb239f033af07ed56565ba9d6a7ddcf1f"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "threatminer_view.display_hash",
+                "title": "Lookup Domain"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Check for the presence of an IP in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.related_samples",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.uris",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip: 1200:0000:AB00:1234:0000:2552:7777:1313, Status message: No results found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois domain",
+            "identifier": "whois_domain",
+            "description": "Execute whois lookup on the given domain",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "\"www.Threatminer.com\",\"Threatminer.com\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "whois.register.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.is_subdomain",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.last_updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-09-14 00:00:00",
+                        "2019-02-25 00:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.root_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "register.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.admin_info.City",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.admin_info.Country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.admin_info.Organization",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.admin_info.Postal_Code",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.admin_info.State",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.billing_info.City",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.billing_info.Country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.billing_info.Organization",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.billing_info.Postal_Code",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.billing_info.State",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.creation_date",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.date_checked",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.email_hashes.admin",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.email_hashes.billing",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.email_hashes.registrant",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.email_hashes.tech",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.emails.admin",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.emails.billing",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.emails.registrant",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.emails.tech",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.expiration_date",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.reg_info.City",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.reg_info.Country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.reg_info.Organization",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.reg_info.Postal_Code",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.reg_info.State",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrant_info.City",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrant_info.Country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrant_info.Organization",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrant_info.Postal_Code",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrant_info.State",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.registrar",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.tech_info.City",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.tech_info.Country",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.tech_info.Organization",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.tech_info.Postal_Code",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.tech_info.State",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.updated_date",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.whois.whois_server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "404",
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found.",
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"www.Threatminer.com\",\"Threatminer.com\""
+                    ],
+                    "contains": [
+                        "domain",
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found.",
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain: \"www.Threatminer.com\",\"Threatminer.com\", Status message: No results found."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reverse ip",
+            "identifier": "reverse_ip",
+            "description": "Find domain names that share an IP",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP address to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "8.8.8.8",
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 2,
+                    "example_values": [
+                        "Threatminer.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.first_seen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 3,
+                    "example_values": [
+                        "2019-02-25 00:19:58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.last_seen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 4,
+                    "example_values": [
+                        "2019-02-25 00:19:58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "204.93.172.99"
+                    ],
+                    "contains": [
+                        "ip",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain: 204.93.172.99, Status message: Results found."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois ip",
+            "identifier": "whois_ip",
+            "description": "Execute whois lookup on the given IP address",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "example_values": [
+                        "8.8.8.8",
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 8,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "8.8.8.8",
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.asn",
+                    "data_type": "string",
+                    "column_name": "ASN",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.asn_name",
+                    "data_type": "string",
+                    "column_name": "ASN Name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.bgp_prefix",
+                    "data_type": "string",
+                    "column_name": "BGP Prefix",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.cc",
+                    "data_type": "string",
+                    "column_name": "Country Code",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.org_name",
+                    "data_type": "string",
+                    "column_name": "Organisation Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.register",
+                    "data_type": "string",
+                    "column_name": "Registrar",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.reverse_name",
+                    "data_type": "string",
+                    "column_name": "Reverse Name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "404"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain: 1200:0000:AB00:1234:0000:2552:7777:1313, Status message: No results found."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup av",
+            "identifier": "lookup_av",
+            "description": "Lookup AV String",
+            "verbose": "Lookup AV string to find known hashes. For example you can lookup 'Trojan.Enfal'",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "av_string": {
+                    "description": "The detection name from the AV vendor",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "avdetection"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.av_string",
+                    "data_type": "string",
+                    "column_name": "av_string",
+                    "column_order": 0,
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.URL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.threatminer.org/report.php?q=Kaspersky_Lab_crouching_yeti_appendixes_eng_final.pdf&y=2014"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "Kaspersky_Lab_crouching_yeti_appendixes_eng_final.pdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.results.*.year",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_tagging.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.samples",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.av_string",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Results found"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Av string: test, Status message: Results found"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "threatminer_view.display_hash",
+                "title": "Lookup AV"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ssl",
+            "identifier": "lookup_ssl",
+            "description": "Search SSL thumbprint",
+            "verbose": "Lookup an SSL thumbprint against ThreatMiner API and return known IP addresses associated with that same SSL certificate",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "thumbprint": {
+                    "description": "SSL Thumbprint",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.thumbprint",
+                    "data_type": "string",
+                    "column_name": "thumbprint",
+                    "column_order": 0,
+                    "example_values": [
+                        "42a8d5b3a867a59a79f44ffadd61460780fe58f2&rt=1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "example_values": [
+                        "8.8.8.8",
+                        "1200:0000:AB00:1234:0000:2552:7777:1313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "404"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "No results found"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.thumbprint",
+                    "data_type": "string",
+                    "example_values": [
+                        "42a8d5b3a867a59a79f44ffadd61460780fe58f2&rt=1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status message: No results found, Thumbprint: 42a8d5b3a867a59a79f44ffadd61460780fe58f2&rt=1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

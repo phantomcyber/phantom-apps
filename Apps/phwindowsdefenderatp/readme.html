@@ -1,0 +1,69 @@
+<!-- File: readme.html
+  Copyright (c) 2019 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<html>
+<head></head>
+<body>
+<h2>Authentication</h2>
+This app requires creating a Microsoft Azure Application. To do so, navigate to <a href="https://portal.azure.com">https://portal.azure.com</a> in a browser and log in with a Microsoft account, then select <b>Azure Active Directory</b>.
+<br>
+<ol>
+  <li>Go to <b>App Registrations</b> and click on <b>+ New Application Registration</b>.</li>
+	<li>Give an appropriate name and provide a sign-on URL.</li>
+  <li>Select an app.</li>
+  <li>Go to <b>App Settings</b> → <b>API Permissions</b> and click on <b>App Name</b> → Select Permission Type.</li>
+	<li>The following Delegated and Application Permissions need to be added to the App:
+      <ul>
+        <b>Application Permissions</b>
+          <ul>
+            <li>Alert.ReadWrite.All</li>
+            <li>File.Read.All</li>
+            <li>Machine.Isolate</li>
+            <li>Machine.Offboard</li>
+            <li>Machine.Read.All</li>
+            <li>Machine.ReadWrite.All</li>
+            <li>Machine.RestrictExecution</li>
+            <li>Machine.Scan</li>
+            <li>Machine.StopAndQuarantine</li>
+            <li>User.Read.All</li>
+          </ul>
+      </ul>
+      <ul>
+        <b>Deligated Permissions</b>
+          <ul>
+            <li>Alert.ReadWrite</li>
+            <li>File.Read.All</li>
+            <li>Machine.Isolate</li>
+            <li>Machine.Offboard</li>
+            <li>Machine.Read</li>
+            <li>Machine.ReadWrite</li>
+            <li>Machine.RestrictExecution</li>
+            <li>Machine.Scan</li>
+            <li>Machine.StopAndQuarantine</li>
+            <li>User.Read.All</li>
+          </ul>
+      </ul>
+  </li>
+</ol>
+<h2>Phantom Graph Asset</h2>
+When creating an asset for the <b>Windows Defender ATP</b> app, place <b>Application Id</b> of the app created during the previous step in the <b>Client ID</b> field and the tenant ID (ID of the active directory) in the <b>Tenant ID</b> field, click <b>SAVE</b>.
+<br>
+For Tenant ID, Go to <b>Azure Active Directory</b> → <b>Properties</b> and copy the <b>Directory ID</b>.
+<br>
+After saving, a new field will appear in the <b>Asset Settings</b> tab. Take the URL found in the <b>POST incoming for Windows Defender ATP to this location</b> field and place it in the <b>App Settings → Redirect URIs</b> field of your registered app. To this URL, add <b>/result</b>. After doing so the URL should look something like:
+<br><br>
+<pre>
+https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_e85407b7-91f0-4019-8fa4-0d29bca741d5/&lt;asset_name&gt;/result
+</pre>
+<br>
+Once again, click save.
+<br>
+<h2>Method to run test connectivity</h2>
+After setting up the asset and user, click the <b>TEST CONNECTIVITY</b> button. A window should pop up and display a URL. Navigate to this URL in a separate browser tab. This new tab will redirect to a Microsoft login page. Log in to a Microsoft account. After logging in, review the requested permissions listed, then click <b>Accept</b>. Finally, close that tab. The test connectivity window should show success message.
+<br><br>
+The app should now be ready to be used.
+</body>
+</html>
