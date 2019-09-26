@@ -1,6 +1,6 @@
 # Splunk>Phantom
 
-Welcome to the Splunk>Phantom Community! Phantom is Splunk's premier Security Automation, Orchestration, and Response ("SOAR") platform. With it, our customers can automation entire or partial workflows for their employees across an infinite number of use-cases. 
+Welcome to the Splunk>Phantom Community! Phantom is Splunk's premier Security Automation, Orchestration, and Response ("SOAR") platform. With it, our customers can automate entire or partial workflows for their employees across an infinite number of use-cases.
 
 This repository represents our efforts to open-source our Phantom Apps so our customers can look at how our code works, make improvements, and generally build a stronger community through the free exchange of ideas.
 
@@ -18,7 +18,7 @@ If you'd like to join our community chat, head over to [https://my.phantom.us](h
 ---
 
 ## Reporting Issues
-If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the `Issues` section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
+If you've found a problem but don't want to contribute a fix, that's ok! All you need to do is go to the [Issues](https://github.com/phantomcyber/phantom-apps/issues) section of the Repo and click 'New Issue'. This will show our conviniently set-up Issue templates. 
 
 ![Issues Templates](.github/Images/Github-Issue-Templates.png)
 

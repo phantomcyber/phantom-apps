@@ -34,7 +34,7 @@ If you've found a bug and wish to fix it, the first thing to do is
 1. Create a branch for the issue (following our [Naming Conventions](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CODING_CONVENTIONS.md))
 1. Make your changes on your branch
 1. Thoroughly test your changes
-1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch. 
+1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch.
 
 **Note: Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
 
