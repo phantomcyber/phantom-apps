@@ -1,0 +1,261 @@
+{
+  "appid": "6a474f60-5355-4ac1-8654-37a2d4a2143b",
+  "name": "Have I Been Pwned",
+  "description": "Queries Have I Been Pwned for data breach information with <b>lookup email</b> and <b>lookup domain</b>.",
+  "type": "investigative",
+  "main_module": "haveibeenpwned_connector.pyc",
+  "app_version": "1.0.11",
+  "utctime_updated": "2018-12-07T02:01:46.000000Z",
+  "product_vendor": "Troy Hunt",
+  "product_name": "Have I Been Pwned",
+  "product_version_regex": ".*",
+  "logo": "haveibeenpwned.png",
+  "min_phantom_version": "2.0.264",
+  "publisher": "Phantom",
+  "package_name": "phantom_haveibeenpwned",
+  "license": "Copyright (c) Phantom Cyber Corporation 2016",
+  "configuration": {},
+  "actions": [
+    {
+      "action": "lookup email",
+      "identifier": "lookup_email",
+      "description": "Searches for breaches associated with an email",
+      "type": "investigate",
+      "read_only": true,
+      "parameters": {
+        "email": {
+          "description": "Email address",
+          "data_type": "string",
+          "contains": [
+            "email"
+          ],
+          "required": true,
+          "primary": true
+        }
+      },
+      "render": {
+        "width": 12,
+        "title": "Lookup Email",
+        "type": "table",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.Name",
+          "data_type": "string",
+          "column_name": "Company",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.Title",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Domain",
+          "data_type": "string",
+          "contains": [
+            "domain"
+          ],
+          "column_name": "Domain",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.IsActive",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.LogoType",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.PwnCount",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.AddedDate",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.IsRetired",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.BreachDate",
+          "data_type": "string",
+          "column_name": "Date Of Breach",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.IsSpamList",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.IsVerified",
+          "data_type": "boolean",
+          "column_order": 3,
+          "column_name": "Verified"
+        },
+        {
+          "data_path": "action_result.data.*.DataClasses",
+          "data_type": "string",
+          "column_order": 4,
+          "column_name": "Data Compromised"
+        },
+        {
+          "data_path": "action_result.data.*.Description",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.IsSensitive",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.email",
+          "data_type": "string",
+          "contains": [
+            "email"
+          ]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_breaches",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "lookup domain",
+      "identifier": "lookup_domain",
+      "description": "Searches for breaches associated with a domain",
+      "type": "investigate",
+      "read_only": true,
+      "parameters": {
+        "domain": {
+          "description": "URL or domain to query",
+          "data_type": "string",
+          "contains": [
+            "url",
+            "domain"
+          ],
+          "required": true,
+          "primary": true
+        }
+      },
+      "render": {
+        "width": 12,
+        "title": "Lookup Domain",
+        "type": "table",
+        "height": 5
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.Name",
+          "data_type": "string",
+          "column_name": "Company",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.Title",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Domain",
+          "data_type": "string",
+          "contains": [
+            "url",
+            "domain"
+          ],
+          "column_name": "Domain",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.IsActive",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.LogoType",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.PwnCount",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.AddedDate",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.IsRetired",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.BreachDate",
+          "data_type": "string",
+          "column_name": "Date Of Breach",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.IsSpamList",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.data.*.IsVerified",
+          "data_type": "boolean",
+          "column_order": 3,
+          "column_name": "Verified"
+        },
+        {
+          "data_path": "action_result.data.*.DataClasses",
+          "data_type": "string",
+          "column_order": 4,
+          "column_name": "Data Compromised"
+        },
+        {
+          "data_path": "action_result.data.*.Description",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.IsSensitive",
+          "data_type": "boolean"
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_breaches",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.parameter.domain",
+          "data_type": "string",
+          "contains": [
+            "url",
+            "domain"
+          ]
+        }
+      ],
+      "versions": "EQ(*)"
+    }
+  ]
+}
