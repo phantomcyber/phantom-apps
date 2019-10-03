@@ -1,11 +1,7 @@
-# --
 # File: haveibeenpwned_consts.py
-#
-# Copyright (c) Phantom Cyber Corporation, 2016-2019
+# Copyright (c) 2019 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-#
-# --
 
 HAVEIBEENPWNED_API_BASE_URL = "https://haveibeenpwned.com/api/v3/"
 HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL = "breachedaccount/{email}"
