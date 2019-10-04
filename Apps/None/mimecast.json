@@ -1,0 +1,3401 @@
+{
+    "appid": "ec5c4962-cc77-48bb-89bf-c144a5b4c30f",
+    "name": "Mimecast",
+    "description": "This app integrates with an instance of Mimecast to perform generic, investigative, and containment actions",
+    "type": "information",
+    "product_vendor": "Mimecast",
+    "logo": "logo_mimecast.svg",
+    "logo_dark": "logo_mimecast_dark.svg",
+    "product_name": "Mimecast",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.9",
+    "utctime_updated": "2019-03-19T22:42:16.000000Z",
+    "package_name": "phantom_mimecast",
+    "main_module": "mimecast_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL of Mimecast",
+            "data_type": "string",
+            "required": true,
+            "default": "",
+            "order": 0
+        },
+        "auth_type": {
+            "description": "Type of authentication being used",
+            "data_type": "string",
+            "required": true,
+            "order": 1,
+            "value_list": [
+                "Domain",
+                "Cloud"
+            ]
+        },
+        "username": {
+            "description": "Username to authenticate with",
+            "data_type": "string",
+            "required": true,
+            "default": "",
+            "order": 2
+        },
+        "password": {
+            "description": "Password of user to authenticate with",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "app_id": {
+            "description": "Mimecast app ID",
+            "data_type": "string",
+            "required": true,
+            "order": 4
+        },
+        "app_key": {
+            "description": "Mimecast app key",
+            "data_type": "password",
+            "required": true,
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "blacklist url",
+            "identifier": "blacklist_url",
+            "description": "Adds URL to a managed URL blacklist",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to blacklist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "match_type": {
+                    "description": "Set to 'explicit' to block instances of the full URL or set to 'domain' to block any URL with the same domain",
+                    "data_type": "string",
+                    "value_list": [
+                        "explicit",
+                        "domain"
+                    ],
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "enable_log_click": {
+                    "description": "Check to enable click logging",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Comment to add to blacklisted URL",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Blocking explicit match of URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableRewrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "mimecast url id",
+                    "column_order": 5,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableUserAwareness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableLogClick",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "block"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "path",
+                    "column_order": 3,
+                    "example_values": [
+                        "/endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matchType",
+                    "data_type": "string",
+                    "column_name": "match type",
+                    "column_order": 4,
+                    "example_values": [
+                        "explicit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scheme",
+                    "data_type": "string",
+                    "column_name": "scheme",
+                    "column_order": 1,
+                    "example_values": [
+                        "https"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully added URL to blacklist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://splunk.com/endpoint"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Blocking explicit match of URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_log_click",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.match_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "explicit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added URL to blacklist"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add member",
+            "identifier": "add_member",
+            "description": "Add a sender or domain to a Mimecast group",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "member": {
+                    "contains": [
+                        "email",
+                        "domain"
+                    ],
+                    "description": "Domain or Email address of a user to add to a group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "id": {
+                    "contains": [
+                        "mimecast group id"
+                    ],
+                    "description": "Mimecast ID of the group to add to",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain added",
+                    "column_order": 2,
+                    "example_values": [
+                        "testphantom.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.folderId",
+                    "data_type": "string",
+                    "column_name": "group id",
+                    "column_order": 3,
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzU8LgjAYgPHvsqtCzRait5qp_bOYiB06OV9jaXth08ii756dH_g9H2JBDgZUTUKSDMn9OhPHG-ydU2nSg-zbBRN66WT0jPNs9Ksuj_xdUarte8QXbwRu-EXE65TyysaauEQOtscHGIk1TCTPs4iu_IAFU3uCsQo1CalLGuxqMJ3S7X_tBR5j3x_CFS1J"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully added member to group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.member",
+                    "data_type": "string",
+                    "example_values": [
+                        "testphantom.com",
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added member to group"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "email added",
+                    "column_order": 1,
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove member",
+            "identifier": "remove_member",
+            "description": "Remove a sender or domain from a Mimecast group",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "member": {
+                    "contains": [
+                        "email",
+                        "domain"
+                    ],
+                    "description": "Domain or Email address of a user to remove from the group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "id": {
+                    "contains": [
+                        "mimecast group id"
+                    ],
+                    "description": "Mimecast group ID to remove from",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain removed",
+                    "column_order": 2,
+                    "example_values": [
+                        "testphantom.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.folderId",
+                    "data_type": "string",
+                    "column_name": "group id",
+                    "column_order": 3,
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzU8LgjAYgPHvsqtCzRait5qp_bOYiB06OV9jaXth08ii756dH_g9H2JBDgZUTUKSDMn9OhPHG-ydU2nSg-zbBRN66WT0jPNs9Ksuj_xdUarte8QXbwRu-EXE65TyysaauEQOtscHGIk1TCTPs4iu_IAFU3uCsQo1CalLGuxqMJ3S7X_tBR5j3x_CFS1J"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully removed member from group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.member",
+                    "data_type": "string",
+                    "example_values": [
+                        "testphantom.com",
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed member from group"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "email removed",
+                    "column_order": 1,
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "blacklist sender",
+            "identifier": "blacklist_sender",
+            "description": "Blacklists a specific sender and recipient in Mimecast",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "undo": "whitelist sender",
+            "parameters": {
+                "sender": {
+                    "contains": [
+                        "email"
+                    ],
+                    "description": "Email address of the sender to blacklist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "to": {
+                    "contains": [
+                        "email"
+                    ],
+                    "description": "Email address of the recipient",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "column_name": "recipient",
+                    "column_order": 2,
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Block"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "MTOKEN:eNoVzU0LgjAcgPHv8r8myNQlelNHOYRMLNbBi7odRjhjb_RC3z07P_B7PmDE7LSQHHJo_PKueyTNEKqOtzdcl2Vih3BPDpQ27HkkzPmXrh7ReXeNR1ujtmIdTe_y4osEYzZBALMzdl2EnlcuNrPqTwQVaZZkW_NCG7kqyFEAy6iMUPw_jlCMvz8iLiut"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sender",
+                    "data_type": "string",
+                    "column_name": "blocked sender",
+                    "column_order": 1,
+                    "example_values": [
+                        "herman@thephantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successful block"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@thephantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successful block"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whitelist sender",
+            "identifier": "whitelist_sender",
+            "description": "Whitelists a specific sender and recipient in Mimecast",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "undo": "blacklist sender",
+            "parameters": {
+                "sender": {
+                    "contains": [
+                        "email"
+                    ],
+                    "description": "Email address of the sender to whitelist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "to": {
+                    "contains": [
+                        "email"
+                    ],
+                    "description": "Email address of the recipient",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "column_name": "recipient",
+                    "column_order": 2,
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Permit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "MTOKEN:eNqrVipOTS4tSs1MUbJSsixNyonyDYtINTKqTMvzKQjwyo3MKTNzcfP09A6vcHcJLy2rLHIuMArQDjVOLPEw9HcOD_Q0z84MKXM0MTUNT1LSUUouLS7Jz00tSs5PSQWa6Bzs52LoaG5pYgmUK0stKs7Mz1OyMtRRyk3MK07NSwFZa2RobFYLAA6zK7o"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sender",
+                    "data_type": "string",
+                    "column_name": "permitted sender",
+                    "column_order": 1,
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successful permit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successful permit"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whitelist url",
+            "identifier": "whitelist_url",
+            "description": "Adds URL to a managed URL whitelist",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to whitelist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "match_type": {
+                    "description": "Set to 'explicit' to permit instances of the full URL or set to 'domain' to permit any URL with the same domain",
+                    "data_type": "string",
+                    "value_list": [
+                        "explicit",
+                        "domain"
+                    ],
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "enable_log_click": {
+                    "description": "Check to disable click logging",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Comment to add to whitelisted URL",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "enable_rewrite": {
+                    "description": "Check to disable domain rewrite",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                },
+                "enable_user_awareness": {
+                    "description": "Check to disable user awareness",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added splunk.com to the whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain",
+                    "column_order": 2,
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableRewrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "mimecast url id",
+                    "column_order": 5,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCuWPB8PV2NjF7ke71Hkwf_xMpMzeaandNiXD7S8f32F9M"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableUserAwareness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableLogClick",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "permit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "path",
+                    "column_order": 3,
+                    "example_values": [
+                        "/endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matchType",
+                    "data_type": "string",
+                    "column_name": "match type",
+                    "column_order": 4,
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scheme",
+                    "data_type": "string",
+                    "column_name": "scheme",
+                    "column_order": 1,
+                    "example_values": [
+                        "https"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully added URL to whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added splunk.com to the whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_log_click",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.match_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://splunk.com/endpoint"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_rewrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_user_awareness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added URL to whitelist"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblacklist url",
+            "identifier": "unblacklist_url",
+            "description": "Removes url from a managed URL blacklist",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "URL ID to unblacklist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully removed URL from URL Protection List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "mimecast url id",
+                    "column_order": 1,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed URL from URL Protection List"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unwhitelist url",
+            "identifier": "unwhitelist_url",
+            "description": "Removes url from a managed URL whitelist",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "URL ID to remove from whitelist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully removed URL from URL Protection List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "mimecast url id",
+                    "column_order": 1,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed URL from URL Protection List"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list urls",
+            "identifier": "list_urls",
+            "description": "Lists all managed URLs from the black/white list",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain",
+                    "column_order": 2,
+                    "example_values": [
+                        "www.splunk.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableRewrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "mimecast url id",
+                    "column_order": 5,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCuwxskxqP0mcg193ldR9mgkQE2Lx7XkTRob-IhkfJkVNY"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableUserAwareness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disableLogClick",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "column_name": "action",
+                    "column_order": 0,
+                    "example_values": [
+                        "block"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matchType",
+                    "data_type": "string",
+                    "column_name": "match type",
+                    "column_order": 4,
+                    "example_values": [
+                        "explicit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scheme",
+                    "data_type": "string",
+                    "column_name": "scheme",
+                    "column_order": 1,
+                    "example_values": [
+                        "https"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "path",
+                    "column_order": 3,
+                    "example_values": [
+                        "/log"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queryString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num urls: 29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_urls",
+                    "data_type": "numeric",
+                    "example_values": [
+                        29
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list groups",
+            "identifier": "list_groups",
+            "description": "Lists all Mimecast groups matching the requested search criteria",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "page_size": {
+                    "description": "Number of results per page",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "The value of the next or previous fields from an earlier request",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 1
+                },
+                "query": {
+                    "description": "A string to query for",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 2
+                },
+                "source": {
+                    "description": "A group source to filter on, either 'cloud' or 'ldap'",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.totalCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.pageSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.next",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjskOgjAURf-lW1lYNELdiagxTBKGyBLbpykBazpoivHfJSxvTnLO_aJX-wDFR-AMbbGDFFAj54GazJZ5b7tPvApCWnrZZrCdv6zy5Hw8XMDkN5u4VS36gvAAk3vtRuoU--loIrJovCtyEDVKiwEkFQwm475IQ7zzyJpM7A1ScfGcqxKokEzpVur5x-8P9e4xgQ"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.description",
+                    "data_type": "string",
+                    "column_name": "group",
+                    "column_order": 1,
+                    "example_values": [
+                        "Relay",
+                        "Permitted senders"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloud"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.folderCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.parentId",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzs0KgkAUQOF3udsEm_xDd6JYEphSOi3c2MyVJHN0Rocievdsf-A7H1DIFokdhwBIbeZ3l3pZNVwTWVSTnlhp1aYbJ2l6pK99TBf9ltG4yzel1cwHcopokXqP7qJD23HoDQzoeTNC0Da9QgPYombxRMkExxWIzllMQs-3_TXUKFUnBgiIAa3oOcr_xPb7A7sYLvQ"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.id",
+                    "data_type": "string",
+                    "column_name": "group id",
+                    "column_order": 3,
+                    "example_values": [
+                        "eNoVzkELgjAYgOH_8l3zsnSJ3sakkiKNitHRtm8wnE02HUX037P7y8P7gYBy9mgUlBDug2j5sW9SJunAgiGxsHpTbev6IF67Sszx7fm4ble3tJv2pOHiXOe9uUaWUSoekIBV3Qil7mzABOQcJjegl07hwvPLqSIsL7JiCSP6YNwTSpKAdlah_y9keUro9wc8pS9q"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.folders.*.userCount",
+                    "data_type": "numeric",
+                    "column_name": "member count",
+                    "column_order": 2,
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloud"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num groups: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.previous",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjc0KgkAYAN9lrwm5Jth2q6wof1BEsehi66dslhv7uUVG7555HAZmPuRR1ICiB1GSBTUIAtdqBBJRv07dJj80p1l7ntrNtcJXi2YaB_vtJgIdX96BlWbyljCxoqzKLA93_jzstccmRycnBuEaO3kHxWUJQ3KdhC5dOsxmg3uCQiHbcauAS1ViV6ju_za_PzBDMfk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "Senders"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "Senders"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjskOgjAURf-lW1lYNELdiagxTBKGyBLbpykBazpoivHfJSxvTnLO_aJX-wDFR-AMbbGDFFAj54GazJZ5b7tPvApCWnrZZrCdv6zy5Hw8XMDkN5u4VS36gvAAk3vtRuoU--loIrJovCtyEDVKiwEkFQwm475IQ7zzyJpM7A1ScfGcqxKokEzpVur5x-8P9e4xgQ"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloud"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list members",
+            "identifier": "list_members",
+            "description": "Lists the members of a specified Mimecast group",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "page_size": {
+                    "description": "Number of results to request",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "The value of the next or previous fields from an earlier request",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 1
+                },
+                "id": {
+                    "description": "Mimecast ID of the group to return",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.next",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjd0KgjAYQN9lt3nhhrXWXX9GmKKIkpdr-4xBbbK5fozePfPycOCcD-r4FZwaQEm0wgFyILydAHEaR10b0kXyynkzx1q38pmGVZEe430Ovri8U1LV5lYytcGsrUniDqdlNviEzRp6RgES3vXmDlYYCWNxW2Y7vKYsYqN7gHXK6OlqQRgrXc9t_1-T7w-_0jEY"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.totalCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.pageSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.previous",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjc0KgkAYAN9lrwm5Jth2q6wof1BEsehi66dslhv7uUVG7555HAZmPuRR1ICiB1GSBTUIAtdqBBJRv07dJj80p1l7ntrNtcJXi2YaB_vtJgIdX96BlWbyljCxoqzKLA93_jzstccmRycnBuEaO3kHxWUJQ3KdhC5dOsxmg3uCQiHbcauAS1ViV6ju_za_PzBDMfk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.groupMembers.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.groupMembers.*.domain",
+                    "data_type": "string",
+                    "column_name": "domain",
+                    "column_order": 2,
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.groupMembers.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.groupMembers.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "email address",
+                    "column_order": 1,
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.groupMembers.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num group members: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjskOgjAURf-lW1lYNELdiagxTBKGyBLbpykBazpoivHfJSxvTnLO_aJX-wDFR-AMbbGDFFAj54GazJZ5b7tPvApCWnrZZrCdv6zy5Hw8XMDkN5u4VS36gvAAk3vtRuoU--loIrJovCtyEDVKiwEkFQwm475IQ7zzyJpM7A1ScfGcqxKokEzpVur5x-8P9e4xgQ"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_group_members",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "find member",
+            "identifier": "find_member",
+            "description": "Finds a member of a specified Mimecast group",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "member": {
+                    "description": "The member to find",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 0,
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                "type": {
+                    "description": "The domain or email of the member to find",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "email",
+                    "value_list": [
+                        "email",
+                        "domain"
+                    ],
+                    "order": 1
+                },
+                "id": {
+                    "description": "Mimecast ID of the group to search",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Found Member!"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.member",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "column_name": "member",
+                    "column_order": 1,
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
+                    ],
+                    "column_name": "mimecast group id",
+                    "column_order": 2,
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found Member!"
+                    ],
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Get emails across the Mimecast platform",
+            "verbose": "Either from, to, subject, or sender_ip parameter must be filled out",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "start": {
+                    "description": "YYYY-MM-DDTHH:MM:SS+0000 (Date and time of the earliest email to track)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 0,
+                    "example_values": [
+                        "2018-10-18T17:28:10+0000"
+                    ]
+                },
+                "end": {
+                    "description": "YYYY-MM-DDTHH:MM:SS+0000 (Date and time of the latest email to track)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 1,
+                    "example_values": [
+                        "2018-10-18T17:28:10+0000"
+                    ]
+                },
+                "search_reason": {
+                    "description": "Reason for tracking an email",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 2
+                },
+                "message_id": {
+                    "description": "Internet message ID of the message to track",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 3
+                },
+                "sender_ip": {
+                    "description": "Source IP address of email to track",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 4,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                "subject": {
+                    "description": "Subject of email to track",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 5
+                },
+                "from": {
+                    "description": "Sending email address or domain of the emails to track",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 6,
+                    "contains": [
+                        "email"
+                    ]
+                },
+                "to": {
+                    "description": "Recipient email address or domain of the emails to track",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 7,
+                    "contains": [
+                        "email"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.info",
+                    "data_type": "string",
+                    "column_name": "email status",
+                    "column_order": 1,
+                    "example_values": [
+                        "Message Hold Applied - Spam Signature policy",
+                        "Indexed and archived"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "held",
+                        "archived"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.received",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fromHdr.emailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "recipient",
+                    "column_order": 4,
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to.*.displayableName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Matt Tichenor"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fromEnv.emailAddress",
+                    "data_type": "string",
+                    "column_name": "sender",
+                    "column_order": 2,
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.senderIP",
+                    "data_type": "string",
+                    "column_name": "sender ip",
+                    "column_order": 3,
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "email id",
+                    "column_order": 5,
+                    "example_values": [
+                        "eNpFjttKw0AURf9lXm2w00xmmiJCSawNhWpJZF6EMJeDBk1S56ZF_HcnFenr2Wevtb-RBeUNdBqt0FJuP3izf762_tO5bkc3de3uAi03VbXjX_cl9-FkiuPi8eopFW6LHwp-qNhb14Q1yTIu0Qz1YK14gdoJ521zOkLkvsK7vkQHDx6q6GM0wzPk-mFy20E7MD2Of8pbN_Zg1KindlHvS7xmOcljJpTrwt_ay72dSO0_oZ3PcXsjMZapojohAlRClhInIheQZCxli5RQTXJ8G4EBjO3GAa2mKcNZGPvo5xc8XFcV"
+                    ],
+                    "contains": [
+                        "mimecast email id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sent",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delivery Status Notification (Delay)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num emails: 14"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_emails",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fromHdr.displayableName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain postMaster address"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fromEnv.displayableName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain postMaster address"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search_reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "Looking for delivery failures"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivery status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "209.85.222.200"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get email",
+            "identifier": "get_email",
+            "description": "Returns message information for a tracked message",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Mimecast ID of the message to load",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "mimecast email id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "held",
+                        "archived"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.info",
+                    "data_type": "string",
+                    "example_values": [
+                        "- Message Spam Scanner (Holding Message)\r\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.manageRecipient",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.attachments",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.fromEnvelope",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14249
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.fromHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "Relaxed Spam Detection"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNpFjt0KgjAAhd9ltyVtuZ-MCEqL6kKikAwCmW6SoBs5lX7o3VtFdHs-znfOAxiZtbUsBBiDLopZGPUWmHK69dAxPg1ga66K9EK01TC8sbTcB2wTHYr1_aavfr7TCz_eLecr5KdmqUAfnEtxecswpqM-aCr1FhslGllXyPKsNY2uZJ1pIS3x92GAZszDnmU8a4rue-WfJ4wQmvwMCYRuMiHQ5XJEqCNczhzMh9ThNM2dIc6hKzASgqZTK-xkbQqtwBjZK-ozaPvg-QLGQUnc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.heldGroup",
+                    "data_type": "string",
+                    "example_values": [
+                        "User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.createTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22T00:49:54+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queueInfo.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delivery Status Notification (Delay)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.fromEnvelope",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.transmissionInfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "<pre>\nReceived: from mail-qk1-f200.google.com (mail-qk1-f200.google.com\r\n [209.85.222.200]) (Using TLS) by sandbox-smtp-1.mimecast.com with ESMTP id\r\n snd-mta-1-_OTU2hbdN9SvNqWmj6CtyQ-1; Mon, 22 Oct 2018 01:49:54 +0100\r\nReceived: by mail-qk1-f200.google.com with SMTP id z10-v6so2949811qkl.4\r\n        for &lt;herman@splunk.com&gt;; Sun, 21 Oct 2018 17:49:52 -0700 (PDT)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=googlemail.com; s=20161025;\r\n        h=from:to:auto-submitted:subject:references:in-reply-to:message-id\r\n         :date;\r\n        bh=p40BSvGAbUMaz+8RbOAWepKiod/tLGkEO2PHzoEM+wg=;\r\n        b=Iwa94go0/fyCIBtyMA6eT/xwwafTNo7oAqN3Gzd/mQ+tgVvvjV86dA7qk6+PoK5UvT\r\n         bgXhPGwO9mgnTlus964g1RM7zZR+lUqPwiNu+dCLbgLj7wnLySac9Mruf+uVWK2yjVCL\r\n         n7v98IPUwJ8YM3KtZ1EyVfgId6tV+mAOHLyI6r+tjsuBw49ixe/ciFpgC16lqQQgnv1k\r\n         yFQmqcpoTjgey087FBJlhJOS4yloApQVOSoOCZu3vFIOL7+HWk5FA1DrhwJMX3GS+cNa\r\n         cHDizNKcT53ahriflehD0v+PTUU5t1tp+v/u4+WSa81iUJuVWy12Ju8OiZevhKTNXrLQ\r\n         bDOw==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:from:to:auto-submitted:subject:references\r\n         :in-reply-to:message-id:date;\r\n        bh=p40BSvGAbUMaz+8RbOAWepKiod/tLGkEO2PHzoEM+wg=;\r\n        b=dsAAYj6j8l4bbG1ZOIZ0oqeP4w78tKLJgmsR114mnDO86vcDrXtbQBzJus2RgnNuaU\r\n         LIdblClCd7/KVqWRmAUexmBJJQUPQxei9xzC3viaUC8SmMpxR3IRgW5t8h1mIh8US5rN\r\n         BJRbwFkJXW69axPls4hcaVjJX1Bv5ZEoCDzKr5vHyZSM1LSStPgVch9fOK5L0Mslk0kG\r\n         uBT1j79veDZ/aurcu3hEQf3wdJL45dEfLmQ9upzR2PYuGeZMpXJe7ixOW1kAkUJydnks\r\n         AaRhnxsVhg2Zftgryk1J1CNoIYstYkB8W29TReYe9qZpVbuKnihqW2q1QYxj8ZJKuoR6\r\n         jh0g==\r\nX-Gm-Message-State: AGRZ1gKQJRyOODxqNWjJ7eyJKDNjsu+vILI262v6Ghnb0hPs+rGqUC8j\r\n\tlig7e5AcpOUJjW9AIBmLJ1YtZMoC6qYobE8c8/d+\r\nX-Google-Smtp-Source: AJdET5dsv29R3SoxJaGOxYHLcgoSXVYBLrB+2RIbX+JXkwDALJAf7uzyX6lD5BJ8GRKADLISq4ht6l++3JW+zrR1MHi4cHzwupFCKw==\r\nX-Received: by 2002:ac8:76d9:: with SMTP id q25-v6mr12277558qtr.35.1540169390891;\r\n        Sun, 21 Oct 2018 17:49:50 -0700 (PDT)\r\nReturn-Path: &lt;&gt;\r\nReceived: by 2002:ac8:76d9:: with SMTP id q25-v6mr12859955qtr.35; Sun, 21 Oct\r\n 2018 17:49:50 -0700 (PDT)\r\nFrom: Mail Delivery Subsystem &lt;mailer-daemon@googlemail.com&gt;\r\nTo: herman@splunk.com\r\nAuto-Submitted: auto-replied\r\nSubject: Delivery Status Notification (Delay)\r\nReferences: &lt;CAE0897Aqtq2HaSRyLNGTn=QBgKhR5Tuc+QsHt_F1WcGfmpYGgQ@mail.gmail.com&gt;\r\nIn-Reply-To: &lt;CAE0897Aqtq2HaSRyLNGTn=QBgKhR5Tuc+QsHt_F1WcGfmpYGgQ@mail.gmail.com&gt;\r\nMessage-ID: &lt;5bcd1eae.1c69fb81.d67aa.b4d0.GMR@mx.google.com&gt;\r\nDate: Sun, 21 Oct 2018 17:49:50 -0700 (PDT)\r\nX-MC-Unique: _OTU2hbdN9SvNqWmj6CtyQ-1\r\nContent-Type: multipart/report; boundary=&quot;0000000000007011f50578c6a1a3&quot;; report-type=delivery-status\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: multipart/related; boundary=&quot;000000000000701f470578c6a1a9&quot;\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: multipart/alternative; boundary=&quot;000000000000701f540578c6a1aa&quot;\r\n\r\n--000000000000701f540578c6a1aa\r\nContent-Type: text/plain; charset=&quot;UTF-8&quot;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550021&quot;;\r\n\r\n\r\n--000000000000701f540578c6a1aa\r\nContent-Type: text/html; charset=&quot;UTF-8&quot;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550041&quot;;\r\n\r\n\r\n--000000000000701f540578c6a1aa--\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: image/png; name=&quot;icon.png&quot;\r\nContent-Disposition: attachment; filename=&quot;icon.png&quot;\r\nContent-Transfer-Encoding: base64\r\nContent-ID: &lt;icon.png&gt;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550061&quot;;\r\n\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: image/png; name=&quot;warning_triangle.png&quot;\r\nContent-Disposition: attachment; filename=&quot;warning_triangle.png&quot;\r\nContent-Transfer-Encoding: base64\r\nContent-ID: &lt;warning_triangle.png&gt;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550081&quot;;\r\n\r\n\r\n--000000000000701f470578c6a1a9--\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: message/delivery-status\r\nX-Mimecast-Att: mailfile=&quot;11810220149550101&quot;;\r\n\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: message/rfc822\r\nX-Mimecast-Att: mailfile=&quot;11810220149550161&quot;;\r\n\r\n\r\n--0000000000007011f50578c6a1a3--\r\n\n</pre>",
+                        "<pre>\nReceived: from mail-wm1-f43.google.com (mail-wm1-f43.google.com\r\n [209.85.128.43]) (Using TLS) by relay.mimecast.com with ESMTP id\r\n snd-mta-2-W7_tRvNmNCyhljAioM2KhQ-1; Wed, 13 Feb 2019 21:04:01 +0000\r\nReceived: by mail-wm1-f43.google.com with SMTP id b11so4104753wmj.1\r\n        for &lt;herman@testphantom.net&gt;; Wed, 13 Feb 2019 13:04:01 -0800 (PST)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=testphantom-net.20150623.gappssmtp.com; s=20150623;\r\n        h=mime-version:from:date:message-id:subject:to;\r\n        bh=ZHXj9RvXSATTj9Wt4X0fetAuGh4UZd/nPrbntI3l7Ow=;\r\n        b=l6gkNS8ebjmeL0tB1IF/Lm1bTDHTufn8kO2aOd9aDh3BcHpIvcaPPaL0UwdkLyT/0h\r\n         2VbF7mdv6JcbEjo7ZqIh/RqMaW7xw7l+4CQrkihUbFGPn6ebgXIsTZpZqK1LcpFlYRbW\r\n         O6rPRHxvZ6WjVSjKUkoXPXt44w8mU1P4zlwLDX50D2wu1EOf9smn4mfEGe6Bw2FByjZE\r\n         m+2HjvDzdNQyXm4yj3mUAe/f3bwSWt2ScjNKhGgoLg364PKorsX5dwURlNFv3QpdGdGk\r\n         g7pdckgmNfvpNEoVEsETNVzC1frStlaa1DQwjQmEVRZmTfj+SPIqiksl/BOcaZ0xuov4\r\n         tZFQ==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;\r\n        bh=ZHXj9RvXSATTj9Wt4X0fetAuGh4UZd/nPrbntI3l7Ow=;\r\n        b=dc42FH/oZKWtoKghiTTopQ3mMjZZ+7zgT7+VvoqdA8CqW20t/GEA8k0F+MixDbpG//\r\n         DAx9goVrWap3PaubELOPgbxyAnL1kXEs5mNQ6S5bj+7BvvsCYyFdb68oY1wAdXLJQ55I\r\n         QBycpjqrZq4Okl3WaBjWVuyGQel19PhU3Y7y9zuMHtVJcoaUTMpIUNlT1QBS9txx5tmt\r\n         06+Y+6rnb7tyiHgJ85X9ymgwPbCQ4tUVlgXC39aCktM+tK+83Jn6t0IIl0FP2grxUU+Y\r\n         FbrEAny6fK2maGxgUfiaUyPHLv6HFOTfcI4uJrquIqtvvkqek1+BruaEyYZtg72brO8C\r\n         yWTg==\r\nX-Gm-Message-State: AHQUAuYe8HK/MR3R5nrOyQTLbuL3o4yLBuwN6DJET+ZJ0x+npFiVzoMp\r\n\tPRzCHIK0YTs5HvthjCyyXVqJSyqfb9CR9UAkb9Mhatlxtb8flw==\r\nX-Google-Smtp-Source: AHgI3IZU0GBtJPq0EeO3Xcga63f7A/jg1KLJXT/+tWZ0JS7yDBGuiShVyT23FIjmnYx7rsFFX9bD53Q3rSZhGOdHk80=\r\nX-Received: by 2002:a7b:cb82:: with SMTP id m2mr594775wmi.135.1550004835828;\r\n Tue, 12 Feb 2019 12:53:55 -0800 (PST)\r\nMIME-Version: 1.0\r\nFrom: Matthew Tichenor &lt;herman@testphantom.net&gt;\r\nDate: Tue, 12 Feb 2019 12:53:45 -0800\r\nMessage-ID: &lt;CAGu25RLsWzcAYB=fyF8Vtp7zjaNTyYCvWfyUMty9DqtYtp=6Ug@mail.gmail.com&gt;\r\nSubject: self\r\nTo: Matthew Tichenor &lt;herman@testphantom.net&gt;\r\nX-MC-Unique: W7_tRvNmNCyhljAioM2KhQ-1\r\nX-Mimecast-Spam-Score: 0\r\nContent-Type: multipart/alternative; boundary=&quot;000000000000a3e2500581b89fb0&quot;\r\n\r\n--000000000000a3e2500581b89fb0\r\nContent-Type: text/plain; charset=&quot;UTF-8&quot;\r\nx-mimecast-att: mailfile=&quot;11902132104010031&quot;;\r\n\r\n\r\n--000000000000a3e2500581b89fb0\r\nContent-Type: text/html; charset=&quot;UTF-8&quot;\r\nx-mimecast-att: mailfile=&quot;11902132104010051&quot;;\r\n\r\n\r\n--000000000000a3e2500581b89fb0--\r\n\n</pre>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.processed",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.contentExpiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DD HH:MM:SS (22 Days)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.metadataExpiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message Expired"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.fromHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.sent",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.messageInfo.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delivery Status Notification (Delay)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.processingServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "snd-mta-1.snd.mimecast.lan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.queueDetailStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message Hold Applied - Spam Signature policy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.processStartTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.txEvent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Received via Open Greylist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.receiptAck",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 SmtpThread-245773-1540169396482@snd-mta-1.snd.mimecast.lan Received OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.remoteServerReceiptAck",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 SmtpThread-245773-1540169396482@snd-mta-1.snd.mimecast.lan Received OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.actualSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14468
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.returnPath",
+                    "data_type": "string",
+                    "example_values": [
+                        "<>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.smtpActualSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14468
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.deliveryType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Encrypted (TLS)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.remoteServerGreeting",
+                    "data_type": "string",
+                    "example_values": [
+                        "EHLO mail-qk1-f200.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.transmissionComponents.*.txSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        570
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.transmissionComponents.*.fileType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Body Part"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.transmissionComponents.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "297d84edb4d1a004121f3c427a0066c7a10412dc21e3724482af323877d07a53"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.transmissionComponents.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "bodypart.eml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.smtpEndTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.transmissionSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14249
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.remoteIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "209.85.222.200"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.remoteServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "mail-qk1-f200.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.smtpStartTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.smtpCompressedStoreSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11005
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.compressedStoreSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11005
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.txInfo.processEndTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.transmissionInfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "<pre>\nReceived: from mail-qk1-f200.google.com (mail-qk1-f200.google.com\r\n [209.85.222.200]) (Using TLS) by sandbox-smtp-1.mimecast.com with ESMTP id\r\n snd-mta-1-_OTU2hbdN9SvNqWmj6CtyQ-1; Mon, 22 Oct 2018 01:49:54 +0100\r\nReceived: by mail-qk1-f200.google.com with SMTP id z10-v6so2949811qkl.4\r\n        for &lt;herman@splunk.com&gt;; Sun, 21 Oct 2018 17:49:52 -0700 (PDT)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=googlemail.com; s=20161025;\r\n        h=from:to:auto-submitted:subject:references:in-reply-to:message-id\r\n         :date;\r\n        bh=p40BSvGAbUMaz+8RbOAWepKiod/tLGkEO2PHzoEM+wg=;\r\n        b=Iwa94go0/fyCIBtyMA6eT/xwwafTNo7oAqN3Gzd/mQ+tgVvvjV86dA7qk6+PoK5UvT\r\n         bgXhPGwO9mgnTlus964g1RM7zZR+lUqPwiNu+dCLbgLj7wnLySac9Mruf+uVWK2yjVCL\r\n         n7v98IPUwJ8YM3KtZ1EyVfgId6tV+mAOHLyI6r+tjsuBw49ixe/ciFpgC16lqQQgnv1k\r\n         yFQmqcpoTjgey087FBJlhJOS4yloApQVOSoOCZu3vFIOL7+HWk5FA1DrhwJMX3GS+cNa\r\n         cHDizNKcT53ahriflehD0v+PTUU5t1tp+v/u4+WSa81iUJuVWy12Ju8OiZevhKTNXrLQ\r\n         bDOw==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:from:to:auto-submitted:subject:references\r\n         :in-reply-to:message-id:date;\r\n        bh=p40BSvGAbUMaz+8RbOAWepKiod/tLGkEO2PHzoEM+wg=;\r\n        b=dsAAYj6j8l4bbG1ZOIZ0oqeP4w78tKLJgmsR114mnDO86vcDrXtbQBzJus2RgnNuaU\r\n         LIdblClCd7/KVqWRmAUexmBJJQUPQxei9xzC3viaUC8SmMpxR3IRgW5t8h1mIh8US5rN\r\n         BJRbwFkJXW69axPls4hcaVjJX1Bv5ZEoCDzKr5vHyZSM1LSStPgVch9fOK5L0Mslk0kG\r\n         uBT1j79veDZ/aurcu3hEQf3wdJL45dEfLmQ9upzR2PYuGeZMpXJe7ixOW1kAkUJydnks\r\n         AaRhnxsVhg2Zftgryk1J1CNoIYstYkB8W29TReYe9qZpVbuKnihqW2q1QYxj8ZJKuoR6\r\n         jh0g==\r\nX-Gm-Message-State: AGRZ1gKQJRyOODxqNWjJ7eyJKDNjsu+vILI262v6Ghnb0hPs+rGqUC8j\r\n\tlig7e5AcpOUJjW9AIBmLJ1YtZMoC6qYobE8c8/d+\r\nX-Google-Smtp-Source: AJdET5dsv29R3SoxJaGOxYHLcgoSXVYBLrB+2RIbX+JXkwDALJAf7uzyX6lD5BJ8GRKADLISq4ht6l++3JW+zrR1MHi4cHzwupFCKw==\r\nX-Received: by 2002:ac8:76d9:: with SMTP id q25-v6mr12277558qtr.35.1540169390891;\r\n        Sun, 21 Oct 2018 17:49:50 -0700 (PDT)\r\nReturn-Path: &lt;&gt;\r\nReceived: by 2002:ac8:76d9:: with SMTP id q25-v6mr12859955qtr.35; Sun, 21 Oct\r\n 2018 17:49:50 -0700 (PDT)\r\nFrom: Mail Delivery Subsystem &lt;mailer-daemon@googlemail.com&gt;\r\nTo: herman@splunk.com\r\nAuto-Submitted: auto-replied\r\nSubject: Delivery Status Notification (Delay)\r\nReferences: &lt;CAE0897Aqtq2HaSRyLNGTn=QBgKhR5Tuc+QsHt_F1WcGfmpYGgQ@mail.gmail.com&gt;\r\nIn-Reply-To: &lt;CAE0897Aqtq2HaSRyLNGTn=QBgKhR5Tuc+QsHt_F1WcGfmpYGgQ@mail.gmail.com&gt;\r\nMessage-ID: &lt;5bcd1eae.1c69fb81.d67aa.b4d0.GMR@mx.google.com&gt;\r\nDate: Sun, 21 Oct 2018 17:49:50 -0700 (PDT)\r\nX-MC-Unique: _OTU2hbdN9SvNqWmj6CtyQ-1\r\nContent-Type: multipart/report; boundary=&quot;0000000000007011f50578c6a1a3&quot;; report-type=delivery-status\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: multipart/related; boundary=&quot;000000000000701f470578c6a1a9&quot;\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: multipart/alternative; boundary=&quot;000000000000701f540578c6a1aa&quot;\r\n\r\n--000000000000701f540578c6a1aa\r\nContent-Type: text/plain; charset=&quot;UTF-8&quot;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550021&quot;;\r\n\r\n\r\n--000000000000701f540578c6a1aa\r\nContent-Type: text/html; charset=&quot;UTF-8&quot;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550041&quot;;\r\n\r\n\r\n--000000000000701f540578c6a1aa--\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: image/png; name=&quot;icon.png&quot;\r\nContent-Disposition: attachment; filename=&quot;icon.png&quot;\r\nContent-Transfer-Encoding: base64\r\nContent-ID: &lt;icon.png&gt;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550061&quot;;\r\n\r\n\r\n--000000000000701f470578c6a1a9\r\nContent-Type: image/png; name=&quot;warning_triangle.png&quot;\r\nContent-Disposition: attachment; filename=&quot;warning_triangle.png&quot;\r\nContent-Transfer-Encoding: base64\r\nContent-ID: &lt;warning_triangle.png&gt;\r\nX-Mimecast-Att: mailfile=&quot;11810220149550081&quot;;\r\n\r\n\r\n--000000000000701f470578c6a1a9--\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: message/delivery-status\r\nX-Mimecast-Att: mailfile=&quot;11810220149550101&quot;;\r\n\r\n\r\n--0000000000007011f50578c6a1a3\r\nContent-Type: message/rfc822\r\nX-Mimecast-Att: mailfile=&quot;11810220149550161&quot;;\r\n\r\n\r\n--0000000000007011f50578c6a1a3--\r\n\n</pre>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromEnvelope",
+                    "data_type": "string",
+                    "example_values": [
+                        "<>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.processed",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.sent",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delivery Status Notification (Delay)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.inheritedCustomerCode",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Opportunistic TLS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Secure Delivery"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.inherited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processingServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "snd-mta-1.snd.mimecast.lan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.queueDetailStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message Hold Applied - Spam Signature policy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processStartTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.txEvent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Item currently queued for delivery"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.receiptAck",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServerReceiptAck",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.actualSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14468
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.returnPath",
+                    "data_type": "string",
+                    "example_values": [
+                        "<>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpActualSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14468
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.deliveryType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Encrypted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServerGreeting",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.txSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        362
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.fileType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email HTML Body Part"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "27d19ccc77eb182147ee77dc6dc2a55501a3f26d9bc73ef61538f8e686a4dd39"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "body.htm"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpEndTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14249
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteIp",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServer",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpStartTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpCompressedStoreSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11005
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.compressedStoreSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11005
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processEndTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "YYYY-MM-DDTHH:MM:SS+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNpFjl1LwzAUhv9Lbl0h6ZLGDhFGy7TIdGMbcVclH6datO3IR3GK_91Ukd2e97zP834hBzpYaA1aILKWGkOpG13wz6Oh6-dU4E1WrqrqQXzclSKMZ1uc0s3VYS79PXkqxLbib-1-XFLGhEIz1IFz8gV2Xvrg9ucTROwrvJtLtA0QoIo6zlg2Q77rJ7XrjQfbkfing_NDB1YPZmoXu8eSLHlO85hJ7dvxb-zlXk-k-p9QYzyvb4Dh1DCQCckalVDaXCeK5CrRlFNFgWVg5G0EjmBdO_RoQeKU_lcY--j7BwA7Vm8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully retrieved message information"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNpFjl1LwzAUhv9Lbl0h6ZLGDhFGy7TIdGMbcVclH6datO3IR3GK_91Ukd2e97zP834hBzpYaA1aILKWGkOpG13wz6Oh6-dU4E1WrqrqQXzclSKMZ1uc0s3VYS79PXkqxLbib-1-XFLGhEIz1IFz8gV2Xvrg9ucTROwrvJtLtA0QoIo6zlg2Q77rJ7XrjQfbkfing_NDB1YPZmoXu8eSLHlO85hJ7dvxb-zlXk-k-p9QYzyvb4Dh1DCQCckalVDaXCeK5CrRlFNFgWVg5G0EjmBdO_RoQeKU_lcY--j7BwA7Vm8"
+                    ],
+                    "contains": [
+                        "mimecast email id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved message information"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retentionInfo.retentionAdjustmentDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retentionInfo.currentPurgeDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-15T21:04:01+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retentionInfo.purgeBasedOn",
+                    "data_type": "string",
+                    "example_values": [
+                        "original"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retentionInfo.originalPurgeDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-15T21:04:01+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.processingServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "snd-mta-2.snd.mimecast.lan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.remoteServerGreeting",
+                    "data_type": "string",
+                    "example_values": [
+                        "EHLO mail-wm1-f43.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.encryptionInfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "TLS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.transmissionSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2664
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.spamEvent",
+                    "data_type": "string",
+                    "example_values": [
+                        "na"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.remoteHost",
+                    "data_type": "string",
+                    "example_values": [
+                        "mail-wm1-f43.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.transmissionStart",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:01+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.transmissionEnd",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:02+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.remoteIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "209.85.128.43"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.mimeType",
+                    "data_type": "string",
+                    "example_values": [
+                        "message/rfc822-stubbed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "2a6ad7bb022e15084dcc49a028814ca8ca291e8b3f17c9fc632225d51d6268bc"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "transmission.eml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.extension",
+                    "data_type": "string",
+                    "example_values": [
+                        "eml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Transmission File"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.components.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2683
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.receiptEvent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Received via header based Permitted Sender"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.receiptAcknowledgement",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 SmtpThread-230451-1550091842414@snd-mta-2.snd.mimecast.lan Received OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.messageExpiresIn",
+                    "data_type": "numeric",
+                    "example_values": [
+                        28
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recipientInfo.recipientMetaInfo.binaryEmailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2726
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.transmissionInfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "<pre>\nReceived: from mail-wm1-f43.google.com (mail-wm1-f43.google.com\r\n [209.85.128.43]) (Using TLS) by relay.mimecast.com with ESMTP id\r\n snd-mta-2-W7_tRvNmNCyhljAioM2KhQ-1; Wed, 13 Feb 2019 21:04:01 +0000\r\nReceived: by mail-wm1-f43.google.com with SMTP id b11so4104753wmj.1\r\n        for &lt;herman@testphantom.net&gt;; Wed, 13 Feb 2019 13:04:01 -0800 (PST)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=testphantom-net.20150623.gappssmtp.com; s=20150623;\r\n        h=mime-version:from:date:message-id:subject:to;\r\n        bh=ZHXj9RvXSATTj9Wt4X0fetAuGh4UZd/nPrbntI3l7Ow=;\r\n        b=l6gkNS8ebjmeL0tB1IF/Lm1bTDHTufn8kO2aOd9aDh3BcHpIvcaPPaL0UwdkLyT/0h\r\n         2VbF7mdv6JcbEjo7ZqIh/RqMaW7xw7l+4CQrkihUbFGPn6ebgXIsTZpZqK1LcpFlYRbW\r\n         O6rPRHxvZ6WjVSjKUkoXPXt44w8mU1P4zlwLDX50D2wu1EOf9smn4mfEGe6Bw2FByjZE\r\n         m+2HjvDzdNQyXm4yj3mUAe/f3bwSWt2ScjNKhGgoLg364PKorsX5dwURlNFv3QpdGdGk\r\n         g7pdckgmNfvpNEoVEsETNVzC1frStlaa1DQwjQmEVRZmTfj+SPIqiksl/BOcaZ0xuov4\r\n         tZFQ==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;\r\n        bh=ZHXj9RvXSATTj9Wt4X0fetAuGh4UZd/nPrbntI3l7Ow=;\r\n        b=dc42FH/oZKWtoKghiTTopQ3mMjZZ+7zgT7+VvoqdA8CqW20t/GEA8k0F+MixDbpG//\r\n         DAx9goVrWap3PaubELOPgbxyAnL1kXEs5mNQ6S5bj+7BvvsCYyFdb68oY1wAdXLJQ55I\r\n         QBycpjqrZq4Okl3WaBjWVuyGQel19PhU3Y7y9zuMHtVJcoaUTMpIUNlT1QBS9txx5tmt\r\n         06+Y+6rnb7tyiHgJ85X9ymgwPbCQ4tUVlgXC39aCktM+tK+83Jn6t0IIl0FP2grxUU+Y\r\n         FbrEAny6fK2maGxgUfiaUyPHLv6HFOTfcI4uJrquIqtvvkqek1+BruaEyYZtg72brO8C\r\n         yWTg==\r\nX-Gm-Message-State: AHQUAuYe8HK/MR3R5nrOyQTLbuL3o4yLBuwN6DJET+ZJ0x+npFiVzoMp\r\n\tPRzCHIK0YTs5HvthjCyyXVqJSyqfb9CR9UAkb9Mhatlxtb8flw==\r\nX-Google-Smtp-Source: AHgI3IZU0GBtJPq0EeO3Xcga63f7A/jg1KLJXT/+tWZ0JS7yDBGuiShVyT23FIjmnYx7rsFFX9bD53Q3rSZhGOdHk80=\r\nX-Received: by 2002:a7b:cb82:: with SMTP id m2mr594775wmi.135.1550004835828;\r\n Tue, 12 Feb 2019 12:53:55 -0800 (PST)\r\nMIME-Version: 1.0\r\nFrom: Matthew Tichenor &lt;herman@testphantom.net&gt;\r\nDate: Tue, 12 Feb 2019 12:53:45 -0800\r\nMessage-ID: &lt;CAGu25RLsWzcAYB=fyF8Vtp7zjaNTyYCvWfyUMty9DqtYtp=6Ug@mail.gmail.com&gt;\r\nSubject: self\r\nTo: Matthew Tichenor &lt;herman@testphantom.net&gt;\r\nX-MC-Unique: W7_tRvNmNCyhljAioM2KhQ-1\r\nX-Mimecast-Spam-Score: 0\r\nContent-Type: multipart/alternative; boundary=&quot;000000000000a3e2500581b89fb0&quot;\r\n\r\n--000000000000a3e2500581b89fb0\r\nContent-Type: text/plain; charset=UTF-8\r\nx-mimecast-att: mailfile=&quot;11902132104010031&quot;;\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n\r\n--000000000000a3e2500581b89fb0\r\nContent-Type: text/html; charset=UTF-8\r\nx-mimecast-att: mailfile=&quot;11902132104010051&quot;;\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n\r\n--000000000000a3e2500581b89fb0--\r\n\n</pre>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromEnvelope",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.processed",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:01+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.sent",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:01+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "self"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Apply Auto Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Auto Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.inherited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.processingServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "snd-mta-2.snd.mimecast.lan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.remoteServerGreeting",
+                    "data_type": "string",
+                    "example_values": [
+                        "220 mx.google.com ESMTP o10si176516wmf.153 - gsmtp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.encryptionInfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "TLS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.transmissionSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2750
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.remoteHost",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-in-f27.1e100.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.deliveryEvent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Delivered via Routing Rule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.transmissionStart",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:03+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.emailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@testphantom.net"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.remoteIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "173.194.76.27"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.mimeType",
+                    "data_type": "string",
+                    "example_values": [
+                        "message/rfc822-stubbed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "f2e9d2eb8db8111eeb07e4ffe81dae047195a67b50a83f8971f21f782c3391a1"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "transmission.eml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.extension",
+                    "data_type": "string",
+                    "example_values": [
+                        "eml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email Transmission File"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.components.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2769
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.transmissionEnd",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-13T21:04:04+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.receiptAcknowledgement",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.0.0 OK  1550091844 o10si176516wmf.153 - gsmtp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deliveredMessage.*.deliveryMetaInfo.messageExpiresIn",
+                    "data_type": "numeric",
+                    "example_values": [
+                        28
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "mimecast_view.display_get_email",
+                "title": "Email Details"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "decode url",
+            "identifier": "decode_url",
+            "description": "Decodes URL that was rewritten by Mimecast for on-click protection",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to decode",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "column_name": "decoded url",
+                    "column_order": 1,
+                    "example_values": [
+                        "https://splunk.com/login"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully decoded URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://sandbox-api.mimecast.com/s/Q3jhCqj0xiOhZIM36?domain=splunk.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully decoded URL"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
