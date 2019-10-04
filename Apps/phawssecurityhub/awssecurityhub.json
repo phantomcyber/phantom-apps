@@ -278,7 +278,7 @@
                     "data_path": "action_result.parameter.resource_ec2_ipv4_addresses",
                     "data_type": "string",
                     "example_values": [
-                        "54.175.136.78"
+                        "54.175.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip"
@@ -288,8 +288,8 @@
                     "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "AWS::IAM::AccessKey:ASIA4LO5NSKP4UCNXV4P",
-                        "arn:aws:ec2:us-east-1:849257271967:instance/i-0ec05be58a212a38a"
+                        "AWS::IAM::AccessKey:XXXXXXXXXXXX",
+                        "arn:aws:ec2:us-east-1:XXXXXXXXXXXX:instance/i-0ec05be58aXXXXX"
                     ],
                     "contains": [
                         "aws security hub resource id",
@@ -310,7 +310,7 @@
                     "data_path": "action_result.data.*.AwsAccountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "XXXXXXXXXXXX"
                     ]
                 },
                 {
@@ -345,14 +345,14 @@
                     "data_path": "action_result.data.*.GeneratorId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXX/finding/7cb5038e6d8f712c01ca9XXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id"
@@ -446,7 +446,7 @@
                     "data_path": "action_result.data.*.NextToken",
                     "data_type": "string",
                     "example_values": [
-                        "U2FsdGVkX1+UxgUmWxKDdWH4ARBuVu6QH5pGfagidKeYAZaetSkSkCixwlAaNsR4VvBenZMoC2jmWwdcRPxUbpKNBDbMoyu3Fjd1G1Yz0lxaMZ9Z0JhQfl0eGQv4gdBoZsqSX4PjwQPkSMjKhDewtMfkkkn60d9X9gs/0OVhb4yDTT8aqeOmfqCcFIMbjgt4l1w87CvcKHX+viMcq2a8kbiy70UAldC24eYUfaVci0jTHwEe2dcwaDa6/tKe/0RK0d9PeKnlP3C09S3GNGeVk0cmpUddGuY5O9fKJz0g3A1ha34pf2KJi+P2L7/+B3XfKWI3P5rNuJdVcPzCTv40kuowjwABx1A/MTXYgnGX512QB7sziNYUoc6Pmln914JfZB2E6BnKgCM2LFnBmATPnRABchUpZiUDdzaKzuUAogE="
+                        "Long base64 encoded string"
                     ]
                 },
                 {
@@ -524,21 +524,21 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
                     "data_type": "string",
                     "example_values": [
-                        "37.8084"
+                        "37.000"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/geoLocation/lon",
                     "data_type": "string",
                     "example_values": [
-                        "-122.2846"
+                        "37.000"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "136.25.155.209"
+                        "136.251.1"
                     ],
                     "contains": [
                         "ip"
@@ -625,14 +625,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/geoLocation/lat",
                     "data_type": "string",
                     "example_values": [
-                        "38.7095"
+                        "37.0000"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/geoLocation/lon",
                     "data_type": "string",
                     "example_values": [
-                        "-78.1539"
+                        "37.0000"
                     ]
                 },
                 {
@@ -743,8 +743,8 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.81.166",
-                        "223.68.10.247"
+                        "141.98.1.1",
+                        "223.68.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -827,7 +827,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.81.166"
+                        "141.98.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -907,7 +907,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.81.166"
+                        "141.98.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -980,7 +980,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:1/value",
                     "data_type": "string",
                     "example_values": [
-                        "eni-007b9f31665c83849"
+                        "eni-007b9f31XXXXXXX"
                     ]
                 },
                 {
@@ -994,7 +994,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:10/value",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc5286a6d774cd"
+                        "i-0adfc52XXXXXXX"
                     ]
                 },
                 {
@@ -1036,7 +1036,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:4/value",
                     "data_type": "string",
                     "example_values": [
-                        "igw-0b758073"
+                        "igw-0b758XXXXXX"
                     ]
                 },
                 {
@@ -1050,7 +1050,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:5/value",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-5113dc2a"
+                        "vpc-5113XXXXXX"
                     ]
                 },
                 {
@@ -1064,7 +1064,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:6/value",
                     "data_type": "string",
                     "example_values": [
-                        "sg-00640ecbd7abefc1f"
+                        "sg-00640ecXXXXXXX"
                     ]
                 },
                 {
@@ -1092,7 +1092,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:8/value",
                     "data_type": "string",
                     "example_values": [
-                        "acl-018ed07a"
+                        "acl-018XXXXXXXX"
                     ]
                 },
                 {
@@ -1120,7 +1120,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/FindingId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dcXXXXXXXXXXX/finding/7cb5038e6d8f712c01caXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws arn"
@@ -1152,7 +1152,7 @@
                     "data_path": "action_result.data.*.ProductFields.detectorId",
                     "data_type": "string",
                     "example_values": [
-                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                        "7eb38a3ebb7fXXXXXXXXXXXX"
                     ],
                     "contains": [
                         "md5"
@@ -1197,21 +1197,21 @@
                     "data_path": "action_result.data.*.ProductFields.rule-arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:macie:us-east-1:849257271967:trigger/6f627493127c959c3c7a76df337bc58d"
+                        "arn:aws:macie:us-east-1:XXXXXXXXXXXX:trigger/6f627493127XXXXXXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.serviceAttributes/assessmentRunArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:inspector:us-east-1:849257271967:target/0-evshZX5K/template/0-weJjg0hC/run/0-vG9gMH6F"
+                        "arn:aws:inspector:us-east-1:XXXXXXXXXXXXX:target/0-XXXXX/template/0-XXXXX/run/0-XXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.serviceAttributes/rulesPackageArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:inspector:us-east-1:316112463485:rulespackage/0-PmNV0Tcd"
+                        "arn:aws:inspector:us-east-1:XXXXXXXXXX:rulespackage/XXXXXXXX"
                     ]
                 },
                 {
@@ -1268,14 +1268,14 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.ImageId",
                     "data_type": "string",
                     "example_values": [
-                        "ami-0de53d8956e8dcf80"
+                        "ami-0de53d8XXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.IpV4Addresses",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.55.28"
+                        "172.31.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip",
@@ -1293,7 +1293,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.SubnetId",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-160c5929"
+                        "subnet-16XXXXXXXX"
                     ]
                 },
                 {
@@ -1307,7 +1307,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.VpcId",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-5113dc2a"
+                        "vpc-511XXXXXXX"
                     ]
                 },
                 {
@@ -1321,7 +1321,7 @@
                     "data_path": "action_result.data.*.Resources.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:ec2:us-east-1:849257271967:instance/i-0ec05be58a212a38a"
+                        "arn:aws:ec2:us-east-1:XXXXXXXXXXX:instance/i-0ec05be5XXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub resource id"
@@ -1331,7 +1331,7 @@
                     "data_path": "action_result.data.*.Resources.*.InstanceId",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc5286a6d774cd"
+                        "i-0adfc5XXXXXXXX"
                     ],
                     "contains": [
                         "aws ec2 instance id"
@@ -1379,7 +1379,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.aws:cloudformation:stack-id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:cloudformation:us-east-1:849257271967:stack/minemeld/766407e0-3b8f-11e9-92b4-128fc503e968"
+                        "arn:aws:cloudformation:us-east-1:XXXXXXXXXX:stack/minemeld/766407e0-3b8f-11e9-XXXXXXXXX"
                     ]
                 },
                 {
@@ -1414,7 +1414,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "f880be36-5c1b-11e9-8467-e737d362220e"
+                        "f880be36-5c1b-11e9-8467-e73XXXXXXX"
                     ]
                 },
                 {
@@ -1449,7 +1449,7 @@
                     "data_path": "action_result.data.*.Title",
                     "data_type": "string",
                     "example_values": [
-                        "Unprotected port on EC2 instance i-0ec05be58a212a38a is being probed"
+                        "Unprotected port on EC2 instance i-0ec05XXXXXXXXXX is being probed"
                     ]
                 },
                 {
@@ -1551,8 +1551,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/4ab44dc07ff64370b4bb08d2f9b32cf5",
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7XXXXXXXXXXXXXXXXXXXXX/finding/4ab44dc07ff64370b4bbXXXXXXXXXXXX",
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7XXXXXXXXXXXXXXXXXXXXX/finding/7cb5038e6d8f712c01caXXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -1563,7 +1563,7 @@
                     "data_path": "action_result.data.*.AwsAccountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "01234567890"
                     ]
                 },
                 {
@@ -1591,14 +1591,14 @@
                     "data_path": "action_result.data.*.GeneratorId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXX:detector/7eb38a3ebb7fXXXXXXXXXXXXXXXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXX/finding/7cb5038e6d8f712cXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id"
@@ -1770,7 +1770,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "12.196.122.122"
+                        "12.196.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -1866,8 +1866,8 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.81.166",
-                        "223.68.10.247"
+                        "141.98.1.1",
+                        "223.68.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -1930,7 +1930,7 @@
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/FindingId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXX/finding/7cb5038e6d8f712c01XXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws arn"
@@ -1962,7 +1962,7 @@
                     "data_path": "action_result.data.*.ProductFields.detectorId",
                     "data_type": "string",
                     "example_values": [
-                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                        "7eb38a3ebb7f20c83dcXXXXXXXXXXX"
                     ],
                     "contains": [
                         "md5"
@@ -1987,14 +1987,14 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.ImageId",
                     "data_type": "string",
                     "example_values": [
-                        "ami-0de53d8956e8dcf80"
+                        "ami-0de53d8XXXXXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.IpV4Addresses",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.55.28"
+                        "172.31.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip",
@@ -2012,7 +2012,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.SubnetId",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-160c5929"
+                        "subnet-160XXXXXXXX"
                     ]
                 },
                 {
@@ -2026,7 +2026,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.VpcId",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-5113dc2a"
+                        "vpc-51XXXXXXX"
                     ]
                 },
                 {
@@ -2040,7 +2040,7 @@
                     "data_path": "action_result.data.*.Resources.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:ec2:us-east-1:849257271967:instance/i-0ec05be58a212a38a"
+                        "arn:aws:ec2:us-east-1:XXXXXXXXXXXX:instance/i-0ec05bXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub resource id"
@@ -2050,7 +2050,7 @@
                     "data_path": "action_result.data.*.Resources.*.InstanceId",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc5286a6d774cd"
+                        "i-0adfc52XXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws ec2 instance id"
@@ -2126,7 +2126,7 @@
                     "data_path": "action_result.data.*.Title",
                     "data_type": "string",
                     "example_values": [
-                        "Unprotected port on EC2 instance i-0ec05be58a212a38a is being probed"
+                        "Unprotected port on EC2 instance i-0ec05be5XXXXXXXX is being probed"
                     ]
                 },
                 {
@@ -2243,8 +2243,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/4ab44dc07ff64370b4bb08d2f9b32cf5",
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXXXXXX/finding/4ab44dc07ff643XXXXXXXXXXXXXXXXXX",
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXXXXXX/finding/7cb5038e6d8f71XXXXXXXXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2302,7 +2302,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBc0yFxTIAMFW_g="
+                        "YBcXXXXXXXXX="
                     ]
                 },
                 {
@@ -2316,7 +2316,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb074eb-29d789410fb595f39db32d5f;Sampled=0"
+                        "Root=1-5cb074eb-29d789410fXXXXXXXXXXXX;Sampled=0"
                     ]
                 },
                 {
@@ -2433,8 +2433,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/4ab44dc07ff64370b4bb08d2f9b32cf5",
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXXXXXX/finding/4ab44dc07ff6437XXXXXXXXXXXXXXXXX",
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXXXXXX/finding/7cb5038e6d8f712XXXXXXXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2492,7 +2492,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBdNwFY3oAMF9hA="
+                        "YBdNwFXXXXXXXX="
                     ]
                 },
                 {
@@ -2506,7 +2506,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb0758b-93f1665c690bd162074aea05;Sampled=0"
+                        "Root=1-5cb0758b-93f1665c69XXXXXXXXXX;Sampled=0"
                     ]
                 },
                 {
@@ -2624,8 +2624,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/4ab44dc07ff64370b4bb08d2f9b32cf5",
-                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/7cb5038e6d8f712c01ca929602c8f225"
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c8XXXXXXXXXXXXXXXX/finding/4ab44dc07ff64370bXXXXXXXXXXXXXXX",
+                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c8XXXXXXXXXXXXXXXX/finding/7cb5038e6d8f712c0XXXXXXXXXXXXXXX"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2683,21 +2683,21 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBdYdF_noAMFzyQ="
+                        "YBdYdXXXXXXXXX="
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "c41dbc3d-5d15-11e9-b3d4-8fb86926a039"
+                        "c41dbc3d-5d15-11e9-b3d4-XXXXXXXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb075cf-45091c0dcb58578d7599984d;Sampled=0"
+                        "Root=1-5cb075cf-45091c0XXXXXXXXXXXXXXX;Sampled=0"
                     ]
                 },
                 {
