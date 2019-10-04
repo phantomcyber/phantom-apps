@@ -84,7 +84,7 @@
                     "data_path": "action_result.data.*.AttachedPolicies.*.PolicyArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257270067:policy/testPolicy"
+                        "arn:aws:iam::XXXXXXXXXXXX:policy/testPolicy"
                     ],
                     "contains": [
                         "aws iam policy arn"
@@ -101,7 +101,7 @@
                     "data_path": "action_result.data.*.Groups.*.Arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849250071967:group/AWS-Console-Admins"
+                        "arn:aws:iam::XXXXXXXXXXXX:group/AWS-Console-Admins"
                     ]
                 },
                 {
@@ -115,7 +115,7 @@
                     "data_path": "action_result.data.*.Groups.*.GroupId",
                     "data_type": "string",
                     "example_values": [
-                        "AGPAJC3DXISCHVJYC3EKG"
+                        "AGPAJXXXXXXXXXXXXXX"
                     ]
                 },
                 {
@@ -227,7 +227,7 @@
                     "data_path": "action_result.data.*.Arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:group/AWS-Console-Admins"
+                        "arn:aws:iam::XXXXXXXXXXXX:group/AWS-Console-Admins"
                     ],
                     "column_name": "Group ARN",
                     "column_order": 3
@@ -245,7 +245,7 @@
                     "data_path": "action_result.data.*.GroupId",
                     "data_type": "string",
                     "example_values": [
-                        "AGPA4JBDXISCHVJYC3EKG"
+                        "AGPAXXXXXXXXXXXXXX"
                     ],
                     "column_name": "Group ID",
                     "column_order": 0
@@ -382,7 +382,7 @@
                     "data_path": "action_result.data.*.Arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:user/aws-test-full-access"
+                        "arn:aws:iam::XXXXXXXXXXXX:user/aws-test-full-access"
                     ]
                 },
                 {
@@ -422,7 +422,7 @@
                     "data_path": "action_result.data.*.UserId",
                     "data_type": "string",
                     "example_values": [
-                        "AIDARRGPSZAR2JOZZAPDI"
+                        "AIDARRXXXXXXXXXXXXXX"
                     ]
                 },
                 {
@@ -491,7 +491,7 @@
                     "data_path": "action_result.data.*.Arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:role/service-role/config-role-us-west-2-test-role"
+                        "arn:aws:iam::XXXXXXXXXXXX:role/service-role/config-role-us-west-2-test-role"
                     ],
                     "column_name": "Role ARN",
                     "column_order": 3
@@ -558,7 +558,7 @@
                     "data_path": "action_result.data.*.RoleId",
                     "data_type": "string",
                     "example_values": [
-                        "AROAZRMVHCOA5UWLW5M64"
+                        "AROAZXXXXXXXXXXXXXXX"
                     ],
                     "column_name": "Role ID",
                     "column_order": 0
@@ -1239,7 +1239,7 @@
                     "data_path": "action_result.data.*.Arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257001967:role/testAWSRoles/testAWSRole7"
+                        "arn:aws:iam::XXXXXXXXXXXX:role/testAWSRoles/testAWSRole7"
                     ],
                     "column_name": "Role ARN",
                     "column_order": "3"
@@ -1461,7 +1461,7 @@
                     "data_path": "action_result.parameter.policy_arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                        "arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access"
                     ],
                     "contains": [
                         "aws iam policy arn"
@@ -1498,7 +1498,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully attached with role testRole"
+                        "Policy with ARN arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access successfully attached with role testRole"
                     ]
                 },
                 {
@@ -1565,7 +1565,7 @@
                     "data_path": "action_result.parameter.policy_arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849200271967:policy/redlock-lab-access"
+                        "arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access"
                     ],
                     "contains": [
                         "aws iam policy arn"
@@ -1602,7 +1602,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Policy with ARN arn:aws:iam::849200271967:policy/redlock-lab-access successfully detached from role testRole"
+                        "Policy with ARN arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access successfully detached from role testRole"
                     ]
                 },
                 {
@@ -1670,7 +1670,7 @@
                     "data_path": "action_result.parameter.policy_arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                        "arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access"
                     ],
                     "contains": [
                         "aws iam policy arn"
@@ -1708,7 +1708,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully assigned to user testUser"
+                        "Policy with ARN arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access successfully assigned to user testUser"
                     ]
                 },
                 {
@@ -1776,7 +1776,7 @@
                     "data_path": "action_result.parameter.policy_arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                        "arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access"
                     ],
                     "contains": [
                         "aws iam policy arn"
@@ -1814,7 +1814,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully removed from user testUser"
+                        "Policy with ARN arn:aws:iam::XXXXXXXXXXXX:policy/redlock-lab-access successfully removed from user testUser"
                     ]
                 },
                 {
