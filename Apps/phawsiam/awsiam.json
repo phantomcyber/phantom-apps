@@ -1,0 +1,1841 @@
+{
+    "appid": "d86b47a3-cba1-419a-8e35-09c27c0f7b0c",
+    "name": "AWS IAM",
+    "description": "This app integrates with Amazon Web Services Identity Access Management (AWS IAM) to support various containment, corrective and investigate actions",
+    "type": "identity management",
+    "product_vendor": "AWS",
+    "logo": "logo_aws.svg",
+    "logo_dark": "logo_aws_dark.svg",
+    "product_name": "AWS Identity Access Management",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2019 Splunk Inc.",
+    "app_version": "1.0.8",
+    "utctime_updated": "2019-06-07T17:52:30.000000Z",
+    "package_name": "phantom_awsiam",
+    "main_module": "awsiam_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "access_key": {
+            "description": "Access key ID",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "secret_key": {
+            "description": "Secret access key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user",
+            "identifier": "get_user",
+            "description": "Get details of all the groups and attached policies for the user",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AttachedPolicies.*.PolicyArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257270067:policy/testPolicy"
+                    ],
+                    "contains": [
+                        "aws iam policy arn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AttachedPolicies.*.PolicyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testPolicy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849250071967:group/AWS-Console-Admins"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-01T16:44:05Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.GroupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AGPAJC3DXISCHVJYC3EKG"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.GroupName",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-Console-Admins"
+                    ],
+                    "contains": [
+                        "aws iam group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.Path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/developer/",
+                        "/resource_management/infrastructure/"
+                    ],
+                    "contains": [
+                        "aws iam group path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_policies",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total policies: 2, Total groups: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "awsiam_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list groups",
+            "identifier": "list_groups",
+            "description": "List groups of AWS IAM",
+            "verbose": "By default groups from path '/' are fetched.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "group_path": {
+                    "description": "Group path in AWS IAM",
+                    "data_type": "string",
+                    "default": "/",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "aws iam group path"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.group_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/developer/",
+                        "/resource_management/infrastructure/"
+                    ],
+                    "contains": [
+                        "aws iam group path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:group/AWS-Console-Admins"
+                    ],
+                    "column_name": "Group ARN",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-01T16:44:05Z"
+                    ],
+                    "column_name": "Creation Date",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.GroupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AGPA4JBDXISCHVJYC3EKG"
+                    ],
+                    "column_name": "Group ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.GroupName",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-Console-Admins"
+                    ],
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/developer/",
+                        "/resource_management/infrastructure/"
+                    ],
+                    "contains": [
+                        "aws iam group path"
+                    ],
+                    "column_name": "Group Path",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "d45d4ff5-ab6d-11e8-b47f-1b5b61756dc9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total groups: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "identifier": "list_users",
+            "description": "List users of AWS IAM",
+            "verbose": "If both parameters are provided, users belonging to specified group and to specified path are fetched. If only user path or group name is provided, users belonging to specified path or group respectively are fetched. If no parameters are provided, users belonging to default user path '/' are fetched.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "user_path": {
+                    "description": "Path of the user",
+                    "data_type": "string",
+                    "default": "/",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "aws iam user path"
+                    ],
+                    "order": 0
+                },
+                "group_name": {
+                    "description": "Group name",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-Console-Admins"
+                    ],
+                    "contains": [
+                        "aws iam group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/dev_users/",
+                        "/resource_management_users/infrastructure/"
+                    ],
+                    "contains": [
+                        "aws iam user path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:user/aws-test-full-access"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-01T18:51:57Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.PasswordLastUsed",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-01T09:09:10Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/dev_users/",
+                        "/resource_management_users/infrastructure/"
+                    ],
+                    "contains": [
+                        "aws iam user path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "364e001c-a796-11e8-a0fc-0de721ad2288"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.UserId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AIDARRGPSZAR2JOZZAPDI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.UserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws-test-full-access"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "awsiam_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list roles",
+            "identifier": "list_roles",
+            "description": "List roles available in AWS IAM",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:role/service-role/config-role-us-west-2-test-role"
+                    ],
+                    "column_name": "Role ARN",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.AssumeRolePolicyDocument",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"support.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+                    ],
+                    "contains": [
+                        "aws iam role policy doc"
+                    ],
+                    "column_name": "Role Policy Document",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-01T20:22:38Z"
+                    ],
+                    "column_name": "Creation Date",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ready only access for Redlock to do its thing and generate test data."
+                    ],
+                    "column_name": "Description",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.MaxSessionDuration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/developerpath/",
+                        "/test-role-path/role-test-path/"
+                    ],
+                    "contains": [
+                        "aws iam role path"
+                    ],
+                    "column_name": "Role Path",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "059a51ac-a5f5-11e8-8538-838f9dea6f15"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RoleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AROAZRMVHCOA5UWLW5M64"
+                    ],
+                    "column_name": "Role ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RoleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "config-role-us-west-2-test-role"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "column_name": "Role Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_roles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total roles: 11"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add user",
+            "identifier": "add_user",
+            "description": "Add user to a group",
+            "type": "generic",
+            "undo": "remove user",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "group_name": {
+                    "description": "Group name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-Console-Admins"
+                    ],
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "059a51ac-a5f5-11e8-8538-838f9dea6f15"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User testUser successfully added to the group AWS-Console-Admins"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove user",
+            "identifier": "remove_user",
+            "description": "Remove user from a group",
+            "type": "generic",
+            "undo": "add user",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "group_name": {
+                    "description": "Group name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-Console-Admins"
+                    ],
+                    "contains": [
+                        "aws iam group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ef6a8900-a5f4-11e8-b017-399fda19a3bc"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User testUser successfully removed from the group AWS-Console-Admins"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete user",
+            "identifier": "delete_user",
+            "description": "Delete user from AWS IAM account",
+            "verbose": "Delete user and user profile as well as all its associations with groups, policies, and access keys from AWS IAM account",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testDeleteUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0db4db92-a9b9-11e8-978e-4b0d10295b69"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User testDeleteUser deleted successfully along with all its associations with login profile, access keys, groups, and policies"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "disable user",
+            "identifier": "disable_user",
+            "description": "Disable login profile and access keys of a user",
+            "verbose": "If disable access keys parameter is marked false, only login profile is disabled. By default both are disabled.",
+            "type": "contain",
+            "undo": "enable user",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "disable_access_keys": {
+                    "description": "Disable access keys",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.disable_access_keys",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Disable Access Keys",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0d58d8d8-a69e-11e8-a447-5fdcd5213aa3"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User testUser disabled successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "enable user",
+            "identifier": "enable_user",
+            "description": "Enable login profile and access keys of a user",
+            "verbose": "If enable access keys parameter is marked false, only login profile is enabled. By default both are enabled. <p class=\"warn\">Please exercise caution when using this action. The password may be kept and logged in clear text.</p>",
+            "type": "correct",
+            "undo": "disable user",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "password": {
+                    "description": "Password",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "enable_access_keys": {
+                    "description": "Enable access keys of user along with login profile",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.enable_access_keys",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Enable Access Keys",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-01T13:45:43Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.PasswordResetRequired",
+                    "data_type": "string",
+                    "example_values": [
+                        "false",
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "aa216400-a611-11e8-aeae-a514954ff620"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.UserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User testUser enabled successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add role",
+            "identifier": "add_role",
+            "description": "Add new role in AWS IAM account",
+            "verbose": "Creation of role is a 3 step process. First instance profile is created with the provided role name, then role is created with the same name, and finally the created role is attached with the instance profile created earlier. <p class=\"warn\">Please exercise caution when using this action. Special characters are not allowed in parameter role path.</p>",
+            "type": "generic",
+            "undo": "remove role",
+            "read_only": false,
+            "parameters": {
+                "role_name": {
+                    "description": "Role name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "order": 0
+                },
+                "role_policy_document": {
+                    "description": "JSON string mentioning trust relationship policy document with the role",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role policy doc"
+                    ],
+                    "order": 1
+                },
+                "role_path": {
+                    "description": "Path to the role",
+                    "data_type": "string",
+                    "default": "/",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role path"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testRole"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "column_name": "Role Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.role_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/testRoles/",
+                        "/testRoles/testRolePath/"
+                    ],
+                    "contains": [
+                        "aws iam role path"
+                    ],
+                    "column_name": "Role Path",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.role_policy_document",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
+                    ],
+                    "contains": [
+                        "aws iam role policy doc"
+                    ],
+                    "column_name": "Role Policy Document",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257001967:role/testAWSRoles/testAWSRole7"
+                    ],
+                    "column_name": "Role ARN",
+                    "column_order": "3"
+                },
+                {
+                    "data_path": "action_result.data.*.AssumeRolePolicyDocument",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
+                    ],
+                    "contains": [
+                        "aws iam role policy doc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CreateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-01T11:45:20Z"
+                    ],
+                    "column_name": "Creation Date",
+                    "column_order": "4"
+                },
+                {
+                    "data_path": "action_result.data.*.Path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/",
+                        "/testRoles/",
+                        "/testRoles/testRolePath/"
+                    ],
+                    "contains": [
+                        "aws iam role path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0386078b-a6ca-11e8-9ad1-9f99af08e9cc"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": "6"
+                },
+                {
+                    "data_path": "action_result.data.*.RoleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "AROA4IZJ2WMJEGJXGQCYS"
+                    ],
+                    "column_name": "Role ID",
+                    "column_order": "0"
+                },
+                {
+                    "data_path": "action_result.data.*.RoleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testRole"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Role testRole successfully added in AWS account"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove role",
+            "identifier": "remove_role",
+            "description": "Remove role from AWS IAM account",
+            "verbose": "Remove role and role instance profiles along with associations of role with all attached policies",
+            "type": "generic",
+            "undo": "add role",
+            "read_only": false,
+            "parameters": {
+                "role_name": {
+                    "description": "Role name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testRole"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "column_name": "Role Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0cd73f00-a9ce-11e8-ac4c-652c58e22721"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Role testRole removed successfully along with all its associations with login instance profiles and policies"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "attach policy",
+            "identifier": "attach_policy",
+            "description": "Attach managed policy to a role",
+            "type": "generic",
+            "undo": "detach policy",
+            "read_only": false,
+            "parameters": {
+                "role_name": {
+                    "description": "Role name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "order": 0
+                },
+                "policy_arn": {
+                    "description": "Policy ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.policy_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                    ],
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "column_name": "Policy ARN",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testRole"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "column_name": "Role Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "6907f600-a6de-11e8-8f90-ffb275044bc7"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully attached with role testRole"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detach policy",
+            "identifier": "detach_policy",
+            "description": "Detach managed policy from a role",
+            "type": "generic",
+            "undo": "attach policy",
+            "read_only": false,
+            "parameters": {
+                "role_name": {
+                    "description": "Role name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "order": 0
+                },
+                "policy_arn": {
+                    "description": "Policy ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.policy_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849200271967:policy/redlock-lab-access"
+                    ],
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "column_name": "Policy ARN",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testRole"
+                    ],
+                    "contains": [
+                        "aws iam role name"
+                    ],
+                    "column_name": "Role Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "29a37007-a6e5-11e8-9be3-5181f778cafc"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy with ARN arn:aws:iam::849200271967:policy/redlock-lab-access successfully detached from role testRole"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "assign policy",
+            "identifier": "assign_policy",
+            "description": "Assign managed policy to the user",
+            "type": "generic",
+            "undo": "remove policy",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "policy_arn": {
+                    "description": "Policy ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.policy_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                    ],
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "column_name": "Policy ARN",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2e007c5f-a763-11e8-ae81-9f3e085249fe"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully assigned to user testUser"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove policy",
+            "identifier": "remove_policy",
+            "description": "Remove managed policy association with the user",
+            "type": "generic",
+            "undo": "assign policy",
+            "read_only": false,
+            "parameters": {
+                "username": {
+                    "description": "Username",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "order": 0
+                },
+                "policy_arn": {
+                    "description": "Policy ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.policy_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::800257271967:policy/redlock-lab-access"
+                    ],
+                    "contains": [
+                        "aws iam policy arn"
+                    ],
+                    "column_name": "Policy ARN",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ],
+                    "contains": [
+                        "user name",
+                        "aws iam user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ef0027a9-a767-11e8-ac4c-652c58e22721"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy with ARN arn:aws:iam::800257271967:policy/redlock-lab-access successfully removed from user testUser"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
