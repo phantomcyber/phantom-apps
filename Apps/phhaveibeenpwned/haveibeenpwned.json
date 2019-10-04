@@ -4,17 +4,24 @@
   "description": "Queries Have I Been Pwned for data breach information with <b>lookup email</b> and <b>lookup domain</b>.",
   "type": "investigative",
   "main_module": "haveibeenpwned_connector.pyc",
-  "app_version": "1.0.11",
+  "app_version": "1.0.12",
   "utctime_updated": "2018-12-07T02:01:46.000000Z",
   "product_vendor": "Troy Hunt",
   "product_name": "Have I Been Pwned",
   "product_version_regex": ".*",
   "logo": "haveibeenpwned.png",
-  "min_phantom_version": "2.0.264",
+  "min_phantom_version": "4.2.7532",
   "publisher": "Phantom",
   "package_name": "phantom_haveibeenpwned",
-  "license": "Copyright (c) Phantom Cyber Corporation 2016",
-  "configuration": {},
+  "license": "Copyright (c) Splunk 2016-2019",
+  "configuration": {
+    "api_key": {
+        "description": "API key",
+        "data_type": "password",
+        "required": true,
+        "order": 0
+    }
+  },
   "actions": [
     {
       "action": "lookup email",
@@ -31,6 +38,18 @@
           ],
           "required": true,
           "primary": true
+        },
+        "truncate": {
+          "description": "Truncate results to just domains",
+          "data_type": "string",
+          "required": false,
+          "primary": false,
+          "value_list": [
+            "True",
+            "False"
+          ],
+          "default": "True",
+          "required": true
         }
       },
       "render": {
