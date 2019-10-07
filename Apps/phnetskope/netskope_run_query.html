@@ -1,0 +1,255 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: netskope_run_query.html
+  Copyright (c) 2018-2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+<style>
+
+    .netskope a:hover {
+        text-decoration:underline;
+    }
+
+    .netskope .wf-h4-style {
+        font-size : 20px;
+    }
+
+    .netskope .wf-table-vertical {
+        width: initial;
+        font-size: 12px;
+    }
+
+    .netskope .wf-table-vertical td{
+        padding: 5px;
+        border: 1px solid !important;
+    }
+
+    .netskope .wf-table-vertical tr td:first-child {
+        font-weight: bold;
+    }
+
+    .netskope .wf-table-events {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .netskope .dataTable th.widget-th {
+        border-top: 1px solid !important;
+        border-bottom: 1px solid !important;
+    }
+
+    .netskope .dataTable td {
+        vertical-align: top;
+    }
+
+    .netskope .dataTable td.widget-td a{
+        font-size: 12px;
+    }
+
+    .netskope .dataTable {
+        font-size: 12px;
+    }
+
+
+</style>
+
+<div class="netskope" style="overflow: auto; width: 100% height: 100%; padding-left:10px; padding-right:10px">
+    <!-- Main Div -->
+
+    {% for result in results %} <!-- loop for each result -->
+    {% if not result.data %}
+    <h4 class="wf-h4-style">No data found</h4>
+    {% else %}
+        <div class="info">
+        <h4 class="wf-h4-style">Info</h4>
+        <table class="wf-table-vertical">
+            <tr>
+                <td>IP</td>
+                <td>
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                    'value':'{{ result.param.ip }}' }], 0,
+                    {{ container.id }}, null, false);">
+                        {{ result.param.ip }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+            </tr>
+            {% if result.param.start_time %}
+            <tr>
+                <td>Start Time</td>
+                <td>{{ result.param.start_time }}</td>
+            </tr>
+            {% endif %}
+            {% if result.param.end_time %}
+            <tr>
+                <td>End Time</td>
+                <td>{{ result.param.end_time }}</td>
+            </tr>
+            {% endif %}
+        </table>
+        </div>
+
+        <div class="page">
+            &nbsp;
+        <h4 class="wf-h4-style">Page Events</h4>
+            <table class="phantom-table dataTable">
+                <thead>
+                    <th class="widget-th">Source IP</th>
+                    <th class="widget-th">Destination IP</th>
+                    <th class="widget-th">Site</th>
+                    <th class="widget-th">User</th>
+                    <th class="widget-th">Org</th>
+                    <th class="widget-th">Insertion Time</th>
+                </thead>
+                <tbody>
+                {% for pages in result.data.page %}
+                <tr>
+                    <td class="widget-td" >
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                        'value':'{{ pages.srcip }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ pages.srcip }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                        'value':'{{ pages.dstip }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ pages.dstip }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">{{ pages.site }}</td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'],
+                        'value':'{{ pages.user }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ pages.user }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'],
+                        'value':'{{ pages.org }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ pages.org }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">{{ pages|by_key:"_insertion_epoch_timestamp" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="application">
+        <h4 class="wf-h4-style">Application Events</h4>
+            <table class="phantom-table dataTable">
+                <thead>
+                    <th class="widget-th">Source IP</th>
+                    <th class="widget-th">Destination IP</th>
+                    <th class="widget-th">Site</th>
+                    <th class="widget-th">User</th>
+                    <th class="widget-th">From User</th>
+                    <th class="widget-th">Org</th>
+                    <th class="widget-th">Insertion Time</th>
+                </thead>
+                <tbody>
+                {% for app in result.data.application %}
+                <tr>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                        'value':'{{ app.srcip }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ app.srcip }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                        'value':'{{ app.dstip }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ app.dstip }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">{{ app.site }}</td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'],
+                        'value':'{{ app.user }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ app.user }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'],
+                        'value':'{{ app.from_user }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ app.from_user }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'],
+                        'value':'{{ app.org }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ app.org }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td class="widget-td">{{ app|by_key:"_insertion_epoch_timestamp" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+
+{% endblock %}
