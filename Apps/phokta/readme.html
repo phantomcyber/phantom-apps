@@ -1,0 +1,57 @@
+<!-- File: readme.html
+  Copyright (c) 2018-2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+<html>
+<head></head>
+<body>
+<h2>Pagination</h2>
+The pagination mechanism has been implemented for the investigative actions mentioned below.
+<ul>
+    <li>list users</li>
+    <li>list user groups</li>
+    <li>list providers</li>
+    <li>list roles</li>
+</ul>
+
+The pagination mechanism has been explained below.
+
+<ul>
+    <li>Limit Parameter: This input parameter is used to mention total number of items (valid positive integer) to be fetched in action results.</li>
+</ul>
+
+<b>Examples</b>
+<br>
+Total items in end system for reference in below examples are 950 and internally, every page fetched will have 200 result items. Based on the value of limit and other parameters combined, the required items from every page will be fetched and added to action results output. The 'after' field (for navigating to next pages) used in API calls is handled internally by the pagination mechanism.
+
+<ul>
+    <li><b>Example 1:</b> Limit = 50</li>
+    <ul>
+        <li>This will fetch first 50 items</li>
+    </ul>
+    <br>
+    <li><b>Example 2:</b> Limit = 200</li>
+    <ul>
+        <li>This will fetch first 200 items</li>
+    </ul>
+    <br>
+    <li><b>Example 3:</b> Limit = 240</li>
+    <ul>
+        <li>This will fetch all 200 items of first page and 40 items from second page, hence in all it will fetch 240 items</li>
+    </ul>
+    <br>
+    <li><b>Example 4:</b> Limit = 1000</li>
+    <ul>
+        <li>This will fetch all 950 items</li>
+    </ul>
+    <br>
+    <li><b>Example 6:</b> Limit = None</li>
+    <ul>
+        <li>This will fetch all 950 items</li>
+    </ul>
+</ul>
+</body>
+</html>
