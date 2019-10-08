@@ -1,0 +1,191 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: jira_update_ticket.html
+  Copyright (c) 2016-2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+<style>
+
+    .jira a:hover {
+        text-decoration:underline;
+    }
+
+    .jira .wf-h4-style {
+        font-size : 20px
+    }
+
+    .jira .wf-table-vertical .dataTable td {
+        vertical-align: top;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+    }
+
+    .jira .wf-table-vertical {
+        width: initial;
+        font-size: 12px;
+    }
+
+    .jira .wf-table-vertical td{
+        padding: 5px;
+        border: 1px solid !important;
+    }
+
+    .jira .wf-table-vertical tr td:first-child {
+        font-weight: bold;
+    }
+
+    .jira .dataTable th.widget-th {
+        border-top: 1px solid !important;
+        border-bottom: 1px solid !important;
+    }
+
+    .jira .dataTable td {
+        vertical-align: top;
+    }
+
+    .jira .dataTable td.widget-td a{
+        font-size: 12px;
+    }
+
+    .jira .dataTable {
+        font-size: 12px;
+    }
+
+    .jira .overflow-column {
+        overflow: auto;
+    }
+
+
+</style>
+
+
+<div class="jira" style="overflow: auto; width: 100% height: 100%; padding-left:10px; padding-right:10px">
+    <!-- Main Div -->
+
+    {% for result in results %} <!-- loop for each result -->
+        {% if not result.data %}
+            <h4 class="wf-h4-style">No data found</h4>
+        {% else %}
+			{% if result.param.id %}
+				<h4 class="wf-h4-style">Info</h4>
+				<table class="wf-table-vertical">
+					{% if result.param.id %}
+						<tr>
+							<td>Id</td>
+							<td>
+								<a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket key'], 'value':'{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+									{{ result.param.id }}
+									&nbsp;
+									<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+								</a>
+							</td>
+						</tr>
+                    {% endif %}
+                    {% if result.param.update_fields %}
+						<tr>
+							<td>Update fields</td>
+							<td>{{ result.param.update_fields }}</td>
+						</tr>
+                    {% endif %}
+                    {% if result.param.vault_id %}
+						<tr>
+							<td>vault_id</td>
+							<td>
+								<a href="javascript:;" onclick="context_menu(this, [{'contains': ['vault id'], 'value':'{{ result.param.vault_id }}' }], 0, {{ container.id }}, null, false);">
+									{{ result.param.vault_id }}
+									&nbsp;
+									<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+								</a>
+							</td>
+						</tr>
+                    {% endif %}
+				</table>
+			{% endif %}
+            &nbsp;
+            <h4 class="wf-h4-style">Updated Ticket</h4>
+
+            <div class="list_items_table overflow-column">
+                <table class="phantom-table dataTable">
+                    <thead>
+                        <th class="widget-th">Summary</th>
+                        <th class="widget-th">Description</th>
+                        <th class="widget-th">Id</th>
+                        <th class="widget-th">Type</th>
+                        <th class="widget-th">Key</th>
+                        <th class="widget-th">Status</th>
+                        <th class="widget-th">Priority</th>
+                        <th class="widget-th">Resolution</th>
+                        <th class="widget-th">Reporter</th>
+                    </thead>
+                    <tbody>
+                    {% for item in result.data %}
+                        <tr>
+                            <td class="widget-td">{{ item.summary }}</td>
+                            <td class="widget-td">{{ item.description }}</td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket key'], 'value':'{{ item.id }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ item.id }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira issue type'], 'value':'{{ item.issue_type }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ item.issue_type }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket key'], 'value':'{{ item.name }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ item.name }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td class="widget-td">{{ item.status }}</td>
+                            <td class="widget-td">{{ item.priority }}</td>
+                            <td class="widget-td">{{ item.resolution }}</td>
+                            <td class="widget-td">{{ item.reporter }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+
+{% endblock %}
