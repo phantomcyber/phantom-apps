@@ -1,0 +1,135 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: display_list_user.html
+  Copyright (c) 2018-2019 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+.okta-app a:hover {
+  text-decoration:underline;
+}
+
+.okta-app .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.okta-app .wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.okta-app .wf-table-horizontal  {
+  margin-right: 10px;
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.okta-app .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.okta-app .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+}
+
+.okta-app .wf-h3-style {
+  font-size : 20px
+}
+
+.okta-app .wf-h4-style {
+  font-size : 16px
+}
+
+.okta-app .wf-h5-style {
+  font-size : 14px
+}
+.okta-app .wf-subheader-style {
+  font-size : 12px
+}
+
+</style>
+<div class="okta-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+<br>
+
+<!------------------- For each Result ---------------------->
+  {% for result in results %}
+    {% if result.data %}
+    <div class="list_items_table overflow-column">
+        <table class="phantom-table dataTable">
+            <thead>
+                <th>STATUS</th>
+                <th>FIRST NAME</th>
+                <th>LAST NAME</th>
+                <th>USER ID</th>
+                <th>LAST LOGIN</th>
+            </thead>
+            <tbody>
+                {% for curr_data in result.data %}
+                    <tr>
+                        <td class="widget-td">{{ curr_data.status }}</td>
+                        <td>{{ curr_data.profile.firstName }}</td>
+                        <td>{{ curr_data.profile.lastName }}</td>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta user id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_data.id }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                        <td>{{ curr_data.lastLogin }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    {% else %}
+        <p> No users found </p>
+    {% endif %}
+  {% endfor %}
+<br>
+
+<!------------------- For each Result END ---------------------->
+</div> <!-- Main Div -->
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+
+{% endblock %} <!-- Main Start Block -->
+
