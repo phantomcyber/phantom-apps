@@ -49,8 +49,7 @@
             "True",
             "False"
           ],
-          "default": "True",
-          "required": true
+          "default": "False"
         }
       },
       "render": {
@@ -64,7 +63,7 @@
           "data_path": "action_result.data.*.Name",
           "data_type": "string",
           "column_name": "Company",
-          "column_order": 0
+          "column_order": 1
         },
         {
           "data_path": "action_result.data.*.Title",
@@ -77,7 +76,7 @@
             "domain"
           ],
           "column_name": "Domain",
-          "column_order": 1
+          "column_order": 2
         },
         {
           "data_path": "action_result.data.*.IsActive",
@@ -103,7 +102,7 @@
           "data_path": "action_result.data.*.BreachDate",
           "data_type": "string",
           "column_name": "Date Of Breach",
-          "column_order": 2
+          "column_order": 3
         },
         {
           "data_path": "action_result.data.*.IsSpamList",
@@ -112,13 +111,13 @@
         {
           "data_path": "action_result.data.*.IsVerified",
           "data_type": "boolean",
-          "column_order": 3,
+          "column_order": 4,
           "column_name": "Verified"
         },
         {
           "data_path": "action_result.data.*.DataClasses",
           "data_type": "string",
-          "column_order": 4,
+          "column_order": 5,
           "column_name": "Data Compromised"
         },
         {
@@ -142,7 +141,9 @@
           "data_type": "string",
           "contains": [
             "email"
-          ]
+          ],
+          "column_order": 0,
+          "column_name": "Email"
         },
         {
           "data_path": "action_result.summary",
