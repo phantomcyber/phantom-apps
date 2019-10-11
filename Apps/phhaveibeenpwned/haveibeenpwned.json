@@ -4,8 +4,8 @@
   "description": "Queries Have I Been Pwned for data breach information with investigative actions",
   "type": "investigative",
   "main_module": "haveibeenpwned_connector.pyc",
-  "app_version": "1.0.12",
-  "utctime_updated": "2018-12-07T02:01:46.000000Z",
+  "app_version": "1.0.13",
+  "utctime_updated": "2019-10-11T22:33:46.000000Z",
   "product_vendor": "Troy Hunt",
   "product_name": "Have I Been Pwned",
   "product_version_regex": ".*",
@@ -17,10 +17,10 @@
   "license": "Copyright (c) Splunk 2016-2019",
   "configuration": {
     "api_key": {
-        "description": "API key",
-        "data_type": "password",
-        "required": true,
-        "order": 0
+      "description": "API key",
+      "data_type": "password",
+      "required": true,
+      "order": 0
     }
   },
   "actions": [
@@ -165,14 +165,14 @@
           "data_path": "summary.total_objects",
           "data_type": "numeric",
           "example_values": [
-              1
+            1
           ]
         },
         {
           "data_path": "summary.total_objects_successful",
           "data_type": "numeric",
           "example_values": [
-              1
+            1
           ]
         }
       ],
@@ -305,14 +305,14 @@
           "data_path": "summary.total_objects",
           "data_type": "numeric",
           "example_values": [
-              1
+            1
           ]
         },
         {
           "data_path": "summary.total_objects_successful",
           "data_type": "numeric",
           "example_values": [
-              1
+            1
           ]
         }
       ],
