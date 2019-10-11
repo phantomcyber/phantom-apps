@@ -1,7 +1,7 @@
 {
   "appid": "6a474f60-5355-4ac1-8654-37a2d4a2143b",
   "name": "Have I Been Pwned",
-  "description": "Queries Have I Been Pwned for data breach information with <b>lookup email</b> and <b>lookup domain</b>.",
+  "description": "Queries Have I Been Pwned for data breach information with investigative actions",
   "type": "investigative",
   "main_module": "haveibeenpwned_connector.pyc",
   "app_version": "1.0.12",
@@ -12,7 +12,7 @@
   "logo": "logo_haveibeenpwned.svg",
   "logo_dark": "logo_haveibeenpwned_dark.svg",
   "min_phantom_version": "4.2.7532",
-  "publisher": "Phantom",
+  "publisher": "Splunk",
   "package_name": "phantom_haveibeenpwned",
   "license": "Copyright (c) Splunk 2016-2019",
   "configuration": {
@@ -130,7 +130,11 @@
         },
         {
           "data_path": "action_result.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -146,12 +150,30 @@
           "column_name": "Email"
         },
         {
+          "data_path": "action_result.parameter.truncate",
+          "data_type": "string"
+        },
+        {
           "data_path": "action_result.summary",
           "data_type": "string"
         },
         {
           "data_path": "action_result.summary.total_breaches",
           "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+              1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+              1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -253,7 +275,11 @@
         },
         {
           "data_path": "action_result.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -273,6 +299,20 @@
           "contains": [
             "url",
             "domain"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+              1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+              1
           ]
         }
       ],
