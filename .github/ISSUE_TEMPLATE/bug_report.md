@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Name of the app**
+The app this issue relates to.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

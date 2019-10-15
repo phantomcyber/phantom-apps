@@ -1,0 +1,108 @@
+<!--
+    File: readme.html
+    Copyright (c) 2018 Splunk Inc.
+    
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+-->
+
+<p>
+Without additional configuration on the proxy server, it will not be possible to connect to WinRM using NTLM authentication through an HTTP(S) proxy.
+If authentication is set to basic, then it will still work, however.
+</p>
+<p>
+In order to use this app you must have the Windows Remote Management service running on the endpoint you wish to connect to.
+For help regarding this process, consult this link: <a href="https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx">https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx</a>
+</p>
+<p>
+The protocol and port can be specified with the IP/hostname. For example, if using HTTPS on port 5986, the IP/Hostname should be <b>https://192.168.10.21:5986</b>.
+</p>
+<p>
+In the configuration options for the asset, a default protocol and port for actions can be specified.
+These options will be prepended or appended to the IP/hostname provided for all actions including <b>test connectivity</b>.
+If a different protocol or port number is specified in the IP/hostname field, the corresponding default will be ignored.
+</p>
+<p>
+This app supports adding a custom parser for the actions <b>run script</b> and <b>run command</b>.
+By default, the output of these actions will just be the status code, standard out, and standard error of
+whatever gets ran. If you want to capture a specific string or fail on a certain status code, you will need
+to provide a custom parser.
+</p>
+<p>
+The custom parser should be a file added to the vault containing a function named <b>custom_parser</b>.
+</p>
+<pre class="shell">
+<code>
+import phantom.app as phantom
+
+
+def custom_parser(action_result, response):
+    # type: (ActionResult, winrm.Response) -> bool
+    data = {}
+    data['status_code'] = response.status_code
+    data['std_out'] = response.std_out
+    data['std_err'] = response.std_err
+
+    action_result.add_data(data)
+    return phantom.APP_SUCCESS
+</code>
+</pre>
+<p>
+This is equivalent to the default parser which is used if nothing is provided. It takes in an ActionResult and
+a Response object (from the pywinrm module), and it is expected to return a boolean value
+(phantom.APP_SUCCESS and phantom.APP_ERROR are equivalent to True and False).
+</p>
+<p>
+Here is an example of a parser which will extract all the IPs from the output, and fail if there
+is a non-zero status code.
+</p>
+<pre class="shell">
+<code>
+import re
+import phantom.app as phantom
+from phantom import utils as ph_utils
+
+
+def custom_parser(action_result, response):
+    # type: (ActionResult, winrm.Response) -> bool
+    data = {}
+    data['status_code'] = response.status_code
+    data['std_out'] = response.std_out
+    data['std_err'] =  response.std_err
+
+    if data['status_code'] != 0:
+        # This will be the message displayed
+        return action_result.set_status(
+            phantom.APP_ERROR, "Error: Returned a non-zero status code"
+        )
+
+    # This can still return values like 999.999.999.999
+    ips = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', data['std_out'])
+    # Get only valid IPs
+    filtered_ips = []
+    for ip in ips:
+        if ph_utils.is_ip(ip):
+            filtered_ips.append(ip)
+
+    data['ips'] = filtered_ips
+
+    action_result.add_data(data)
+    return phantom.APP_SUCCESS
+</code>
+</pre>
+<p>
+As a final thing to consider, the playbook editor will not be aware of any custom data paths
+which your parser introduces.
+Using the above example, if you wanted to use the list of ips in a playbook, you would need to type in the correct
+datapath manually (action_result.data.*.ips).
+</p>
+<p>
+For more information on datapaths and the ActionResult object, refer to the Phantom App Developer Guide.
+</p>
+<p>
+Both the <b>run script</b> and <b>run command</b> actions also support running commands asynchronously.
+By default, the app will wait for these actions to finish. In the case of starting a long running job,
+or some other command which you want to start but don't care for the output, then you can check the <b>async</b> parameter.
+After the command starts, it will return a <b>command_id</b> and <b>shell_id</b>, which you can optionally use to retrieve the
+output of that command at a later time.
+</p>

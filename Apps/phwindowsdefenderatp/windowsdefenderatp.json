@@ -1,0 +1,1986 @@
+{
+    "appid": "e85407b7-91f0-4019-8fa4-0d29bca741d5",
+    "name": "Windows Defender ATP",
+    "description": "This app integrates with Windows Defender Advanced Threat Protection(ATP) to execute various containment, corrective and investigative actions",
+    "type": "endpoint",
+    "product_vendor": "Microsoft",
+    "logo": "logo_windowsdefenderatp.svg",
+    "logo_dark": "logo_windowsdefenderatp_dark.svg",
+    "product_name": "Windows Defender ATP",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2019-05-14T20:08:52.000000Z",
+    "package_name": "phantom_windowsdefenderatp",
+    "main_module": "windowsdefenderatp_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "rest_handler": "windowsdefenderatp_connector._handle_rest_request",
+    "configuration": {
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "tenant_id": {
+            "description": "Tenant ID",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine device",
+            "identifier": "quarantine_device",
+            "description": "Quarantine the device",
+            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>Maximum timeout period for status check is 10 minutes.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unquarantine device",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "type": {
+                    "description": "Type of quarantine (Default: Full)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Full",
+                        "Selective"
+                    ],
+                    "default": "Full",
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment for quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 30,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "selective quarantine",
+                        "test"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30,
+                        130
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Selective",
+                        "Full"
+                    ],
+                    "column_name": "Quarantine Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-10T12:30:33.8322656Z",
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "cb908a36-1a14-4e7c-a39a-dca5d8e09997",
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-10T12:30:47.3902185Z",
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Selective",
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded",
+                        "InProgress",
+                        "Pending"
+                    ],
+                    "column_name": "Quarantine Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Isolate"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "14b61d76-0ab2-4108-b6c5-2f42b2a2a6a2",
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.quarantine_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress",
+                        "Pending"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: 14b61d76-0ab2-4108-b6c5-2f42b2a2a6a2, Quarantine status: InProgress",
+                        "Event id: 6925706d-3a7e-4596-b2d7-321fca9cd965, Quarantine status: Pending"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine device",
+            "identifier": "unquarantine_device",
+            "description": "Unquarantine the device",
+            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 10 minutes.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "quarantine device",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to unquarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Comment for unquarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 30,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "unquarantine the device",
+                        "test"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-11T06:37:03.876372Z",
+                        "2019-05-03T08:52:22.7708738Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9553d967-bddb-4c02-996c-0ec184667c32",
+                        "cb15e6e0-1d53-4762-9c37-f14d412ece9e"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-11T06:37:03.876372Z",
+                        "2019-05-03T08:52:22.7708738Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "isolation",
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress",
+                        "Pending"
+                    ],
+                    "column_name": " Unquarantine Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unisolate"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9553d967-bddb-4c02-996c-0ec184667c32",
+                        "cb15e6e0-1d53-4762-9c37-f14d412ece9e"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.unquarantine_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress",
+                        "Pending"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: 9553d967-bddb-4c02-996c-0ec184667c32, Unquarantine status: InProgress",
+                        "Event id: cb15e6e0-1d53-4762-9c37-f14d412ece9e, Unquarantine status: Pending"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get status",
+            "identifier": "get_status",
+            "description": "Get status of the event on a machine",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "event_id": {
+                    "description": "ID of the event",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "8ee4bf1f-4b37-48dc-a49d-ab0a75117942",
+                        "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T11:38:11.6114543Z",
+                        "2019-05-03T09:01:19.3478911Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileInstances",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "8ee4bf1f-4b37-48dc-a49d-ab0a75117942",
+                        "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T11:38:37.8975956Z",
+                        "2019-05-03T09:01:27.6955788Z"
+                    ],
+                    "column_name": "Last Update Time",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
+                        "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo.fileIdentifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "2dba4c14a5e97312f9edf617e1c8b0cc0d387fd8"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo.fileIdentifierType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user@example.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Requestor",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "From phantom",
+                        "test"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "11ffeabbe42159e1365aa82463d8690c845ce7b7"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded",
+                        "InProgress"
+                    ],
+                    "column_name": "Event Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "RunAntiVirusScan",
+                        "Isolate"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.event_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event status: Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "scan device",
+            "identifier": "scan_device",
+            "description": "Scan a device for virus",
+            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 1 hour.",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "scan_type": {
+                    "description": "Type of scan",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Quick",
+                        "Full"
+                    ],
+                    "default": "Quick",
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment for scan",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 30,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 2,
+                    "example_values": [
+                        "Scanning from Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scan_type",
+                    "data_type": "string",
+                    "column_name": "Scan Type",
+                    "column_order": 1,
+                    "example_values": [
+                        "Quick"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T11:35:30.8573959Z"
+                    ],
+                    "column_name": "Creation Time",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "34a0905e-316b-46eb-994d-c7d0e8ac2efb"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T11:35:30.8573959Z"
+                    ],
+                    "column_name": "Last Update Time",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Requestor",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "From phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress"
+                    ],
+                    "column_name": "Scan Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "RunAntiVirusScan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "34a0905e-316b-46eb-994d-c7d0e8ac2efb"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.scan_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: 34a0905e-316b-46eb-994d-c7d0e8ac2efb, Scan status: InProgress"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine file",
+            "identifier": "quarantine_file",
+            "description": "Quarantine a file",
+            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 10 minutes.",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "file_hash": {
+                    "description": "Identifier of the file",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment for quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 30,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "file quarantine",
+                        "dfgf"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
+                        "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "e1049556edc2b28ef25b2932c722e4dc927e9d04",
+                        "2dba4c14a5e97312f9edf617e1c8b0cc0d387fd8"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "File Hash",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30,
+                        125
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T12:17:13.5187442Z",
+                        "2019-05-03T06:00:00.2740597Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileId",
+                    "data_type": "string",
+                    "example_values": [
+                        "e1049556edc2b28ef25b2932c722e4dc927e9d04"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileInstances.*.filePath",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileInstances.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "17413c5c-663e-425d-8582-3013b47a3454",
+                        "76e82ecd-54b8-400d-83be-a05d582b3546"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-12T12:17:29.2879612Z",
+                        "2019-05-03T06:00:00.2740597Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
+                        "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo.fileIdentifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "2dba4c14a5e97312f9edf617e1c8b0cc0d387fd8"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo.fileIdentifierType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "file quarantine",
+                        "dfgf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "e1049556edc2b28ef25b2932c722e4dc927e9d04"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded",
+                        "InProgress",
+                        "Pending"
+                    ],
+                    "column_name": "Quarantine Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "StopAndQuarantineFile"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "17413c5c-663e-425d-8582-3013b47a3454",
+                        "76e82ecd-54b8-400d-83be-a05d582b3546"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.quarantine_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "InProgress",
+                        "Pending"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: 17413c5c-663e-425d-8582-3013b47a3454, Quarantine status: InProgress",
+                        "Event id: 76e82ecd-54b8-400d-83be-a05d582b3546, Quarantine status: Pending"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list devices",
+            "identifier": "list_devices",
+            "description": "List of recently seen devices",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "input_type": {
+                    "description": "Type of input (Default: All)",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "value_list": [
+                        "All",
+                        "Domain",
+                        "File Hash",
+                        "IP"
+                    ],
+                    "default": "All"
+                },
+                "input": {
+                    "description": "Input filter of type Domain, File hash or IP",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false,
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "domain"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.input",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.1.2"
+                    ],
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.input_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "All"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aadDeviceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.agentVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.4850.17134.1",
+                        "10.5850.17763.404"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "desktop-ph2a1ro",
+                        "desktop-hq2fctd"
+                    ],
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Computer Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-04T05:19:51.5099989Z",
+                        "2019-04-16T00:27:12.2677222Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groupName",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.healthStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ],
+                    "column_name": "Health Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
+                        "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.isAadJoined",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastExternalIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "203.88.139.34",
+                        "204.107.141.240"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Last External IP Address",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.lastIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.1.87",
+                        "10.1.66.140"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Last IP Address",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T05:23:45.9643247Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osBuild",
+                    "data_type": "numeric",
+                    "example_values": [
+                        17134,
+                        17763
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osPlatform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows10"
+                    ],
+                    "column_name": "OS",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.systemProductName",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "identifier": "list_alerts",
+            "description": "List all alerts of a given type",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "input_type": {
+                    "description": "Type of input (Default: All)",
+                    "data_type": "string",
+                    "required": false,
+                    "value_list": [
+                        "All",
+                        "Domain",
+                        "File Hash",
+                        "IP"
+                    ],
+                    "default": "All",
+                    "order": 0
+                },
+                "input": {
+                    "description": "Input filter of type Domain, File Hash and IP",
+                    "data_type": "string",
+                    "required": false,
+                    "contains": [
+                        "domain",
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "ip"
+                    ],
+                    "order": 1
+                },
+                "limit": {
+                    "description": "Maximum number of alerts to return (Default: 100)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 100,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.input",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b3b40fbc889fd4c645cc12c85d0805ac36ba254",
+                        "fda7:e6ee:2e09:0:19f9:12ea:c80d:cf5b",
+                        "google.com"
+                    ],
+                    "contains": [
+                        "domain",
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.input_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "All",
+                        "Domain",
+                        "File Hash",
+                        "IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7,
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCreationTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T06:14:57.3215921Z",
+                        "2019-05-03T01:20:51.8699882Z"
+                    ],
+                    "column_name": "Creation Time",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.assignedTo",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com",
+                        "Automation"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Assigned To",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "General"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.createdBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@example.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.createdTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-01T13:21:37.869889Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that Windows Defender has stopped the malware from delivering its payload. However, it is prudent to check the machine for signs of infection."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectionSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "WindowsDefenderAv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.determination",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstEventTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T06:11:39.7694679Z",
+                        "2019-05-02T23:03:43.2077683Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "636664544975761381_-2060171509",
+                        "636924432519012302_1685044642"
+                    ],
+                    "column_name": "Alert ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.incidentId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.investigationId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.investigationState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Benign"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastEventTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T06:15:56.4358958Z",
+                        "2019-05-02T23:03:43.2077683Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T01:29:51.9233333Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recommendedAction",
+                    "data_type": "string",
+                    "example_values": [
+                        "Collect artifacts and determine scope\n\u2022\tReview the machine timeline for suspicious activities that may have occurred before and after the time of the alert, and record additional related artifacts (files, IPs/URLs) \n\u2022\tLook for the presence of relevant artifacts on other systems. Identify commonalities and differences between potentially compromised systems.\n\u2022\tSubmit relevant files for deep analysis and review resulting detailed behavioral information.\n\u2022\tSubmit undetected files to the MMPC malware portal\n\nInitiate containment & mitigation \n\u2022\tContact the user to verify intent and initiate local remediation actions as needed.\n\u2022\tUpdate AV signatures and run a full scan. The scan might reveal and remove previously-undetected malware components.\n\u2022\tEnsure that the machine has the latest security updates. In particular, ensure that you have installed the latest software, web browser, and Operating System versions.\n\u2022\tIf credential theft is suspected, reset all relevant users passwords.\n\u2022\tBlock communication with relevant URLs or IPs at the organization\u2019s perimeter."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resolvedTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T06:14:57.3215921Z",
+                        "2019-05-03T01:29:51.7614303Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Informational"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "New",
+                        "Resolved"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.threatFamilyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "EICAR_Test_File",
+                        "Fuery"
+                    ],
+                    "column_name": "Threat Family",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows Defender AV detected 'EICAR_Test_File' malware",
+                        "Windows Defender AV detected 'Fuery' malware"
+                    ],
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7,
+                        12
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total alerts: 7",
+                        "Total alerts: 12"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list sessions",
+            "identifier": "list_sessions",
+            "description": "List all logged in users on a machine",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.accountDomainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "desktop-gq5jf56"
+                    ],
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Account Domain Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.accountName",
+                    "data_type": "string",
+                    "example_values": [
+                        "example"
+                    ],
+                    "column_name": "Account Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.accountSid",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T00:00:00Z"
+                    ],
+                    "column_name": "First Seen",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "desktop-gq5jf56\\example"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.isDomainAdmin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Domain Admin",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.isOnlyNetworkUser",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-07-06T00:00:00Z"
+                    ],
+                    "column_name": "Last Seen",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.leastPrevalentMachineId",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logOnMachinesCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logonTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Network, RemoteInteractive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mostPrevalentMachineId",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_sessions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total sessions: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+<!-- File: readme.html
+  Copyright (c) 2019 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<p><b>Functioning of On Poll</b></p>
+	<ul>
+		<li> There are two approaches for ingesting data using the On Poll action.</li>
+		<br>
+			<ul>
+				<li><b>Normal Polling</b></li>
+				<br>
+					<ol>
+						<li>On Poll</li>
+							<p>This is manual On Poll. Here, the findings data of the past N days (poll_now_days configuration parameter) will be ingested.</p>
+						<li>Scheduled Polling</li>
+							<p>In the first run, the findings data of the past M days (Scheduled_poll_days configuration parameter) will be ingested and then, for the consecutive runs, only the findings which are updated after the last run's time (last_ingested_date stored in the state file) will be fetched.</p>
+						<li>Interval Polling</li>
+							<p>The logic of fetching and ingesting the findings is the same as scheduled polling.</p>
+					</ol>
+				<br>
+				<li><b>SQS Polling</b></li>
+					<p>This polling approach uses the SQS URL provided in the configuration parameter to read the messages available in the SQS queue. The findings data is extracted and ingested into Phantom from this queue and then, it is deleted from the SQS queue. This method will ignore the <b>poll_now_days</b> and <b>scheduled_poll_days</b> asset configuration parameters.</p>
+			</ul>
+	</ul>
