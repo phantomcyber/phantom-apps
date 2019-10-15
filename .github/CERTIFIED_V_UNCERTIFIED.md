@@ -11,6 +11,7 @@ Passive Testing  | *
 Full Functionality Testing |
 Regular Regression Testing |	
 
+***
 
 ## Uncertified App Testing 
 	
