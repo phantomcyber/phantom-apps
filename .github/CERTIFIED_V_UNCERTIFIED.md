@@ -1,8 +1,5 @@
 # Certified and Uncertified Apps
 
-
-![Certified App Logo](Images/certified-app-logo.png)
-
 You may have noticed the Certified banner that shows up next to some Phantom Apps.  This document explains what goes into that icon.  
 
 ![Certified App Logo](Images/certified-app-logo.png)  | Uncertified App
