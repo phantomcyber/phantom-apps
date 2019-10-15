@@ -13,8 +13,8 @@ Code Review  | *
 Security Review  | *
 Content Review  | *
 Passive Testing  | *
-	| Full Functionality Testing
-	| Regular Regression Testing	
+- | Full Functionality Testing
+- | Regular Regression Testing	
 
 
 ## Uncertified App Testing 
