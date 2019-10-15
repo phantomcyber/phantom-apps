@@ -7,14 +7,14 @@ You may have noticed the Certified banner that shows up next to some Phantom App
 
 
 
-Uncertified App  | Certified App
+Certified App  | Uncertified App
 ------------- | -------------
 Code Review  | *
 Security Review  | *
 Content Review  | *
 Passive Testing  | *
-- | Full Functionality Testing
-- | Regular Regression Testing	
+Full Functionality Testing |
+Regular Regression Testing |	
 
 
 ## Uncertified App Testing 
