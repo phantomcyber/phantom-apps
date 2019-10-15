@@ -37,7 +37,7 @@ For example:
 * Does the app properly handle exceptions?
 
 ## Certified App Testing
-The main differentiating factor of a Certified app is that it has been fully tested against a functional version of the product the app integrates with.  
+Certified apps build on top of all tests done for an uncertified app.  The main differentiating factor of a Certified app is that it has been fully tested against a functional version of the product the app integrates with.  
 
 ### Full Functionality Testing
 Fort a Certified app, the Phantom QA team tests every action exposed by the app against a working version of the product.  
