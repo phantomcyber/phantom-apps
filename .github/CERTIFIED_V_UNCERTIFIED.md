@@ -41,7 +41,7 @@ For example:
 Certified apps build on top of all tests done for an uncertified app.  The main differentiating factor of a Certified app is that it has been fully tested against a functional version of the product the app integrates with.  
 
 ### Full Functionality Testing
-Fort a Certified app, the Phantom QA team tests every action exposed by the app against a working version of the product.  
+For a Certified app, the Phantom QA team tests every action exposed by the app against a working version of the product.  
 
 ### Regular Regression Testing
 As part of the Certified app testing process, the Phantom QA team produces a Phantom Playbook that tests for app functionality.  This test is in turn used to perform regular regression testing of all Certified Phantom Apps.
