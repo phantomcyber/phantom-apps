@@ -1,0 +1,709 @@
+{
+    "appid": "a9977c7a-b26a-4ef8-84fa-feb4fe5502c4",
+    "name": "PolySwarm",
+    "description": "This app integrates with PolySwarm  to implement investigative actions",
+    "type": "reputation",
+    "product_vendor": "PolySwarm",
+    "logo": "logo_polyswarm.svg",
+    "logo_dark": "logo_polyswarm_dark.svg",
+    "product_name": "PolySwarm",
+    "product_version_regex": ".*",
+    "publisher": "PolySwarm",
+    "license": "Copyright (c) PolySwarm, 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-05-30T22:06:54.013359Z",
+    "package_name": "phantom_polyswarm",
+    "main_module": "polyswarm_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "polyswarm_api_key": {
+            "description": "PolySwarm API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "base_url": {
+            "description": "The Base URL to connect to",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "https://api.polyswarm.network/v1",
+            "order": 1
+        },
+        "polyswarm_community": {
+            "description": "PolySwarm Community",
+            "data_type": "string",
+            "default": "lima",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file reputation",
+            "identifier": "file_reputation",
+            "description": "Queries Polyswarm for file reputation info",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "File hash to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "column_name": "hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url reputation",
+            "identifier": "url_reputation",
+            "description": "Queries Polyswarm for url reputation info",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "identifier": "domain_reputation",
+            "description": "Queries Polyswarm for Domain reputation info",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "identifier": "ip_reputation",
+            "description": "Queries Polyswarm for IP reputation info",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file",
+            "identifier": "get_file",
+            "description": "Downloads a file from Polyswarm, and adds it to the vault",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "File hash to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "column_name": "hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": 3,
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Lookup results from UUID",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "parameters": {
+                "scan_uuid": {
+                    "description": "Lookup UUID",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "uuid"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.scan_uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "uuid"
+                    ],
+                    "column_name": "scan_uuid",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "identifier": "detonate_file",
+            "description": "Upload a file to Polyswarm and retrieve analysis results",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID or SHA1 of the file to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "vault_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "identifier": "detonate_url",
+            "description": "Load a URL to Polyswarm and retrieve analysis results",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_scans",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.scan_uuid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.permalink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.positives",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scan_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }             ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
