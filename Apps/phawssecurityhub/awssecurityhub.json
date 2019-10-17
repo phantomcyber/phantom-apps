@@ -8,13 +8,13 @@
     "logo_dark": "logo_awssecurityhub_dark.svg",
     "product_name": "Security Hub",
     "product_version_regex": ".*",
-    "publisher": "test",
-    "license": "Copyright (c) 2019 test Inc.",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
     "app_version": "1.1.6",
     "utctime_updated": "2019-06-24T20:02:22.000000Z",
-    "package_name": "test_awssecurityhub",
+    "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.pyc",
-    "min_test_version": "4.2.7532",
+    "min_phantom_version": "4.2.7532",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
