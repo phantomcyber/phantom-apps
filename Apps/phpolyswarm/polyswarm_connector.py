@@ -1,5 +1,5 @@
 # File: polyswarm_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) PolySwarm, 2019.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
