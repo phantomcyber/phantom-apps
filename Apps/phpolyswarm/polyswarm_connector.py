@@ -1,3 +1,8 @@
+# File: polyswarm_connector.py
+# Copyright (c) 2019 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -6,12 +11,12 @@ from phantom.vault import Vault
 
 from polyswarm_consts import *
 
+import os
 import time
-
 import requests
 import json
-
 import logging
+import uuid
 
 # Set Debug level
 # logging.basicConfig(level=logging.DEBUG)
@@ -43,8 +48,12 @@ class Polyswarm_API:
         r = None
 
         # set full URL for request
-        full_url = '{base_url}{path_url}'.format(base_url=self.config['base_url'],
-                                                  path_url=path_url)
+        try:
+            full_url = '{base_url}{path_url}'.format(base_url=self.config['base_url'],
+                                                    path_url=path_url)
+        except:
+            self.debug_print('Error occurred while making HTTP Request. {0}'.format(POLYSWARM_CONFIG_PARAMS_ERR_MSG))
+            return phantom.APP_ERROR, None
 
         logging.info('[{method}] URL: {full_url} - params/data: {data} - files: {files} - headers: {headers}'.
                        format(method=method.upper(),
@@ -224,9 +233,13 @@ class PolyswarmConnector(BaseConnector):
         self.polyswarm_api = Polyswarm_API(config)
 
         # Access action parameters passed in the 'param' dictionary
-        self.save_progress('Base URL is: {base_url} - Community: {polyswarm_community}'.
+        try:
+            self.save_progress('Base URL is: {base_url} - Community: {polyswarm_community}'.
                             format(base_url=config['base_url'],
                                    polyswarm_community=config['polyswarm_community']))
+        except:
+            self.save_progress(POLYSWARM_DEBUG_ERROR_MSG)
+            return phantom.APP_ERROR
 
         return phantom.APP_SUCCESS
 
@@ -367,19 +380,23 @@ class PolyswarmConnector(BaseConnector):
             if (phantom.is_fail(status_code)):
                 return action_result.get_status()
 
-            file_path = '{path}/{hash}'.format(path=str(Vault.get_vault_tmp_dir()),
-                                               hash=param['hash'])
+            if hasattr(Vault, 'get_vault_tmp_dir'):
+                temp_dir = Vault.get_vault_tmp_dir()
+            else:
+                temp_dir = 'opt/phantom/vault/tmp'
+            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            os.makedirs(temp_dir)
+            file_path = os.path.join(temp_dir, param['hash'])
+
+            with open(file_path, 'wb') as f:
+                f.write(response)
+
             if self.cli:
                 container_id = 1
             else:
                 container_id = self.get_container_id()
 
-            with open(file_path, 'wb') as f:
-                f.write(response)
-
             self.debug_print('file_path: {file_path}'.format(file_path=file_path))
-            # binary data
-            # self.debug_print('type: {response}'.format(response=type(response)))
             self.debug_print('container_id: {container_id}'.
                              format(container_id=container_id))
 
