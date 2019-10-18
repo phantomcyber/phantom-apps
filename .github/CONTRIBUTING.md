@@ -26,6 +26,11 @@ To successfully contribute, you should spend a little time familiarizing yoursel
 <!-- - [Testing Details](https://github.com/phantomcyber/phantom-apps/blob/next/.github/TESTING.md) - How we test apps & playbooks -->
 
 
+## Step-by-Step Guide Available
+If you are not familiar with a fork-and-branch Git workflow, or just feel a bit rusty on your Git knowledge, please check out our [step-by-step contribution guide](https://github.com/phantomcyber/phantom-apps/blob/next/.github/GUIDE.md) which has actual command line examples
+
+
+# High Level Contribution Overview
 ## Contributing Bug-fixes
 If you've found a bug and wish to fix it, the first thing to do is 
 
