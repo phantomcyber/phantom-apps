@@ -1,0 +1,176 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block widget_content %}
+
+<!-- File: reversinglabs_template.html
+  Copyright (c) 2014-2019 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+#reversinglabs {
+}
+
+#reversinglabs > #headers > div {
+  display: inline-block;
+  text-align: center;
+  font-size: 12px;
+}
+
+#reversinglabs > #headers {
+  position: relative;
+  border-bottom: 2px solid rgba(80, 80, 120, .2);
+  padding-bottom: 10px;
+}
+
+#reversinglabs > #headers > #results {
+  width: 40%;
+}
+
+#reversinglabs > #headers > #hash {
+  text-align: left;
+  padding-left: 10px;
+  width: calc(60% - (68px * 2) - 10px);
+}
+
+#reversinglabs > #headers > #detections, #reversinglabs > #headers > #scanners  {
+  width: 68px;
+}
+
+#reversinglabs #rl-body > #rl-stats {
+  width: 40%;
+  float: left;
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 10px;
+}
+
+#reversinglabs #rl-body > #rl-stats > #headline #pct-value {
+  font-size: 44px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#reversinglabs #rl-body > #rl-stats > #headline #pct-title {
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
+  margin-top: -10px;
+}
+
+#reversinglabs #files {
+  float: right;
+  height: 238px;
+  width: 60%;
+  overflow: auto;
+}
+
+#reversinglabs #files .tb-row {
+  font-size: 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(20, 20, 50, .2);
+}
+
+#reversinglabs #files .tb-cell {
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+#reversinglabs #other-stats > div {
+  display: inline-block;
+  text-align: center;
+  width: 32%;
+  padding-top: 15px;
+}
+
+#reversinglabs #other-stats .item-count {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#reversinglabs #other-stats .item-title {
+}
+
+#reversinglabs #other-stats > div.rl_middle {
+  border-left: 1px solid rgba(20, 20, 50, .2);
+  border-right: 1px solid rgba(20, 20, 50, .2);
+}
+
+.rl-result-hash {
+    width: calc(100% - (68px * 2) - 10px);
+    vertical-align: middle;
+}
+
+.rl-result-count {
+    width: 68px; text-align: center;
+    vertical-align: middle;
+}
+
+</style>
+
+<script>
+
+function on_rl_load(caller) {
+  $(caller).find('[data-percentage]').each( function () {
+    $(this).animate( {
+      width: $(this).attr("data-percentage"),
+    });
+  });
+}
+
+</script>
+<div id="reversinglabs" class="row-fluid p-t-10" onwidgetload="on_rl_load(this);" onwidgetupdate="handle_update(update_data, {{ app.id|default:'' }}, this);">
+  <div id="headers">
+    <div id="results">Results</div>
+    <div id="hash">Hash</div>
+    <div id="detections">Detections</div>
+    <div id="scanners">Scanners</div>
+  </div>
+  <div id="rl-body">
+    <div id="rl-stats">
+      <div id="headline">
+        <div id="large-pct">
+          <div id="pct-value" data-value="{{ parameters.result_summary.3.1.0 }}" animation-duration="700">{{ parameters.result_summary.3.1.0|safe_intcomma }}%</div>
+          <div id="pct-title">{{ parameters.result_summary.3.0|upper }}</div>
+          {% if parameters.percentage %}
+            <div class="progress transparent progress-small no-radius m-t-10 m-b-15" style="width:100%">
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      <div id="other-stats">
+        <div>
+          <div class="item-count" data-value="{{ parameters.result_summary.0.1.0 }}" animation-duration="700">{{ parameters.result_summary.0.1.0|safe_intcomma }}</div>
+          <div class="item-title">{{ parameters.result_summary.0.0 }}</div>
+        </div>
+        <div class="rl_middle">
+          <div class="item-count" data-value="{{ parameters.result_summary.1.1.0 }}" animation-duration="700">{{ parameters.result_summary.1.1.0|safe_intcomma }}</div>
+          <div class="item-title">{{ parameters.result_summary.1.0 }}</div>
+        </div>
+        <div>
+          <div class="item-count" data-value="{{ parameters.result_summary.2.1.0 }}" animation-duration="700">{{ parameters.result_summary.2.1.0|safe_intcomma }}</div>
+          <div class="item-title">{{ parameters.result_summary.2.0 }}</div>
+        </div>
+      </div>
+    </div>
+    <div id="files">
+      <div id="rl_results_table">
+        {% for hash, det, scan in results %}
+          <div class="tb-row">
+            <div class="tb-cell ellipsis rl-result-hash">{{ hash|upper }}</div>
+            <div class="tb-cell rl-result-count">{{ det }}</div>
+            <div class="tb-cell rl-result-count">{{ scan }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

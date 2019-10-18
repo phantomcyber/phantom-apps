@@ -1,0 +1,1295 @@
+{
+    "appid": "6b3ecf24-e187-47b3-9bc7-a0b701eb01be",
+    "name": "Forcepoint Web Security",
+    "description": "This app provides category management and blocking actions for the Forcepoint Web Security platform",
+    "type": "network security",
+    "product_vendor": "Forcepoint",
+    "logo": "logo_forcepoint.svg",
+    "logo_dark": "logo_forcepoint_dark.svg",
+    "product_name": "Web Security",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.6",
+    "utctime_updated": "2019-08-21T21:57:46.000000Z",
+    "package_name": "phantom_forcepointwebsecurity",
+    "main_module": "forcepointwebsecurity_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Hostname",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "port": {
+            "description": "Port (Forcepoint default: 15873)",
+            "data_type": "numeric",
+            "required": true,
+            "default": 15873,
+            "order": 1
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": false,
+            "order": 2
+        },
+        "ph_0": {
+            "data_type": "ph",
+            "order": 3
+        },
+        "username": {
+            "description": "User Name",
+            "data_type": "string",
+            "required": true,
+            "order": 4
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block ip",
+            "identifier": "block_ip",
+            "description": "Block IP or list of IPs by adding them to the supplied category",
+            "verbose": "Adding an IP to a category automatically sets it into a blocking action.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock ip",
+            "parameters": {
+                "ip": {
+                    "description": "IP or list of IPs to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "category": {
+                    "description": "Add the IP(s) to this category",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "default": "Phantom",
+                    "order": 1
+                },
+                "create_category": {
+                    "description": "If the category does not exist, create it",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "falied"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.create_category",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 0,
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Added IPs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Added URLs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "dd6ff080-c109-11e8-853a-cedf71c89df7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Block IPs/ URLs completed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block url",
+            "identifier": "block_url",
+            "description": "Block URL or list of URLs by adding them to the supplied category",
+            "verbose": "Adding URLs to a category automatically sets it into a blocking action.<br />NOTE: If a url is provided without the protocol, it will block HTTP, HTTPS, and FTP.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock url",
+            "parameters": {
+                "url": {
+                    "description": "URL or list of URLs to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "category": {
+                    "description": "Add the URL(s) to this category",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "default": "Phantom",
+                    "order": 1
+                },
+                "create_category": {
+                    "description": "If the category does not exist, create it",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "column_name": "Category",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.create_category",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0,
+                    "example_values": [
+                        "http://test.com/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Added IPs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Added URLs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "4ff2d0da-c111-11e8-af31-b2572e0b68cd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Block IPs/ URLs completed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock ip",
+            "identifier": "unblock_ip",
+            "description": "Unblock IP or list of IPs by removing them from the supplied category",
+            "verbose": "An empty category will remove them from all available categories.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "block ip",
+            "parameters": {
+                "ip": {
+                    "description": "IP or list of IPs to unblock",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "category": {
+                    "description": "Category for which to remove the block (if empty, remove from all categories)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "default": "Phantom",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "column_name": "Category",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IPs",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Deleted IPs",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Deleted URLs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Transaction ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "99c5d638-c109-11e8-bb9a-ad790ed9aab5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.commit_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "September, 25 2018 09:26:15 PM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "99c5d638-c109-11e8-bb9a-ad790ed9aab5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unblock IPs/ URLs completed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock url",
+            "identifier": "unblock_url",
+            "description": "Unblock URL or list of URLs by removing them from the supplied category",
+            "verbose": "An empty category will remove them from all available categories.<br />NOTE: If a url is provided without the protocol, it will unblock HTTP, HTTPS, and FTP.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "block url",
+            "parameters": {
+                "url": {
+                    "description": "URL or list of URLs to unblock",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "category": {
+                    "description": "Category for which to remove the block (if empty, remove from all categories)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "default": "Phantom",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "column_name": "Category",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Deleted IPs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Totals.Deleted URLs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Transaction ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "a293f3ee-c109-11e8-a4da-e38a189e8fdb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.URLs",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.commit_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "September, 25 2018 09:26:30 PM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "a293f3ee-c109-11e8-a4da-e38a189e8fdb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unblock IPs/ URLs completed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Lookup the categories related to the IP or list of IPs",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP or list of IPs to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.categories",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "column_name": "Categories",
+                    "column_order": 1,
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found category count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.lookup count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved categories for each object: ['1.1.1.1']"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup url",
+            "identifier": "lookup_url",
+            "description": "Lookup the categories related to the URL or list of URLs",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL or list of URLs to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "test.com, http://test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.categories",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found category count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.lookup count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved categories for each object: ['test.com', 'http://test.com']"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get category",
+            "identifier": "get_category",
+            "description": "Return the category list contents",
+            "verbose": "Return all URLs and IPs in a specified category.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "category": {
+                    "description": "Category name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 0,
+                    "example_values": [
+                        "Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://test.com"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 2,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.category_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1919
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.category_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved contents of category: Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list categories",
+            "identifier": "list_categories",
+            "description": "Return a list of all API-managed categories",
+            "verbose": "Only API-managed categories can be viewed or changed.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Automation ARIC makes Forcepoint API calls to block requested URLs and IPs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Hierarchy",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1913
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Automation Block List"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 0,
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Category Owner",
+                    "data_type": "string",
+                    "example_values": [
+                        "API"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.category count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved list of categories"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete category",
+            "identifier": "delete_category",
+            "description": "Delete API-managed category",
+            "verbose": "Only API-managed categories can be viewed or changed.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "category": {
+                    "description": "Category name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 0,
+                    "example_values": [
+                        "Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.commit_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "September, 25 2018 09:15:13 PM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0fb93292-c108-11e8-9f60-8a6b095871f8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Category deleted: Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add category",
+            "identifier": "add_category",
+            "description": "Add API-managed category to Forcepoint",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "category": {
+                    "description": "Category name, must be unique",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description of the category",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string",
+                    "contains": [
+                        "forcepoint category"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 0,
+                    "example_values": [
+                        "Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1,
+                    "example_values": [
+                        "Phantom generated Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Categories.*.Category Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Block List"
+                    ],
+                    "contains": [
+                        "forcepoint category"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.commit_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "September, 25 2018 09:17:32 PM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.transaction_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "620f71b4-c108-11e8-b029-8a3671f954e5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added category: Phantom Block List"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
