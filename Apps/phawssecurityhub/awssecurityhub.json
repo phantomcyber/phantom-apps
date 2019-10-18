@@ -278,7 +278,7 @@
                     "data_path": "action_result.parameter.resource_ec2_ipv4_addresses",
                     "data_type": "string",
                     "example_values": [
-                        "54.175.1.1"
+                        "12.123.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip"
@@ -288,8 +288,8 @@
                     "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "AWS::IAM::AccessKey:XXXXXXXXXXXX",
-                        "arn:aws:ec2:us-east-1:XXXXXXXXXXXX:instance/i-0ec05be58aXXXXX"
+                        "AWS::IAM::AccessKey:ABCDEFGH123456789",
+                        "arn:aws:ec2:us-east-1:123456789012:instance/i-abcdefgh1234567"
                     ],
                     "contains": [
                         "aws security hub resource id",
@@ -310,7 +310,7 @@
                     "data_path": "action_result.data.*.AwsAccountId",
                     "data_type": "string",
                     "example_values": [
-                        "XXXXXXXXXXXX"
+                        "ABCDEFGH123456789"
                     ]
                 },
                 {
@@ -345,14 +345,14 @@
                     "data_path": "action_result.data.*.GeneratorId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/abcd1234abcd1234abcd1234"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXX/finding/7cb5038e6d8f712c01ca9XXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:1234567890:detector/abcd1234abcd1234abcd1234/finding/abcd1234abcd1234abcd1234"
                     ],
                     "contains": [
                         "aws security hub findings id"
@@ -453,7 +453,7 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(Splunk Phantom - 2019-06-20 09:41:25) test overwrite false\n\n(Splunk Phantom - 2019-06-20 09:40:46) true"
+                        "(test - 2019-06-20 09:41:25) test overwrite false\n\n(test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
@@ -468,7 +468,7 @@
                     "data_path": "action_result.data.*.Note.UpdatedBy",
                     "data_type": "string",
                     "example_values": [
-                        "automation-splunk"
+                        "automation-test"
                     ]
                 },
                 {
@@ -503,14 +503,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Oakland"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "CountryName"
                     ]
                 },
                 {
@@ -538,7 +538,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "136.251.1"
+                        "123.123.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -548,7 +548,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "19165"
+                        "123456"
                     ]
                 },
                 {
@@ -590,7 +590,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/localPortDetails/port",
                     "data_type": "string",
                     "example_values": [
-                        "22"
+                        "11"
                     ]
                 },
                 {
@@ -611,14 +611,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Washington"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "countryName"
                     ]
                 },
                 {
@@ -639,7 +639,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "40.85.171.116"
+                        "12.12.123.123"
                     ],
                     "contains": [
                         "ip"
@@ -649,35 +649,35 @@
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "8075"
+                        "1234"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/organization/asnOrg",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/organization/isp",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remoteIpDetails/organization/org",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/networkConnectionAction/remotePortDetails/port",
                     "data_type": "string",
                     "example_values": [
-                        "46428"
+                        "12345"
                     ]
                 },
                 {
@@ -698,7 +698,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/localPortDetails/port",
                     "data_type": "string",
                     "example_values": [
-                        "22"
+                        "11"
                     ]
                 },
                 {
@@ -712,15 +712,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Suqian"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama",
-                        "Test"
+                        "countryName"
                     ]
                 },
                 {
@@ -728,7 +727,7 @@
                     "data_type": "string",
                     "example_values": [
                         "9",
-                        "33.9492"
+                        "3333.943392"
                     ]
                 },
                 {
@@ -736,15 +735,14 @@
                     "data_type": "string",
                     "example_values": [
                         "-80",
-                        "118.2958"
+                        "1318.243958"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.1.1",
-                        "223.68.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -754,8 +752,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "57043",
-                        "56046"
+                        "12345"
                     ]
                 },
                 {
@@ -785,7 +782,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/localPortDetails/port",
                     "data_type": "string",
                     "example_values": [
-                        "22"
+                        "11"
                     ]
                 },
                 {
@@ -799,14 +796,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama"
+                        "countryName"
                     ]
                 },
                 {
@@ -827,7 +824,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -837,7 +834,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:1/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "57043"
+                        "12345"
                     ]
                 },
                 {
@@ -865,7 +862,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/localPortDetails/port",
                     "data_type": "string",
                     "example_values": [
-                        "22"
+                        "11"
                     ]
                 },
                 {
@@ -879,14 +876,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama"
+                        "cityname"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama"
+                        "countryName"
                     ]
                 },
                 {
@@ -907,7 +904,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -917,7 +914,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:2/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "57043"
+                        "12345"
                     ]
                 },
                 {
@@ -980,7 +977,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:1/value",
                     "data_type": "string",
                     "example_values": [
-                        "eni-007b9f31XXXXXXX"
+                        "eni-12345abcdfe123"
                     ]
                 },
                 {
@@ -994,7 +991,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:10/value",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc52XXXXXXX"
+                        "i-12345abcdfe123"
                     ]
                 },
                 {
@@ -1036,7 +1033,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:4/value",
                     "data_type": "string",
                     "example_values": [
-                        "igw-0b758XXXXXX"
+                        "igw-12345abcdfe123"
                     ]
                 },
                 {
@@ -1050,7 +1047,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:5/value",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-5113XXXXXX"
+                        "vpc-12345abcdf"
                     ]
                 },
                 {
@@ -1064,7 +1061,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:6/value",
                     "data_type": "string",
                     "example_values": [
-                        "sg-00640ecXXXXXXX"
+                        "sg-12345abcdfe123"
                     ]
                 },
                 {
@@ -1092,7 +1089,7 @@
                     "data_path": "action_result.data.*.ProductFields.attributes:8/value",
                     "data_type": "string",
                     "example_values": [
-                        "acl-018XXXXXXXX"
+                        "acl-12345abcdfe123"
                     ]
                 },
                 {
@@ -1113,14 +1110,14 @@
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/CompanyName",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/FindingId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dcXXXXXXXXXXX/finding/7cb5038e6d8f712c01caXXXXXXXXXX"
+                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:123456789012:detector/1234567abcdefghijkl12345abcde/finding/1234567abcdefghijkl12345abcde"
                     ],
                     "contains": [
                         "aws arn"
@@ -1152,7 +1149,7 @@
                     "data_path": "action_result.data.*.ProductFields.detectorId",
                     "data_type": "string",
                     "example_values": [
-                        "7eb38a3ebb7fXXXXXXXXXXXX"
+                        "1234567abcdefghijkl12345abcde"
                     ],
                     "contains": [
                         "md5"
@@ -1197,21 +1194,21 @@
                     "data_path": "action_result.data.*.ProductFields.rule-arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:macie:us-east-1:XXXXXXXXXXXX:trigger/6f627493127XXXXXXXXXXX"
+                        "arn:aws:macie:us-east-1:123456789012:trigger/1234567abcdefghijkl12"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.serviceAttributes/assessmentRunArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:inspector:us-east-1:XXXXXXXXXXXXX:target/0-XXXXX/template/0-XXXXX/run/0-XXXXX"
+                        "arn:aws:inspector:us-east-1:123456789012:target/0-XXXXX/template/0-XXXXX/run/0-XXXXX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.serviceAttributes/rulesPackageArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:inspector:us-east-1:XXXXXXXXXX:rulespackage/XXXXXXXX"
+                        "arn:aws:inspector:us-east-1:123456789012:rulespackage/1234567abcdefghijkl12"
                     ]
                 },
                 {
@@ -1268,14 +1265,14 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.ImageId",
                     "data_type": "string",
                     "example_values": [
-                        "ami-0de53d8XXXXXXX"
+                        "ami-1234567abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.IpV4Addresses",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip",
@@ -1293,7 +1290,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.SubnetId",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-16XXXXXXXX"
+                        "subnet-1234567abcde"
                     ]
                 },
                 {
@@ -1307,7 +1304,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.VpcId",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-511XXXXXXX"
+                        "vpc-12345ABCDE"
                     ]
                 },
                 {
@@ -1321,7 +1318,7 @@
                     "data_path": "action_result.data.*.Resources.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:ec2:us-east-1:XXXXXXXXXXX:instance/i-0ec05be5XXXXXXXX"
+                        "arn:aws:ec2:us-east-1:123456789012:instance/i-1234567abcdefgh"
                     ],
                     "contains": [
                         "aws security hub resource id"
@@ -1331,7 +1328,7 @@
                     "data_path": "action_result.data.*.Resources.*.InstanceId",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc5XXXXXXXX"
+                        "i-1234567abcdefghi"
                     ],
                     "contains": [
                         "aws ec2 instance id"
@@ -1341,7 +1338,7 @@
                     "data_path": "action_result.data.*.Resources.*.Partition",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
@@ -1358,14 +1355,14 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.Name",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Enterprise Redux"
+                        "test Enterprise Redux"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Tags.aws:autoscaling:groupName",
                     "data_type": "string",
                     "example_values": [
-                        "new-test-group1"
+                        "test-group"
                     ]
                 },
                 {
@@ -1379,7 +1376,7 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.aws:cloudformation:stack-id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:cloudformation:us-east-1:XXXXXXXXXX:stack/minemeld/766407e0-3b8f-11e9-XXXXXXXXX"
+                        "arn:aws:cloudformation:us-east-1:123456789012:stack/minemeld/1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -1414,7 +1411,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "f880be36-5c1b-11e9-8467-e73XXXXXXX"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -1449,7 +1446,7 @@
                     "data_path": "action_result.data.*.Title",
                     "data_type": "string",
                     "example_values": [
-                        "Unprotected port on EC2 instance i-0ec05XXXXXXXXXX is being probed"
+                        "Unprotected port on EC2 instance i-123456abcdefhgf is being probed"
                     ]
                 },
                 {
@@ -1551,8 +1548,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7XXXXXXXXXXXXXXXXXXXXX/finding/4ab44dc07ff64370b4bbXXXXXXXXXXXX",
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7XXXXXXXXXXXXXXXXXXXXX/finding/7cb5038e6d8f712c01caXXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef",
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -1591,14 +1588,14 @@
                     "data_path": "action_result.data.*.GeneratorId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXX:detector/7eb38a3ebb7fXXXXXXXXXXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXX/finding/7cb5038e6d8f712cXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef"
                     ],
                     "contains": [
                         "aws security hub findings id"
@@ -1692,7 +1689,7 @@
                     "data_path": "action_result.data.*.Note.Text",
                     "data_type": "string",
                     "example_values": [
-                        "(Splunk Phantom - 2019-06-20 09:41:25) test overwrite false\n\n(Splunk Phantom - 2019-06-20 09:40:46) true"
+                        "(test test - 2019-06-20 09:41:25) test overwrite false\n\n(test test - 2019-06-20 09:40:46) true"
                     ]
                 },
                 {
@@ -1707,7 +1704,7 @@
                     "data_path": "action_result.data.*.Note.UpdatedBy",
                     "data_type": "string",
                     "example_values": [
-                        "automation-splunk"
+                        "automation-test"
                     ]
                 },
                 {
@@ -1742,35 +1739,35 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "San Jose"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "countryName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
                     "data_type": "string",
                     "example_values": [
-                        "37.4073"
+                        "3337.4073"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/geoLocation/lon",
                     "data_type": "string",
                     "example_values": [
-                        "-121.939"
+                        "-1321.939"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "12.196.1.1"
+                        "12.123.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -1780,7 +1777,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/awsApiCallAction/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "7018"
+                        "1234"
                     ]
                 },
                 {
@@ -1836,14 +1833,14 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/city/cityName",
                     "data_type": "string",
                     "example_values": [
-                        "Suqian"
+                        "cityName"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/country/countryName",
                     "data_type": "string",
                     "example_values": [
-                        "Panama"
+                        "countryName"
                     ]
                 },
                 {
@@ -1851,7 +1848,7 @@
                     "data_type": "string",
                     "example_values": [
                         "9",
-                        "33.9492"
+                        "3333.9492"
                     ]
                 },
                 {
@@ -1859,15 +1856,14 @@
                     "data_type": "string",
                     "example_values": [
                         "-80",
-                        "118.2958"
+                        "11338.2958"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/ipAddressV4",
                     "data_type": "string",
                     "example_values": [
-                        "141.98.1.1",
-                        "223.68.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -1877,8 +1873,7 @@
                     "data_path": "action_result.data.*.ProductFields.action/portProbeAction/portProbeDetails:0/remoteIpDetails/organization/asn",
                     "data_type": "string",
                     "example_values": [
-                        "57043",
-                        "56046"
+                        "12345"
                     ]
                 },
                 {
@@ -1923,14 +1918,14 @@
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/CompanyName",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/FindingId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXX/finding/7cb5038e6d8f712c01XXXXXXXXXXX"
+                        "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef/finding/123456abcdef1234abcdef"
                     ],
                     "contains": [
                         "aws arn"
@@ -1962,7 +1957,7 @@
                     "data_path": "action_result.data.*.ProductFields.detectorId",
                     "data_type": "string",
                     "example_values": [
-                        "7eb38a3ebb7f20c83dcXXXXXXXXXXX"
+                        "123456abcdef1234abcdef"
                     ],
                     "contains": [
                         "md5"
@@ -1987,14 +1982,14 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.ImageId",
                     "data_type": "string",
                     "example_values": [
-                        "ami-0de53d8XXXXXXXXXX"
+                        "ami-123456abcdef1234a"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.IpV4Addresses",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.1.1"
+                        "123.12.1.1"
                     ],
                     "contains": [
                         "aws security hub resource ip",
@@ -2012,7 +2007,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.SubnetId",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-160XXXXXXXX"
+                        "subnet-123456abcdef"
                     ]
                 },
                 {
@@ -2026,7 +2021,7 @@
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.VpcId",
                     "data_type": "string",
                     "example_values": [
-                        "vpc-51XXXXXXX"
+                        "vpc-513464894"
                     ]
                 },
                 {
@@ -2040,7 +2035,7 @@
                     "data_path": "action_result.data.*.Resources.*.Id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:ec2:us-east-1:XXXXXXXXXXXX:instance/i-0ec05bXXXXXXXXXXX"
+                        "arn:aws:ec2:us-east-1:123456789012:instance/i-123456abcdef1234ab"
                     ],
                     "contains": [
                         "aws security hub resource id"
@@ -2050,7 +2045,7 @@
                     "data_path": "action_result.data.*.Resources.*.InstanceId",
                     "data_type": "string",
                     "example_values": [
-                        "i-0adfc52XXXXXXXXXXXX"
+                        "i-123456abcdef1234abcdef"
                     ],
                     "contains": [
                         "aws ec2 instance id"
@@ -2060,7 +2055,7 @@
                     "data_path": "action_result.data.*.Resources.*.Partition",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "test"
                     ]
                 },
                 {
@@ -2077,14 +2072,14 @@
                     "data_path": "action_result.data.*.Resources.*.Tags.Name",
                     "data_type": "string",
                     "example_values": [
-                        "test-ec2-for-splunk-actions"
+                        "test-actions"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.Resources.*.Tags.aws:autoscaling:groupName",
                     "data_type": "string",
                     "example_values": [
-                        "new-test-group1"
+                        "test-group"
                     ]
                 },
                 {
@@ -2126,7 +2121,7 @@
                     "data_path": "action_result.data.*.Title",
                     "data_type": "string",
                     "example_values": [
-                        "Unprotected port on EC2 instance i-0ec05be5XXXXXXXX is being probed"
+                        "Unprotected port on EC2 instance i-123456abcdef1234abcd is being probed"
                     ]
                 },
                 {
@@ -2243,8 +2238,7 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXXXXXX/finding/4ab44dc07ff643XXXXXXXXXXXXXXXXXX",
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXXX:detector/7eb38a3ebb7f20c83XXXXXXXXXXXXXXX/finding/7cb5038e6d8f71XXXXXXXXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1123456789012detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2302,21 +2296,21 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBcXXXXXXXXX="
+                        "ABCFD123456="
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "3c0f4289-5d15-11e9-bce2-df6576d185db"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb074eb-29d789410fXXXXXXXXXXXX;Sampled=0"
+                        "Root=1-1234abcd-12ab-ab12-ab12-123456abcdef;Sampled=0"
                     ]
                 },
                 {
@@ -2330,7 +2324,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "3c0f4289-5d15-11e9-bce2-df6576d185db"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -2433,8 +2427,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXXXXXX/finding/4ab44dc07ff6437XXXXXXXXXXXXXXXXX",
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c83dXXXXXXXXXXXXXX/finding/7cb5038e6d8f712XXXXXXXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef",
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2492,21 +2486,21 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBdNwFXXXXXXXX="
+                        "123456abcdef1234="
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "9b430dde-5d15-11e9-abd3-91239d413aae"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb0758b-93f1665c69XXXXXXXXXX;Sampled=0"
+                        "Root=1-1234abcd-12ab-ab12-ab12-123456abcdef;Sampled=0"
                     ]
                 },
                 {
@@ -2520,7 +2514,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "9b430dde-5d15-11e9-abd3-91239d413aae"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -2624,8 +2618,8 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c8XXXXXXXXXXXXXXXX/finding/4ab44dc07ff64370bXXXXXXXXXXXXXXX",
-                        "arn:aws:guardduty:us-east-1:XXXXXXXXXXXX:detector/7eb38a3ebb7f20c8XXXXXXXXXXXXXXXX/finding/7cb5038e6d8f712c0XXXXXXXXXXXXXXX"
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab",
+                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab"
                     ],
                     "contains": [
                         "aws security hub findings id",
@@ -2683,21 +2677,21 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
                     "data_type": "string",
                     "example_values": [
-                        "YBdYdXXXXXXXXX="
+                        "123456789abcdefghi1234ab="
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "c41dbc3d-5d15-11e9-b3d4-XXXXXXXXXX"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "Root=1-5cb075cf-45091c0XXXXXXXXXXXXXXX;Sampled=0"
+                        "Root=1-5cb075cf-123456789abcdefghi1234ab;Sampled=0"
                     ]
                 },
                 {
@@ -2711,7 +2705,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "c41dbc3d-5d15-11e9-b3d4-8fb86926a039"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
