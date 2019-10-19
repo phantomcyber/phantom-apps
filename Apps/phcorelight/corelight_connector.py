@@ -1,6 +1,7 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: corelight_connector.py
+# Copyright (c) 2019 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
@@ -8,7 +9,6 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from corelight_consts import *
 import requests
 import json
 import base64
@@ -169,7 +169,7 @@ class CorelightConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/api/authinfo', action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
@@ -336,17 +336,22 @@ class CorelightConnector(BaseConnector):
         # self.save_progress("URI = {0}".format(uri))
         ret_val, response = self._make_rest_call(uri, action_result, params=None, headers=None)
 
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
+        else:
+            temp_dir = 'opt/phantom/vault/tmp'
         guid = uuid.uuid4()
-        local_dir = '/vault/tmp/{}'.format(guid)
+        local_dir = temp_dir + '/{}'.format(guid)
+
         try:
             os.makedirs(local_dir)
+            fileName = param['backup_name']
+            file_path = "{0}/{1}".format(local_dir, fileName)
+            output = json.dumps(response)
+            with open(file_path, 'wb') as f:
+                f.write(output)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder '/vault/tmp'.", e)
-        fileName = param['backup_name']
-        file_path = "{0}/{1}".format(local_dir, fileName)
-        output = json.dumps(response)
-        with open(file_path, 'wb') as f:
-            f.write(output)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to create and write to a temporary file in the folder {0}".format(local_dir), e)
 
         vault_ret_dict = Vault.add_attachment(file_path, self.get_container_id(), file_name=fileName)
         curr_data = {}
