@@ -145,11 +145,15 @@ class CorelightConnector(BaseConnector):
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
-        # Create a URL to connect to
-        if ("https://" in endpoint):
-            url = endpoint
-        else:
-            url = self._base_url + endpoint
+        try:
+            # Create a URL to connect to
+            if ("https://" in endpoint):
+                url = endpoint
+            else:
+                url = self._base_url + endpoint
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR,
+                            "Error while creating the endpoint for the action. Please check the asset configuration and action parameters. Error: {0}".format(str(e))), resp_json)
 
         try:
             r = request_func(
@@ -158,7 +162,7 @@ class CorelightConnector(BaseConnector):
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
