@@ -1,20 +1,20 @@
 {
     "appid": "a8934270-ba7b-4824-a8c5-88621a5cca9c",
     "name": "Twitter",
-    "description": "Search tweets for a specific phrase",
+    "description": "This app integrates with Twitter to perform a search action",
     "type": "information",
     "product_vendor": "Twitter",
-    "logo": "twitter.png",
-    "logo_dark": "twitter_dark.png",
+    "logo": "logo_twitter.svg",
+    "logo_dark": "logo_twitter_dark.svg",
     "product_name": "Twitter",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "license": "Copyright (c) 2019 Splunk Inc.",
     "app_version": "1.0.1",
     "utctime_updated": "2019-01-23T09:50:28.457767Z",
     "package_name": "phantom_twitter",
-    "main_module": "twitter_connector.py",
-    "min_phantom_version": "4.1.94",
+    "main_module": "twitter_connector.pyc",
+    "min_phantom_version": "4.2.7532",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -29,32 +29,24 @@
             "description": "Twitter account token",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "token_secret": {
             "description": "Twitter account token secret",
             "data_type": "password",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "consumer_key": {
             "description": "Twitter account consumer key",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 2
         },
         "consumer_secret": {
             "description": "Twitter account consumer secret",
             "data_type": "password",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 3
         }
     },
@@ -63,7 +55,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -73,8 +64,7 @@
         {
             "action": "run query",
             "identifier": "run_query",
-            "description": "Search Twitter for specific text",
-            "verbose": "",
+            "description": "Search tweets for specific text",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -82,9 +72,6 @@
                     "description": "Text to search",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -93,14 +80,15 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
                     "example_values": [
-                        "virustotal.com"
+                        "test.com"
                     ]
                 },
                 {
@@ -109,7 +97,7 @@
                     "column_name": "Tweet Link",
                     "column_order": 2,
                     "example_values": [
-                        "https://twitter.com/glenbeer/status/1106343825230962689"
+                        "https://twitter.com/username/status/1106343825230962689"
                     ]
                 },
                 {
@@ -118,14 +106,14 @@
                     "column_name": "Hashtags",
                     "column_order": 3,
                     "example_values": [
-                        "Mirai"
+                        "demo"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.*.retweeted status",
                     "data_type": "string",
                     "example_values": [
-                        "\u26a0\ufe0f WARNING \u26a0\ufe0f\nUnauthenticated RCE Detected\n\nSource IP: 198.211.98.169 (\ud83c\uddfa\ud83c\uddf8)\nRecon Scan Type: ZMap\nExploit Target: Li\u2026 https://t.co/kVXF2ZvmCr"
+                        "\u26a0\ufe0f WARNING \u26a0\ufe0f\nUnauthenticated RCE Detected\n\nSource IP: 122.122.122.122 (\ud83c\uddfa\ud83c\uddf8)\nRecon Scan Type: ZMap\nExploit Target: Li\u2026 https://test.co/kVXF2ZvmCr"
                     ]
                 },
                 {
@@ -134,7 +122,7 @@
                     "column_name": "Tweet",
                     "column_order": 0,
                     "example_values": [
-                        "RT @bad_packets: \u26a0\ufe0f WARNING \u26a0\ufe0fUnauthenticated RCE DetectedSource IP: 198.211.98.169 (\ud83c\uddfa\ud83c\uddf8)Recon Scan Type: ZMapExploit Target: Linksys r\u2026"
+                        "RT @bad_packets: \u26a0\ufe0f WARNING \u26a0\ufe0fUnauthenticated RCE DetectedSource IP: 122.122.122.122 (\ud83c\uddfa\ud83c\uddf8)Recon Scan Type: ZMapExploit Target: Testsys r\u2026"
                     ]
                 },
                 {
@@ -153,7 +141,7 @@
                     "column_name": "Username",
                     "column_order": 1,
                     "example_values": [
-                        "glenbeer"
+                        "user_name"
                     ]
                 },
                 {

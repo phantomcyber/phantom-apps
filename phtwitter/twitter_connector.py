@@ -96,7 +96,10 @@ class TwitterConnector(BaseConnector):
         # get time for searching
         time_limit = self._get_date_limit()
 
-        search_results = t.search.tweets(q=query, until=time_limit)
+        try:
+            search_results = t.search.tweets(q=query, until=time_limit)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, str(e))
 
         # store the full results returned
         action_result.add_extra_data(search_results)
