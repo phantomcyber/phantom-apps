@@ -12,7 +12,7 @@ from phantom.action_result import ActionResult
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 
 
 class RetVal(tuple):
@@ -35,18 +35,18 @@ class DossierConnector(BaseConnector):
         self._base_url = None
 
     def _make_rest_call(self, param):
-        
+
         url = "https://api.activetrust.net:8000/api/"
 
         config = self.get_config()
         api_key = config["api_key"]
 
-        headers = {"Content-Type":"application/json"}
-        
-        r = requests.get(url + param, headers=headers, auth=HTTPBasicAuth(api_key,""))
+        headers = {"Content-Type": "application/json"}
+
+        r = requests.get(url + param, headers=headers, auth=HTTPBasicAuth(api_key, ""))
 
         return r.json(), r.status_code
-        
+
     def _handle_test_connectivity(self, param):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -82,7 +82,7 @@ class DossierConnector(BaseConnector):
 
         # Required values can be accessed directly
         domain = param['domain']
-        
+
         # format our url
         url = "services/intel/lookup/indicator/host?value={}&source=atp&wait=true".format(domain)
 
@@ -94,23 +94,23 @@ class DossierConnector(BaseConnector):
             action_result.add_data(response["results"])
             threat_level = 0
             threat_confidence = 0
-            
+
             # this gets the highest theat level and confidence score for the summary
             for i in response["results"][0]["data"]["threat"]:
-                
+
                 if i["threat_level"] > threat_level:
                     threat_level = i["threat_level"]
-                
+
                 if "confidence" in i and i["confidence"] > threat_confidence:
                     print(i['confidence'])
-                #if i['confidence'] > threat_confidence:
-                 #   threat_confidence = i["confidence"]
+                # if i['confidence'] > threat_confidence:
+                # threat_confidence = i["confidence"]
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['threat_level'] = threat_level
             summary['threat_confidence'] = threat_confidence
-            
+
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -130,21 +130,20 @@ class DossierConnector(BaseConnector):
 
         # Required values can be accessed directly
         hash = param['hash']
-        
+
         # format our url
         url = "services/intel/lookup/indicator/hash?value={}&source=malware_analysis&wait=true".format(hash)
-        # make rest call                                                                                                       
+        # make rest call
         response, status_code = self._make_rest_call(url)
 
-        if status_code == 200: 
-           
+        if status_code == 200:
             # Add the response into the data section
             action_result.add_data(response["results"])
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['results'] = response["results"][0]["data"]["details"]["av_match_count"]
-            
+
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -167,20 +166,20 @@ class DossierConnector(BaseConnector):
         # submitted_url comes from phantom. not the best name, i know.
         submitted_url = param['url']
 
-        # format our url 
+        # format our url
         url = "services/intel/lookup/indicator/url?value={}&source=atp&wait=true".format(submitted_url)
-        
-        # make rest call                                                                                                       
+
+        # make rest call
         response, status_code = self._make_rest_call(url)
-        
+
         if status_code == 200:
             # Add the response into the data section
             action_result.add_data(response["results"])
-            
+
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['results'] = response["results"][0]["data"]["record_count"]
-            
+
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -205,17 +204,17 @@ class DossierConnector(BaseConnector):
         # format our url
         url = "services/intel/lookup/indicator/ip?value={}&source=atp&wait=true".format(ip)
 
-        # make rest call                                                                                                       
+        # make rest call
         response, status_code = self._make_rest_call(url)
         print(response["results"])
         if status_code == 200:
             # Add the response into the data section
             action_result.add_data(response["results"])
-            
+
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['results'] = response["results"][0]["data"]["record_count"]
-            
+
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
