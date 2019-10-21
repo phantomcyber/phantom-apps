@@ -14,7 +14,7 @@
     "utctime_updated": "2019-07-01T18:56:43.605210Z",
     "package_name": "phantom_corelight",
     "main_module": "corelight_connector.pyc",
-    "min_phantom_version": "4.5.15425",
+    "min_phantom_version": "4.2.7532",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -136,7 +136,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "intel update",
+            "action": "intel intelligence",
             "identifier": "ip_intel",
             "description": "Update intel framework",
             "verbose": "Send data to the Corelight intel framework.",
@@ -248,9 +248,9 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get conf",
+            "action": "get configuration",
             "identifier": "get_conf",
-            "description": "Get Corelight full config",
+            "description": "Get Corelight full configuration",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
