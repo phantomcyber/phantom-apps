@@ -32,11 +32,6 @@ class TwitterConnector(BaseConnector):
 
         self._state = None
 
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
-        self._base_url = None
-
     # returns the current date - 7 days as this is the max twitter allows for the limit
     def _get_date_limit(self):
         d = datetime.datetime.now() - datetime.timedelta(days=7)

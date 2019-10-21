@@ -64,7 +64,7 @@
         {
             "action": "run query",
             "identifier": "run_query",
-            "description": "Search tweets for specific text",
+            "description": "Search tweets for specific text within the past 7 days",
             "type": "investigate",
             "read_only": true,
             "parameters": {
