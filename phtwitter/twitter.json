@@ -1,0 +1,194 @@
+{
+    "appid": "a8934270-ba7b-4824-a8c5-88621a5cca9c",
+    "name": "Twitter",
+    "description": "Search tweets for a specific phrase",
+    "type": "information",
+    "product_vendor": "Twitter",
+    "logo": "twitter.png",
+    "logo_dark": "twitter_dark.png",
+    "product_name": "Twitter",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2019-01-23T09:50:28.457767Z",
+    "package_name": "phantom_twitter",
+    "main_module": "twitter_connector.py",
+    "min_phantom_version": "4.1.94",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "twitter",
+                "input_file": "wheels/twitter-1.18.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "token": {
+            "description": "Twitter account token",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "token_secret": {
+            "description": "Twitter account token secret",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        },
+        "consumer_key": {
+            "description": "Twitter account consumer key",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        },
+        "consumer_secret": {
+            "description": "Twitter account consumer secret",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Search Twitter for specific text",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Text to search",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "virustotal.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Tweet Link",
+                    "data_type": "string",
+                    "column_name": "Tweet Link",
+                    "column_order": 2,
+                    "example_values": [
+                        "https://twitter.com/glenbeer/status/1106343825230962689"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.hashtags",
+                    "data_type": "string",
+                    "column_name": "Hashtags",
+                    "column_order": 3,
+                    "example_values": [
+                        "Mirai"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.retweeted status",
+                    "data_type": "string",
+                    "example_values": [
+                        "\u26a0\ufe0f WARNING \u26a0\ufe0f\nUnauthenticated RCE Detected\n\nSource IP: 198.211.98.169 (\ud83c\uddfa\ud83c\uddf8)\nRecon Scan Type: ZMap\nExploit Target: Li\u2026 https://t.co/kVXF2ZvmCr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.tweet",
+                    "data_type": "string",
+                    "column_name": "Tweet",
+                    "column_order": 0,
+                    "example_values": [
+                        "RT @bad_packets: \u26a0\ufe0f WARNING \u26a0\ufe0fUnauthenticated RCE DetectedSource IP: 198.211.98.169 (\ud83c\uddfa\ud83c\uddf8)Recon Scan Type: ZMapExploit Target: Linksys r\u2026"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.urls",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://twitter.com/i/web/status/1106325213497573376"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.username",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
+                    "example_values": [
+                        "glenbeer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Found Tweets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found tweets: 14"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
