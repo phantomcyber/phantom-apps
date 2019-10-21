@@ -136,7 +136,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "intel intelligence",
+            "action": "intelligence update",
             "identifier": "ip_intel",
             "description": "Update intel framework",
             "verbose": "Send data to the Corelight intel framework.",
@@ -1215,7 +1215,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "list intel",
+            "action": "list intelligences",
             "identifier": "list_intel_framework",
             "description": "List the different input framework endpoints",
             "type": "investigate",
