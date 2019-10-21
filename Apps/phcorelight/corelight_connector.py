@@ -39,6 +39,7 @@ class CorelightConnector(BaseConnector):
         self._base_url = None
         self._username = None
         self._password = None
+        self._local_dir = None
 
     def _process_empty_response(self, response, action_result):
 
@@ -193,13 +194,13 @@ class CorelightConnector(BaseConnector):
         update = param['is_this_a_update']
 
         if (update):
-            f = open("/var/tmp/" + name, "w")
+            f = open("{0}/{1}".format(self._local_dir, name), "w")
             f.write("#fields\tindicator\tindicator_type\tmeta.source\tmeta.desc\tmeta.url\n")
         else:
-            ret_val = self._handle_list_intel_framework(param)
-            if (phantom.is_fail(ret_val)):
+            ret_val = self._fetch_list_intel_framework(action_result)
+            if ret_val is None:
                 return action_result.get_status()
-            f = open("/var/tmp/phantom_intel_corelight.dat", "a")
+            f = open("{0}/phantom_intel_corelight.dat".format(self._local_dir), "a")
 
         ioc = param['ioc']
         source = param.get('meta_source', "Phantom")
@@ -216,7 +217,7 @@ class CorelightConnector(BaseConnector):
 
         # make rest call
         f.close()
-        f = open("/var/tmp/" + name, "r")
+        f = open("{0}/{1}".format(self._local_dir, name), "r")
         files = {'file': f}
         ret_val, response = self._make_rest_call('/api/bro/intel?dry-run=0', action_result, params=None, headers=None, method="put", files=files)
         f.close()
@@ -224,10 +225,6 @@ class CorelightConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -244,10 +241,28 @@ class CorelightConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _fetch_list_intel_framework(self, action_result):
+        ret_val, response = self._make_rest_call('/api/bro/intel', action_result, params=None, headers=None)
+
+        if phantom.is_fail(ret_val):
+            return None
+
+        if not response.get("file", {}).get("content"):
+            action_result.set_status(phantom.APP_ERROR, "No intel framework data found")
+            return None
+
+        decode = base64.b64decode(response.get("file", {}).get("content"))
+        response["file"]["content"] = decode
+        f = open("{0}/phantom_intel_corelight.dat".format(self._local_dir), "w")
+        f.write(response["file"]["content"])
+        f.close()
+
+        if (phantom.is_fail(ret_val)):
+            return None
+
+        return response
 
     def _handle_list_intel_framework(self, param):
 
@@ -255,20 +270,12 @@ class CorelightConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, response = self._make_rest_call('/api/bro/intel', action_result, params=None, headers=None)
-        decode = base64.b64decode(response["file"]["content"])
-        response["file"]["content"] = decode
-        f = open("/var/tmp/phantom_intel_corelight.dat", "w")
-        f.write(response["file"]["content"])
-        f.close()
+        response = self._fetch_list_intel_framework(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if response is None:
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -285,9 +292,6 @@ class CorelightConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_input_framework(self, param):
@@ -301,12 +305,12 @@ class CorelightConnector(BaseConnector):
         input = param['input']
 
         if (append):
-            f = open("/var/tmp/" + name, "w")
+            f = open("{0}/{1}".format(self._local_dir, name), "w")
             f.write(input)
             files = {'file': f}
             ret_val, response = self._make_rest_call('/api/bro/inpu' + name, action_result, params=None, headers=None, method="put", files=files)
         else:
-            f = open("/var/tmp/" + name, "w")
+            f = open("{0}/{1}".format(self._local_dir, name), "w")
             fields = param.get('fields')
             f.write(fields + "\n")
             f.write(input)
@@ -320,10 +324,6 @@ class CorelightConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_backup_corelight(self, param):
@@ -333,25 +333,16 @@ class CorelightConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         bundlePassword = param['bundle_password']
         uri = '/api/provision/bundle?bundle-password=' + bundlePassword + '&no-sensitive=0&type=backup'
-        # self.save_progress("URI = {0}".format(uri))
         ret_val, response = self._make_rest_call(uri, action_result, params=None, headers=None)
 
-        if hasattr(Vault, 'get_vault_tmp_dir'):
-            temp_dir = Vault.get_vault_tmp_dir()
-        else:
-            temp_dir = 'opt/phantom/vault/tmp'
-        guid = uuid.uuid4()
-        local_dir = temp_dir + '/{}'.format(guid)
-
         try:
-            os.makedirs(local_dir)
             fileName = param['backup_name']
-            file_path = "{0}/{1}".format(local_dir, fileName)
+            file_path = "{0}/{1}".format(self._local_dir, fileName)
             output = json.dumps(response)
             with open(file_path, 'wb') as f:
                 f.write(output)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to create and write to a temporary file in the folder {0}".format(local_dir), e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to write to a temporary file in the folder {0}".format(self._local_dir), e)
 
         vault_ret_dict = Vault.add_attachment(file_path, self.get_container_id(), file_name=fileName)
         curr_data = {}
@@ -366,16 +357,14 @@ class CorelightConnector(BaseConnector):
         else:
             action_result.set_status(phantom.APP_ERROR, phantom.APP_ERR_FILE_ADD_TO_VAULT)
             action_result.append_to_message(vault_ret_dict['message'])
+
         # remove the /tmp/<> temporary directory
-        shutil.rmtree(local_dir)
+        shutil.rmtree(self._local_dir)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -386,11 +375,13 @@ class CorelightConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         vault_info = Vault.get_file_info(vault_id=param.get('vault_id'))
 
+        data_string = None
+
         for item in vault_info:
             vault_path = item.get('path')
             if vault_path is None:
-
                 return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
+
             try:
                 vault_file = open(vault_path)
                 data_string = vault_file.read()
@@ -398,6 +389,7 @@ class CorelightConnector(BaseConnector):
                 # self.save_progress("restore: {0}".format(data_string))
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: " + str(e))
+
         bundlePassword = param['bundle_password']
         headers = {
             "Content-Type": "application/json",
@@ -409,11 +401,6 @@ class CorelightConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-
-        # action_result.add_data(response.headers['location'])
-
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -429,9 +416,6 @@ class CorelightConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -495,6 +479,19 @@ class CorelightConnector(BaseConnector):
         self._base_url = config.get('base_url')
         self._user = config.get('user')
         self._password = config.get('password')
+
+        if self.get_action_identifier() in ['ip_intel', 'list_intel_framework', 'input_framework', 'backup_corelight']:
+            if hasattr(Vault, 'get_vault_tmp_dir'):
+                temp_dir = Vault.get_vault_tmp_dir()
+            else:
+                temp_dir = 'opt/phantom/vault/tmp'
+            guid = uuid.uuid4()
+            self._local_dir = temp_dir + '/{}'.format(guid)
+
+            try:
+                os.makedirs(self._local_dir)
+            except Exception as e:
+                return self.set_status(phantom.APP_ERROR, "Unable to create the temporary directory {0}".format(self._local_dir), e)
 
         return phantom.APP_SUCCESS
 
