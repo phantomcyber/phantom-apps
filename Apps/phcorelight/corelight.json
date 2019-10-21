@@ -248,7 +248,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get configuration",
+            "action": "get config",
             "identifier": "get_conf",
             "description": "Get Corelight full configuration",
             "type": "investigate",
