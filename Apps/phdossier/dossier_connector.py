@@ -137,11 +137,12 @@ class DossierConnector(BaseConnector):
 
         if status_code == 200:
             # Add the response into the data section
-            action_result.add_data(response["results"])
+            action_result.add_data(response.get("results"))
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            summary['results'] = response["results"][0]["data"]["details"]["av_match_count"]
+            if response.get("results"):
+                summary['results'] = response["results"][0]["data"].get("details", {}).get("av_match_count")
 
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
