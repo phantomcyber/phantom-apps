@@ -1,0 +1,182 @@
+{
+    "appid": "a8934270-ba7b-4824-a8c5-88621a5cca9c",
+    "name": "Twitter",
+    "description": "This app integrates with Twitter to perform a search action",
+    "type": "information",
+    "product_vendor": "Twitter",
+    "logo": "logo_twitter.svg",
+    "logo_dark": "logo_twitter_dark.svg",
+    "product_name": "Twitter",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2019-01-23T09:50:28.457767Z",
+    "package_name": "phantom_twitter",
+    "main_module": "twitter_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "twitter",
+                "input_file": "wheels/twitter-1.18.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "token": {
+            "description": "Twitter account token",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "token_secret": {
+            "description": "Twitter account token secret",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "consumer_key": {
+            "description": "Twitter account consumer key",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "consumer_secret": {
+            "description": "Twitter account consumer secret",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Search tweets for specific text within the past 7 days",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Text to search",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Tweet Link",
+                    "data_type": "string",
+                    "column_name": "Tweet Link",
+                    "column_order": 2,
+                    "example_values": [
+                        "https://twitter.com/username/status/1106343825230962689"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.hashtags",
+                    "data_type": "string",
+                    "column_name": "Hashtags",
+                    "column_order": 3,
+                    "example_values": [
+                        "demo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.retweeted status",
+                    "data_type": "string",
+                    "example_values": [
+                        "\u26a0\ufe0f WARNING \u26a0\ufe0f\nUnauthenticated RCE Detected\n\nSource IP: 122.122.122.122 (\ud83c\uddfa\ud83c\uddf8)\nRecon Scan Type: ZMap\nExploit Target: Li\u2026 https://test.co/kVXF2ZvmCr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.tweet",
+                    "data_type": "string",
+                    "column_name": "Tweet",
+                    "column_order": 0,
+                    "example_values": [
+                        "RT @bad_packets: \u26a0\ufe0f WARNING \u26a0\ufe0fUnauthenticated RCE DetectedSource IP: 122.122.122.122 (\ud83c\uddfa\ud83c\uddf8)Recon Scan Type: ZMapExploit Target: Testsys r\u2026"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.urls",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://twitter.com/i/web/status/1106325213497573376"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.username",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
+                    "example_values": [
+                        "user_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Found Tweets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found tweets: 14"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
