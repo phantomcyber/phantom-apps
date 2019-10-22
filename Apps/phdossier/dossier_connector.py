@@ -1,17 +1,16 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
-
-# Phantom App imports
+# File: dossier_connector.py
+# Copyright (c) 2019 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
 # from dossier_consts import *
+import json
 import requests
 from requests.auth import HTTPBasicAuth
-import json
 # from bs4 import BeautifulSoup
 
 
@@ -34,16 +33,17 @@ class DossierConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
-    def _make_rest_call(self, param):
+    def _make_rest_call(self, endpoint):
 
-        url = "https://api.activetrust.net:8000/api/"
+        base_url = "https://api.activetrust.net:8000/api/"
 
         config = self.get_config()
-        api_key = config["api_key"]
+        api_key = config["api_key"].encode('utf-8')
 
         headers = {"Content-Type": "application/json"}
 
-        r = requests.get(url + param, headers=headers, auth=HTTPBasicAuth(api_key, ""))
+        url = "{}{}".format(base_url, endpoint)
+        r = requests.get(url, headers=headers, auth=HTTPBasicAuth(api_key, ""))
 
         return r.json(), r.status_code
 
@@ -59,14 +59,13 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("Connecting to endpoint")
         # make rest call
-        r, status_code = self._make_rest_call("services/intel/lookup/targets")
-        self.save_progress(r)
+        _, status_code = self._make_rest_call("services/intel/lookup/targets")
 
         if status_code == 200:
             self.save_progress("Successfully connected and authenticated")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            self.save_progress("Coule not connect to service")
+            self.save_progress("Could not connect to service")
             return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_domain(self, param):
