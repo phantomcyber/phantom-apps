@@ -70,8 +70,6 @@ class DossierConnector(BaseConnector):
 
     def _handle_lookup_domain(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -118,8 +116,6 @@ class DossierConnector(BaseConnector):
 
     def _handle_lookup_hash(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -142,19 +138,19 @@ class DossierConnector(BaseConnector):
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             if response.get("results"):
-                summary['results'] = response["results"][0]["data"].get("details", {}).get("av_match_count")
+                if response["results"][0]["data"].get("details", {}).get("av_match_count"):
+                    summary['results'] = response["results"][0]["data"].get("details", {}).get("av_match_count")
+                else:
+                    summary['results'] = 0
 
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            # For now return Error with a message, in case of success we don't set the message, but use the summary
-            return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
 
     def _handle_lookup_url(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -178,19 +174,17 @@ class DossierConnector(BaseConnector):
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            summary['results'] = response["results"][0]["data"]["record_count"]
+            if response.get("results"):
+                summary['results'] = response["results"][0]["data"]["record_count"]
 
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            # For now return Error with a message, in case of success we don't set the message, but use the summary
-            return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
 
     def _handle_lookup_ip(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -209,18 +203,21 @@ class DossierConnector(BaseConnector):
         print(response["results"])
         if status_code == 200:
             # Add the response into the data section
-            action_result.add_data(response["results"])
+            action_result.add_data(response.get("results"))
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            summary['results'] = response["results"][0]["data"]["record_count"]
+            if response.get("results"):
+                if response["results"][0]["data"].get("record_count"):
+                    summary['results'] = response["results"][0]["data"]["record_count"]
+                else:
+                    summary['results'] = 0
 
             # Return success, no need to set the message, only the status
             # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            # For now return Error with a message, in case of success we don't set the message, but use the summary
-            return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
 
     def handle_action(self, param):
 
