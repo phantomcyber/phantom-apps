@@ -362,9 +362,6 @@ class CorelightConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, phantom.APP_ERR_FILE_ADD_TO_VAULT)
             action_result.append_to_message(vault_ret_dict['message'])
 
-        # remove the /tmp/<> temporary directory
-        shutil.rmtree(self._local_dir)
-
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
@@ -500,6 +497,9 @@ class CorelightConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def finalize(self):
+
+        # remove the /tmp/<> temporary directory
+        shutil.rmtree(self._local_dir)
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)

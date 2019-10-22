@@ -1,7 +1,7 @@
 {
     "appid": "fd078e4e-0c3a-49c1-8e6e-b2ddbcb20cbb",
     "name": "Corelight",
-    "description": "This action supports investigate and generic actions to add config and update frameworks",
+    "description": "This action supports investigative and generic actions to add configurations and update frameworks on Corelight",
     "type": "network device",
     "product_vendor": "Corelight",
     "logo": "logo_corelight.svg",
@@ -1215,7 +1215,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "list intelligences",
+            "action": "list intelligence",
             "identifier": "list_intel_framework",
             "description": "List the different input framework endpoints",
             "type": "investigate",
@@ -2878,7 +2878,7 @@
             "parameters": {
                 "location": {
                     "required": true,
-                    "description": "The location form the 202",
+                    "description": "The location for the 202",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
