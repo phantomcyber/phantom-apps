@@ -1,0 +1,2958 @@
+{
+    "appid": "fd078e4e-0c3a-49c1-8e6e-b2ddbcb20cbb",
+    "name": "Corelight",
+    "description": "This action supports investigative and generic actions to add configurations and update frameworks on Corelight",
+    "type": "network device",
+    "product_vendor": "Corelight",
+    "logo": "logo_corelight.svg",
+    "logo_dark": "logo_corelight_dark.svg",
+    "product_name": "Corelight",
+    "product_version_regex": ".*",
+    "publisher": "Corelight",
+    "license": "Copyright (c) Corelight, 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-07-01T18:56:43.605210Z",
+    "package_name": "phantom_corelight",
+    "main_module": "corelight_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "URL for Corelight",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "order": 1
+        },
+        "user": {
+            "description": "User Name",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "input framework",
+            "identifier": "input_framework",
+            "description": "Update input framework",
+            "verbose": "Send data to the Corelight input framework.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "append": {
+                    "description": "Is this an append to the input framework? Otherwise it will overwrite",
+                    "data_type": "boolean",
+                    "order": 0
+                },
+                "name": {
+                    "description": "Name of the list to upload/update",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "fields": {
+                    "description": "Tab-seperated listed starts with #fields separated by tabs",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "input": {
+                    "description": "Information for the imput framework separated by tabs",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.append",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.input",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "intelligence update",
+            "identifier": "ip_intel",
+            "description": "Update intel framework",
+            "verbose": "Send data to the Corelight intel framework.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "ioc": {
+                    "description": "IP address or host name",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "meta_source": {
+                    "description": "Source of the intel",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "meta_desc": {
+                    "description": "Descrition of the intel",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "meta_url": {
+                    "description": "URL of the intel",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "is_this_a_update": {
+                    "description": "Is this an update? If not, it will overwrite the intel feed",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "ipaddress": {
+                    "description": "Is this an IP address?",
+                    "data_type": "boolean",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ioc",
+                    "data_type": "string",
+                    "column_name": "IOC",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.ipaddress",
+                    "data_type": "boolean",
+                    "column_name": "IP Address",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.is_this_a_update",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.meta_desc",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.meta_source",
+                    "data_type": "string",
+                    "column_name": "Intel Source",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.meta_url",
+                    "data_type": "string",
+                    "column_name": "Intel URL",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get config",
+            "identifier": "get_conf",
+            "description": "Get Corelight full configuration",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.authentication.ldap.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.analyzers.smb.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.mapping",
+                    "data_type": "string",
+                    "example_values": [
+                        "auto"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "$6$hCwlxo6ffFZI7y6z$DRb6x6uaessAilOJBNYaIvdWx6VllxE/DZtsbaQQxKUlRB4eL85txaHfVi/DGsNvbnXrQ7K7/AF8NVsDs.hBv0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "corelight-"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://cloud.test.com:9200"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.elasticsearch.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "C2KhzhoXMDGCHISaJysOh7KNLXjBuQHVwQelJCJsj0lL"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.archives",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.executables",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.flash",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.java",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.office_documents",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.files.types.pdfs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.json.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.json.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.json.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.json.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.101.180:5010"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.kafka.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.logs.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.logs.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.logs.format",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.logs.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "3600"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.s3.file.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.s3.log.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.index",
+                    "data_type": "string",
+                    "example_values": [
+                        "corelight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.101.163:8089"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.splunk.servers_enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.export.syslog.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.input.max_total_mb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.intel.max_indicators",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.bzar1_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        600
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.bzar2_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.bzar2_limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "5,10,15,20,30,40,50,100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.bzar3_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.bzar3_limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "5,10,15,20,30,40,50,100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.file_extract_option",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.ignore_orig_h",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.bzar.config.ignore_resp_h",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.communityid.config.do_base64",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.communityid.config.seed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.corelight_shunting.config.shunt_burst_conns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.corelight_shunting.config.shunt_ssl_after_negotiation",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.corelight_shunting.config.size_threshold",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.corelight_shunting.config.speed_threshold",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.corelight_shunting.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.conn.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.dns.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.files.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.http.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.ssl.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.stats.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.config.weird.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.datared.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.file_sha256.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.log_add_http_post_bodies.config.max_body_length",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.mac_logging.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.namecache.config.do_mdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.namecache.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.scan_detection.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.smtp_links.config.max_hostname_repetitions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.ssl_expiring_certs.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.pkgs.corelight.vlan_logging.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.profiling.sample_rate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.site.ignore_bpf",
+                    "data_type": "string",
+                    "example_values": [
+                        "host 10.100.100.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.site.local_nets",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fleet.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metrics.bro.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metrics.bro.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "60"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metrics.cloudwatch.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metrics.graphite.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metrics.syslog.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mode.password.strict",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.ipv4.dhcp.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.ipv6.auto_dhcp.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.ipv6.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.ntp.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.pool.ntp.org,1.pool.ntp.org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.proxy.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "$6$oFdg2gqZ79JMCidO$d.NkU6Ia/ZQsHh08bQY3iS5ec/veFbMIod4ENqiWPZT/azMe5BJsMvVLY7TiDWmMPNRaqjwdnP1v6C3bO7efS."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.proxy.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.proxy.username",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.management.syslog.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.monitor.port0.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.monitor.port1.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.monitor.port2.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.monitor.port3.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remote.management",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remote.share.functional",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remote.share.health",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remote.share.performance",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.http.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.http.networks",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.ssh.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.ssh.networks",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.user.admin.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "$6$wjhxK.ii/Jw4tbLc$oZUIIDE0vW1Roa/fUL4ufMGBnAwcUJa3biX5fZtxOCFOyLllzgp1EU1mgByVNLDBUYwVPh4OPDRXvvCccgJaR."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.user.monitor.password",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security.user.netconfig.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "$6$yjZbomr0VG6qJdkg$a8hHNDATQSxIF8qQQ61cZW7xQh7c6i/J8qDvkMTO9p3q2A.g2uEfTbPxslAr1eUVMcsGN82XRaGB9wx7iI6qi."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-system-corelight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Chicago"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updates.all",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "json"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list input",
+            "identifier": "list_input_framework",
+            "description": "List the different input frameworks",
+            "verbose": "Get a list of the different input framework endpoints.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1,
+                    "example_values": [
+                        "Files with a MIME type in this set no longer get reported\nin files_red.log. This file contains a single column called\n\"mime_type\", with each row listing a MIME type such as\n\"application/pdf\"."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.entries",
+                    "data_type": "numeric",
+                    "column_name": "Entries",
+                    "column_order": 2,
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "datared-files-mime-wl.txt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.package",
+                    "data_type": "string",
+                    "example_values": [
+                        "datared"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        234
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "A whitelist of MIME types"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.uploaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list intelligence",
+            "identifier": "list_intel_framework",
+            "description": "List the different input framework endpoints",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.content",
+                    "data_type": "string",
+                    "column_name": "File Content",
+                    "column_order": 2,
+                    "example_values": [
+                        "I2ZpZWxkcwlpbmRpY2F0b3IJaW5kaWNhdG9yX3R5cGUJbWV0YS5zb3VyY2UJbWV0YS5kZXNjCW1ldGEudXJsCmprZW5nZy5pbglJbnRlbDo6RE9NQUlOCW1hbHdhcmVkb21haW5zLmNvbQlNYWx3YXJlCWh0dHA6Ly93d3cubWFsd2FyZWRvbWFpbnMuY29tCg=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-intel.dat"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicators",
+                    "data_type": "string",
+                    "column_name": "Number of Indicators",
+                    "column_order": 0,
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last-modified",
+                    "data_type": "numeric",
+                    "column_name": "Last Updated",
+                    "column_order": 1,
+                    "example_values": [
+                        1562165861301
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "backup box",
+            "identifier": "backup_corelight",
+            "description": "Create a JSON backup of the Corelight box",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "backup_name": {
+                    "description": "Name of the backup",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "bundle_password": {
+                    "description": "Bundle password",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.backup_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_corelight.json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.bundle_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bro.packages.bundle",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bundle-version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.exporter.private",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA0AAAAIAAAAAe6LnJkh5Dhrc29+IPXeTWR5fxzSDf6utU2cjELP8P+XV2AnUPaFao1Q01EZ3mdyJMpatvZKIG4sg2eZZDrNRIcdnqQgT6/qF1TwqwlnMC/yJyiUxIjcvNIyXR6JEe6O2DgEOPJoqTm6ENWC2idTPU04xMsK26O/y2fhP+cJmNfVMkXGPUnMKMTl1dQGGTi27OulsjwJgK0H6foyv5T8JaLl8MpDgpLIA6jI6PyRps9MeAFw5xSZk96ZrA13806be7uW+UQo1JqNMT1smjJ9H4UOAnsaTP4vYYLNbCnq6ZaEsddfhsIGIRfwrytGpXuS4nxRoNQ8DtOvdcx7/9x2SCfedAvE5QA+kTyW6almS99bLE6TuHq6HldV1pC6s1Oio4bSoqoRttdqaGGSGH7W1YEzk8jMeng+GjjnJc+yEGJ0b9k4IZpizt/uLEn0aH0Vf80I/qGIk6j0sMpTZP5ah6Nxq74QQJt/PhWQcSe2ydyx+1941wkG72/3+qGVnqWhOEFHLcn1a1vk+KNS3rh1YvxR5QStHCIvh+raRUt7lwcU8FUoikiVk+/U+PiAQCZlK9s2h8vyWGcPHymuunTVfTSbE3G0wKKji3j2qALWmNlDmleUBV0r9t/jWtwIZqmvdT6QJpqeDRtwrSBg6po/pqOoENB18h0AgX30m7ioSejsh66uNb07S4hH3q9Fqj1mNOTWI2zSFUFH8uWAjEL8Kaf7TMCnZwTOXErgcTX5B0ypWiz52X3vyHTnuGCAMqFRJ1dHdXswQoNJBiJjDxQfPxGIA/tXGsAXNO+Tu904khr2qUA4N5/gh9PNfPtE4ENVeBcB9kXDSKAxnwVk9iGoCIJLlMpCno323z6CSlJAZi4zWv/UNeAArEga2D0/wzPob4WMW+5s5vvMEUi+ojHIi1gIcB8W+8d9K2vBDIzWEHXGNS9wjAeh4fiMKU8u8yU/dAFLsGIeJ1NkZcVYNCgekmFzXcjvIz/lA6mFl+ONRksbd6txFr9lTrodc+sMJfAcoKjADwafP3+HFVQBvesABw21wsMbW+Y6HibIOcl+54kUifUm4DQpNpr2nfcfIpmXjnQ6Rx4zRfN466YWSIOsfjbHvRT0/Muyemq8FmUpiEg6Sop4VH/Y1pDM+scK3WJ9OKFFH9t3dMzzrDq0GpOyczRnJrdFBcAbo9JWKcYcZOBYrF7NmF/EYftk+K3dhlOF50+XcPCne82ZreomnAbo2bQaT6lIBm6448LqKizST/k96R40v230i/odRQ1S0Hf7Xy/4KnY3XmrGXQjDTNDk3O1xya2FmbPwahSASjtd1zOD3lsx2YkQekojTOftAwXsjx/NQwLu1Egg/U4zaH6yi8GsnDwPF0bPp1E018rioDm6Nkm6uEEZMUpVMNSOOMy2VIBHqWLgvT0f3K6HTJLwiWB0nvy3W5CaMBl6YAe/nHjlGNOkjmWWKzW92Q1Si/nh4aGnFKyKjJTCuxdxiFr3mj59WLa1plY8Sn4hFtJ6Iq6jd0x/lmiyk1qum9K8J8JEFzbkiJPsFcZh1uAA9NopQxJ+x2nZLKTbPBpSvkv1YFzd/Ov3QyAZ9hmP0Kr8QyVNo5SR1CAmLjBdkUxaAYiqrV9rebGRriD57OoHkPgVqadMpByuuNzvATRf/Jk+ULLdVWincc9cuZ4dXrqa7avcD47cjqesYlxpFSSHDF8o6bqOv8n0tMs5a8ofCx/leSpfD/mzR1I6g4zPWtOpcXPMs/6sVRmqCubHiwG9sY5G9xQVlsQ2cFyC96ooWVc2+zkK3fH3G/nEOLC09Z+yCZW0HvISoQDUEuHQgU4UlTrIrnE4qtCgI7aTksJhzhMCqoeLMZb3kt900i+EnA6evp3db0PuYX4eT8bf2S5Yv94v5jXWpZQLsCwTRqfuKLITYVLdilXAw7RDEteSj94hOfOzmv39bbAVyVUqHmHbqd+tcSSWtSbnJlZkysYA39mmIbQEn/KJ0/tjsrRoFi5S1LbWJZJxob0IL3LZVQGjkMnRq2QNXwsV89WEqiSrf/DMQqBAnW+36aTTH7MQjOeADRFvnawWWluWpfWSky/dXfq6M8EWYy9/SX7LQ21hDf0xradge75p9G0tdp/+AIAElhnyC3HJWydeB47eVIcIjMXzHgsUBT/z+Uoh49XsjbQ4a7g0bZB1rz7/0jAdWDuehgPdX2TYyqVpJBMK5PzQQTDM6kgYylfAYPrnlQunUyFgs/1YTKNrS2IU9ZnUnkjwIakHjU1YdvhXS5zt5pJYJCE+3Y82l9EKQeCpsPAhCc4Ktx39xSg8/DzD05ht/WMLn+sywG3nisk5bLi5bHewaRqCAQtkqOk3QMiLUsr6hW6YnBMX0TewThfkXdn8ktEsgfqjvj1V2sAFDLOxXKvFNv7+TQMUUcODI+saQpQ="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.exporter.public",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQEDPGJcG55y51j8D0+NAynbAdl8M73OBF+I0+JtYtJh61TXCZ6RNUgd2UmNofwqLdkdi3+G1VW4rz0mdAuwZmoqm4GD1rHBvxC0/WGSr9v9ro3fqDmKVbcdvIqoiX9ktADjyppg/mAWV5+XAoue4qYBlgrhVObGBO1La5B/JNr4R9//+Jx9Xt0FOjPCYXcPNWe6F+hxHtCKygwWwmGPr9WeReCENi6iPj7Pxt00fm4+XpEP6VzR2sjHfy5Dh0lZgyIrrgOYNyY/fAndx2u1lZ6QENHubIwYDdq98etp4q7DMdqAzF2cNgUQAPO8/oGReF18LNiuj6HT8AoTrWdqXxRl Corelight Sensor\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.dsa.private",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAcizgb/F1+qsDTi1yGp+dkOoqYDMSJ/a6IBv4ZrqRx7j+XeXZIuiEB9KIm96kXXa7c+qJ36fST2YUi6WyEavZ+A4Co+2nzPTyMPcRCpksMgWHYJ35pod+GLISak2/MPwGL4vTUkSATuxpN87oFREBj8BoGy17NypuZlT/uqApM2RFLpyoU89OuSHAoaxpa8x4FgFVeSK91+Bbwzj880t4DD7Aijnh4u7JegYQgLCtjpa6b1Cxyc8ySKsUXtgfbIHQhKf2CTTXB3WV/J3KfmheIME5WOTxO/6q5Pz9zVt+/s5VA+STMJpOiBBS0wP7FlJ8j+STd0ohVDvbfVc0NCG6UyLCoobIYkW4XEYpGR70HnFg/tZlS5qYf6M/M6hcFVWfUewQMA57NW5lJ2zU/JKb7n06XSWCLUablrSGPaDburMHYy6A8TLD13WUuE7lEXEKN+MBXwj0/SFU09ZkCM4AcKBflE55BvCBT/DHdGH+KumKN9yVaYaREdyxWM5nlz3cYqWdT2RqK1hnUquEP+ty7RbSawdUfh5iQR+ncCgjDrNqZ8Z0dK8CMCNEy99q0JwRAzPnQpEWfJAvOyZzFYBpLkRUbBuWeht36a9r9c6qCdoPY3isgJ5OLmgvm15HnR40rNyJ62PToBlZCaa2YaejBkheygDbz4CYxi9eKR9Dh7qW0Pu+LeZowRFEURJkxR6wSKbisqlKBerzbkv/cUALalYQNTHUC3u/mEzHVo0UDbBjVnTnIXk9vrzfJw+LdYpu3a8twwdiqx5VluTHqmEzY993//ovI49xtXofjwcQj4cRcJ5ONZ85/5E+hktzrTLvqG4MAcLdVXVIoaOsC7AUmdtZjHyusakLAztIiu/Nq+iBa7cqNv4LFRT6jiHcgvwz8LyF2Dq2kVw6Vy2D7Fj1+SH4Ha6cIAPYWHZR7uMc5Xgt29dgY5oJIeDyun4mSNV5owLbA+dZgqa9scUfrIumx8QGTUdsCz9J/auOowHvfEYcQB665K0U+BK1h6NhHszFpZePeXQz+q4oJ0IOpt5gwiEmZz0TTj5MvOi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.dsa.public",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssh-dss AAAAB3NzaC1kc3MAAACBAKqwinkrK+Xtsnyheho+zIousisJPJAQz3q5tj0br6dGEZjPqFXPq+oXpe8CR/6PfzcYSUmjvenBoYqKyqVMkenkgUeXKxa8NFHz7+PhZqn3mFjIh/P9pTHgLoGrTZl4z4Fb9Q3vYw/r8g4xJ1G4wwD5TePS42VwzZhS3GRAhfapAAAAFQCruRmy2pJ9muZpXE/kDpf9YYI3cQAAAIEAnJJDnGKnr/9j+C8AIOX1jODSaB59vzZAHNSQRnpkqbOQgjVVMymaD7at079BvHpsjWyFn9LfIb5SgeFxMAi73MV8Zl7Xr7eopUrhUp3+UuyG0X/hRo4XRxlp6utHEVbzOrm9OZ1gjovxCcShxlbjJktZOVxh5jx73rM9rb3hXmMAAACAKZcXAT7YoNvxrHyDfmOlKE0I3thge9vlOzDasIIh5iRol90xOUPW3dibwwphi03Q0Zla9pOXE5IW92fxFW6Gdw9y67UuVm1PYVaKkWUh4jsvzeMwR7Xsun6LRUGzLUaBldO6te4FHnbsxAeZ5om43enfs3U9THKfRf38H2dtHDY= Corelight Sensor\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.ecdsa.private",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAATXx5U/uNGJ8NdqDdL7SBnZBEP4cgAXOz3NkZwcYY7lk0jht0Ql5lvGlnoopCub5htlc4no3S4HwmGB+b+Cr2pg9QTeF+2At+fUhmTioHtUg8TgX8mRuZz+znHGZnb1EsqXA/vgPsJ2UJv6MDMxENhhLlP9hJHi6Xn/rGX6DybkVejR3qzmKs35EgqBYWBN5Jm2ei64V2UL+PXYdANSUUJojyCtjjLnt4uVyFKvX1jZeg71oXbFhwywplx9Jhz8ZI7Tztqd3gnZbxQBq8Cu53SqIQiDbEj13tVTdy9v1tuGRJCdq9TvU67oGImRA4NcoNcLsVeSpPsLzrm84Qxy9pT4HIy1uAnY1IzR33lk8kCJ4w6t/+j2yk5tA8Ik9s2eAj4hlJOlMM9F/XNhdbFoe0NPU51lqwjWwIcdtZL8vSkv48SIJ1plrJ2WwScCsU1vRC6H9BAT21uHEO4I="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.ecdsa.public",
+                    "data_type": "string",
+                    "example_values": [
+                        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmzldHAyNTYAAAAIbmlzdHAyNTYAAABBBMogLxe47c/EXNxm2WvXWzohqw9NWtOZ2VEIpYCLXfjyafvpAiqbmw0oHSi/yuOHRBAie1e8lmPw5RjDPIHpQgk= Corelight Sensor\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.ed25519.private",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAZnkAs8g3EXDHrmOz7YxcT+EBocbAA68Ij6qWKiYjYYUgRqhnVBUdeMbbGMX0kcBqKMngRF1/Zb3W97KO2mgrHdJNFBU4WzWtmxImQuO3EFStPKLxhXFMWBJp9t9nh8ZuxdwqvRSsC2CYij1SPjj9ZmlyX5j/PVSl+Ymo9cpCJvt8525+ewhjVt+FBTyt9uPzcfR6dPEXSDUxYI6oeHFb10yumexdxga06tma54pQOkH7+wJWURvlHsgt0fBWEuar8lmv9Ggs9D4fwPoyS8KvNRDk5wfz+RLUNWDPlPJt7IJpGgXdGv6Qrwd54JftP6AGEBDsl657BUrXJMNsZAzIKEVCdSEFn8Uz6nM20I9fVtDnzv17FXFV0idbUWy51kdkNL0VN+c7hHaEDW2FvKOrwoo+GM0idW2+jdx//dWZcrlskp0BhvQa1doZuh+LZ1387aSF7MZzdiA51txePHX1oDTSkyKJ+vM9Sh5vPcIG0rNvw2pXS3OalczJ2HaDs/Qdx1/MNCGSJcx5IHM9kYFFp3+9OMH6UZzbVygOj6myBXD91J0SjizLNCSZBSic12Gpely8qvrXAkbxTGUC9vpNwK+wpeSw8tMWhPLy3ijo9X/yXrlXWZMP9e5N9ZHu/GbjyScHNNnnoGgrlhW0s7GD1Q/3y5YVg2d0HfwQJJmfJ2aTRQkxa7qOg8="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.ed25519.public",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAIAKSCllmM/KlSDxTeVfonIK4oDXr9L/YYRb2PjDk6uyu5 Corelight Sensor\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.rsa.private",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAVTb+P8BKSPaimuzpLbBTgt+bjX4UhEb6mDMfcw3hKYHMcudjXStaSTPcy6xi/6F173oLhW9Ij9iDly8Eahl/1WnFxi74AYyfzsj6qW7I5HQn+nFzSHWvFo0AcM1P3/RU2oqERm86V3fq/h9Qb5A23IgCl6qLRA8B/KsunvIPu4BqX2dFq45P6u7j+3NzOsQM7T4p/NXJHLsmE2xKiEThhXGqBe3o7ua4oVPxNMbhp7xNbHdx96Pm3VRCjyKJZRK7LUiy1wWrncRWZ+LXuW6WtzFQUAB59z/Wbpu1R4h7QPTsqU+JGyktuNIPuLrPpfFA5H6MC0c4VVrnM24A2y4/++iZyBrOTzxezul4cabb2e8rlbxikzFDycxswFaTyTNiW045qS9ZDAd+UlPv6kigg3pQAyZUnntV2Wiakz1cOzaxPAZB7R+6mE/ICzGhSbFhYEWxp9k4Gegf3pyGFK4gJO8YR6YlLAo/pbWHR7ce2vxLnUJL196+FedtGnaWB7YsK5y9HOhz7gcK5oI53XkNY672AD4yy2k5BxPhs2ZSRgO8Cz/RwRr9j20sdsx1bcPcNKR9mDaFcgy6eblESRnasaFdyCJb2zZVwydO0BpdCZch2MAm/HiOmXxbUGGOo29bDM+Bcs9A7X+f9aDQs0BlOXcDLVXIPSPA6oZhIUGyeV869bm9rMqw1BysVXexDmbVjnvbeYMhAluEwanwCOEJaBhSK9s/ii8oGHVHq/sEfsHj9g6zDYpkP0+zG7N+YA3zAKh8b3doOBocSsnK0BpK2dLzvDk4vR/Rtv8qoDGoPqPoXg2mca/IPQcjW61w6gAD/riw0hKXQbvgt1Eg6w7s5f6qSdYQ4R1YGJBSOplqWi2hKByIH8pLJE8p728PdBuM85I6EsfcC507NvZHwJdne0x8etyBnpCaGuHxd6vFSvOUymwEGqtKXT+oa0aUHFfoSPbuothYuZTT3r9NtzzE8W/h8eAUPMz7+M9VE2KgtH8C/MwomrSZX9nFWi/lpgcsrCZdI2ikg32uFzCdPQqDF9Tr/+BOA5G83LcQDr5EcyEaO3lxyuJHHvnkblZLSgmH/03Cz0iLNqniHZIaVUOGL26RVkqbQSEEaZaoOKy+nv0cyCHAtPTpTNF4jgOt3J4MK3domhI5oXKFx6Aokh+9+TKtogxfIIeXCLnfneBBfbw4+mJuBxIrmUyGdnk5/xt8jyMJlvHrJoEnxpo2LsskvdmOgmTh4cS9KJ6NMzja1+0ou379zdXLbQDdCTG4O7lLAXEomjqNmlXqWFrDPn8xYaBuJ9zz1oJ9lowErQbb1ElODUjDOsGqaAwwYVrwIx8tzvKF1Uai8eTkNSgL8qz8RBMAp315iZpIgrnzTfU5jfGnNyP0VhE8vXgb9CAMH9cRjE6mlN1a0uahXqS+jAEZEvGdZEpxNtm39FqDRcxll7Mir0Z+RUNEoQ5/FG4x6UgFhCexFYDrRAwoMxIUAwW3VqK79VOkqwH+OyyZxrTa8K+igMKFidChmi/FF479ztwdWW7LsJiuaanFhyLTLMhrAgQBorBNp8cmBHRMVGYOzoPba/o/SEgAHPMHKp2mfrqkE2Q2CqyEkQUZNQQ+cqvxPv/27s6ifS6RqYVATO+a4PiiXoDLwmhlA8ebl9gnepnCkfy/LZV7skHjD7zFqrBZ4Ww/dES+hgf/np65L2awgoM3i1dPJzoAWp1MAIldsPYwFl0+iXN933N//Ccol6AYngDhOgJKgE7Diz5/OF+Q7Xw3alX4z8oxHAt5BEokSQn4xBafwaUv+xfoqRR0U+XDPi62CYEBNIuL6uaIqRrMDrs1ndttlgDsE6OYo22bDIPlFu0dmz5SySgSyqop3FfRPyAjfC628I+iy29u9Bq4SHVcGHgRs8XiV5xvZLkmG1MiXgTjKfRjMfMkO0xIdtVkWlTZDNNIQidW9Fljp198DP/RYQKNemHnFKEdnTgmQOIPBKSsGW5Y/5jA+TjDAe6meGVsp50xQQHUGgbQ2qtxu7QZuJsaXIR2z3hUxCpA5ca+HbTmwfcKzeG7oxMfpI3s1t2MIjEJy93jUtjysnIW/fepz833g/Qd0p4DqKbt9n3jtcRTiYV9NJ4HO9W9xPXaPgr0eL5bxxmNCrSd3GHOt+C1BVtK8eMgnDEkmiHYWeda/LVkZ1k1N0vRJ25PY8lUx2RufVZkZ5rfeYDEuyDWbnqukInWiWJo7D1s+ic0wi3i1w7/4q93gr3Y1SPspYAfhJDf/rxvv3i10mUX/oFEBZUz9jMshLpQsvAio8n2ug9qcgJCnRVDaI0ynn0viALXlA6/5Nw96kWNg0Y96+Vg7xfWAOXx0r6P2LdA2vZRe/LLiGbUsmbYvHywb6fx/xjogWRDveFcrxArmG12RVOuVnzCjpEAPRh8t4="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.keys.host.rsa.public",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdnpqbOBLxcEydXCnjc4ik5EdVEWNgoeN8o9BoH6nUQJzlu+oSAE+eBQPsUR6I+ZZKSHQ/XEf2Itb1h/nJGbE25SBjEtW8HCMa69Tdm9haHXPQ2RTTHiV6/8z+LrzB6endcaLlyrV2qP+aJnzGj+O6m/d3+ODCOT9GzPQo/blNbNe6vsJOL4IW2SoB6YfB+IuSd0isktpuDfHJqPBtX4XoV3mqtHRV80uUTs26+NXHizwCVS9liyA1cUzdbXx7BINzApBbWPGVsqCtWF09BvWB10QgCn9Z1cueXpjT2W/HsMLJU/J5SsZNw0EWO/BSsKNVAlS9+lcmQ/vwe6abIaOx Corelight Sensor\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "test_corelight.json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.bind_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.bind_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAWVr4pj4c0ZHQp3YTxAl3k9s2ZCJjM2wPoQTo/wS+WmEBBhWVp4wLU5Q6ueXJNdeTMCZwWfB9KFKew54FSN6e1l2/sJpcAruLXKVSXyIRGT5upN5X3ymSb7+bbao5ooqCU0w9HfMp+hHngGJ/M/K//1G6A=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.encryption",
+                    "data_type": "string",
+                    "example_values": [
+                        "starttls"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.group_base_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.group_read_only",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.group_read_write",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.user_base_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.authentication.ldap.user_search_template",
+                    "data_type": "string",
+                    "example_values": [
+                        "(sAMAccountName=%(username)s)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.analyzers.smb.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.mapping",
+                    "data_type": "string",
+                    "example_values": [
+                        "auto"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAATuiplYCf4kXuHAQSQCldPP5O7Wg6RXbABw0U3n9YWOao/pBHZEbOh0peOO0coT/ULKDr6GFpem2Jmbif73tNiLz/wumYlf/HxpnAJaGoZh2f40dgptmhM860FNgzmV51eYm7lWFc3EnCIKBNYas4jDkDw=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "corelight-"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://cloud.test.com:9200"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.elasticsearch.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "C2KhzhoXMDGCHISaJysOh7KNLXjBuQHVwQelJCJsj0lL"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.archives",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.executables",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.flash",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.java",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.office_documents",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.files.types.pdfs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.json.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.json.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.json.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.json.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.101.180:5010"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.compression",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.sasl_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAVv91EDti8VsCyDnK74vbYAg/RrV/o1Ju+3d79B3JMYZI9gvVk3zL+d9WKg1aQq+AzHcnRqcoifck2sZ2+Z923DTH4od98r5xGhZvm6O+CNr+utZYcRPqm5hGssGdR5mVhSe+SDOkEo1MWFW3CqlG9K+HQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.sasl_username",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.180:9092"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.kafka.ssl_enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.logs.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.logs.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.logs.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.logs.format",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.logs.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "3600"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.access_key",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.file.bucket",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.file.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.file.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.log.bucket",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.log.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.log.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.log.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.s3.secret_access_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAVBMJBwNnYK5173UckEugMi5rv9ivPtSEH6OAxrsSy5DnzyteGCZ9GNJEXGWAQFK+lqHy0RCI9bSziNpQCx96GdKuVkitaSQ0gjgu3Qrf3IyH6wcIGS9CcufCDurquFrXSuG30Ae6A3WSKqSDRKsRy4ZFQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.file.path",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.file.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.file.user",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.log.path",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.log.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.sftp.log.user",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.index",
+                    "data_type": "string",
+                    "example_values": [
+                        "corelight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.163:8089"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.splunk.servers_enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.exclude",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.facility",
+                    "data_type": "string",
+                    "example_values": [
+                        "local0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.format",
+                    "data_type": "string",
+                    "example_values": [
+                        "test5424_octet_framing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.export.syslog.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "info"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.input.max_total_mb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.intel.max_indicators",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.bzar1_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        600
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.bzar2_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.bzar2_limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "5,10,15,20,30,40,50,100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.bzar3_epoch",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.bzar3_limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "5,10,15,20,30,40,50,100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.file_extract_option",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.ignore_orig_h",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.bzar.config.ignore_resp_h",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.communityid.config.do_base64",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.communityid.config.seed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.corelight_shunting.config.shunt_burst_conns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.corelight_shunting.config.shunt_ssl_after_negotiation",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.corelight_shunting.config.size_threshold",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.corelight_shunting.config.speed_threshold",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.corelight_shunting.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.conn.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.dns.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.files.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.http.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.ssl.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.stats.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.config.weird.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.datared.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.file_sha256.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.log_add_http_post_bodies.config.max_body_length",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.mac_logging.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.namecache.config.do_mdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.namecache.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.scan_detection.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.smtp_links.config.max_hostname_repetitions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.ssl_expiring_certs.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.pkgs.corelight.vlan_logging.loaded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.profiling.sample_rate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.site.ignore_bpf",
+                    "data_type": "string",
+                    "example_values": [
+                        "host 10.100.100.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.bro.site.local_nets",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.fleet.community_string",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAeSlOCQORYjZ5jJil+CQhZ43xyM7n1QUWo7X8lmqsxmF7MeWiKpfZeyLaPizyoORWs19L4/BqV6ugxvdYDNOscbuANcHvDgrp0Rd+5SnQNbqKRy5/67S6r1RKEc3rG0sdTyQVkCQvCr9cPFOP82tfdhc4A=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.fleet.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.fleet.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.bro.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.bro.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "60"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.cloudwatch.aws_access_key_id",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.cloudwatch.aws_secret_access_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAY1IRMvc6hJaF1+JbctpM00mlC3Du2W4mATbF5ZkNtW/67SPBt/5H3NqdC96HkQLOT1o0jstArC9SEs+SSCfHkHVBd+ORA5LX3P1pnhiBDRu+wflbEbMHVUD48J4yga6UOFvEKS7Kec4JJ43v4kcUwAp7w=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.cloudwatch.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.cloudwatch.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "60"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.cloudwatch.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.graphite.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.graphite.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "300"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.graphite.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.syslog.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.metrics.syslog.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "3600"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.mode.password.strict",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.dhcp.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.dns_search",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.resolvers",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.static.address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.static.gateway",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv4.static.subnet",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.auto_dhcp.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.dns_search",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.resolvers",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.static.address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.static.gateway",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ipv6.static.prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.ntp.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.pool.ntp.org,1.pool.ntp.org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.proxy.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAYfiopIm7PlkwIrPxzGcSFTzw2RDoH2GFZzi7OJqV9qxM7f7DmQd3mCKBnKX2hLFEfeXxaHJ++ivFgG6/Bqe8Ttw+bY8Wd4P8k4Ymr3qZh4EHnk3f5e3IzcCe7BP/IhwOtnjS5rZUdAlMOQIcdhUa+q9MQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.proxy.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.proxy.username",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.management.syslog.server",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.monitor.port0.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.monitor.port1.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.monitor.port2.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.network.monitor.port3.speed",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.remote.management",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.remote.share.functional",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.remote.share.health",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.remote.share.performance",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.http.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.http.networks",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.ssh.enable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.ssh.networks",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.100.100.1/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.user.admin.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAW+aM0EMcTJL0rSACu10I5m2Nyg8e6j0zmv8frj6cLIB7fHr9y7O0A9utb3/c/urgOtKurPIi0Z0MIurfifkYlVAZzGYU3JqPJjkBSVvPFiXOHp3miuqYsIJZdf+ltre9FnO2GBAv/MHbjRThcw2nar0DtJuvTscNGNKn7ezw086ogsFRkzHKx3gp4CrVdfuOGgbmROHMXVVz+SXJWmHyx6uecJkcvpizNm3x7pCodY18v41frbPBSkPSJA565zk9/ZuSa4Tqc3+fOCntdKImPpZy+jRkA2WObV559W7oqGLUql6aNIATeCVhEBcSz4gbk1LEx7S6t7OOLGEnPxii4QtVsoNun4DlssmBL5yBdK7qWHt+LexyHZPAE5uddxIfHasdohqkz5Xpck5B41Llq49DyUoOn+AEnPMZ9wvvr+3l9LhuVaFCTp7ya3+v4LmJgUdmQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.user.monitor.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAcWCsYfgN1hANQrwdcBn/ENle1TKjUCLhVr/XytVbO1WtnZybzMJoiDLK8kwuwwIY6lIks22YLLRs5St8PuNGPIrh7n41BUoasH0t7AzVKis27hpBM+sEPd7v0UDHzNuZHmn61rsC1nO2LzVI137WTv6EeNO9UBqhEgevsUIEks="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.security.user.netconfig.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "**encrypted**AA4AAAAIAAAAAQWo6K6KeoRfkDjGunYZynNUGZY9+vWOiz6d95duGaavJLniZytwysdvzWx2kUQTT9vwYLgpriMEduDcgo4Z2KHJfB2LBh00Bo9yvMycbA4ak5Kxxu6rkMQ3pTkAIQJfIGlKnUeiPI+WlLdm7ct+5F18vR2XIU+D6cMACAm+Xms79GAnACX+ng3O4RDApeCB015FsmF893KHv8i2E4uZ5r/c0Nu2bmcEX5PVl/J8YqBkClOm+mW1iL3qzCO+d7g2liY31esxH6A9dFvUK73JndNxG/2LOaHMA6+9gZf2lbszd13WQvsBWptC9XFMqSeFijI9yzI="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.system.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-system-corelight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.system.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Chicago"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.updates.all",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.updates.no_impact",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.updates.reboot",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.updates.service_restart",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.options.updates.visible_change",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system-info.mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "ac:1f:6b:47:34:ee"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system-info.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-system-corelight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system-info.time",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mon Jul 15 08:00:17 CDT 2019"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system-info.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "51-7c-de-3b-f8-2e-a3-dc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system-info.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "17.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "2bbe1e6742864b3a6d74b51e06b815597bc3e7e1"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_corelight.json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2bbe1e6742864b3a6d74b51e06b815597bc3e7e1"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vault id: 2bbe1e6742864b3a6d74b51e06b815597bc3e7e1, Name: test_corelight.json"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "restore box",
+            "identifier": "restore_corelight",
+            "description": "Restore JSON config to the Corelight box",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "required": true,
+                    "description": "Vault ID of the file to be detonated",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ],
+                    "order": 0
+                },
+                "bundle_password": {
+                    "description": "Bundle password",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.bundle_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2bbe1e6742864b3a6d74b51e06b815597bc3e7e1"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "column_name": "Location",
+                    "column_order": 0,
+                    "example_values": [
+                        "https://10.100.101.193/api/pending/c00b"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check results",
+            "identifier": "check_results",
+            "description": "Check the results for 202",
+            "verbose": "Check the results from restore and intel update.",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "location": {
+                    "required": true,
+                    "description": "The location for the 202",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.100.101.192/api/pending/9302"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "column_name": "Response",
+                    "column_order": 0,
+                    "example_values": [
+                        "The JSON bundle has been uploaded and the changes are in effect now."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
