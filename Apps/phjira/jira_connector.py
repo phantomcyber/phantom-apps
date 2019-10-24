@@ -47,6 +47,7 @@ class JiraConnector(phantom.BaseConnector):
     ACTION_ID_ADD_WATCHER = "add_watcher"
     ACTION_ID_REMOVE_WATCHER = "remove_watcher"
     ACTION_ID_ON_POLL = "on_poll"
+    ACTION_ID_GET_ATTACHMENTS = "get_attachments"
 
     def __init__(self):
 
@@ -794,6 +795,7 @@ class JiraConnector(phantom.BaseConnector):
         issue_id = param[JIRA_JSON_ID]
 
         comment_body['body'] = param[JIRA_JSON_COMMENT]
+        # comment_body['properties'] = [{'key': 'sd.public.comment', 'value': {'internal': "True"}}]
 
         try:
             issue = self._jira.issue(issue_id)
@@ -803,17 +805,10 @@ class JiraConnector(phantom.BaseConnector):
         if (not issue):
             return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists.")
 
-        ret_val, update_fields = self._get_update_fields({"update_fields": json.dumps(update_body)}, issue_id, action_result)
-
-        error_message = action_result.get_message()
-        if not error_message:
-            error_message = ""
-
-        if (not ret_val and JIRA_ERR_FETCH_CUSTOM_FIELDS not in error_message):
-            return phantom.APP_ERROR
-
-        if (not self._add_update_fields(issue, update_fields, action_result)):
-            return phantom.APP_ERROR
+        try:
+            self._jira.add_comment(issue_id, param[JIRA_JSON_COMMENT], is_internal=param['internal'])
+        except Exception as e:
+            return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added the comment")
 
@@ -1410,6 +1405,60 @@ class JiraConnector(phantom.BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to remove the watcher. Please check the provided parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed the user from the watchers list of the issue ID: {0}".format(issue_id))
+
+    def _handle_get_attachments(self,param):
+        self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
+        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+
+        # Create the jira object
+        if (phantom.is_fail(self._create_jira_object())):
+            return self.get_status()
+
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
+        ticket_key = param['id']
+        get_all_attachments = param['retrieve_all']
+        extension_filter = param.get('extension_filter')
+        container_id = param['container_id']
+
+        try:
+            jira_issue = self._jira.issue(ticket_key, expand="attachment")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Please enter a valid Jira Ticket ID. Please check the provided parameters.")
+
+        if len(jira_issue.fields.attachment) > 0:
+            temp_vault_path = Vault.get_vault_tmp_dir().rstrip('/')
+            if get_all_attachments:
+                for attachment in jira_issue.fields.attachment:
+                    jira_filename = "".join(str(attachment.filename).split())
+                    full_path = '{}/{}'.format(temp_vault_path,jira_filename)
+                    with open(full_path, 'wb') as f:
+                        attachment_content = attachment.get()
+                        f.write(attachment_content)
+                        action_result.add_data(Vault.add_attachment(file_location=full_path,container_id=container_id))
+
+            elif extension_filter:
+                extension_list = extension_filter.split(',')
+                extension_list = [".{}".format(extension.lstrip('.')) for extension in extension_list]
+
+                for attachment in jira_issue.fields.attachment:
+                    jira_filename = "".join(str(attachment.filename).split())
+                    full_path = '{}/{}'.format(temp_vault_path, jira_filename)
+                    file_extension = ".{}".format(jira_filename.rsplit('.')[-1])
+
+                    if file_extension in extension_list:
+                        with open(full_path, 'wb') as f:
+                            attachment_content = attachment.get()
+                            f.write(attachment_content)
+                        action_result.add_data(Vault.add_attachment(file_location=full_path, container_id=container_id))
+
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Please select retrieve all or pass in a list of extensions to look for. Please check the provided parameters.")
+
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved attachments from Jira ticket.")
+
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters.")
 
     def _check_to_create_updated_artifact(self, container_id, issue, previous_full_artifact, action_result):
 

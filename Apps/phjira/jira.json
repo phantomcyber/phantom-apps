@@ -1275,6 +1275,61 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get attachments",
+            "description": "Gets specific attachments from a Jira Ticket (issue)",
+            "verbose": "The Function with store specific attachments from a given Jira ticket inside the vault",
+            "type": "generic",
+            "identifier": "get_attachments",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "This is the Jira ticket key for the issue.",
+                    "contains": [
+                        "jira project key"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "retrieve_all": {
+                    "data_type": "boolean",
+                    "order": 1,
+                    "description": "This is set to true if all attachments want to be retrieved from the issue.",
+                    "required": true
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "order": 2,
+                    "description": "This is the Container id.",
+                    "required": true
+                },
+                "extension_filter": {
+                    "data_type": "string",
+                    "order": 3,
+                    "description": "Comma-separated list of file extensions to be returned from the issue.",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "get attachments",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "update ticket",
             "description": "Update ticket (issue)",
             "type": "generic",
@@ -3203,6 +3258,12 @@
                     "description": "Comment to add",
                     "data_type": "string",
                     "order": 1,
+                    "required": true
+                },
+                "internal": {
+                    "description": "Whether comment should be internal only or not",
+                    "data_type": "boolean",
+                    "order": 2,
                     "required": true
                 }
             },
