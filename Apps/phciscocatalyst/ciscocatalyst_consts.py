@@ -1,0 +1,30 @@
+# --
+# File: ciscocatalyst_consts.py
+#
+# Copyright (c) Phantom Cyber Corporation, 2014-2016
+#
+# This unpublished material is proprietary to Phantom Cyber.
+# All rights reserved. The methods and
+# techniques described herein are considered trade secrets
+# and/or confidential. Reproduction or distribution, in whole
+# or in part, is forbidden except by express written permission
+# of Phantom Cyber.
+#
+# --
+
+CISCOCATALYST_JSON_IP_MAC = "ip_macaddress"
+CISCOCATALYST_JSON_VLAN_ID = "vlan_id"
+CISCOCATALYST_JSON_OVERRIDE_TRUNK = "override_trunk"
+CISCOCATALYST_JSON_PING_IP = "ping_ip"
+CISCOCATALYST_JSON_MAC_ADDRESS = "mac_address"
+
+CISCOCATALYST_ERR_IP_MAC_NOT_FOUND = "Unable to get the mac of the ip. Please specify the mac address"
+CISCOCATALYST_ERR_MAC_NOT_FOUND = "MAC address not found on device"
+CISCOCATALYST_MSG_SEARCHING_MAC = "Searching for mac on device"
+CISCOCATALYST_MSG_VLAN_SAME = "VLAN id same as required"
+CISCOCATALYST_ERR_PORT_NOT_FOUND = "Port information for '{port}' could not be found on the device"
+CISCOCATALYST_MSG_PORT_TRUNK = "Vlan of trunk port {port} not modified, re-run action with Set vlan of trunk port"
+CISCOCATALYST_ERR_CMD_EXEC = "Command execution failed"
+CISCOCATALYST_MSG_GETTING_MAC_OF_IP = "Getting mac address of specified ip"
+CISCOCATALYST_MSG_PINGING_IP_TO_REFRESH_MAC = "Pinging {ip} from device to get mac address"
+CISCOCATALYST_MSG_FROM_DEVICE = "Message from device:\n"

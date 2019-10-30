@@ -1,0 +1,212 @@
+{
+    "appid": "5cb9cf0e-064a-4cd7-ba2d-98b426bb21e0",
+    "name": "Cisco Catalyst",
+    "description": "This app supports containment actions like 'set system vlan' in addition to investigative actions like 'get config' and 'get version' on a Cisco Catalyst switch.",
+    "type": "firewall",
+    "publisher": "Phantom",
+    "main_module": "ciscocatalyst_connector.pyc",
+    "app_version": "1.2.14",
+    "utctime_updated": "2018-12-07T02:01:27.000000Z",
+    "package_name": "phantom_ciscocatalyst",
+    "product_vendor": "Cisco Systems",
+    "product_name": "Cisco Catalyst",
+    "product_version_regex": ".*",
+    "min_phantom_version": "1.2.236",
+    "logo": "cisco.png",
+    "license": "Copyright (c) Phantom Cyber Corporation 2015-2016",
+    "configuration": {
+        "device": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Device IP/Hostname",
+            "required": true
+        },
+        "username": {
+            "data_type": "string",
+            "order": 1,
+            "description": "Username",
+            "required": true
+        },
+        "password": {
+            "data_type": "password",
+            "order": 2,
+            "description": "Password",
+            "required": true
+        },
+        "enable_password": {
+            "data_type": "password",
+            "order": 3,
+            "description": "Password used to enter the 'enable' mode",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action runs a few commands on the device to check the connection and credentials.",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get config",
+            "description": "Gets the current running config of the device.",
+            "type": "investigate",
+            "identifier": "get_config",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.command",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get version",
+            "description": "Gets the software version information of the device.",
+            "type": "investigate",
+            "identifier": "get_version",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.command",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "vlan host",
+            "description": "Set the vlan of the port on which the host is connected",
+            "verbose": "This action takes as input either a MAC address or an IP. If an IP is specified, it will try to get the MAC address for that IP. It executes the 'show ip device tracking ip {ip} | include {ip} ' command to get to the MAC address. If this call fails to get any data, that means the device currently does not have any information about the IP. It then proceeds to ping the IP from the device (action parameters permitting). Once the MAC address is known, the port that the MAC address is connected to is queried by running the 'show mac address-table address {mac_addr} | include {mac_addr} ' command. This command gives back a switchport. Once the switchport is known, the vlan of the switchport is modified to the required value. If the switchport happens to be a trunk port, then the vlan is only changed if the action parameters permit it.",
+            "type": "contain",
+            "identifier": "set_vlan",
+            "read_only": false,
+            "parameters": {
+                "ip_macaddress": {
+                    "description": "MAC or IP address of device to query",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "mac address",
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "ping_ip": {
+                    "description": "Ping IP if not found on device",
+                    "data_type": "boolean",
+                    "order": 1,
+                    "default": false,
+                    "required": false
+                },
+                "vlan_id": {
+                    "description": "VLAN Id",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "required": true
+                },
+                "override_trunk": {
+                    "description": "Set VLAN even if port is a trunk port",
+                    "data_type": "boolean",
+                    "order": 3,
+                    "default": false,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.override_trunk",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_macaddress",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ping_ip",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.vlan_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.mac_address",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
