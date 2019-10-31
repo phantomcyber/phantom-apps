@@ -393,20 +393,30 @@
             "action": "add listitem",
             "identifier": "add_url",
             "description": "Add url/category to local database file URL list shared object.",
-            "verbose": "Category is not relevant when adding URL to URL list shared object.",
+            "verbose": "Category is not relevant when adding URL to URL list shared object. IP and URL cannot be provided in the same action call. IP is only usable with IP list shared objects.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "url": {
                     "description": "URL to add to local database file or URL list shared object",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "primary": true,
                     "contains": [
                         "url",
                         "url list"
                     ],
                     "order": 0
+                },
+                "ip": {
+                    "description": "IP to remove from local database file or IP list shared object",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 1
                 },
                 "uuid": {
                     "description": "Policy UUID",
@@ -416,13 +426,13 @@
                         "symantecmc policy uuid"
                     ],
                     "required": true,
-                    "order": 1
+                    "order": 2
                 },
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
                     "required": false,
-                    "order": 2
+                    "order": 3
                 },
                 "category": {
                     "description": "URL category to add",
@@ -432,13 +442,13 @@
                         "symantecmc category name"
                     ],
                     "required": false,
-                    "order": 3
+                    "order": 4
                 },
                 "add_category": {
                     "description": "Add category",
                     "data_type": "boolean",
                     "required": false,
-                    "order": 4
+                    "order": 5
                 }
             },
             "output": [
@@ -464,6 +474,13 @@
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.url",
@@ -516,12 +533,12 @@
             "action": "remove listitem",
             "identifier": "remove_url",
             "description": "Remove url/category from local database file or URL list shared object",
-            "verbose": "Category is not relevant when removing URL from URL list shared object.",
+            "verbose": "Category is not relevant when removing URL from URL list shared object. IP and URL cannot be provided in the same action call. IP is only usable with IP list shared objects.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "url": {
-                    "description": "URL to remove from local database file",
+                    "description": "URL to remove from local database file or URL list shared object",
                     "data_type": "string",
                     "required": false,
                     "primary": true,
@@ -531,6 +548,16 @@
                     ],
                     "order": 0
                 },
+                "ip": {
+                    "description": "IP to remove from local database file or IP list shared object",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 1
+                },
                 "uuid": {
                     "description": "Policy UUID",
                     "data_type": "string",
@@ -539,7 +566,7 @@
                         "symantecmc policy uuid"
                     ],
                     "required": true,
-                    "order": 1
+                    "order": 2
                 },
                 "category": {
                     "description": "URL category to remove",
@@ -549,13 +576,13 @@
                         "symantecmc category name"
                     ],
                     "required": false,
-                    "order": 2
+                    "order": 3
                 },
                 "delete_all": {
                     "description": "Delete all occurences of URL",
                     "data_type": "boolean",
                     "required": false,
-                    "order": 3
+                    "order": 4
                 }
             },
             "output": [
@@ -577,6 +604,13 @@
                 {
                     "data_path": "action_result.parameter.delete_all",
                     "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.url",
