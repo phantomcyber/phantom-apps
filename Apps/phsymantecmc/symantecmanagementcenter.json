@@ -392,12 +392,13 @@
         {
             "action": "add listitem",
             "identifier": "add_url",
-            "description": "Add url/category to local database file",
+            "description": "Add url/category to local database file URL list shared object.",
+            "verbose": "Category is not relevant when adding URL to URL list shared object.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "url": {
-                    "description": "URL to add to local database file",
+                    "description": "URL to add to local database file or URL list shared object",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -407,16 +408,6 @@
                     ],
                     "order": 0
                 },
-                "category": {
-                    "description": "URL category to add",
-                    "data_type": "string",
-                    "primary": true,
-                    "contains": [
-                        "symantecmc category name"
-                    ],
-                    "required": true,
-                    "order": 1
-                },
                 "uuid": {
                     "description": "Policy UUID",
                     "data_type": "string",
@@ -425,11 +416,21 @@
                         "symantecmc policy uuid"
                     ],
                     "required": true,
-                    "order": 2
+                    "order": 1
                 },
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "category": {
+                    "description": "URL category to add",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc category name"
+                    ],
                     "required": false,
                     "order": 3
                 },
@@ -514,7 +515,8 @@
         {
             "action": "remove listitem",
             "identifier": "remove_url",
-            "description": "Remove url/category from local database file",
+            "description": "Remove url/category from local database file or URL list shared object",
+            "verbose": "Category is not relevant when removing URL from URL list shared object.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -529,16 +531,6 @@
                     ],
                     "order": 0
                 },
-                "category": {
-                    "description": "URL category to remove",
-                    "data_type": "string",
-                    "primary": true,
-                    "contains": [
-                        "symantecmc category name"
-                    ],
-                    "required": false,
-                    "order": 1
-                },
                 "uuid": {
                     "description": "Policy UUID",
                     "data_type": "string",
@@ -547,6 +539,16 @@
                         "symantecmc policy uuid"
                     ],
                     "required": true,
+                    "order": 1
+                },
+                "category": {
+                    "description": "URL category to remove",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "symantecmc category name"
+                    ],
+                    "required": false,
                     "order": 2
                 },
                 "delete_all": {

@@ -218,13 +218,15 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         return action_result.set_status(
             phantom.APP_SUCCESS,
-            'Successfully retrieved ' + str(len(response)) + ' policies')
+            'Successfully retrieved ' + str(len(response['policies'])) + ' policies')
 
     def get_policy_info(self, param, with_detail, action_result):
         reference_id = param.get('reference_id')
         name = param.get('name')
         uuid = param.get('uuid')
         content_type = param.get('content_type')
+
+        self.debug_print('testdonkey', str([reference_id, name, uuid, content_type]))
 
         if reference_id:
             reference_id = UnicodeDammit(reference_id).unicode_markup.encode('utf-8')
@@ -254,7 +256,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         if uuid:
             endpoint = '{0}/{1}'.format(endpoint, uuid)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
 
         if (phantom.is_fail(ret_val)):
             raise Exception('Could not retrieve policy information. Details: {0}'.format(str(response) if response else 'No details'))
@@ -330,7 +332,7 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         url = param['url'].lower().replace('http://',
                                            '').replace('https://', '')
-        category = param['category']
+        category = param.get('category')
         add_category = param.get('add_category')
 
         comment = 'Added by Phantom - Container ({0}) Action Name ({1}) Run ID ({2})'.format(
@@ -352,8 +354,8 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         policy_details = policy_details['policies'][0]
 
-        if policy_details['contentType'] != 'LOCAL_CATEGORY_DB':
-            message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB'.format(policy_details['contentType'])
+        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST']:
+            message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB, URL_LIST'.format(policy_details['contentType'])
             return action_result.set_status(phantom.APP_ERROR, message)
 
         message = None
@@ -372,6 +374,56 @@ class SymantecManagementCenterConnector(BaseConnector):
     def _edit_policy_details(self, policy_details, url, category, uuid, edit_type, action_result, add_category=False, comment=None):
         message = None
 
+        post_data = {}
+
+        if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
+            post_data, message = self._edit_local_category_db_content(policy_details, url, category, uuid, edit_type, action_result, add_category, comment)
+        elif policy_details['contentType'] == 'URL_LIST':
+            post_data, message = self._edit_url_list_content(policy_details, url, category, uuid, edit_type, action_result, add_category, comment)
+
+        ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
+
+        if phantom.is_fail(ret_val):
+            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))
+
+        policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
+
+        action_result.add_data([policy_details])
+
+        return policy_details, message
+
+    def _edit_url_list_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
+        message = None
+        
+        if edit_type == 'remove':
+            policy_details['policy_details']['content']['urls'] = [
+                urlobj for urlobj
+                in policy_details['policy_details']['content']['urls']
+                if urlobj['url'].lower() != url.lower()
+            ]
+            message = 'URL removed from policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+        else:
+            policy_details['policy_details']['content']['urls'].append(
+                {
+                    "description": comment,
+                    "url": url,
+                    "enabled": True
+                }
+            )
+            message = 'URL added to policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+
+        post_data = {
+            'content': policy_details['policy_details']['content'],
+            'contentType': policy_details['contentType'],
+            'schemaVersion': policy_details['policy_details']['schemaVersion'],
+            'changeDescription': 'Updated by Phantom - Details: {0}'.format(comment)
+        }
+
+        return post_data, message
+
+    def _edit_local_category_db_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
+        message = None
+        
         if edit_type == 'remove' and not (url):
             cat_num = len(
                 policy_details['policy_details']['content']['categories'])
@@ -432,16 +484,7 @@ class SymantecManagementCenterConnector(BaseConnector):
             'changeDescription': 'Updated by Phantom - Details: {0}'.format(comment)
         }
 
-        ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
-
-        if phantom.is_fail(ret_val):
-            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))
-
-        policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
-
-        action_result.add_data([policy_details])
-
-        return policy_details, message
+        return post_data, message
 
     def _handle_remove_url(self, param):
 
@@ -454,14 +497,8 @@ class SymantecManagementCenterConnector(BaseConnector):
         category = param.get('category')
         uuid = param.get('uuid')
 
-        if not (url or category):
-            return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a url and/or category be supplied')
-
-        if url and not (category or param.get('delete_all')):
-            return action_result.set_status(phantom.APP_ERROR, 'If no category is provided, delete_all must be checked')
-
-        if category and not (url or param.get('delete_all')):
-            return action_result.set_status(phantom.APP_ERROR, 'If no url is provided, delete_all must be checked to delete entire category')
+        url = param['url'].lower().replace('http://',
+                                           '').replace('https://', '')
 
         try:
             policy_details = self.get_policy_info(param, True, action_result)
@@ -470,9 +507,19 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         policy_details = policy_details['policies'][0]
 
-        if policy_details['contentType'] != 'LOCAL_CATEGORY_DB':
+        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST']:
             message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB'.format(policy_details['contentType'])
             return action_result.set_status(phantom.APP_ERROR, message)
+
+        if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
+            if not (url or category):
+                return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a url and/or category be supplied')
+
+            if url and not (category or param.get('delete_all')):
+                return action_result.set_status(phantom.APP_ERROR, 'If no category is provided, delete_all must be checked')
+
+            if category and not (url or param.get('delete_all')):
+                return action_result.set_status(phantom.APP_ERROR, 'If no url is provided, delete_all must be checked to delete entire category')
 
         try:
             policy_details, message = self._edit_policy_details(policy_details, url, category, uuid, 'remove', action_result, add_category=False)
