@@ -3,7 +3,7 @@
     "name": "Cisco Catalyst",
     "description": "This app supports containment actions like 'set system vlan' in addition to investigative actions like 'get config' and 'get version' on a Cisco Catalyst switch.",
     "type": "firewall",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "main_module": "ciscocatalyst_connector.pyc",
     "app_version": "1.2.14",
     "utctime_updated": "2018-12-07T02:01:27.000000Z",
@@ -11,9 +11,9 @@
     "product_vendor": "Cisco Systems",
     "product_name": "Cisco Catalyst",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.2.236",
+    "min_phantom_version": "4.5.15922",
     "logo": "cisco.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2015-2016",
+    "license": "Copyright (c) 2014-2019 Splunk Inc.",
     "configuration": {
         "device": {
             "data_type": "string",
