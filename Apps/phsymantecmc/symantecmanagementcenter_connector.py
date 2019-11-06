@@ -218,13 +218,15 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         return action_result.set_status(
             phantom.APP_SUCCESS,
-            'Successfully retrieved ' + str(len(response)) + ' policies')
+            'Successfully retrieved ' + str(len(response['policies'])) + ' policies')
 
     def get_policy_info(self, param, with_detail, action_result):
         reference_id = param.get('reference_id')
         name = param.get('name')
         uuid = param.get('uuid')
         content_type = param.get('content_type')
+
+        self.debug_print('testdonkey', str([reference_id, name, uuid, content_type]))
 
         if reference_id:
             reference_id = UnicodeDammit(reference_id).unicode_markup.encode('utf-8')
@@ -254,7 +256,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         if uuid:
             endpoint = '{0}/{1}'.format(endpoint, uuid)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
 
         if (phantom.is_fail(ret_val)):
             raise Exception('Could not retrieve policy information. Details: {0}'.format(str(response) if response else 'No details'))
@@ -317,7 +319,7 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
-    def _handle_add_url(self, param):
+    def _handle_add_content(self, param):
 
         self.save_progress("In action handler for: {0}".format(
             self.get_action_identifier()))
@@ -328,9 +330,19 @@ class SymantecManagementCenterConnector(BaseConnector):
         action_name = self.get_action_name()
         run_id = self.get_app_run_id()
 
-        url = param['url'].lower().replace('http://',
-                                           '').replace('https://', '')
-        category = param['category']
+        url = param.get('url')
+        ip = param.get('ip')
+
+        content = url or ip
+        content = content.lower().replace('http://',
+                                           '').replace('https://', '')  
+
+        if not(content):
+            return action_result.set_status(
+                phantom.APP_ERROR, 'An IP or URL must be provided.'
+            )
+
+        category = param.get('category')
         add_category = param.get('add_category')
 
         comment = 'Added by Phantom - Container ({0}) Action Name ({1}) Run ID ({2})'.format(
@@ -343,7 +355,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         except Exception as err:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                ('Unable to retrieve policy info: ' + err.message))
+                ('Unable to retrieve policy info: ' + str(err)))
 
         if len(policy_details) < 1:
             return action_result.set_status(
@@ -352,14 +364,21 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         policy_details = policy_details['policies'][0]
 
-        if policy_details['contentType'] != 'LOCAL_CATEGORY_DB':
-            message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB'.format(policy_details['contentType'])
+        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+            message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB, URL_LIST'.format(policy_details['contentType'])
             return action_result.set_status(phantom.APP_ERROR, message)
+
+        if policy_details['contentType'] == 'IP_LIST':
+            if ip is None:
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no IP was provided.')
+        else: 
+            if url is None:
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit requires a URL, but none was provided.')
 
         message = None
 
         try:
-            policy_details, message = self._edit_policy_details(policy_details, url, category, uuid, 'add', action_result, add_category=add_category, comment=comment)
+            policy_details, message = self._edit_policy_details(policy_details, content, category, uuid, 'add', action_result, add_category=add_category, comment=comment)
         except Exception as err:
             return action_result.set_status(phantom.APP_ERROR, ('Unable to edit policy. Error: {0}'.format(err.message)))
 
@@ -369,9 +388,103 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _edit_policy_details(self, policy_details, url, category, uuid, edit_type, action_result, add_category=False, comment=None):
+    def _edit_policy_details(self, policy_details, content, category, uuid, edit_type, action_result, add_category=False, comment=None):
         message = None
 
+        post_data = {}
+
+        if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
+            post_data, message = self._edit_local_category_db_content(policy_details, content, category, uuid, edit_type, action_result, add_category, comment)
+        elif policy_details['contentType'] == 'IP_LIST':
+            post_data, message = self._edit_ip_list_content(policy_details, content, category, uuid, edit_type, action_result, add_category, comment)
+        elif policy_details['contentType'] == 'URL_LIST':
+            post_data, message = self._edit_url_list_content(policy_details, content, category, uuid, edit_type, action_result, add_category, comment)
+
+        ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
+
+        if phantom.is_fail(ret_val):
+            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))
+
+        policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
+
+        action_result.add_data([policy_details])
+
+        return policy_details, message
+    
+    def _edit_ip_list_content(self, policy_details, ip, category, uuid, edit_type, action_result, add_category, comment):
+        message = None
+
+        if edit_type == 'remove':
+            policy_details['policy_details']['content']['ipAddresses'] = [
+                ipobj for ipobj
+                in policy_details['policy_details']['content']['ipAddresses']
+                if ipobj['ipAddress'] != ip
+            ]
+            message = 'IP removed from policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+        else:
+            if len([ipobj for ipobj
+                in policy_details['policy_details']['content']['ipAddresses']
+                if ipobj['ipAddress'] == ip
+            ]) == 0:
+                policy_details['policy_details']['content']['ipAddresses'].append(
+                    {
+                        "description": comment,
+                        "ipAddress": ip,
+                        "enabled": True
+                    }
+                )
+                message = 'IP added to policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+            else:
+                message = 'IP already exists in policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+
+        post_data = {
+            'content': policy_details['policy_details']['content'],
+            'contentType': policy_details['contentType'],
+            'schemaVersion': policy_details['policy_details']['schemaVersion'],
+            'changeDescription': 'Updated by Phantom - Details: {0}'.format(comment)
+        }
+
+        return post_data, message
+
+
+    def _edit_url_list_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
+        message = None
+        
+        if edit_type == 'remove':
+            policy_details['policy_details']['content']['urls'] = [
+                urlobj for urlobj
+                in policy_details['policy_details']['content']['urls']
+                if urlobj['url'].lower() != url.lower()
+            ]
+            message = 'URL removed from policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+        else:
+            if len([urlobj for urlobj
+                in policy_details['policy_details']['content']['urls']
+                if urlobj['url'].lower() == url.lower()
+            ]) == 0:
+                policy_details['policy_details']['content']['urls'].append(
+                    {
+                        "description": comment,
+                        "url": url,
+                        "enabled": True
+                    }
+                )
+                message = 'URL added to policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+            else:
+                message = 'URL already exists in policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
+
+        post_data = {
+            'content': policy_details['policy_details']['content'],
+            'contentType': policy_details['contentType'],
+            'schemaVersion': policy_details['policy_details']['schemaVersion'],
+            'changeDescription': 'Updated by Phantom - Details: {0}'.format(comment)
+        }
+
+        return post_data, message
+
+    def _edit_local_category_db_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
+        message = None
+        
         if edit_type == 'remove' and not (url):
             cat_num = len(
                 policy_details['policy_details']['content']['categories'])
@@ -432,18 +545,9 @@ class SymantecManagementCenterConnector(BaseConnector):
             'changeDescription': 'Updated by Phantom - Details: {0}'.format(comment)
         }
 
-        ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
+        return post_data, message
 
-        if phantom.is_fail(ret_val):
-            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))
-
-        policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
-
-        action_result.add_data([policy_details])
-
-        return policy_details, message
-
-    def _handle_remove_url(self, param):
+    def _handle_remove_content(self, param):
 
         self.save_progress("In action handler for: {0}".format(
             self.get_action_identifier()))
@@ -451,17 +555,13 @@ class SymantecManagementCenterConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url = param.get('url')
+        ip = param.get('ip')
         category = param.get('category')
         uuid = param.get('uuid')
 
-        if not (url or category):
-            return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a url and/or category be supplied')
-
-        if url and not (category or param.get('delete_all')):
-            return action_result.set_status(phantom.APP_ERROR, 'If no category is provided, delete_all must be checked')
-
-        if category and not (url or param.get('delete_all')):
-            return action_result.set_status(phantom.APP_ERROR, 'If no url is provided, delete_all must be checked to delete entire category')
+        content = url or ip
+        content = content.lower().replace('http://',
+                                           '').replace('https://', '')                     
 
         try:
             policy_details = self.get_policy_info(param, True, action_result)
@@ -470,12 +570,28 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         policy_details = policy_details['policies'][0]
 
-        if policy_details['contentType'] != 'LOCAL_CATEGORY_DB':
-            message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB'.format(policy_details['contentType'])
+        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+            message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB, URL_LIST, or IP_LIST'.format(policy_details['contentType'])
             return action_result.set_status(phantom.APP_ERROR, message)
 
+        if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
+            if not (url or category):
+                return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a url and/or category be supplied')
+
+            if url and not (category or param.get('delete_all')):
+                return action_result.set_status(phantom.APP_ERROR, 'If no category is provided, delete_all must be checked')
+
+            if category and not (url or param.get('delete_all')):
+                return action_result.set_status(phantom.APP_ERROR, 'If no url is provided, delete_all must be checked to delete entire category')
+        elif policy_details['contentType'] == 'IP_LIST':
+            if ip is None:
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no IP was provided.')
+        else:
+            if url is None:
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a URL_LISTS Shared Object, but no URL was provided.')
+
         try:
-            policy_details, message = self._edit_policy_details(policy_details, url, category, uuid, 'remove', action_result, add_category=False)
+            policy_details, message = self._edit_policy_details(policy_details, content, category, uuid, 'remove', action_result, add_category=False)
         except Exception as err:
             return action_result.set_status(phantom.APP_ERROR, 'Unable to edit policy: {0}'.format(err.message or ''))
 
@@ -520,11 +636,13 @@ class SymantecManagementCenterConnector(BaseConnector):
         elif action_id == 'get_policy':
             ret_val = self._handle_list_policies(param, with_detail=True)
 
+        # this also handles aremoving IPs, legacy naming though
         elif action_id == 'remove_url':
-            ret_val = self._handle_remove_url(param)
+            ret_val = self._handle_remove_content(param)
 
+        # this also handles adding IPs, legacy naming though
         elif action_id == 'add_url':
-            ret_val = self._handle_add_url(param)
+            ret_val = self._handle_add_content(param)
 
         return ret_val
 
