@@ -194,6 +194,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._client_id = None
         self._access_token = None
         self._refresh_token = None
+        self._client_secret = None
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -258,6 +259,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         message = None
+        error_code = None
         # Check whether the response contains error and error description fields
         # This condition will be used in test_connectivity
         if resp_json.get('error') and resp_json.get('error_description'):
@@ -265,12 +267,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
                       "\"error_description\": {2}".format(response.status_code, resp_json['error'],
                                                           resp_json['error_description'])
 
+            error_code = resp_json.get('error_codes')
+
         # For other actions
-        if resp_json.get('error', {}).get('message'):
+        elif resp_json.get('error', {}).get('message'):
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
                                                                                          resp_json['error']['message'])
-        if resp_json.get('error', {}).get('code'):
-            if resp_json['error']['code'] == 'NotFound':
+            # Need to verify this
+            error_code = resp_json.get('error', {}).get('code')
+
+        if error_code:
+            if error_code == 'NotFound':
                 device_actions = ['quarantine_device', 'unquarantine_device', 'scan_device']
                 file_actions = ['quarantine_file']
                 event_actions = ['get_status']
@@ -600,7 +607,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'grant_type': 'authorization_code',
             'redirect_uri': redirect_uri,
             'code': current_code,
-            'resource': DEFENDERATP_RESOURCE_URL
+            'resource': DEFENDERATP_RESOURCE_URL,
+            'client_secret': self._client_secret
         }
         # for first time access, new access token is generated
         ret_val = self._generate_new_access_token(action_result=action_result, data=data)
@@ -618,7 +626,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
         }
         ret_val, response = self._update_request(action_result=action_result, endpoint=url, params=params)
         if phantom.is_fail(ret_val):
-            self.send_progress('')
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
@@ -1199,6 +1206,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._client_id = config[DEFENDERATP_CONFIG_CLIENT_ID].encode('utf-8')
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
+        self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET].encode('utf-8')
 
         return phantom.APP_SUCCESS
 
