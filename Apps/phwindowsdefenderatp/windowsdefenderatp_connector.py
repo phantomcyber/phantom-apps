@@ -208,7 +208,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Response Code: {0}. Empty response and no information in the header".format(response.status_code)),
                       None)
 
     @staticmethod
@@ -358,7 +358,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         token_data = {
             'client_id': self._client_id,
             'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
-            'refresh_token': self._refresh_token
+            'refresh_token': self._refresh_token,
+            'client_secret': self._client_secret
         }
 
         if not self._access_token:
@@ -509,6 +510,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._access_token = resp_json[DEFENDERATP_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
 
     def _wait(self, action_result):
@@ -599,6 +601,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         current_code = self._state['code']
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
 
         self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
 
@@ -618,8 +621,37 @@ class WindowsDefenderAtpConnector(BaseConnector):
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
-        self.save_progress(DEFENDERATP_ALERTS_INFO_MSG)
+        # self.save_progress(DEFENDERATP_ALERTS_INFO_MSG)
+        self.save_progress(DEFENDERATP_DEVICES_INFO_MSG)
 
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINES_ENDPOINT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+
+        while True:
+
+            # make rest call
+            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+
+            if phantom.is_fail(ret_val):
+                if DEFENDERATP_NO_DATA_FOUND_MSG in action_result.get_message() and action_result.get_data_size():
+                    break
+                return action_result.get_status()
+
+            if response:
+                for machine in response.get('value', []):
+                    action_result.add_data(machine)
+            else:
+                break
+
+            # If no link for next page present then break
+            if response and not response.get(DEFENDERATP_NEXT_LINK_STRING):
+                break
+
+            url = response[DEFENDERATP_NEXT_LINK_STRING]
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No device found")
+
+        '''
         url = '{}{}'.format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_ALERTS_ENDPOINT)
         params = {
             '$top': 1
@@ -630,6 +662,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         self.save_progress(DEFENDERATP_RECEIVED_ALERT_INFO_MSG)
+        '''
+
         self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_PASSED_MSG)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1221,6 +1255,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
 
 
