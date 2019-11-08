@@ -1735,7 +1735,6 @@ class JiraConnector(phantom.BaseConnector):
 
         # If it's the first poll, don't filter based on update time
         elif (state.get('first_run', True)):
-            state['first_run'] = False
             max_tickets = int(config.get('first_run_max_tickets', -1))
 
         # If it's scheduled polling add a filter for update time being greater than the last poll time
@@ -1763,6 +1762,11 @@ class JiraConnector(phantom.BaseConnector):
             last_time_jira_server_tz_specific = parse(last_fetched_issue.fields.updated)
             last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(dateutil.tz.tzlocal())
             state['last_time'] = time.mktime(last_time_phantom_server_tz_specific.timetuple())
+
+        # Mark the first_run as False once the scheduled or ingestion polling
+        # first run or every run has been successfully completed
+        if not self.is_poll_now():
+            state['first_run'] = False
 
         # Check for save_state API, use it if it is present
         if (hasattr(self, 'save_state')):
