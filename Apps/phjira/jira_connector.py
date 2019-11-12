@@ -11,17 +11,20 @@ from phantom.vault import Vault
 
 # THIS Connector imports
 from jira_consts import *
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 
 from jira.client import JIRA
 from datetime import *
+from dateutil.parser import parse
 
+import dateutil
 import requests
 import tempfile
 import signal
 import json
 import time
 import os
+import pytz
 
 
 def timeout_handler(signum, frame):
@@ -54,6 +57,7 @@ class JiraConnector(phantom.BaseConnector):
         super(JiraConnector, self).__init__()
 
         self._jira = None
+        self._timezone = None
 
     def initialize(self):
 
@@ -62,6 +66,7 @@ class JiraConnector(phantom.BaseConnector):
         # Base URL
         self._base_url = config[JIRA_JSON_DEVICE_URL].encode('utf-8')
         self._host = self._base_url[self._base_url.find('//') + 2:]
+        self._timezone = config.get(JIRA_JSON_TIMEZONE, JIRA_JSON_DEFAULT_TIMEZONE)
 
         return phantom.APP_SUCCESS
 
@@ -1203,7 +1208,7 @@ class JiraConnector(phantom.BaseConnector):
         if (phantom.is_fail(ret_val)):
             return phantom.APP_ERROR
 
-        vault_ret = Vault.add_attachment(tmp.name, container_id, attachment.filename)
+        vault_ret = Vault.add_attachment(tmp.name, container_id, UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
 
         if not vault_ret.get('succeeded'):
             self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
@@ -1211,7 +1216,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_json = {}
 
-        artifact_json['name'] = 'attachment - {0}'.format(attachment.filename)
+        artifact_json['name'] = 'attachment - {0}'.format(UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
         artifact_json['label'] = 'attachment'
         artifact_json['container_id'] = container_id
         artifact_json['source_data_identifier'] = attachment.id
@@ -1220,7 +1225,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_cef['size'] = attachment.size
         artifact_cef['created'] = attachment.created
-        artifact_cef['filename'] = attachment.filename
+        artifact_cef['filename'] = UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8')
         artifact_cef['mimeType'] = attachment.mimeType
         artifact_cef['author'] = attachment.author.name
         artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
@@ -1568,6 +1573,8 @@ class JiraConnector(phantom.BaseConnector):
         previous_full_artifact = self._get_artifact_id(issue.key, container_id, issue_type=issue_type, full_artifact=True)
 
         if not previous_full_artifact:
+            self.save_progress(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
+            self.debug_print(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
             return phantom.APP_ERROR
 
         to_create_updated_artifact = self._check_to_create_updated_artifact(container_id, issue, previous_full_artifact, action_result)
@@ -1699,6 +1706,15 @@ class JiraConnector(phantom.BaseConnector):
                 if last_time < 0:
                     last_time = 0
 
+                # Updating the timestamp based on the timezone mentioned
+                # in the asset configuration parameters
+                ts_dt = datetime.fromtimestamp(last_time)
+                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
+
+                timez = pytz.timezone(self._timezone)
+                ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
+                last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
+
             except:
                 return action_result.set_status(phantom.APP_ERROR,
                                                 "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
@@ -1721,13 +1737,12 @@ class JiraConnector(phantom.BaseConnector):
 
         # If it's the first poll, don't filter based on update time
         elif (state.get('first_run', True)):
-            state['first_run'] = False
             max_tickets = int(config.get('first_run_max_tickets', -1))
 
         # If it's scheduled polling add a filter for update time being greater than the last poll time
         else:
             max_tickets = int(config.get('max_tickets', -1))
-            query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', datetime.fromtimestamp(last_time).strftime(JIRA_TIME_FORMAT))
+            query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', last_time_str)
 
         # Order by update time
         query = "{0} order by updated asc".format(query if query else '')
@@ -1746,8 +1761,14 @@ class JiraConnector(phantom.BaseConnector):
 
         if not self.is_poll_now() and issues:
             last_fetched_issue = self._jira.issue(issues[-1].key)
-            last_fetched_issue_updated_timestamp = time.mktime(datetime.strptime(last_fetched_issue.fields.updated[:-5], "%Y-%m-%dT%H:%M:%S.%f").timetuple())
-            state['last_time'] = last_fetched_issue_updated_timestamp
+            last_time_jira_server_tz_specific = parse(last_fetched_issue.fields.updated)
+            last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(dateutil.tz.tzlocal())
+            state['last_time'] = time.mktime(last_time_phantom_server_tz_specific.timetuple())
+
+        # Mark the first_run as False once the scheduled or ingestion polling
+        # first run or every run has been successfully completed
+        if not self.is_poll_now():
+            state['first_run'] = False
 
         # Check for save_state API, use it if it is present
         if (hasattr(self, 'save_state')):

@@ -72,6 +72,13 @@
             "order": 8,
             "description": "Comma-separated string of custom fields (case-sensitive) to be ingested",
             "required": false
+        },
+        "timezone": {
+            "data_type": "timezone",
+            "order": 9,
+            "description": "Jira instance timezone (used for timezone conversions for querying in ingestion). Refer README file for more details",
+            "default": "GMT",
+            "required": true
         }
     },
     "actions": [
