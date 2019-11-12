@@ -11,7 +11,7 @@ from phantom.vault import Vault
 
 # THIS Connector imports
 from jira_consts import *
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 
 from jira.client import JIRA
 from datetime import *
@@ -1208,7 +1208,7 @@ class JiraConnector(phantom.BaseConnector):
         if (phantom.is_fail(ret_val)):
             return phantom.APP_ERROR
 
-        vault_ret = Vault.add_attachment(tmp.name, container_id, attachment.filename)
+        vault_ret = Vault.add_attachment(tmp.name, container_id, UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
 
         if not vault_ret.get('succeeded'):
             self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
@@ -1216,7 +1216,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_json = {}
 
-        artifact_json['name'] = 'attachment - {0}'.format(attachment.filename)
+        artifact_json['name'] = 'attachment - {0}'.format(UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
         artifact_json['label'] = 'attachment'
         artifact_json['container_id'] = container_id
         artifact_json['source_data_identifier'] = attachment.id
@@ -1225,7 +1225,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_cef['size'] = attachment.size
         artifact_cef['created'] = attachment.created
-        artifact_cef['filename'] = attachment.filename
+        artifact_cef['filename'] = UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8')
         artifact_cef['mimeType'] = attachment.mimeType
         artifact_cef['author'] = attachment.author.name
         artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
@@ -1573,6 +1573,8 @@ class JiraConnector(phantom.BaseConnector):
         previous_full_artifact = self._get_artifact_id(issue.key, container_id, issue_type=issue_type, full_artifact=True)
 
         if not previous_full_artifact:
+            self.save_progress(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
+            self.debug_print(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
             return phantom.APP_ERROR
 
         to_create_updated_artifact = self._check_to_create_updated_artifact(container_id, issue, previous_full_artifact, action_result)
