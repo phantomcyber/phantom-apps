@@ -40,7 +40,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         self._state = None
 
         # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
+        # Do note that the app json defines the asset config, so, please
         # modify this as you deem fit.
         self._base_url = None
         self._api_key = None
