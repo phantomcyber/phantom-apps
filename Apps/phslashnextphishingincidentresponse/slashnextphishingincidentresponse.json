@@ -1,11 +1,11 @@
 {
     "appid": "28f0ee41-a058-4665-be79-fad1913312bf",
     "name": "SlashNext Phishing Incident Response",
-    "description": "SlashNext Phishing Incident Response Integration supports investigate type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER\u2122 threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services.",
+    "description": "SlashNext Phishing Incident Response Integration supports investigative type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER\u2122 threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services.",
     "type": "reputation",
     "product_vendor": "SlashNext",
-    "logo": "slashnextphishingincidentresponse.svg",
-    "logo_dark": "slashnextphishingincidentresponse_dark.svg",
+    "logo": "logo_slashnextphishingincidentresponse.svg",
+    "logo_dark": "logo_slashnextphishingincidentresponse_dark.svg",
     "product_name": "SlashNextPhishingIR",
     "product_version_regex": ".*",
     "publisher": "SlashNext",
@@ -17,14 +17,14 @@
     "min_phantom_version": "4.5.15922",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "Your API Key": {
-            "description": "The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com",
+        "api_key": {
+            "description": "Your API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com)",
             "data_type": "password",
             "required": true,
             "order": 0
         },
-        "SlashNext API Base URL": {
-            "description": "Optional configuration. Input only if specifically provided by SlashNext",
+        "api_base_url": {
+            "description": "SlashNext API Base URL (Input only if specifically provided by SlashNext)",
             "data_type": "string",
             "required": false,
             "default": "https://oti.slashnext.cloud/api",
@@ -64,6 +64,10 @@
                 },
                 {
                     "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 }
             ],
@@ -2185,8 +2189,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.textData.textBase64",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.textData.textName",

@@ -357,20 +357,20 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Test Connectivity Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
+            self.save_progress('Test Connectivity Failed')
+            msg = 'Error Reason: Error connecting to SlashNext Cloud'
             return action_result.set_status(phantom.APP_ERROR, msg)
 
         # Return success
         elif response['errorNo'] == 0:
             msg = 'Test Connectivity Successful'
             self.save_progress(msg)
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            return action_result.set_status(phantom.APP_SUCCESS)
 
         # If there is an error then return the exact error message
         else:
-            msg = 'Test Connectivity Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
+            self.save_progress('Test Connectivity Failed')
+            msg = 'Error Reason: {0}'.format(response['errorMsg'])
             return action_result.set_status(phantom.APP_ERROR, msg)
 
     def _handle_api_quota(self, param):
@@ -1160,10 +1160,10 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Access values in asset config by the name
         # Required values can be accessed directly
-        self._api_key = config['Your API Key']
+        self._api_key = config['api_key']
 
         # Optional values should use the .get() function
-        self._base_url = config.get('SlashNext API Base URL', BASE_API)
+        self._base_url = config.get('api_base_url', BASE_API)
 
         return phantom.APP_SUCCESS
 
