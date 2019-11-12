@@ -35,7 +35,7 @@ class DossierConnector(BaseConnector):
 
     def _make_rest_call(self, endpoint):
 
-        base_url = "https://api.activetrust.net:8000/api/"
+        base_url = "https://api.activetrust.net:8000/api/services/intel/lookup"
 
         config = self.get_config()
         api_key = config["api_key"].encode('utf-8')
@@ -59,7 +59,7 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("Connecting to endpoint")
         # make rest call
-        _, status_code = self._make_rest_call("services/intel/lookup/targets")
+        _, status_code = self._make_rest_call("/targets")
 
         if status_code == 200:
             self.save_progress("Successfully connected and authenticated")
@@ -81,7 +81,7 @@ class DossierConnector(BaseConnector):
         domain = param['domain']
 
         # format our url
-        url = "services/intel/lookup/indicator/host?value={}&source=atp&wait=true".format(domain)
+        url = "/indicator/host?value={}&source=atp&wait=true".format(domain)
 
         # make rest call
         response, status_code = self._make_rest_call(url)
@@ -127,7 +127,7 @@ class DossierConnector(BaseConnector):
         hash = param['hash']
 
         # format our url
-        url = "services/intel/lookup/indicator/hash?value={}&source=malware_analysis&wait=true".format(hash)
+        url = "/indicator/hash?value={}&source=malware_analysis&wait=true".format(hash)
         # make rest call
         response, status_code = self._make_rest_call(url)
 
@@ -163,7 +163,7 @@ class DossierConnector(BaseConnector):
         submitted_url = param['url']
 
         # format our url
-        url = "services/intel/lookup/indicator/url?value={}&source=atp&wait=true".format(submitted_url)
+        url = "/indicator/url?value={}&source=atp&wait=true".format(submitted_url)
 
         # make rest call
         response, status_code = self._make_rest_call(url)
@@ -196,11 +196,10 @@ class DossierConnector(BaseConnector):
         ip = param['ip']
 
         # format our url
-        url = "services/intel/lookup/indicator/ip?value={}&source=atp&wait=true".format(ip)
+        url = "/indicator/ip?value={}&source=atp&wait=true".format(ip)
 
         # make rest call
         response, status_code = self._make_rest_call(url)
-        print(response["results"])
         if status_code == 200:
             # Add the response into the data section
             action_result.add_data(response.get("results"))

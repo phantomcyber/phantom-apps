@@ -9,7 +9,7 @@
     "product_name": "Dossier",
     "product_version_regex": ".*",
     "publisher": "Nick Roy",
-    "license": "Copyright (c) Nick Roy, 2019",
+    "license": "Copyright (c) Splunk, 2019",
     "app_version": "1.0.1",
     "utctime_updated": "2019-09-24T13:19:33.963396Z",
     "package_name": "phantom_dossier",
@@ -67,8 +67,7 @@
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "example_values": [
-                        "twooo.cn",
-                        "sync.bfmio.com."
+                        "test.com"
                     ],
                     "contains": [
                         "domain",
@@ -293,7 +292,7 @@
                     "data_path": "action_result.data.*.*.data.threat.*.host",
                     "data_type": "string",
                     "example_values": [
-                        "sync.bfmio.com"
+                        "test.com"
                     ]
                 },
                 {
@@ -398,7 +397,7 @@
                     "column_name": "Domain",
                     "column_order": 0,
                     "example_values": [
-                        "sync.bfmio.com"
+                        "test.com"
                     ]
                 },
                 {
@@ -480,7 +479,7 @@
         {
             "action": "lookup ip",
             "identifier": "lookup_ip",
-            "description": "Check for the presence of an ip in a threat intelligence feed",
+            "description": "Check for the presence of an IP in a threat intelligence feed",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -508,7 +507,7 @@
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "example_values": [
-                        "185.222.202.62"
+                        "1.1.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -636,7 +635,7 @@
                     "data_path": "action_result.data.*.*.data.threat.*.ip",
                     "data_type": "string",
                     "example_values": [
-                        "185.222.202.62"
+                        "1.1.1.1"
                     ],
                     "contains": [
                         "ip"
@@ -719,7 +718,7 @@
                     "column_name": "IP",
                     "column_order": 0,
                     "example_values": [
-                        "185.222.202.62"
+                        "1.1.1.1"
                     ],
                     "contains": [
                         "ip"
