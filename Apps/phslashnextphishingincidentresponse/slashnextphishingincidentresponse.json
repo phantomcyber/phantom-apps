@@ -1,11 +1,11 @@
 {
     "appid": "28f0ee41-a058-4665-be79-fad1913312bf",
     "name": "SlashNext Phishing Incident Response",
-    "description": "SlashNext Phishing Incident Response Integration supports investigate type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER\u2122 threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services.",
+    "description": "SlashNext Phishing Incident Response Integration supports the investigative type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER\u2122 threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services",
     "type": "reputation",
     "product_vendor": "SlashNext",
-    "logo": "slashnextphishingincidentresponse.svg",
-    "logo_dark": "slashnextphishingincidentresponse_dark.svg",
+    "logo": "logo_slashnextphishingincidentresponse.svg",
+    "logo_dark": "logo_slashnextphishingincidentresponse_dark.svg",
     "product_name": "SlashNextPhishingIR",
     "product_version_regex": ".*",
     "publisher": "SlashNext",
@@ -17,14 +17,14 @@
     "min_phantom_version": "4.5.15922",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "Your API Key": {
-            "description": "The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com",
+        "api_key": {
+            "description": "Your API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com)",
             "data_type": "password",
             "required": true,
             "order": 0
         },
-        "SlashNext API Base URL": {
-            "description": "Optional configuration. Input only if specifically provided by SlashNext",
+        "api_base_url": {
+            "description": "SlashNext API Base URL (Input only if specifically provided by SlashNext)",
             "data_type": "string",
             "required": false,
             "default": "https://oti.slashnext.cloud/api",
@@ -45,7 +45,7 @@
         {
             "action": "snx api quota",
             "identifier": "api_quota",
-            "description": "Find information about your API quota, like current usage, quota left etc.",
+            "description": "Find information about your API quota, like current usage, quota left, etc.",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -65,6 +65,10 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -80,7 +84,7 @@
         {
             "action": "snx host reputation",
             "identifier": "host_reputation",
-            "description": "Search in SlashNext Cloud database and retrieve reputation of a host",
+            "description": "Search in SlashNext Cloud database and retrieve the reputation of a host",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -222,7 +226,7 @@
         {
             "action": "snx host urls",
             "identifier": "host_urls",
-            "description": "Search in SlashNext Cloud database and retrieve list of all URLs associated with the specified host",
+            "description": "Search in SlashNext Cloud database and retrieve a list of all URLs associated with the specified host",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -949,7 +953,7 @@
             "action": "snx url scan",
             "identifier": "url_scan",
             "description": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine",
-            "verbose": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine. If the specified URL already exists in the cloud database, scan results will get returned immediately. If not, this action will submit a URL scan request and return with \u2018check back later\u2019 message along with a unique Scan ID. User can check results of this scan with \u2018scan report\u2019 action after 30 seconds or later using the returned Scan ID.",
+            "verbose": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine. If the specified URL already exists in the cloud database, scan results will get returned immediately. If not, this action will submit a URL scan request and return with a \u2018check back later\u2019 message along with a unique Scan ID. Users can check the results of this scan with \u2018scan report\u2019 action after 30 seconds or later using the returned Scan ID.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1267,7 +1271,7 @@
             "action": "snx url scansync",
             "identifier": "url_scan_sync",
             "description": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode",
-            "verbose": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode. If the specified URL already exists in the cloud database, scan result will get returned immediately. If not, this action will submit a URL scan request and wait for the scan to finish. The scan may take up to 30 seconds to finish.",
+            "verbose": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode. If the specified URL already exists in the cloud database, the scan result will get returned immediately. If not, this action will submit a URL scan request and wait for the scan to finish. The scan may take up to 30 seconds to finish.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1288,7 +1292,7 @@
                     "order": 1
                 },
                 "timeout": {
-                    "description": "A timeout value in seconds. If the system is unable to complete a scan within the specified timeout, a timeout error will be returned. User may try again with a different timeout. If no timeout value is specified, a default value of 60 seconds will be used",
+                    "description": "A timeout value in seconds. If the system is unable to complete a scan within the specified timeout, a timeout error will be returned. Users may try again with a different timeout. If no timeout value is specified, a default value of 60 seconds will be used",
                     "data_type": "numeric",
                     "required": false,
                     "default": 60,
@@ -1599,7 +1603,7 @@
             "action": "snx scan report",
             "identifier": "scan_report",
             "description": "Retrieve URL scan results against a previous Scan request",
-            "verbose": "Retrieve URL scan results against a previous Scan request. If the scan is finished, result will be returned immediately; otherwise a \u2018check back later' message will be returned.",
+            "verbose": "Retrieve URL scan results against a previous Scan request. If the scan is finished, the result will be returned immediately; otherwise, a \u2018check back later' message will be returned.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2027,7 +2031,7 @@
         {
             "action": "snx download html",
             "identifier": "download_html",
-            "description": "Download webpage html against a previous URL Scan request",
+            "description": "Download webpage HTML against a previous URL Scan request",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2185,8 +2189,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.textData.textBase64",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.textData.textName",
