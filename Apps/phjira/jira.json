@@ -76,7 +76,7 @@
         "timezone": {
             "data_type": "timezone",
             "order": 9,
-            "description": "Jira instance profile timezone (used for timezone conversions for querying in ingestion)",
+            "description": "Jira instance timezone (used for timezone conversions for querying in ingestion). Refer README file for more details",
             "default": "GMT",
             "required": true
         }
