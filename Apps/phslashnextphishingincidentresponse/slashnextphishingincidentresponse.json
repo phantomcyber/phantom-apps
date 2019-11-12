@@ -45,7 +45,7 @@
         {
             "action": "snx api quota",
             "identifier": "api_quota",
-            "description": "Find information about your API quota, like current usage, quota left, etc.",
+            "description": "Find information about your API quota, like current usage, quota left, etc",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -69,6 +69,20 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
