@@ -1569,12 +1569,12 @@ class JiraConnector(phantom.BaseConnector):
 
                 # By default, we won't create the artifact for current comment
                 # to avoid duplicate artifacts for comments even if the fields are updated for the ticket
-                create_updated_comment_artifact = True
+                create_updated_comment_artifact_not_req = False
 
-                if str(comment_current_updated_time_utc_tz_specific) != str(comment_artifact_updated_time_utc_tz_specific):
-                    create_updated_comment_artifact = False
+                if str(comment_current_updated_time_utc_tz_specific) == str(comment_artifact_updated_time_utc_tz_specific):
+                    create_updated_comment_artifact_not_req = True
 
-                if self.is_poll_now() or not comment_artifact_current_updated_time or not create_updated_comment_artifact:
+                if self.is_poll_now() or not comment_artifact_current_updated_time or not create_updated_comment_artifact_not_req:
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
