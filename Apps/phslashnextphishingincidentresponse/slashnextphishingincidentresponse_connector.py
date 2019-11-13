@@ -686,8 +686,8 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "snx scan report" action with Scan ID = {0} or '\
-                  'running the same "snx url scan" action one more time'.format(response['urlData']['scanId'])
+                  'Please check back later using "scan report" action with Scan ID = {0} or '\
+                  'running the same "url scan" action one more time'.format(response['urlData']['scanId'])
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -778,7 +778,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and is taking longer than expected to complete.\n' \
                   'Please check back later using scan report action with Scan ID = {0} or ' \
-                  'running the same "snx url scan sync" action one more time'.format(response['urlData']['scanId'])
+                  'running the same "url scan sync" action one more time'.format(response['urlData']['scanId'])
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -865,7 +865,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "snx scan report" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "scan report" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -950,7 +950,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download screenshot" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download screenshot" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1012,7 +1012,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download html" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download html" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1074,7 +1074,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download text" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download text" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
