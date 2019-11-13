@@ -43,7 +43,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx api quota",
+            "action": "api quota",
             "identifier": "api_quota",
             "description": "Find information about your API quota, like current usage, quota left, etc",
             "type": "generic",
@@ -96,7 +96,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx host reputation",
+            "action": "host reputation",
             "identifier": "host_reputation",
             "description": "Search in SlashNext Cloud database and retrieve the reputation of a host",
             "type": "investigate",
@@ -238,7 +238,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx host urls",
+            "action": "host urls",
             "identifier": "host_urls",
             "description": "Search in SlashNext Cloud database and retrieve a list of all URLs associated with the specified host",
             "type": "investigate",
@@ -497,7 +497,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx host report",
+            "action": "host report",
             "identifier": "host_report",
             "description": "Search in SlashNext Cloud database and retrieve a detailed report for a host and associated URL",
             "type": "investigate",
@@ -964,7 +964,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx url scan",
+            "action": "url scan",
             "identifier": "url_scan",
             "description": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine",
             "verbose": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine. If the specified URL already exists in the cloud database, scan results will get returned immediately. If not, this action will submit a URL scan request and return with a \u2018check back later\u2019 message along with a unique Scan ID. Users can check the results of this scan with \u2018scan report\u2019 action after 30 seconds or later using the returned Scan ID.",
@@ -1282,7 +1282,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx url scansync",
+            "action": "url scansync",
             "identifier": "url_scan_sync",
             "description": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode",
             "verbose": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode. If the specified URL already exists in the cloud database, the scan result will get returned immediately. If not, this action will submit a URL scan request and wait for the scan to finish. The scan may take up to 30 seconds to finish.",
@@ -1614,7 +1614,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx scan report",
+            "action": "scan report",
             "identifier": "scan_report",
             "description": "Retrieve URL scan results against a previous Scan request",
             "verbose": "Retrieve URL scan results against a previous Scan request. If the scan is finished, the result will be returned immediately; otherwise, a \u2018check back later' message will be returned.",
@@ -1622,7 +1622,7 @@
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018snx url scan\u2019 or \u2018snx url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1935,14 +1935,14 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx download screenshot",
+            "action": "download screenshot",
             "identifier": "download_screenshot",
             "description": "Download webpage screenshot against a previous URL Scan request",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018snx url scan\u2019 or \u2018snx url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2043,14 +2043,14 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx download html",
+            "action": "download html",
             "identifier": "download_html",
             "description": "Download webpage HTML against a previous URL Scan request",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018snx url scan\u2019 or \u2018snx url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2151,14 +2151,14 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snx download text",
+            "action": "download text",
             "identifier": "download_text",
             "description": "Download webpage text against a previous URL Scan request",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018snx url scan\u2019 or \u2018snx url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
