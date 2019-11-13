@@ -38,6 +38,12 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 <p>
 	<b>Functioning of On Poll</b>
 		<ul>
+			<li><b>NOTE (Consider below points due to a minute's granularity (instead of a second or lesser) for querying tickets in the JIRA)</b></li>
+				<ul>
+					<li>It is highly recommended for configuring a significantly large value (larger than the number of existing tickets on the user's instance) in the <b></b> asset configuration parameter to bring the ingested tickets in the Phantom in sync entirely with the JIRA instance in the first run</li>
+					<li>It is highly recommended for configuring a significantly large value (larger than the possible number of tickets that can be updated in 1 minute or any value larger than the average number of tickets getting created every unit of time (based on frequency of scheduled or interval polling)) in the <b></b> asset configuration parameter to avoid the duplicate tickets ingestion</li>
+				</ul>
+			<br>
 			<li>The On Poll action works in 2 steps. In the first step, all the tickets (issues) in a defined time duration will be fetched. In the second step, all the components (e.g. fields, comments, and attachments) of the tickets (retrieved in the first step) will be fetched. A container will be created for each ticket and for each ticket all the components will be created as the respective artifacts.</li>
 			<li>The tickets will be fetched in the oldest first order based on the <b>updated</b> time in the On Poll action</li>
 			<li>The updated timestamps of the components have been appended to the end of the artifact name to maintain the uniqueness of a particular component</li>
