@@ -1277,7 +1277,7 @@
         {
             "action": "get attachments",
             "description": "Gets specific attachments from a Jira Ticket (issue)",
-            "verbose": "The Function with store specific attachments from a given Jira ticket inside the vault",
+            "verbose": "The Function will store specific attachments from a given Jira ticket inside the vault",
             "type": "generic",
             "identifier": "get_attachments",
             "read_only": false,
@@ -1285,7 +1285,7 @@
                 "id": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "This is the Jira ticket key for the issue.",
+                    "description": "The Jira ticket key for the issue.",
                     "contains": [
                         "jira project key"
                     ],
@@ -1295,13 +1295,13 @@
                 "retrieve_all": {
                     "data_type": "boolean",
                     "order": 1,
-                    "description": "This is set to true if all attachments want to be retrieved from the issue.",
+                    "description": "If this is set to true all attachments will be retrieved from the issue.",
                     "required": true
                 },
                 "container_id": {
                     "data_type": "string",
                     "order": 2,
-                    "description": "This is the Container id.",
+                    "description": "The Container ID to associate the file with.",
                     "required": true
                 },
                 "extension_filter": {
