@@ -16,6 +16,99 @@
             "verbose": ""
         },
         {
+            "action": "send push notification",
+            "description": "Validate the user prompt with push notification",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "required": true,
+                    "description": "Okta User id, email address, or username.",
+                    "data_type": "string",
+                    "default": "",
+                    "contains": [
+                        "okta user id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                },
+                "factortype": {
+                    "required": true,
+                    "description": "Okta Factor Type.",
+                    "data_type": "string",
+                    "default": "push",
+                    "value_list": [
+                        "push",
+                        "sms",
+                        "token:software:totp"
+                    ],
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "okta user id"
+                    ],
+                    "data_path": "action_result.parameter.email",
+                    "example_values": [
+                        "00uby4va2hynIj0mS0h7",
+                        "herman@phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "example_values": [],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.result.factorResult",
+                    "example_values": [
+                        "WAITING",
+                        "REJECTED",
+                        "SUCCESS",
+                        "TIMEOUT"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully sent push verification."
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ],
+            "identifier": "send_push_notification",
+            "type": "contain",
+            "verbose": ""
+        },
+        {
             "read_only": true,
             "description": "Get the list of users",
             "parameters": {
