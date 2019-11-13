@@ -1532,7 +1532,7 @@ class JiraConnector(phantom.BaseConnector):
 
         try:
             for attachment in issue.fields.attachment:
-                if not self._get_artifact_id(attachment.id, container_id):
+                if not self._get_artifact_id(attachment.id, container_id, issue_type="attachment"):
                     ret_val = self._handle_attachment(attachment, container_id, artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
@@ -1544,7 +1544,9 @@ class JiraConnector(phantom.BaseConnector):
 
             for comment in issue.fields.comment.comments:
 
-                if not self._get_artifact_id(comment.id, container_id):
+                full_artifact = self._get_artifact_id(comment.id, container_id, issue_type="comment", full_artifact=True)
+
+                if not full_artifact:
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
@@ -1552,11 +1554,27 @@ class JiraConnector(phantom.BaseConnector):
 
                     continue
 
-                update_time = issue.fields.updated[:-5]
-                update_datetime = datetime.strptime(update_time, "%Y-%m-%dT%H:%M:%S.%f")
-                update_epoch = (update_datetime - datetime.utcfromtimestamp(0)).total_seconds()
+                # Comparing current updated time of comment with the already existing comment artifact
+                # 1. Fetch the current comment's updated time and convert it to UTC
+                comment_current_updated_time = comment.updated
+                comment_current_updated_time_jira_server_tz_specific = parse(comment_current_updated_time)
+                comment_current_updated_time_utc_tz_specific = comment_current_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
 
-                if self.is_poll_now() or (update_epoch > last_time):
+                # 2. Fetch the current comment's artifact's updated time and convert it to UTC
+                comment_artifact_current_updated_time = full_artifact.get("cef", {}).get("updated")
+
+                if comment_artifact_current_updated_time:
+                    comment_artifact_updated_time_jira_server_tz_specific = parse(comment_artifact_current_updated_time)
+                    comment_artifact_updated_time_utc_tz_specific = comment_artifact_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
+
+                # By default, we won't create the artifact for current comment
+                # to avoid duplicate artifacts for comments even if the fields are updated for the ticket
+                create_updated_comment_artifact_not_req = False
+
+                if str(comment_current_updated_time_utc_tz_specific) == str(comment_artifact_updated_time_utc_tz_specific):
+                    create_updated_comment_artifact_not_req = True
+
+                if self.is_poll_now() or not comment_artifact_current_updated_time or not create_updated_comment_artifact_not_req:
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
