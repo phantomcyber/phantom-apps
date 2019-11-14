@@ -35,32 +35,32 @@
             "required": true,
             "order": 0
         },
-        "ignore_perrors": {
-            "description": "Ignore parsing errors",
-            "data_type": "boolean",
-            "required": false,
-            "default": false,
-            "order": 1
-        },
         "save_file": {
             "description": "Save file to vault",
             "data_type": "boolean",
             "required": false,
             "default": false,
-            "order": 2
+            "order": 1
         },
         "container_count": {
             "description": "Maximum entries to parse (0 for all)",
             "data_type": "numeric",
             "required": false,
             "default": 0,
-            "order": 3
+            "order": 2
         },
         "artifact_count": {
             "description": "Maximum artifacts to create per entry (0 for all)",
             "data_type": "numeric",
             "required": false,
             "default": 0,
+            "order": 3
+        },
+        "ignore_perrors": {
+            "description": "Ignore parsing errors",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
             "order": 4
         }
     },
