@@ -99,9 +99,7 @@ class DossierConnector(BaseConnector):
                     threat_level = i["threat_level"]
 
                 if "confidence" in i and i["confidence"] > threat_confidence:
-                    print(i['confidence'])
-                # if i['confidence'] > threat_confidence:
-                # threat_confidence = i["confidence"]
+                    self.debug_print(i['confidence'])
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
