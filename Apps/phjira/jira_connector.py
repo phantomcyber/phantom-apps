@@ -1710,6 +1710,11 @@ class JiraConnector(phantom.BaseConnector):
         # Add action result
         action_result = self.add_action_result(phantom.ActionResult(param))
 
+        if not state:
+            self.debug_print(JIRA_ERR_STATE_FILE_LOAD_ERROR)
+            self.save_progress(JIRA_ERR_STATE_FILE_LOAD_ERROR)
+            return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_STATE_FILE_LOAD_ERROR)
+
         # Get time from last poll, save now as time for this poll
         last_time = state.get('last_time', 0)
 
@@ -1744,7 +1749,7 @@ class JiraConnector(phantom.BaseConnector):
         if project_key:
             query = "project={0}".format(project_key)
 
-        action_query = config.get(JIRA_JSON_QUERY, "")
+        action_query = UnicodeDammit(config.get(JIRA_JSON_QUERY, "")).unicode_markup.encode('utf-8')
 
         if (len(action_query) > 0):
             query = "{0}{1}{2}".format(query, ' and ' if query else '', action_query)

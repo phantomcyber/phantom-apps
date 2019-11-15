@@ -51,6 +51,7 @@ JIRA_JSON_UNRESOLVED = 'Unresolved'
 JIRA_JSON_CUSTOM_FIELDS = 'custom_fields'
 
 JIRA_INVALID_LIMIT = "Please provide non-zero positive integer in limit"
+JIRA_ERR_STATE_FILE_LOAD_ERROR = "Could not load the state file"
 JIRA_ERR_FETCH_CUSTOM_FIELDS = "Error occurred while fetching the custom fields metadata"
 JIRA_ERR_API_INITIALIZATION = "API Initialization failed"
 JIRA_ERR_API_TIMEOUT = "Timed out waiting for API to initialize. Please verify the asset configuration parameters, username, and password."
