@@ -55,6 +55,13 @@
             "required": false,
             "default": 0,
             "order": 3
+        },
+        "ignore_perrors": {
+            "description": "Ignore parsing errors",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 4
         }
     },
     "actions": [
