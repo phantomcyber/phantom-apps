@@ -18,7 +18,7 @@
         {
             "action": "send push notification",
             "description": "Validate the user prompt with push notification",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "email": {
                     "required": true,
