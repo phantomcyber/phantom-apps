@@ -68,6 +68,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
                     "order": 0
                 }
             },
