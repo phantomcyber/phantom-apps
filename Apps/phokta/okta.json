@@ -16,24 +16,28 @@
             "verbose": ""
         },
         {
+            "identifier": "send_push_notification",
+            "type": "contain",
             "action": "send push notification",
             "description": "Validate the user prompt with push notification",
             "read_only": false,
             "parameters": {
                 "email": {
                     "required": true,
-                    "description": "Okta User id, email address, or username.",
+                    "description": "Okta User id, email address, or username",
                     "data_type": "string",
                     "default": "",
                     "contains": [
-                        "okta user id"
+                        "okta user id",
+                        "okta email address",
+                        "okta username"
                     ],
                     "primary": true,
                     "order": 0
                 },
                 "factortype": {
                     "required": true,
-                    "description": "Okta Factor Type.",
+                    "description": "Okta Factor Type",
                     "data_type": "string",
                     "default": "push",
                     "value_list": [
@@ -65,7 +69,9 @@
                         "00uby4va2hynIj0mS0h7",
                         "herman@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "User"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -80,7 +86,9 @@
                         "SUCCESS",
                         "TIMEOUT"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "Result"
                 },
                 {
                     "data_path": "action_result.message",
@@ -103,10 +111,7 @@
                     ],
                     "data_type": "numeric"
                 }
-            ],
-            "identifier": "send_push_notification",
-            "type": "contain",
-            "verbose": ""
+            ]
         },
         {
             "read_only": true,
