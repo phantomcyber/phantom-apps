@@ -1,14 +1,13 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: canary_connector.py
+# Copyright (c) 2019 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from canary_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -163,10 +162,13 @@ class CanaryConnector(BaseConnector):
 
         self.save_progress("Response: " + str(response))
 
-        if response['result'] == "success":
-            return action_result.set_status(phantom.APP_SUCCESS)
+        if response:
+            if response.get('result') == "success":
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error communicating with Canary API")
+            return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
@@ -203,13 +205,16 @@ class CanaryConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary['count'] = len(response['incidents'])
+        if response:
+            summary = action_result.update_summary({})
+            summary['count'] = len(response['incidents'])
 
-        if response['result'] == "success":
-            return action_result.set_status(phantom.APP_SUCCESS)
+            if response.get('result') == "success":
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error communicating with Canary API")
+            return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
@@ -332,16 +337,16 @@ class CanaryConnector(BaseConnector):
         # Add the response into the data section
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary['result'] = response['result']
+        if response:
+            summary = action_result.update_summary({})
+            summary['result'] = response.get('result')
 
-        if response['result'] == "success":
-            return action_result.set_status(phantom.APP_SUCCESS)
+            if response.get('result') == "success":
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error communicating with Canary API")
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+            return action_result.set_status(phantom.APP_ERROR, "Error while communicating with Canary API")
 
     def handle_action(self, param):
 
@@ -422,9 +427,10 @@ if __name__ == '__main__':
         password = getpass.getpass("Password: ")
 
     if (username and password):
+        login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -434,10 +440,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platform. Error: " + str(e))
