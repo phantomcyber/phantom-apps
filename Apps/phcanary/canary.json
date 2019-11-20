@@ -1,0 +1,780 @@
+{
+    "appid": "00b3dc3a-ea6e-47a8-82a5-036f05d83863",
+    "name": "Canary",
+    "description": "App to Integrate with ThinkST Canary API Service",
+    "type": "siem",
+    "product_vendor": "ThinkST",
+    "logo": "canary.png",
+    "logo_dark": "canary_dark.png",
+    "product_name": "Canary",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) Phantom, 2018",
+    "app_version": "1.0.2",
+    "utctime_updated": "2018-11-09T01:55:04.189254Z",
+    "package_name": "phantom_canary",
+    "main_module": "canary_connector.py",
+    "min_phantom_version": "2.1.452",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "domain": {
+            "description": "Domain used for Canary website. For example (https://*domain*.canary.tools)",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "apiKey": {
+            "description": "API Key from Canary Wesbite",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "on_poll ingest all unacknowledged Canary incidents",
+            "verbose": "",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {
+                "nodeid": {
+                    "description": "Get all incidents for a specific node",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "tz": {
+                    "description": "Timezone in pytz format (For example Australia/Sydney)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "eventlimit": {
+                    "description": "Specify the maximum number of event logs to be returned with the incident",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update incident",
+            "identifier": "update_incident",
+            "description": "Acknowledge existing Canary incident",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "incident": {
+                    "description": "The incident key of of an existing Incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "incident_state": {
+                    "description": "State to make incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [
+                        "acknowledge",
+                        "unacknowledge"
+                    ],
+                    "default": "acknowledge",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.incident",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "incident",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.incident_state",
+                    "data_type": "string",
+                    "column_name": "incident",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list incidents",
+            "identifier": "list_incidents",
+            "description": "Get list of existing Canary Incidents",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "node_id": {
+                    "description": "Get incidents from a specific node",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "incident_state": {
+                    "description": "State of incidents to list",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [
+                        "acknowledged",
+                        "unacknowledged"
+                    ],
+                    "default": "acknowledged",
+                    "order": 1
+                },
+                "tz": {
+                    "description": "Timezone in pytz format (For example Australia/Sydney)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.node_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.incident_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "acknowledged"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tz",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Count: 5"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 5,
+                    "example_values": [
+                        "Acknowledged Incidents"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.max_updated_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        79
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sun, 28 Oct 2018 22:33:20 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1540766000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fri, 26 Oct 2018 00:46:48 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.src_port",
+                    "data_type": "string",
+                    "example_values": [
+                        "60222"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ATHQESXP01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.src_host",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.17.240.97"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events_count",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.notified",
+                    "data_type": "string",
+                    "example_values": [
+                        "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "1540514762"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.acknowledged",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.src_host_reverse",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.logtype",
+                    "data_type": "string",
+                    "example_values": [
+                        "3001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.dst_host",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.18.34.58"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.node_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "000000002f391f1d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.created_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:02 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.ippers",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.mac_address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.dst_port",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.USERNAME",
+                    "data_type": "string",
+                    "example_values": [
+                        "root"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1540514762
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.HOSTNAME",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.18.34.58"
+                    ],
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.PATH",
+                    "data_type": "string",
+                    "example_values": [
+                        "/folder"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.timestamp_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:02 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.SKIN",
+                    "data_type": "string",
+                    "example_values": [
+                        "vmware"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.USERAGENT",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.PASSWORD",
+                    "data_type": "string",
+                    "example_values": [
+                        "root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP Login Attempt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.summary",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 1,
+                    "example_values": [
+                        "HTTP Login Attempt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.updated_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:48 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.id",
+                    "data_type": "string",
+                    "column_name": "Event Key",
+                    "column_order": 3,
+                    "example_values": [
+                        "incident:httplogin:b4a7013dfe899ce773353c5c:172.17.240.97:1540514762"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.updated_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.devices.*.description.events.*.SETTINGS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fri, 26 Oct 2018 00:46:48 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.src_port",
+                    "data_type": "string",
+                    "example_values": [
+                        "60222"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.name",
+                    "data_type": "string",
+                    "column_name": "Canary",
+                    "column_order": 2,
+                    "example_values": [
+                        "ATHQESXP01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.src_host",
+                    "data_type": "string",
+                    "column_name": "Source Host",
+                    "column_order": 4,
+                    "example_values": [
+                        "172.17.240.97"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events_count",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.notified",
+                    "data_type": "string",
+                    "example_values": [
+                        "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "1540514762"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.acknowledged",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.src_host_reverse",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.logtype",
+                    "data_type": "string",
+                    "example_values": [
+                        "3001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.dst_host",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.18.34.58"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.node_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "000000002f391f1d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.created_std",
+                    "data_type": "string",
+                    "column_name": "Created",
+                    "column_order": 0,
+                    "example_values": [
+                        "2018-10-26 00:46:02 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.ippers",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.mac_address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.dst_port",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.USERNAME",
+                    "data_type": "string",
+                    "example_values": [
+                        "root"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1540514762
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.HOSTNAME",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.18.34.58"
+                    ],
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.PATH",
+                    "data_type": "string",
+                    "example_values": [
+                        "/folder"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.timestamp_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:02 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.SKIN",
+                    "data_type": "string",
+                    "example_values": [
+                        "vmware"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.USERAGENT",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.PASSWORD",
+                    "data_type": "string",
+                    "example_values": [
+                        "root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP Login Attempt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP Login Attempt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.updated_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-26 00:46:48 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "incident:httplogin:b4a7013dfe899ce773353c5c:172.17.240.97:1540514762"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.updated_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidents.*.description.events.*.SETTINGS",
+                    "data_type": "string",
+                    "example_values": [
+                        "userid=aycan.firatli@at.govt.nz,username=,totp_enable=False,sensitive_data_masking_enable=True,auth_token_enable=False,incident_webhooks_enable=False,slack_incident_webhook=,hipchat_integration_url=,generic_incident_webhook=,email_notification_enable=True,email_notification_addresses=aycan.firatli@at.govt.nz,brendan.barrett@at.govt.nz,sms_notification_enable=False,summary_email_enable=True,summary_email_addresses=brendan.barrett@at.govt.nz, aycanfiratli@at.govt.nz,notify_settings_change_enable=True,notify_device_settings_change_enable=True,whitelist_enable=False,whitelist_ips=,whitelist_oids_enable=False,whitelist_oids=,ssh_credential_watches_enable=False,ssh_credential_watches=,ssh_credential_watch_only=False,sms_notification_numbers=,update_automatically_enable=True,canarytokens_alerts_enable=True,canarytokens_user_domains_enable=False,canarytokens_user_domains=,canarytokens_webroot_enable=False,canarytokens_webroot=<html><body><h1>It works!</h1>\r\n<p>This is the default web page for this server.</p>\r\n<p>The web server software is running but no content has been added, yet.</p>\r\n</body></html>,smtp_host=,smtp_port=,smtp_from_address=,smtp_username=,smtp_password=,smtp_starttls=,syslog_fwd_enable=False,syslog_fwd_remote_host=,syslog_fwd_remote_port=,syslog_fwd_protocol=tcp,syslog_fwd_fmt=custom,syslog_fwd_facility=local0,syslog_fwd_priority=emerg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_std",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-28 22:33:20 UTC+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
