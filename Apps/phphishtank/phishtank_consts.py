@@ -1,8 +1,7 @@
 # File: phishtank_consts.py
 # Copyright (c) 2016-2019 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 # Embedded file name: ./phishtank_consts.py
 PHISHTANK_DOMAIN = 'http://www.phishtank.com'
 PHISHTANK_API_DOMAIN = 'https://checkurl.phishtank.com/checkurl/'
