@@ -1,10 +1,7 @@
+# File: slashnextphishingincidentresponse_connector.py
+# Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
 #
-# Copyright (C) SlashNext, Inc. (www.slashnext.com)
-#
-# License:     Subject to the terms and conditions of SlashNext EULA, SlashNext grants to Customer a non-transferable,
-#              non-sublicensable, non-exclusive license to use the Software as expressly permitted in accordance with
-#              Documentation or other specifications published by SlashNext. The Software is solely for Customer's
-#              internal business purposes. All other rights in the Software are expressly reserved by SlashNext.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
 """
@@ -40,7 +37,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         self._state = None
 
         # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
+        # Do note that the app json defines the asset config, so, please
         # modify this as you deem fit.
         self._base_url = None
         self._api_key = None
@@ -167,13 +164,13 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
     #
     #     if phantom.is_fail(ret_val):
     #         # Server did not return status code: 200
-    #         msg = 'IP Reputation Failed, Error Reason: Error connecting to SlashNext Cloud.'
+    #         msg = 'IP Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
     #         self.save_progress(msg)
     #         return action_result.set_status(phantom.APP_ERROR, msg)
     #
     #     elif response['errorNo'] == 0:
     #         # Success
-    #         msg = 'IP Reputation Passed.'
+    #         msg = 'IP Reputation Passed'
     #         self.save_progress(msg)
     #         action_result.add_data(response)
     #
@@ -207,13 +204,13 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
     #
     #     if phantom.is_fail(ret_val):
     #         # Server did not return status code: 200
-    #         msg = 'URL Reputation Failed, Error Reason: Error connecting to SlashNext Cloud.'
+    #         msg = 'URL Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
     #         self.save_progress(msg)
     #         return action_result.set_status(phantom.APP_ERROR, msg)
     #
     #     elif response['errorNo'] == 0:
     #         # Success
-    #         msg = 'URL Reputation Passed.'
+    #         msg = 'URL Reputation Passed'
     #         self.save_progress(msg)
     #         action_result.add_data(response)
     #
@@ -257,12 +254,12 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            self.save_progress('Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud.')
+            self.save_progress('Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud')
             actions_failed += 1
 
         # Return success
         elif response['errorNo'] == 0:
-            self.save_progress('Download Screenshot Successful.')
+            self.save_progress('Download Screenshot Successful')
             action_result.add_data(response)
 
         # If there is an error then return the exact error message
@@ -287,12 +284,12 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            self.save_progress('Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud.')
+            self.save_progress('Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud')
             actions_failed += 1
 
         # Return success
         elif response['errorNo'] == 0:
-            self.save_progress('Download HTML Successful.')
+            self.save_progress('Download HTML Successful')
             action_result.add_data(response)
 
         # If there is an error then return the exact error message
@@ -316,12 +313,12 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            self.save_progress('Download Text Failed, Error Reason: Error connecting to SlashNext Cloud.')
+            self.save_progress('Download Text Failed, Error Reason: Error connecting to SlashNext Cloud')
             actions_failed += 1
 
         # Return success
         elif response['errorNo'] == 0:
-            self.save_progress('Download Text Successful.')
+            self.save_progress('Download Text Successful')
             action_result.add_data(response)
 
         # If there is an error then return the exact error message
@@ -357,20 +354,20 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Test Connectivity Failed, Error Reason: Error connecting to SlashNext Cloud.'
-            self.save_progress(msg)
+            self.save_progress('Test Connectivity Failed')
+            msg = 'Error Reason: Error connecting to SlashNext Cloud'
             return action_result.set_status(phantom.APP_ERROR, msg)
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Test Connectivity Successful.'
+            msg = 'Test Connectivity Successful'
             self.save_progress(msg)
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            return action_result.set_status(phantom.APP_SUCCESS)
 
         # If there is an error then return the exact error message
         else:
-            msg = 'Test Connectivity Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
+            self.save_progress('Test Connectivity Failed')
+            msg = 'Error Reason: {0}'.format(response['errorMsg'])
             return action_result.set_status(phantom.APP_ERROR, msg)
 
     def _handle_api_quota(self, param):
@@ -410,7 +407,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -419,7 +416,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Host Reputation Successful.'
+            msg = 'Host Reputation Successful'
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -467,7 +464,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -476,7 +473,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Host URLs Successful.'
+            msg = 'Host URLs Successful'
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -520,7 +517,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -529,7 +526,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            self.save_progress('Host Report Successful.')
+            self.save_progress('Host Report Successful')
             action_result.add_data(response)
             action_result.update_summary({
                 'State': 'Report Fetched',
@@ -566,7 +563,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -575,7 +572,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            self.save_progress('Host URLs Successful.')
+            self.save_progress('Host URLs Successful')
 
             first_url = response['urlDataList'][0]
             latest_url = first_url['url']
@@ -596,7 +593,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
                 # Server did not return status code: 200, return error
                 if phantom.is_fail(ret_val):
-                    msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud.'
+                    msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
                     self.save_progress(msg)
                     action_result.update_summary({
                         'State': 'Connection Error'
@@ -605,7 +602,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
                 # Return success
                 elif response['errorNo'] == 0:
-                    self.save_progress('URL Synchronous Scan Successful.')
+                    self.save_progress('URL Synchronous Scan Successful')
                     action_result.add_data(response)
 
                     # If there is landing URL available, get its forensics instead
@@ -646,7 +643,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # --------------------------- Forensics Data ---------------------------
         # Calling the function to collectively download screenshot, HTML and text data
-        msg = 'Host Report Successful.'
+        msg = 'Host Report Successful'
         if response.get('swlData') is None:
             self._download_forensics(action_result, latest_url_scanid, msg)
         else:
@@ -679,7 +676,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'URL Scan Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'URL Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -689,8 +686,8 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "snx scan report" action with Scan ID = {0} or '\
-                  'running the same "snx url scan" action one more time'.format(response['urlData']['scanId'])
+                  'Please check back later using "scan report" action with Scan ID = {0} or '\
+                  'running the same "url scan" action one more time'.format(response['urlData']['scanId'])
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -700,7 +697,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'URL Scan Successful.'
+            msg = 'URL Scan Successful'
             self.save_progress(msg)
             action_result.add_data(response)
 
@@ -770,7 +767,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -781,7 +778,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and is taking longer than expected to complete.\n' \
                   'Please check back later using scan report action with Scan ID = {0} or ' \
-                  'running the same "snx url scan sync" action one more time'.format(response['urlData']['scanId'])
+                  'running the same "url scan sync" action one more time'.format(response['urlData']['scanId'])
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -791,7 +788,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'URL Scan Successful.'
+            msg = 'URL Scan Successful'
             self.save_progress(msg)
             action_result.add_data(response)
 
@@ -858,7 +855,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Scan Report Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Scan Report Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -868,7 +865,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "snx scan report" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "scan report" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -878,7 +875,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Scan Report Successful.'
+            msg = 'Scan Report Successful'
             self.save_progress(msg)
             action_result.add_data(response)
 
@@ -943,7 +940,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -953,7 +950,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download screenshot" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download screenshot" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -963,7 +960,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Download Screenshot Successful.'
+            msg = 'Download Screenshot Successful'
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1005,7 +1002,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -1015,7 +1012,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download html" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download html" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1025,7 +1022,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Download HTML Successful.'
+            msg = 'Download HTML Successful'
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1067,7 +1064,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
-            msg = 'Download Text Failed, Error Reason: Error connecting to SlashNext Cloud.'
+            msg = 'Download Text Failed, Error Reason: Error connecting to SlashNext Cloud'
             self.save_progress(msg)
             action_result.update_summary({
                 'State': 'Connection Error'
@@ -1077,7 +1074,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Return success
         elif response['errorNo'] == 1:
             msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "snx download text" action with Scan ID = {0}'.format(scanid)
+                  'Please check back later using "download text" action with Scan ID = {0}'.format(scanid)
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1087,7 +1084,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Return success
         elif response['errorNo'] == 0:
-            msg = 'Download Text Successful.'
+            msg = 'Download Text Successful'
             self.save_progress(msg)
             action_result.add_data(response)
             action_result.update_summary({
@@ -1160,10 +1157,10 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Access values in asset config by the name
         # Required values can be accessed directly
-        self._api_key = config['Your API Key']
+        self._api_key = config['api_key']
 
         # Optional values should use the .get() function
-        self._base_url = config.get('SlashNext API Base URL', BASE_API)
+        self._base_url = config.get('api_base_url', BASE_API)
 
         return phantom.APP_SUCCESS
 
