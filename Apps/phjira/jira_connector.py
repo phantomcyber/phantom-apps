@@ -129,12 +129,15 @@ class JiraConnector(phantom.BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
-            error_text = "Cannot parse error details. Unparsed error: {0}".format(error_text)
+            try:
+                error_text = "Cannot parse error details. Unparsed error: {0}".format(UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
+            except:
+                error_text = "Unable to parse the details of the error received in the output response"
 
         if "Epic Name is required" in error_text:
-            error_text = "{} {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"custom_field\" : \"epic_name\" } ")
+            error_text = "{}. {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"custom_field\" : \"epic_name\" } ")
 
-        return result_object.set_status(phantom.APP_ERROR, "{0}. Message from server: {1}".format(message, error_text))
+        return result_object.set_status(phantom.APP_ERROR, "{0}. Message: {1}".format(message, error_text))
 
     def _create_jira_object(self):
 
@@ -255,7 +258,9 @@ class JiraConnector(phantom.BaseConnector):
                 # replace them
                 input_fields[custom_id_to_name[field]] = input_fields.pop(field)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields ID with name. Error: {0}".format(str(e))), None, custom_keys_present)
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields ID with name. Error: {0}".format(
+                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None, custom_keys_present)
 
         return (phantom.APP_SUCCESS, input_fields, custom_keys_present)
 
@@ -269,7 +274,9 @@ class JiraConnector(phantom.BaseConnector):
                 # replace them
                 input_fields[custom_name_to_id[field]] = input_fields.pop(field)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields name with ID. Error: {0}".format(str(e))), None)
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields name with ID. Error: {0}".format(
+                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None)
 
         return (phantom.APP_SUCCESS, input_fields)
 
@@ -285,8 +292,9 @@ class JiraConnector(phantom.BaseConnector):
         try:
             update_fields = json.loads(update_fields)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR,
-                        '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_UPDATE_FIELDS), str(e).replace('{', '(').replace('}', ')'))), None)
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            return (action_result.set_status(phantom.APP_ERROR, '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(
+                                field_name=JIRA_JSON_UPDATE_FIELDS), UnicodeDammit(error_msg).unicode_markup.encode('utf-8').replace('{', '(').replace('}', ')'))), None)
 
         if (not update_fields):
             return (action_result.set_status(phantom.APP_ERROR, "The input dictionary seems to be empty"), None)
@@ -619,8 +627,9 @@ class JiraConnector(phantom.BaseConnector):
             try:
                 fields = json.loads(param.get(JIRA_JSON_FIELDS))
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR,
-                            '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_FIELDS), str(e).replace('{', '(').replace('}', ')')))
+                error_msg = e.message if e.message else 'Unknown error occurred'
+                return action_result.set_status(phantom.APP_ERROR, '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_FIELDS),
+                                    UnicodeDammit(error_msg).unicode_markup.encode('utf-8').replace('{', '(').replace('}', ')')))
 
             if ('fields' in fields):
                 if (len(fields.keys()) > 1):
@@ -668,7 +677,8 @@ class JiraConnector(phantom.BaseConnector):
                 self._jira.assign_issue(new_issue, assignee)
             except Exception as e:
                 self.debug_print("Exception for assignee")
-                assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee, str(e))
+                error_msg = e.message if e.message else 'Unknown error occurred'
+                assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee, UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))
 
         issue_id = new_issue.key
 
@@ -877,7 +887,8 @@ class JiraConnector(phantom.BaseConnector):
                 self._jira.add_attachment(issue=issue, attachment=f, filename=meta['name'])
         except Exception as e:
             self.debug_print("Error while attaching")
-            return JIRA_ERR_ATTACH_FAILED.format(str(e))
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            return JIRA_ERR_ATTACH_FAILED.format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))
 
         return ""
 
@@ -1258,7 +1269,9 @@ class JiraConnector(phantom.BaseConnector):
 
             artifact_list.append(artifact_json)
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the comment artifact. Error message: {0}".format(str(e)))
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the comment artifact. Error message: {0}".format(
+                        UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
             return phantom.APP_ERROR
 
         return phantom.APP_SUCCESS
@@ -1274,7 +1287,9 @@ class JiraConnector(phantom.BaseConnector):
                 else:
                     issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS)
             except Exception as e:
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of tickets (issues). Error: {0}".format(str(e)))
+                error_msg = e.message if e.message else 'Unknown error occurred'
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of tickets (issues). Error: {0}".format(
+                            UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
                 return None
 
             if issues is None:
@@ -1364,7 +1379,8 @@ class JiraConnector(phantom.BaseConnector):
         try:
             self._jira.add_watcher(issue_id, username)
         except Exception as e:
-            self.save_progress("Response from the server: {0}".format(str(e)))
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            self.save_progress("Response from the server: {0}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
             return action_result.set_status(phantom.APP_ERROR, "Failed to add the watcher. Please check the provided parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added the user to the watchers list of the issue ID: {0}".format(issue_id))
@@ -1374,8 +1390,10 @@ class JiraConnector(phantom.BaseConnector):
         try:
             response = self._jira.watchers(issue_id)
         except Exception as e:
-            self.save_progress("Response from the server:{}".format(str(e)))
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the watchers list. Error: {0}".format(str(e))), None
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            self.save_progress("Response from the server:{}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the watchers list. Error: {0}".format(
+                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None
 
         watcher_list = list()
         for watcher in response.watchers:
@@ -1411,7 +1429,8 @@ class JiraConnector(phantom.BaseConnector):
         try:
             self._jira.remove_watcher(issue_id, username)
         except Exception as e:
-            self.save_progress("Response from the server: {0}".format(str(e)))
+            error_msg = e.message if e.message else 'Unknown error occurred'
+            self.save_progress("Response from the server: {0}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
             return action_result.set_status(phantom.APP_ERROR, "Failed to remove the watcher. Please check the provided parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed the user from the watchers list of the issue ID: {0}".format(issue_id))
@@ -1745,7 +1764,11 @@ class JiraConnector(phantom.BaseConnector):
         # Build the query for the issue search
         query = ""
 
-        project_key = config.get(JIRA_JSON_PROJECT_KEY)
+        try:
+            project_key = UnicodeDammit(config.get(JIRA_JSON_PROJECT_KEY, "")).unicode_markup.encode('utf-8')
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid project key")
+
         if project_key:
             query = "project={0}".format(project_key)
 
@@ -1799,7 +1822,7 @@ class JiraConnector(phantom.BaseConnector):
         else:
             self._save_state(state)
 
-        if (failed):
+        if failed:
             return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_FAILURES)
 
         return action_result.set_status(phantom.APP_SUCCESS)
