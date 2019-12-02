@@ -28,32 +28,43 @@
             "order": 1,
             "required": true
         },
+        "initial_ingestion_window": {
+            "data_type": "numeric",
+            "description": "How far back to search (in minutes) for first poll (maximum 60)",
+            "order": 2,
+            "required": true,
+            "default": 60
+        },
+        "ph": {
+            "data_type": "ph",
+            "order": 3
+        },
         "ingest_permitted_clicks": {
             "data_type": "boolean",
             "description": "Ingest Permitted Clicks",
             "required": false,
-            "order": 2,
+            "order": 4,
             "default": true
         },
         "ingest_blocked_clicks": {
             "data_type": "boolean",
             "description": "Ingest Blocked Clicks",
             "required": false,
-            "order": 3,
+            "order": 5,
             "default": true
         },
         "ingest_delivered_messages": {
             "data_type": "boolean",
             "description": "Ingest Delivered Messages",
             "required": false,
-            "order": 4,
+            "order": 6,
             "default": true
         },
         "ingest_blocked_messages": {
             "data_type": "boolean",
             "description": "Ingest Blocked Messages",
             "required": false,
-            "order": 5,
+            "order": 7,
             "default": true
         }
     },
