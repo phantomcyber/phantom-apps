@@ -1,6 +1,7 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: gitlab_connector.py
+# Copyright (c) Peter Bertel, 2019
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
@@ -12,11 +13,9 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
-
 
 class GitlabConnector(BaseConnector):
 
@@ -30,7 +29,6 @@ class GitlabConnector(BaseConnector):
         # Variable to hold a base_url in case the app makes REST calls
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
-        # self._base_url = "{}/api/v4".format(config.get('gitlab_location'))
         self._base_url = None
 
     def _process_empty_response(self, response, action_result):
@@ -150,17 +148,11 @@ class GitlabConnector(BaseConnector):
             return action_result.get_status()
 
         # Return success
-        # self.save_progress(response)
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity passed.")
 
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
     def _handle_list_users(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -170,23 +162,12 @@ class GitlabConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/users', action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully returned users")
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def _handle_list_projects(self, param):
 
@@ -355,7 +336,6 @@ class GitlabConnector(BaseConnector):
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
-
 
 if __name__ == '__main__':
 
