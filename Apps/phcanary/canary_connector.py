@@ -129,7 +129,7 @@ class CanaryConnector(BaseConnector):
             r = request_func(
                             url,
                             # auth=(username, password),  # basic authentication
-                            verify=config.get('verify_server_cert', True),
+                            verify=True,
                             **kwargs)
         except Exception as e:
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
@@ -146,7 +146,7 @@ class CanaryConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
         config = self.get_config()
-        apiKey = config.get('apiKey')
+        apiKey = config.get('api_key')
         params = {'auth_token': apiKey}
 
         self.save_progress("Connecting to endpoint")
@@ -159,8 +159,6 @@ class CanaryConnector(BaseConnector):
             # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
             # return action_result.get_status()
-
-        self.save_progress("Response: " + str(response))
 
         if response:
             if response.get('result') == "success":
@@ -183,7 +181,7 @@ class CanaryConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
         config = self.get_config()
-        apiKey = config.get('apiKey')
+        apiKey = config.get('api_key')
         params = {'auth_token': apiKey}
 
         incidentState = param['incident_state']
@@ -203,9 +201,8 @@ class CanaryConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed.")
             # return action_result.get_status()
 
-        action_result.add_data(response)
-
         if response:
+            action_result.add_data(response)
             summary = action_result.update_summary({})
             summary['count'] = len(response['incidents'])
 
@@ -229,7 +226,7 @@ class CanaryConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        apiKey = config.get('apiKey')
+        apiKey = config.get('api_key')
         params = {'auth_token': apiKey}
 
         endpoint = "/incidents/unacknowledged"
@@ -310,7 +307,7 @@ class CanaryConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        apiKey = config.get('apiKey')
+        apiKey = config.get('api_key')
         incident = param['incident']
         params = {'auth_token': apiKey, 'incident': incident}
 

@@ -1,7 +1,7 @@
 {
     "appid": "00b3dc3a-ea6e-47a8-82a5-036f05d83863",
     "name": "Canary",
-    "description": "App to Integrate with ThinkST Canary API Service",
+    "description": "This app supports ingestion and investigative actions on the ThinkST Canary API Service",
     "type": "siem",
     "product_vendor": "ThinkST",
     "logo": "logo_canary.svg",
@@ -23,7 +23,7 @@
             "required": true,
             "order": 0
         },
-        "apiKey": {
+        "api_key": {
             "description": "API Key from Canary Website",
             "data_type": "password",
             "required": true,
@@ -44,23 +44,23 @@
         {
             "action": "on poll",
             "identifier": "on_poll",
-            "description": "On poll ingest all unacknowledged Canary incidents",
+            "description": "Ingest unacknowledged incidents from Canary",
             "type": "ingest",
             "read_only": true,
             "parameters": {
-                "nodeid": {
+                "node_id": {
                     "description": "Get all incidents for a specific node",
                     "data_type": "string",
                     "required": false,
                     "order": 0
                 },
-                "tz": {
+                "timezone": {
                     "description": "Timezone in pytz format (For example Australia/Sydney)",
                     "data_type": "string",
                     "required": false,
                     "order": 1
                 },
-                "eventlimit": {
+                "event_limit": {
                     "description": "Specify the maximum number of event logs to be returned with the incident",
                     "data_type": "numeric",
                     "required": false,
@@ -78,7 +78,7 @@
             "read_only": false,
             "parameters": {
                 "incident": {
-                    "description": "The incident key of of an existing Incident",
+                    "description": "The incident key of an existing Incident",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -155,7 +155,7 @@
                     "description": "Get incidents from a specific node",
                     "data_type": "string",
                     "required": false,
-                    "order": 1
+                    "order": 0
                 },
                 "incident_state": {
                     "description": "State of incidents to list",
@@ -168,11 +168,11 @@
                     "default": "acknowledged",
                     "order": 1
                 },
-                "tz": {
+                "timezone": {
                     "description": "Timezone in pytz format (For example Australia/Sydney)",
                     "data_type": "string",
                     "required": false,
-                    "order": 1
+                    "order": 2
                 }
             },
             "output": [
