@@ -31,6 +31,7 @@ class CanaryConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+        self._api_key = None
 
     def _process_empty_response(self, response, action_result):
 
@@ -109,12 +110,16 @@ class CanaryConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, endpoint, action_result, method, **kwargs):
+    def _make_rest_call(self, endpoint, action_result, params=None, method, **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
         config = self.get_config()
         domain = config.get('domain')
 
+        parameters = {'auth_token': self._api_key}
+        if params:
+            parameters = parameters.update(params)
+        
         resp_json = None
 
         try:
@@ -130,6 +135,7 @@ class CanaryConnector(BaseConnector):
                             url,
                             # auth=(username, password),  # basic authentication
                             verify=True,
+                            params=parameters,
                             **kwargs)
         except Exception as e:
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
@@ -146,8 +152,6 @@ class CanaryConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
         config = self.get_config()
-        apiKey = config.get('api_key')
-        params = {'auth_token': apiKey}
 
         self.save_progress("Connecting to endpoint")
         # make rest call
@@ -181,8 +185,6 @@ class CanaryConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
         config = self.get_config()
-        apiKey = config.get('api_key')
-        params = {'auth_token': apiKey}
 
         incidentState = param['incident_state']
         if incidentState == "acknowledged":
@@ -226,8 +228,6 @@ class CanaryConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        apiKey = config.get('api_key')
-        params = {'auth_token': apiKey}
 
         endpoint = "/incidents/unacknowledged"
 
@@ -307,9 +307,9 @@ class CanaryConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        apiKey = config.get('api_key')
+        # apiKey = config.get('api_key')
         incident = param['incident']
-        params = {'auth_token': apiKey, 'incident': incident}
+        params = {'incident': incident}
 
         incidentState = param['incident_state']
         if incidentState == "acknowledge":
@@ -388,6 +388,7 @@ class CanaryConnector(BaseConnector):
         """
 
         self._base_url = config.get('base_url')
+        self._api_key = config.get('api_key')
 
         return phantom.APP_SUCCESS
 
