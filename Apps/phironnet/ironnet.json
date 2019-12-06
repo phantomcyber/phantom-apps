@@ -21,7 +21,6 @@
             "description": "The base URL for the IronAPI",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "https://irondefense.hostname/IronApi",
             "order": 0
         },
@@ -29,8 +28,6 @@
             "description": "The username to use for authentication",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "password": {
@@ -52,7 +49,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -63,7 +59,6 @@
             "action": "rate alert",
             "identifier": "irondefense_rate_alert",
             "description": "Provides a rating for an Alert within IronDefense",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -73,9 +68,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "irondefense_alert_id"
+                        "irondefense alert id"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "analyst_severity": {
@@ -110,7 +104,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "default": "",
                     "order": 3
                 },
                 "share_comment_with_irondome": {
@@ -118,17 +111,90 @@
                     "data_type": "boolean",
                     "required": true,
                     "primary": false,
+                    "default": true,
                     "order": 4
                 }
             },
-            "output":[],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.analyst_severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "undecided",
+                        "benign",
+                        "suspicious",
+                        "malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.analyst_expectation",
+                    "data_type": "string",
+                    "example_values": [
+                        "expected",
+                        "unexpected",
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "set alert status",
             "identifier": "irondefense_set_alert_status",
             "description": "Sets the status of an Alert within IronDefense",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -138,9 +204,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "irondefense_alert_id"
+                        "irondefense alert id"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "alert_status": {
@@ -153,7 +218,6 @@
                         "under review",
                         "closed"
                     ],
-                    "default": "",
                     "order": 1
                 },
                 "comment": {
@@ -161,7 +225,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "default": "",
                     "order": 2
                 },
                 "share_comment_with_irondome": {
@@ -169,17 +232,75 @@
                     "data_type": "boolean",
                     "required": true,
                     "primary": false,
+                    "default": true,
                     "order": 3
                 }
             },
-            "output":[],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "comment on alert",
             "identifier": "irondefense_comment_on_alert",
             "description": "Adds a comment to an Alert within IronDefense",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -189,9 +310,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "irondefense_alert_id"
+                        "irondefense alert id"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "comment": {
@@ -199,7 +319,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "share_comment_with_irondome": {
@@ -207,17 +326,71 @@
                     "data_type": "boolean",
                     "required": true,
                     "primary": false,
+                    "default": true,
                     "order": 2
                 }
             },
-            "output":[],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "report bad activity",
             "identifier": "irondefense_report_observed_bad_activity",
             "description": "Reports observed bad activity to IronDefense",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -226,7 +399,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "default": "",
                     "order": 0
                 },
                 "description": {
@@ -234,14 +406,13 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "domain": {
                     "description": "Domain associated with the observed bad activity",
                     "data_type": "string",
                     "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": ["domain"],
                     "order": 2
                 },
@@ -249,7 +420,7 @@
                     "description": "IP associated with the observed bad activity",
                     "data_type": "string",
                     "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": ["ip"],
                     "order": 3
                 },
@@ -266,7 +437,75 @@
                     "order": 5
                 }
             },
-            "output":[],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.activity_end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.activity_start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 09:36:43.676105+00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]
