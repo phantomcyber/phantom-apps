@@ -17,7 +17,7 @@ from carbonblack_consts import *
 import os
 import time
 import re
-import urllib
+import six.moves.urllib.parse
 from parse import parse
 import json
 import zipfile
@@ -385,7 +385,11 @@ class CarbonblackConnector(BaseConnector):
 
         while (status != 'active') and (tries <= MAX_POLL_TRIES):
 
-            self.send_progress("Getting session id for sensor: {0} {1}".format(sensor_id, '.'.join(['' for x in xrange(tries + 1)])))
+            try:
+                self.send_progress("Getting session id for sensor: {0} {1}".format(sensor_id, '.'.join(['' for x in xrange(tries + 1)])))
+            except NameError:
+                # Python 3, xrange renamed to range
+                self.send_progress("Getting session id for sensor: {0} {1}".format(sensor_id, '.'.join(['' for x in range(tries + 1)])))
             time.sleep(CARBONBLACK_SLEEP_SECS)
 
             # try to get the status of the live session
@@ -1418,7 +1422,7 @@ class CarbonblackConnector(BaseConnector):
 
         for watchlist in watchlists:
             try:
-                watchlist['quoted_query'] = urllib.unquote(watchlist['search_query'][2:].replace('cb.urlver=1&', ''))
+                watchlist['quoted_query'] = six.moves.urllib.parse.unquote(watchlist['search_query'][2:].replace('cb.urlver=1&', ''))
                 watchlist['query_type'] = CARBONBLACK_QUERY_TYPE_BINARY if watchlist['index_type'] == 'modules' else CARBONBLACK_QUERY_TYPE_PROCESS
             except:
                 pass
@@ -1467,7 +1471,7 @@ class CarbonblackConnector(BaseConnector):
 
         query = param[CARBONBLACK_JSON_QUERY]
 
-        query = urllib.quote(query)
+        query = six.moves.urllib.parse.quote(query)
 
         if "cb.urlver=1&" not in query:
             query = "cb.urlver=1&" + query
@@ -1523,7 +1527,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            watchlist['quoted_query'] = urllib.unquote(watchlist['search_query'][2:].replace('cb.urlver=1&', ''))
+            watchlist['quoted_query'] = six.moves.urllib.parse.unquote(watchlist['search_query'][2:].replace('cb.urlver=1&', ''))
             watchlist['query_type'] = CARBONBLACK_QUERY_TYPE_BINARY if watchlist['index_type'] == 'modules' else CARBONBLACK_QUERY_TYPE_PROCESS
         except:
             pass
