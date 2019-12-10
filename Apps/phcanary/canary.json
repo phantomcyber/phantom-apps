@@ -128,7 +128,7 @@
         {
             "action": "list incidents",
             "identifier": "list_incidents",
-            "description": "Get list of existing Canary Incidents",
+            "description": "Get the list of existing Canary Incidents",
             "type": "investigate",
             "read_only": true,
             "parameters": {

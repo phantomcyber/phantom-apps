@@ -110,7 +110,7 @@ class CanaryConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, endpoint, action_result, params=None, method, **kwargs):
+    def _make_rest_call(self, endpoint, action_result, method, params=None, **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
         config = self.get_config()
@@ -119,7 +119,7 @@ class CanaryConnector(BaseConnector):
         parameters = {'auth_token': self._api_key}
         if params:
             parameters = parameters.update(params)
-        
+
         resp_json = None
 
         try:
@@ -134,8 +134,8 @@ class CanaryConnector(BaseConnector):
             r = request_func(
                             url,
                             # auth=(username, password),  # basic authentication
-                            verify=True,
                             params=parameters,
+                            verify=True,
                             **kwargs)
         except Exception as e:
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
@@ -151,12 +151,11 @@ class CanaryConnector(BaseConnector):
         # i.e. the param dictionary passed to this handler will be empty.
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
-        config = self.get_config()
 
         self.save_progress("Connecting to endpoint")
         # make rest call
 
-        ret_val, response = self._make_rest_call('/ping', action_result, params=params, headers=None, method="get")
+        ret_val, response = self._make_rest_call('/ping', action_result, headers=None, method="get")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -184,7 +183,6 @@ class CanaryConnector(BaseConnector):
         # i.e. the param dictionary passed to this handler will be empty.
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
-        config = self.get_config()
 
         incidentState = param['incident_state']
         if incidentState == "acknowledged":
@@ -195,7 +193,7 @@ class CanaryConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
         # make rest call
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=params, headers=None, method="get")
+        ret_val, response = self._make_rest_call(endpoint, action_result, headers=None, method="get")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -227,20 +225,15 @@ class CanaryConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        config = self.get_config()
-
         endpoint = "/incidents/unacknowledged"
 
         self.save_progress("Connecting to endpoint")
 
         # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=params, headers=None, method="get")
+        ret_val, response = self._make_rest_call(endpoint, action_result, headers=None, method="get")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            pass
+            return action_result.get_status()
 
         self.save_progress("Processing JSON Incident List")
         for incident in response["incidents"]:
@@ -306,8 +299,6 @@ class CanaryConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        config = self.get_config()
-        # apiKey = config.get('api_key')
         incident = param['incident']
         params = {'incident': incident}
 
@@ -324,17 +315,14 @@ class CanaryConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params, headers=None, method="post")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            pass
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
-        action_result.add_data(response)
 
         if response:
+            action_result.add_data(response)
             summary = action_result.update_summary({})
             summary['result'] = response.get('result')
 
