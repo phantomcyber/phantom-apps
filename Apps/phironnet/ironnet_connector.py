@@ -1,5 +1,5 @@
 # -----------------------------------------
-# Phantom sample App Connector python file
+# IronNet Phantom Connector
 # -----------------------------------------
 
 # Phantom App imports
@@ -7,8 +7,6 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from ironnet_consts import *
 import requests
 import json
 import re
