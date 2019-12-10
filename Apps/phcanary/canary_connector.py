@@ -158,10 +158,8 @@ class CanaryConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/ping', action_result, headers=None, method="get")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
-            # return action_result.get_status()
+            return action_result.get_status()
 
         if response:
             if response.get('result') == "success":
@@ -196,10 +194,7 @@ class CanaryConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, headers=None, method="get")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
-            # return action_result.get_status()
+            return action_result.get_status()
 
         if response:
             action_result.add_data(response)

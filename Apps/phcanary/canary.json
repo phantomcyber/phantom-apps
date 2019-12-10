@@ -161,14 +161,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.node_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.tz",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.devices.*.description.acknowledged",
                     "data_type": "string",
                     "example_values": [
