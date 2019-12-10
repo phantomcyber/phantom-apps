@@ -47,26 +47,7 @@
             "description": "Ingest unacknowledged incidents from Canary",
             "type": "ingest",
             "read_only": true,
-            "parameters": {
-                "node_id": {
-                    "description": "Get all incidents for a specific node",
-                    "data_type": "string",
-                    "required": false,
-                    "order": 0
-                },
-                "timezone": {
-                    "description": "Timezone in pytz format (For example Australia/Sydney)",
-                    "data_type": "string",
-                    "required": false,
-                    "order": 1
-                },
-                "event_limit": {
-                    "description": "Specify the maximum number of event logs to be returned with the incident",
-                    "data_type": "numeric",
-                    "required": false,
-                    "order": 2
-                }
-            },
+            "parameters": {},
             "output": [],
             "versions": "EQ(*)"
         },
@@ -151,12 +132,6 @@
             "type": "investigate",
             "read_only": true,
             "parameters": {
-                "node_id": {
-                    "description": "Get incidents from a specific node",
-                    "data_type": "string",
-                    "required": false,
-                    "order": 0
-                },
                 "incident_state": {
                     "description": "State of incidents to list",
                     "data_type": "string",
@@ -166,13 +141,7 @@
                         "unacknowledged"
                     ],
                     "default": "acknowledged",
-                    "order": 1
-                },
-                "timezone": {
-                    "description": "Timezone in pytz format (For example Australia/Sydney)",
-                    "data_type": "string",
-                    "required": false,
-                    "order": 2
+                    "order": 0
                 }
             },
             "output": [
