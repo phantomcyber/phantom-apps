@@ -1,0 +1,38 @@
+<!-- File: readme.html
+  Copyright (c) 2019 Splunk Inc.
+
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+<p><b>Notes</b>
+    <ul>
+     <li>List Groups</li>
+       <ul>
+         <li>
+           The filter parameter values follow the <a href="https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference" target="_blank">FQL Syntax</a>.
+         </li>
+         <li>
+           The sort parameter value has to be provided in the format property_name.asc for ascending and property_name.desc for descending order.
+         </li>
+       </ul>
+     <br>
+     <li>Query Devices</li>
+       <ul>
+         <li>
+           Both the filter and sort parameters follow the same concepts as mentioned above for the list groups action.
+         </li>
+       </ul>
+     <br>
+     <li>Assign Hosts, Remove Hosts, Quarantine Device, and Unquarantine Device</li>
+       <ul>
+         <li>
+           The devices will be fetched based on the values provided in both the device_id and hostname parameters.
+         </li>
+         <li>
+           If any incorrect value is provided in both the device_id and hostname parameters each, then, the action will fail with an appropriate error message.
+         </li>
+       </ul>
+     <br> 
+ </p>
+ 

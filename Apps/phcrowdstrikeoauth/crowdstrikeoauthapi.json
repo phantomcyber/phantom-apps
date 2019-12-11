@@ -1,0 +1,1514 @@
+{
+    "appid": "ae971ba5-3117-444a-8ac5-6ce779f3a232",
+    "name": "CrowdStrike OAuth API",
+    "description": "This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data",
+    "type": "endpoint",
+    "product_vendor": "CrowdStrike",
+    "logo": "crowdstrikeoauthapi.svg",
+    "logo_dark": "crowdstrikeoauthapi_dark.svg",
+    "product_name": "CrowdStrike",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.3",
+    "utctime_updated": "2019-07-16T21:52:21.000000Z",
+    "package_name": "phantom_crowdstrikeoauthapi",
+    "main_module": "crowdstrikeoauthapi_connector.pyc",
+    "app_config_render": "default",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "url": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Base URL",
+            "required": true,
+            "default": "https://api.crowdstrike.com"
+        },
+        "place_holder": {
+            "description": "Placeholder",
+            "data_type": "ph",
+            "order": 1
+        },
+        "client_id": {
+            "data_type": "password",
+            "order": 2,
+            "description": "Client ID",
+            "required": true
+        },
+        "client_secret": {
+            "data_type": "password",
+            "order": 3,
+            "description": "Client Secret",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query device",
+            "description": "Fetch the device details based on the provided query",
+            "type": "investigate",
+            "identifier": "query_device",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum devices to be fetched",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "Filter expression used to limit the fetched devices (FQL Syntax)",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "hostname: 'E*'",
+                        "platform_name:'Windows'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "hostname.desc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agent_load_flags",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agent_local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-13T10:46:11.024Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "5.10.9106.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bios_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk Technologies LTD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bios_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.build_number",
+                    "data_type": "string",
+                    "example_values": [
+                        "17134"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.config_id_base",
+                    "data_type": "string",
+                    "example_values": [
+                        "65994753"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.config_id_build",
+                    "data_type": "string",
+                    "example_values": [
+                        "9106"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.config_id_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928ab"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.device_control.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.device_control.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-18T13:16:17.246147089Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.device_control.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-18T13:09:53.221767635Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.device_control.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "cb4babb273274f79a91e8a0e84164916"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.device_control.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "device-control"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-03T23:31:25.402021685Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-03T23:27:22.325516295Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "49ee9efc99164562ad89640955f372ce"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "globalconfig"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.global_config.settings_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "a75911b0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-03T23:57:05.493184498Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-03T23:53:41.614339193Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad0dad6639454b4d8bbfc963bf9510c9"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "prevention"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.prevention.settings_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "4aa96e52"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-08T02:39:21.726331953Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-08T02:36:05.073298048Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6c74313d6c864180bd759c3235dbd550"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "remote-response"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.remote_response.settings_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "f472bd8e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-30T23:21:58.956282211Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-30T23:02:19.540591355Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "226d7067a47b4ea7a3369f7e9114b180"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "sensor-update"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.settings_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "65994753|3|2|automatic;101"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_policies.sensor_update.uninstall_protection",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENABLED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "204.107.141.240"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-19T19:10:14Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "4493ec18e3c942078b7c0bd4248d3f5e"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-01",
+                        "EC2AMAZ-K5LEL73"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Hostname",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-20T14:01:26Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.local_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.18.49"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mac_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "00-0c-29-a0-10-27"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machine_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "corp.splunk.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.major_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "59509"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.minor_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-20T14:04:12Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 10",
+                        "Windows Server 2019"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.platform_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.platform_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pointer_size",
+                    "data_type": "string",
+                    "example_values": [
+                        "8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.applied_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-03T23:57:05.493184498Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.assigned_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-03T23:53:41.614339193Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad0dad6639454b4d8bbfc963bf9510c9"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.policy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "prevention"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policies.*.settings_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "4aa96e52"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.product_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "1",
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.product_type_desc",
+                    "data_type": "string",
+                    "example_values": [
+                        "Workstation",
+                        "Server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.provision_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Provisioned"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service_pack_major",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service_pack_minor",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.site_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default-First-Site-Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.slow_changing_modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-17T16:08:07Z",
+                        "2019-06-25T08:34:08Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "contained",
+                        "lift_containment_pending"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.system_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system_product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk Platform"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Query Device",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "list groups",
+            "description": "Fetch the details of the host groups",
+            "type": "investigate",
+            "identifier": "list_groups",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum host groups to be fetched",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "Filter expression used to limit the fetched host groups (FQL Syntax)",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "modified_timestamp:<='2019-06-14T10:22:02.02236652Z'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_timestamp.asc",
+                        "name.desc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assignment_rule",
+                    "data_type": "string",
+                    "example_values": [
+                        "device_id:[''],hostname:['','EC2AMAZ-K5LEL73']"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "first.last@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-28T22:51:01.124782712Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a sample test group"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.group_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "static"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "b5098f79716c4beb8f9c2aebff609075"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ],
+                    "column_name": "Hostgroup ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user@example.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-28T22:51:01.124782712Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "super secure group"
+                    ],
+                    "column_name": "Hostgroup Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.total_host_group",
+                    "data_type": "numeric",
+                    "example_values": [
+                        529
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_host_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total host group: 529"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "List Groups",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "quarantine device",
+            "description": "Block the device",
+            "verbose": "This action contains the host, which stops any network communications to locations other than the CrowdStrike cloud and IPs specified in the user's containment policy.",
+            "type": "contain",
+            "undo": "unquarantine device",
+            "identifier": "quarantine_device",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of device IDs",
+                    "required": false,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                "hostname": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of hostnames",
+                    "required": false,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "host name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c70bbe8334aa47bd61046603eb27b15a"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-01"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c70bbe8334aa47bd61046603eb27b15a"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/devices/entities/devices/v1"
+                    ],
+                    "column_name": "Path",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_quarantined_device",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total quarantined device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Quarantine Device",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "unquarantine device",
+            "description": "Unblock the device",
+            "verbose": "This action lifts containment on the host, which returns its network communications to normal",
+            "type": "correct",
+            "undo": "quarantine device",
+            "identifier": "unquarantine_device",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of device IDs",
+                    "required": false,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                "hostname": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of hostnames",
+                    "required": false,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "host name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c70bbe8334aa47bd61046603eb27b15a"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-01"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c70bbe8334aa47bd61046603eb27b15a"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/devices/entities/devices/v1"
+                    ],
+                    "column_name": "Path",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_unquarantined_device",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total unquarantined device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Unquarantine Device",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "assign hosts",
+            "description": "Assign one or more hosts to the static host group",
+            "type": "correct",
+            "undo": "remove hosts",
+            "identifier": "assign_hosts",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of device IDs",
+                    "required": false,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                "hostname": {
+                    "data_type": "string",
+                    "description": "Comma separated list of hostnames",
+                    "required": false,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                "host_group_id": {
+                    "data_type": "string",
+                    "description": "Static host group ID",
+                    "required": true,
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928ab"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_group_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5c3203cee6934edd894c0c02d5a7d2ad"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-01"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assignment_rule",
+                    "data_type": "string",
+                    "example_values": [
+                        "device_id:[''],hostname:['CB-TEST-01']"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "api-client-id:ae1690074e144336ae1de4de9dc1bd93"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-18T06:43:48.348572725Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "test 6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "static"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5c3203cee6934edd894c0c02d5a7d2ad"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "api-client-id:ae1690074e144336ae1de4de9dc1bd93"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-18T06:43:48.348572725Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_assigned_device",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total assigned device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Assign Hosts",
+                "type": "custom",
+                "height": 5,
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "remove hosts",
+            "description": "Remove one or more hosts from the static host group",
+            "type": "contain",
+            "undo": "assign hosts",
+            "identifier": "remove_hosts",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of device IDs",
+                    "required": false,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                "hostname": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of hostnames",
+                    "required": false,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                "host_group_id": {
+                    "data_type": "string",
+                    "description": "Static host group ID",
+                    "required": true,
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928ab"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_group_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5c3203cee6934edd894c0c02d5a7d2ad"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-01"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assignment_rule",
+                    "data_type": "string",
+                    "example_values": [
+                        "device_id:[''],hostname:['']"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "api-client-id:ae1690074e144336ae1de4de9dc1bd93"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-18T06:43:48.348572725Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "test 6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "static"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5c3203cee6934edd894c0c02d5a7d2ad"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "api-client-id:ae1690074e144336ae1de4de9dc1bd93"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-06-18T06:43:48.348572725Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_removed_device",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Remove Hosts",
+                "type": "custom",
+                "height": 5,
+                "view": "crowdstrike_view.display_view"
+            }
+        }
+    ]
+}
