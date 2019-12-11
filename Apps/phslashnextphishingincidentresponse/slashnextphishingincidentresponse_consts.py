@@ -4,12 +4,6 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-"""
-Created on August 20, 2019
-
-@author: Saadat Abid, Umair Ahmad
-"""
-
 # Define your constants here
 BASE_API = 'https://oti.slashnext.cloud/api'
 HOST_REPUTE_API = '/oti/v1/host/reputation'
