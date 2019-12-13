@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.4",
-    "utctime_updated": "2019-07-31T20:11:04.000000Z",
+    "app_version": "1.0.6",
+    "utctime_updated": "2019-10-11T00:18:46.000000Z",
     "package_name": "phantom_awscloudtrail",
     "main_module": "awscloudtrail_connector.pyc",
     "min_phantom_version": "4.2.7532",
@@ -189,7 +189,7 @@
                     "column_name": "Trail Name",
                     "column_order": 0,
                     "example_values": [
-                        "splunk-cloudtrail-fors3monitoring"
+                        "test-cloudtrail"
                     ]
                 },
                 {
@@ -198,14 +198,14 @@
                     "column_name": "S3 Bucket",
                     "column_order": 2,
                     "example_values": [
-                        "splunk-test-cloudtrail-fors3monitoring"
+                        "test-bucket"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.SnsTopicARN",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:sns:us-west-2:849257271967:test-splunk-aws-addon-sns-notifications"
+                        "arn:aws:sns:us-west-2:123456789012:test-splunk-aws-addon-sns-notifications"
                     ],
                     "contains": [
                         "aws arn"
@@ -215,7 +215,7 @@
                     "data_path": "action_result.data.*.SnsTopicName",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:sns:us-west-2:849257271967:test-splunk-aws-addon-sns-notifications"
+                        "arn:aws:sns:us-west-2:123456789012:test-addon-sns"
                     ],
                     "contains": [
                         "aws arn"
@@ -225,7 +225,7 @@
                     "data_path": "action_result.data.*.TrailARN",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:cloudtrail:us-east-1:849257271967:trail/splunk-cloudtrail-fors3monitoring"
+                        "arn:aws:cloudtrail:us-east-1:123456789012:trail/test-cloudtrail"
                     ],
                     "contains": [
                         "aws arn"
@@ -350,21 +350,21 @@
                     "data_path": "action_result.data.*.AccessKeyId",
                     "data_type": "string",
                     "example_values": [
-                        "ASIA4LO5NSKPZOLJOMTH"
+                        "ABCDEFGHI1234567890"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.EventId",
                     "data_type": "string",
                     "example_values": [
-                        "1652c189-2fb0-490d-a30c-c9afc10e5f2c"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.EventName",
                     "data_type": "string",
                     "example_values": [
-                        "LookupEvents"
+                        "testEvents"
                     ],
                     "column_name": "Event Name",
                     "column_order": 2
@@ -410,21 +410,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.errorMessage",
                     "data_type": "string",
                     "example_values": [
-                        "User: arn:aws:sts::849257271967:assumed-role/genericlambdarole/parseSplunkRegistrationEmailBase64 is not authorized to perform: logs:CreateLogStream on resource: arn:aws:logs:us-east-1:849257271967:log-group:/aws/lambda/parseSplunkRegistrationEmailBase64:log-stream:2019/07/30/[$LATEST]dbe0ed5d1b6e4bf8844eef4b41f74e6b"
+                        "User: arn:aws:sts::123456789012:assumed-role/test-role/parseRegistrationEmailBase64 is not authorized to perform: logs:CreateLogStream on resource: arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/parseRegistrationEmailBase64:log-stream:2019/07/30/[$LATEST]1234abcd12abab12ab12123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventID",
                     "data_type": "string",
                     "example_values": [
-                        "1652c189-2fb0-490d-a30c-c9afc10e5f2c"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.eventName",
                     "data_type": "string",
                     "example_values": [
-                        "LookupEvents"
+                        "testEvents"
                     ]
                 },
                 {
@@ -467,14 +467,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.recipientAccountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestID",
                     "data_type": "string",
                     "example_values": [
-                        "a4ff6465-eacd-45cc-9d00-54d156f1046a"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -506,14 +506,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.accountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.agentName",
                     "data_type": "string",
                     "example_values": [
-                        "amazon-ssm-agent"
+                        "test-ssm-agent"
                     ]
                 },
                 {
@@ -534,7 +534,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.computerName",
                     "data_type": "string",
                     "example_values": [
-                        "ip-172-31-92-126.ec2.internal"
+                        "ip-123-12-12-123.ec2.internal"
                     ]
                 },
                 {
@@ -549,7 +549,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.encryptionContext.aws:lambda:FunctionArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:lambda:us-east-1:849257271967:function:test-test-printoutput3-LambdaImportAssets-F2X87UKSD8EW"
+                        "arn:aws:lambda:us-east-1:123456789012:function:test--LambdaAssets-ABCDE1234567"
                     ],
                     "contains": [
                         "aws arn"
@@ -566,21 +566,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.environmentId",
                     "data_type": "string",
                     "example_values": [
-                        "e-ef2b3m54ec"
+                        "e-abcde12345"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.externalId",
                     "data_type": "string",
                     "example_values": [
-                        "qrmVcjiYGE"
+                        "abcdEFGhi"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.fileSystemId",
                     "data_type": "string",
                     "example_values": [
-                        "fs-5ca579bf"
+                        "fs-1234abcd"
                     ]
                 },
                 {
@@ -597,7 +597,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.instanceId",
                     "data_type": "string",
                     "example_values": [
-                        "i-0ea1454477403286d"
+                        "i-abcdefg123456"
                     ]
                 },
                 {
@@ -625,7 +625,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.marker",
                     "data_type": "string",
                     "example_values": [
-                        "lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZkGsDz1LI7e+TWIc3wm1hIW/c4h0kdS55OYMM4o/jpTjHbLNqsrBsgR/ee2eXoJp0e6ORRUuOVOaR5nxZmGTGQADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5Qvo3bzKGVTASYpusBX+bSTmSHOiGxLITL+mvpL/sXfkK+8MMwtRyKS4b64do4cE7mPFzUUluuj8W69Cm74OK1NgiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWcWzbQhxtGas3WJ8MmCebU1auV7TUkBvPVomaBnFP+5l4rh7OjJMy7bcV+dw0TAkgzMHloQ5dXhvm751bUYR7A85kKM4EcBK3HokqBzefLfgRU99q0jOYJVftlPhUGWp+T8EoO4fBXNHqRXmq4aLpzPpQMzMc5vGlkrP7x7GF9emA="
+                        "lslTXFcbLQKkbaabbccddh8Iuhhi7cd/c3sgqk3eiDRabcdfergtskS7Bo66iQPTMpVOHZkGsDz1LI7e+TWIc3wm1hIW/abcdefg12345/jpTjHbLNqsrBsgR/ee2eXoJp0e6ORRUuOVOaR5nxZmGTGQADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5Qvo3bzKGVTASYpusBX+bSTmSHOiGxLITL+mvpL/sXfkK+8MMwtRyKS4b64do4cE7mPFzUUluuj8W69Cm74OK1NgiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWcWzbQhxtGas3WJ8MmCebU1auV7TUkBvPVomaBnFP+5l4rh7OjJMy7bcV+dw0TAkgzMHloQ5dXhvm751bUYR7A85kKM4EcBK3HokqBzefLfgRU99q0jOYJVftlPhUGWp+T8EoO4fBXNHqRXmq4aLpzPpQMzMc5vGlkrP7x7GF9emA="
                     ]
                 },
                 {
@@ -653,14 +653,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.mountTargetId",
                     "data_type": "string",
                     "example_values": [
-                        "fsmt-32b8e1d3"
+                        "fsmt-1234abcd"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.networkInterfaceId",
                     "data_type": "string",
                     "example_values": [
-                        "eni-09ad7f9cb3ffac70d"
+                        "eni-abcdefg1234567"
                     ]
                 },
                 {
@@ -688,7 +688,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.policyArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:policy/redlock-lab-access"
+                        "arn:aws:iam::123456789012:policy/testPolicy"
                     ],
                     "contains": [
                         "aws arn"
@@ -698,14 +698,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.requestContext.awsAccountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resource",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:lambda:us-east-1:849257271967:function:test_26"
+                        "arn:aws:lambda:us-east-1:123456789012:function:test"
                     ],
                     "contains": [
                         "aws arn"
@@ -715,7 +715,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resourceArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:elasticbeanstalk:us-east-1:849257271967:environment/proyer-target-web-workload/ProyerTargetWebWorkload-env"
+                        "arn:aws:elasticbeanstalk:us-east-1:123456789012:environment/test-target/testtarget-env"
                     ],
                     "contains": [
                         "aws arn"
@@ -725,14 +725,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.resourceId",
                     "data_type": "string",
                     "example_values": [
-                        "ws-kwmt2wtsb"
+                        "ws-abcdef1234"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                        "arn:aws:iam::123456789012:role/test-role"
                     ],
                     "contains": [
                         "aws arn"
@@ -742,21 +742,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleName",
                     "data_type": "string",
                     "example_values": [
-                        "RedLockReadOnly"
+                        "test-role"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.roleSessionName",
                     "data_type": "string",
                     "example_values": [
-                        "redlock"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.stackName",
                     "data_type": "string",
                     "example_values": [
-                        "awseb-e-ef2b3m54ec-stack"
+                        "awseb-e-1234abcde-stack"
                     ]
                 },
                 {
@@ -770,7 +770,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.topicArn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:sns:us-east-1:849257271967:test-cleaningup-code-SNSTopic-DDW8O4QNOPLH"
+                        "arn:aws:sns:us-east-1:123456789012:test-code-SNSTopic-ABCDEFGH123"
                     ],
                     "contains": [
                         "aws arn"
@@ -787,7 +787,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.resources.*.ARN",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                        "arn:aws:iam::123456789012:role/test-role"
                     ],
                     "contains": [
                         "aws arn"
@@ -797,7 +797,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.resources.*.accountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
@@ -815,14 +815,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.Message",
                     "data_type": "string",
                     "example_values": [
-                        "User: arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock is not authorized to perform: eks:ListClusters on resource: arn:aws:eks:us-east-1:849257271967:cluster/*"
+                        "User: arn:aws:sts::123456789012:assumed-role/test-role/test is not authorized to perform: eks:ListClusters on resource: arn:aws:eks:us-east-1:123456789012:cluster/*"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.assumedRoleUser.arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock"
+                        "arn:aws:sts::123456789012:assumed-role/test-role/test"
                     ],
                     "contains": [
                         "aws arn"
@@ -832,14 +832,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.assumedRoleUser.assumedRoleId",
                     "data_type": "string",
                     "example_values": [
-                        "AROAIYE5WYDZKPDJAFLLA:redlock"
+                        "ABCDEFGHI123456789:test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.credentials.accessKeyId",
                     "data_type": "string",
                     "example_values": [
-                        "ASIA4LO5NSKPZOLJOMTH"
+                        "ABCDEFGHI123456789"
                     ]
                 },
                 {
@@ -853,21 +853,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.credentials.sessionToken",
                     "data_type": "string",
                     "example_values": [
-                        "AgoJb3JpZ2luX2VjEBMaCXVzLWVhc3QtMSJGMEQCIGmmjSmuKp8Dk8AmEx1yuMYYFSpD7h8tuqJDX0BdawM1AiBOV74zA4lnwD6uo5aj50a6pTmrDDFxsI9Gz7B+wg+96iqXAgiM//////////8BEAAaDDg0OTI1NzI3MTk2NyIMIyw/uI5w04fo9r5LKusB05HceTN5TJRBkLrVOK+yGMXURedACeF1kXJ0rID3FC18eDZg16wFAVWVy4cQ/l77qDKR7HIjFrhaCGMzWWIDZXdv8uDjgq+TDfWOuS02BnnSq6sZ89PFLn32tXnshrEHKomzqqhW+7ObRY+z3OxoMIWw4vCIkJauWmygzXYTn4Evskv8lpf4sTQ6q2FySLQm+U8afbVSJ4wyztmYphwcfHDHNRTz04Q8hr6L4Fk6+xg+gqC9h5cNKqrUV+PW9SZQ+yePFRe7w5viJimsl9C5A6Av5YUMul0gfVtd8/s6JudVLf/GQ0EI72pIDTDRwIDqBTq1AXJX4J9YqaODMiUjBePvsGZdwpvUh0jK/QuSJtj2314Mieo61MxDBzCRnkpGglhRoGyQsBsU39GVowbmyGuh9Ptn5rd5/qWXnjKTfWUXsxoxl2r7tc/j8gIbcmiHFtAM05KUaehB4d5u1m+Yz1jxItWpEi9rBxs4OFxQqPoXrLwGKY8nqunAsTjKF/bgMoj7PBeaLq2b8yhaAiTUUUDrb70Isl0RGE7EQSdSn7fu33OgK+j/Ak8="
+                        "AgoJb3JpZ2luX2Vabcdefghi123456789EQCIGmmjSmuKp8Dk8AmEx1yuMYYFSpD7h8tuqJDX0BdawM1AiBOV74zA4lnwD6uo5aj50a6pTmrDDFxsI9Gz7B+wg+96iqXAgiM//////////abcdefghijklmn1234567890/uI5w04fo9r5LKusB05HceTN5TJRBkLrVOK+yGMXURedACeF1kXJ0rID3FC18eDZg16wFAVWVy4cQ/l77qDKR7HIjFrhaCGMzWWIDZXdv8uDjgq+TDfWOuS02BnnSq6sZ89PFLn32tXnshrEHKomzqqhW+7ObRY+z3OxoMIWw4vCIkJauWmygzXYTn4Evskv8lpf4sTQ6q2FySLQm+U8afbVSJ4wyztmYphwcfHDHNRTz04Q8hr6L4Fk6+xg+gqC9h5cNKqrUV+PW9SZQ+yePFRe7w5viJimsl9C5A6Av5YUMul0gfVtd8/s6JudVLf/GQ0EI72pIDTDRwIDqBTq1AXJX4J9YqaODMiUjBePvsGZdwpvUh0jK/QuSJtj2314Mieo61MxDBzCRnkpGglhRoGyQsBsU39GVowbmyGuh9Ptn5rd5/qWXnjKTfWUXsxoxl2r7tc/j8gIbcmiHFtAM05KUaehB4d5u1m+Yz1jxItWpEi9rBxs4OFxQqPoXrLwGKY8nqunAsTjKF/bgMoj7PBeaLq2b8yhaAiTUUUDrb70Isl0RGE7EQSdSn7fu33OgK+j/Ak8="
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.alias",
                     "data_type": "string",
                     "example_values": [
-                        "d-90671a8129"
+                        "d-12345abcdefg"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.customerUserName",
                     "data_type": "string",
                     "example_values": [
-                        "Administrator"
+                        "testUser"
                     ],
                     "contains": [
                         "user name"
@@ -877,7 +877,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.directoryId",
                     "data_type": "string",
                     "example_values": [
-                        "d-90671a8129"
+                        "d-12345abcdefg"
                     ]
                 },
                 {
@@ -898,7 +898,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.dnsIpAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "172.16.1.208"
+                        "123.12.1.123"
                     ],
                     "contains": [
                         "ip"
@@ -908,7 +908,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.iamRoleId",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:role/workspaces_DefaultRole"
+                        "arn:aws:iam::123456789012:role/test-role"
                     ],
                     "contains": [
                         "aws arn"
@@ -918,7 +918,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.registrationCode",
                     "data_type": "string",
                     "example_values": [
-                        "SLiad+CF835G"
+                        "ABC123+EFG456"
                     ]
                 },
                 {
@@ -932,7 +932,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.subnetIds",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-0536482e450ca6918"
+                        "subnet-1234567890abcdefge"
                     ]
                 },
                 {
@@ -963,21 +963,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.directories.*.workspaceSecurityGroupId",
                     "data_type": "string",
                     "example_values": [
-                        "sg-0c070d01ec8dbb279"
+                        "sg-1234abcde1234"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:logical-id",
                     "data_type": "string",
                     "example_values": [
-                        "LambdaImportAssets"
+                        "LambdaAssets"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:stack-id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:cloudformation:us-east-1:849257271967:stack/test-test-18/e3f92bc0-946b-11e9-91eb-0a9ef6cbb06a"
+                        "arn:aws:cloudformation:us-east-1:123456789012:stack/test/1234abcd-12ab-ab12-ab12-123456abcdef"
                     ],
                     "contains": [
                         "aws arn"
@@ -987,35 +987,35 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.tags.aws:cloudformation:stack-name",
                     "data_type": "string",
                     "example_values": [
-                        "test-test-18"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.bundleId",
                     "data_type": "string",
                     "example_values": [
-                        "wsb-3t36q0xfc"
+                        "wsb-abc123abc"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.computerName",
                     "data_type": "string",
                     "example_values": [
-                        "IP-C6137C1F"
+                        "IP-ABCD123AB"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.directoryId",
                     "data_type": "string",
                     "example_values": [
-                        "d-90671a8129"
+                        "d-12345abcdefg"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.ipAddress",
                     "data_type": "string",
                     "example_values": [
-                        "172.16.1.107"
+                        "123.12.1.123"
                     ],
                     "contains": [
                         "ip"
@@ -1032,14 +1032,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.subnetId",
                     "data_type": "string",
                     "example_values": [
-                        "subnet-0536482e450ca6918"
+                        "subnet-1234567890abcdefge"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.userName",
                     "data_type": "string",
                     "example_values": [
-                        "code42"
+                        "testUser"
                     ],
                     "contains": [
                         "user name"
@@ -1049,7 +1049,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.responseElements.workspaces.*.workspaceId",
                     "data_type": "string",
                     "example_values": [
-                        "ws-kwmt2wtsb"
+                        "ws-abcde12345"
                     ]
                 },
                 {
@@ -1091,14 +1091,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.sharedEventID",
                     "data_type": "string",
                     "example_values": [
-                        "2d4c5f4f-dbd9-43a1-aa15-07bbf3053ac3"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.sourceIPAddress",
                     "data_type": "string",
                     "example_values": [
-                        "34.199.10.120"
+                        "12.123.12.123"
                     ],
                     "contains": [
                         "ip"
@@ -1110,7 +1110,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userAgent",
                     "data_type": "string",
                     "example_values": [
-                        "aws-sdk-java/1.11.569 Linux/4.14.128-87.105.amzn1.x86_64 Java_HotSpot(TM)_64-Bit_Server_VM/25.202-b08 java/1.8.0_202 groovy/2.4.15 vendor/Oracle_Corporation"
+                        "aws-sdk-java/1.11.569 Linux/4.14.128-87.105.amzn1.x86_64 test_HotSpot(TM)_64-Bit_Server_VM/25.202-b08 test/1.8.0_202 test1/2.4.15 vendor/test_Corporation"
                     ],
                     "column_name": "User Agent",
                     "column_order": 4
@@ -1119,21 +1119,21 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.accessKeyId",
                     "data_type": "string",
                     "example_values": [
-                        "ASIA4LO5NSKPZOLJOMTH"
+                        "ABCDEFGHI123456789"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.accountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:sts::849257271967:assumed-role/RedLockReadOnly/redlock"
+                        "arn:aws:sts::123456789012:assumed-role/test-role/test"
                     ],
                     "contains": [
                         "aws arn"
@@ -1150,7 +1150,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.principalId",
                     "data_type": "string",
                     "example_values": [
-                        "AROAIYE5WYDZKPDJAFLLA:redlock"
+                        "ABCDEFGHI1234567890:test"
                     ]
                 },
                 {
@@ -1171,14 +1171,14 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.accountId",
                     "data_type": "string",
                     "example_values": [
-                        "849257271967"
+                        "123456789012"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:role/RedLockReadOnly"
+                        "arn:aws:iam::123456789012:role/test-role"
                     ],
                     "contains": [
                         "aws arn"
@@ -1188,7 +1188,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.principalId",
                     "data_type": "string",
                     "example_values": [
-                        "AROAIYE5WYDZKPDJAFLLA"
+                        "ABCDEFGHI1234567890"
                     ]
                 },
                 {
@@ -1202,7 +1202,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.sessionContext.sessionIssuer.userName",
                     "data_type": "string",
                     "example_values": [
-                        "RedLockReadOnly"
+                        "testUser"
                     ],
                     "contains": [
                         "user name"
@@ -1219,7 +1219,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.userIdentity.userName",
                     "data_type": "string",
                     "example_values": [
-                        "test@splunk.us"
+                        "test@example.us"
                     ],
                     "contains": [
                         "email",
@@ -1237,7 +1237,7 @@
                     "data_path": "action_result.data.*.Resources.*.ResourceName",
                     "data_type": "string",
                     "example_values": [
-                        "ASIA4LO5NSKPZOLJOMTH"
+                        "ABCDEFGHI123456789"
                     ]
                 },
                 {
@@ -1251,7 +1251,7 @@
                     "data_path": "action_result.data.*.Username",
                     "data_type": "string",
                     "example_values": [
-                        "redlock"
+                        "testUser"
                     ],
                     "contains": [
                         "email",

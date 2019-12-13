@@ -146,7 +146,7 @@
                         "athena query"
                     ],
                     "example_values": [
-                        "SELECT origin, count(*) AS total_departures\nFROM\nflights_parquet\nWHERE year >= '2000'\nGROUP BY origin\nORDER BY total_departures DESC\nLIMIT 10;"
+                        "SELECT origin, count(*) AS total_departures\nFROM\ntest_table\nWHERE year >= '2000'\nGROUP BY origin\nORDER BY total_departures DESC\nLIMIT 10;"
                     ]
                 },
                 {
@@ -165,7 +165,7 @@
                         "athena named query"
                     ],
                     "example_values": [
-                        "d347516b-5d35-4ea8-bfa7-41b1b4cacd84"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -193,8 +193,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "f4f216f0-a891-11e7-8492-fd02bf47bc43",
-                        "c5ab5171-a892-11e7-aff6-d797b63dd472"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -209,8 +208,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "f4f216f0-a891-11e7-8492-fd02bf47bc43",
-                        "c5ab5171-a892-11e7-aff6-d797b63dd472"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -337,16 +335,14 @@
                         "athena named query"
                     ],
                     "example_values": [
-                        "0e2655a6-46cc-4337-9a2f-2e714243578c",
-                        "e39ae6c4-374d-4915-8dbf-e8f3b7316814"
-                    ]
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"                    ]
                 },
                 {
                     "data_path": "action_result.parameter.s3_location",
                     "data_type": "string",
                     "example_values": [
-                        "s3://test-query-bucket/test-queries",
-                        "s3://test-query-bucket/test-queries/kms_encrypt"
+                        "s3://test-bucket/test-queries",
+                        "s3://test-bucket/test-queries/kms_encrypt"
                     ]
                 },
                 {

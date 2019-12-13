@@ -185,7 +185,7 @@
                     ],
                     "example_values": [
                         "parsePhantomRegistrationEmail",
-                        "arn:aws:lambda:us-east-1:849257271967:function:example_helloworld"
+                        "arn:aws:lambda:us-east-1:123456789012:function:example_helloworld"
                     ]
                 },
                 {
@@ -308,18 +308,14 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "ed46d54f-9144-4984-bb1a-1b862b441059",
-                        "5627ef7f-d117-41ac-9bd5-a3f6528e928f",
-                        "49eda7c5-1298-49ee-a63d-3bd009ab99fd"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
                     "data_type": "string",
                     "example_values": [
-                        "root=1-5c6c7252-db817790f16133e8cfcadae0;sampled=0",
-                        "root=1-5c6c7498-a1b56d395731ee18dcc868be;sampled=0",
-                        "root=1-5c6c8230-4e8ec85e9cd298ea4ee8f476;sampled=0"
+                        "root=1-abcd1234-abcdfghi123456789abcd;sampled=0"
                     ]
                 },
                 {
@@ -333,9 +329,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "ed46d54f-9144-4984-bb1a-1b862b441059",
-                        "5627ef7f-d117-41ac-9bd5-a3f6528e928f",
-                        "49eda7c5-1298-49ee-a63d-3bd009ab99fd"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -443,7 +437,7 @@
                     "data_path": "action_result.data.*.Functions.*.CodeSha256",
                     "data_type": "string",
                     "example_values": [
-                        "sXKYFbymI6jUm3DjyeO6uyUvhBFEzz2QdqpdNqeEp4Q="
+                        "abcdEFG123456ABCDefghijk12345678abDE="
                     ]
                 },
                 {
@@ -464,7 +458,7 @@
                     "data_path": "action_result.data.*.Functions.*.RevisionId",
                     "data_type": "string",
                     "example_values": [
-                        "b31bbba4-f0bd-4278-9d92-6c953baec163"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -481,7 +475,7 @@
                         "lambda function arn"
                     ],
                     "example_values": [
-                        "arn:aws:lambda:us-east-1:849257271967:function:demo9"
+                        "arn:aws:lambda:us-east-1:123456789012:function:demo9"
                     ],
                     "column_name": "Function Arn",
                     "column_order": 2
@@ -497,7 +491,7 @@
                     "data_path": "action_result.data.*.Functions.*.Role",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:iam::849257271967:role/service-role/genericlambdarole"
+                        "arn:aws:iam::123456789012:role/service-role/test-role"
                     ],
                     "column_name": "Role",
                     "column_order": 1
@@ -549,7 +543,7 @@
                         "lambda next token"
                     ],
                     "example_values": [
-                        "lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe2EMAuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs="
+                        "abcdEFG123456ABCDefghijk12345678abDE/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOabcdEFG123456ABCDefghijk12345678abDELUO6qPe2EMAuNDBjUTxm8z6N28yhlUwEmKbrAV/abcdEFG123456ABCDefghijk12345678abDE/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/abcdEFG123456ABCDefghijk12345678abDE/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs="
                     ]
                 },
                 {
@@ -570,7 +564,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "53469e64-4140-11e9-be56-a320126d7c8d"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -584,7 +578,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "53469e64-4140-11e9-be56-a320126d7c8d"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -612,7 +606,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Next token: lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe2EMAuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs=, Num functions: 1"
+                        "Next token: 1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo1234abcd-12ab-ab12-ab12-123456abcdefuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs=, Num functions: 1"
                     ]
                 },
                 {
@@ -633,7 +627,7 @@
                         "lambda next token"
                     ],
                     "example_values": [
-                        "lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe2EMAuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc+Qq9u3+IYyk7smjCWpIY371RST1llX0KIVaZkBn+agQ6cVvSAmBrKVEdtAzHROaivow8IdH2YG8FxvGmI5HkwSTf60OBM3jFrxw7v5OjCoId/ao6LBGYkuSAPF6YvgvwBdpgZeRmXfx9Iop3eaCNyLeGtKzLqVSOUwazScYgfAk="
+                        "1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe1234abcd12abab12ab12123456abcdef/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc+Qq9u3+IYyk7smjCWpIY371RST1llX0KIVaZkBn+agQ6cVvSAmBrKVEdtAzHROaivow8IdH2YG8FxvGmI5HkwSTf60OBM3jFrxw7v5OjCoId/ao6LBGYkuSAPF6YvgvwBdpgZeRmXfx9Iop3eaCNyLeGtKzLqVSOUwazScYgfAk="
                     ]
                 },
                 {
@@ -643,7 +637,7 @@
                         "lambda next token"
                     ],
                     "example_values": [
-                        "lslTXFcbLQKkb0vP9Kgh5jEva29h8Iuhhi7cd/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe2EMAuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs="
+                        "1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6Vg1234abcd12abab12ab12123456abcdef/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs="
                     ]
                 },
                 {
@@ -783,7 +777,6 @@
                         "lambda function arn"
                     ],
                     "example_values": [
-                        "parsePhantomRegistrationEmailBase64",
                         "example_helloworld"
                     ]
                 },
@@ -810,7 +803,7 @@
                     "data_path": "action_result.parameter.source_arn",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:lambda:us-east-1:849257271967:function:parsePhantomRegistrationEmailBase64"
+                        "arn:aws:lambda:us-east-1:123456789012:function:parseRegistrationEmailBase64"
                     ]
                 },
                 {
@@ -854,8 +847,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
                     "data_type": "string",
                     "example_values": [
-                        "7d45e44c-315e-11e9-b2ed-59f4e83b25cc",
-                        "0edc063e-3496-11e9-8757-d509958aecd0"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
@@ -871,8 +863,7 @@
                     "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "7d45e44c-315e-11e9-b2ed-59f4e83b25cc",
-                        "0edc063e-3496-11e9-8757-d509958aecd0"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ],
                     "column_name": "Request ID",
                     "column_order": 1
@@ -888,8 +879,8 @@
                     "data_path": "action_result.data.*.Statement",
                     "data_type": "string",
                     "example_values": [
-                        "{\"Sid\":\"ID-1\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:849257271967:function:parsePhantomRegistrationEmailBase64\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:lambda:us-east-1:849257271967:function:parsePhantomRegistrationEmailBase64\"}}}",
-                        "{\"Sid\":\"ID-1\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:849257271967:function:example_helloworld\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:lambda:us-east-1:849257271967:function:parsePhantomRegistrationEmailBase64\"}}}"
+                        "{\"Sid\":\"ID-1\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:123456789012:function:parseRegistrationEmailBase64\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:lambda:us-east-1:123456789012:function:parseRegistrationEmailBase64\"}}}",
+                        "{\"Sid\":\"ID-1\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:123456789012:function:example_helloworld\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:lambda:us-east-1:123456789012:function:parseRegistrationEmailBase64\"}}}"
                     ]
                 },
                 {
