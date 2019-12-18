@@ -1,11 +1,13 @@
 {
     "appid": "1e1618e7-2f70-4fc0-916a-f96facc2d2e1",
+    "connector_id": "1e1618e7-2f70-4fc0-916a-f96facc2d2e1",
     "name": "Jira",
     "description": "This app integrates with JIRA to perform several ticket management actions",
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.pyc",
     "app_version": "2.0.36",
+    "connector_version": "2.0.36",
     "utctime_updated": "2019-11-20T23:48:02.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
