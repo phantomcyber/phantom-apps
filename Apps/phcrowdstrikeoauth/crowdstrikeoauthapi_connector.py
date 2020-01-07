@@ -1,5 +1,5 @@
 # File: crowdstrikeoauthapi_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -42,9 +42,9 @@ class CrowdstrikeConnector(BaseConnector):
         config = self.get_config()
 
         # Base URL
-        self._client_id = config[CROWDSTRIKE_CLIENT_ID].encode('utf-8')
-        self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET].encode('utf-8')
-        self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth].encode('utf-8')
+        self._client_id = config[CROWDSTRIKE_CLIENT_ID]
+        self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
+        self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth]
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
 
         if (self._base_url_oauth[-1] == '/'):
@@ -93,8 +93,8 @@ class CrowdstrikeConnector(BaseConnector):
             if response.get("resources"):
                 list_ids.extend(response.get("resources"))
 
-            if limit and len(list_ids) >= limit:
-                return list_ids[:limit]
+            if limit and len(list_ids) >= int(limit):
+                return list_ids[:int(limit)]
 
             if offset == total:
                 return list_ids
@@ -137,7 +137,7 @@ class CrowdstrikeConnector(BaseConnector):
         if id_list is None:
             return id_list
 
-        id_list = map(str, id_list)
+        id_list = list(map(str, id_list))
 
         return id_list
 
