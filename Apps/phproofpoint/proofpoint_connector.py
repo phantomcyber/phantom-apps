@@ -375,7 +375,7 @@ class ProofpointConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _decode_url(self, param):
-        """ This function is used to handle the decoding of a Proofpoint rewrite URL.
+        """ This function is used to handle the decoding of a Proofpoint rewritten URL.
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
@@ -385,16 +385,17 @@ class ProofpointConnector(BaseConnector):
         params = {}
         url_list = []
 
-        # The Decode API allows for multiple values. Split the parameter by a ,
+        # The Decode API allows for multiple values. Split the parameter by ,
         url_split = param.get('url').split(',')
+        
         for url in url_split:
-            # Add the URL to the list to send
+            # Add the URL to the list to decode
             url_list.append(url)
 
         # Add the URL(s) to the json
         params['urls'] = url_list
 
-        # make rest call
+        # Make rest call
         ret_val, response = self._make_rest_call(action_result, PP_API_PATH_DECODE, method="post", json=params)
 
         if (phantom.is_fail(ret_val)):
