@@ -330,7 +330,7 @@ class PolyswarmConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR,
                               'Error in response. Details: ' + (str(response)))
 
-            uuid = artifact_instances[0]['bounty_result']['uuid']
+            uuid = artifact_instances[0]['bounty_result']['files'][0]['submission_guid']
             assertions = artifact_instances[0]['bounty_result']['files'][0]['assertions']
 
             for assertion in assertions:
