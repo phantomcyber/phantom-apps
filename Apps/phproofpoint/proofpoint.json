@@ -856,6 +856,89 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "decode url",
+            "description": "Decode Proofpoint rewritten URL(s)",
+            "type": "information",
+            "identifier": "decode_url",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "data_type": "string",
+                    "description": "List of URL(s) to decode, comma separated",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "allow_list": true
+                }
+            },
+            "render": {
+                "type": "json"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.clusterName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.decodedUrl",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+				{
+                    "data_path": "action_result.data.*.encodedUrl",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.messageGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.recipientEmail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ]
 }
