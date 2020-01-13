@@ -1,0 +1,2513 @@
+{
+    "appid": "b3b0294c-cfb3-4547-a5cf-4012329a485b",
+    "name": "Tanium Detect",
+    "description": "This app provides an integration between Phantom and Tanium Detect",
+    "type": "network security",
+    "product_vendor": "Tanium",
+    "logo": "taniumdetect.png",
+    "logo_dark": "taniumdetect_dark.png",
+    "product_name": "Detect",
+    "product_version_regex": ".*",
+    "publisher": "Robert Drouin",
+    "license": "Copyright (c) Phantom, 2018",
+    "app_version": "1.3.0",
+    "utctime_updated": "2019-11-11T14:20:14.00000Z",
+    "package_name": "phantom_taniumdetect",
+    "main_module": "taniumdetect_connector.pyc",
+    "min_phantom_version": "4.1.94",
+    "app_wizard_version": "1.3.0",
+    "configuration": {
+        "base_url": {
+            "description": "IP or Hostname of Tanium Server",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "Verify Server Certificate": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 1
+        },
+        "Username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        },
+        "Password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 3
+        },
+        "timezone": {
+            "required": true,
+            "order": 4,
+            "data_type": "timezone",
+            "description": "Tanium server timezone"
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get suppression rule",
+            "identifier": "get_suppression_rule",
+            "description": "Get a suppression rule by ID",
+            "verbose": "Get a suppression rule by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the suppression rule",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create suppression rule",
+            "identifier": "create_suppression_rule",
+            "description": "Create a new suppression rule",
+            "verbose": "Create a new suppression rule",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "The name for the new rule",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "config": {
+                    "description": "The new config for the rule",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "description": {
+                    "description": "The new description for the rule",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "inteldocid": {
+                    "description": "The id of the intel doc to associate the rule to",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.config",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "config",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.inteldocid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "inteldocid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list suppression rules",
+            "identifier": "list_suppression_rules",
+            "description": "List all available suppression rules in the system",
+            "verbose": "List all available suppression rules in the system",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "limit": {
+                    "description": "The maximum number of rules to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.intelDocId",
+                    "data_type": "numeric",
+                    "column_name": "Intel Document ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.revision",
+                    "data_type": "numeric",
+                    "column_name": "Revision",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete suppression rule",
+            "identifier": "delete_suppression_rule",
+            "description": "Delete one or more suppression rules",
+            "verbose": "Delete one or more suppression rules",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the rule to delete, Multiple occurrences are supported",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get source",
+            "identifier": "get_source",
+            "description": "Get a single source",
+            "verbose": "Get a single source by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the source to show",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete source",
+            "identifier": "delete_source",
+            "description": "Delete an existing source",
+            "verbose": "Delete an existing source",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the source to delete",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list sources",
+            "identifier": "list_sources",
+            "description": "List sources configured to manage IOC's in the system",
+            "verbose": "Creates a new source",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "limit": {
+                    "description": "The maximum number of sources to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.enabled",
+                    "data_type": "boolean",
+                    "column_name": "Enabled",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Revision",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.signalCount",
+                    "data_type": "numeric",
+                    "column_name": "Revision",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get sourcetype",
+            "identifier": "get_sourcetype",
+            "description": "Show details for a single source type",
+            "verbose": "Show details for a single source type by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the source type to show",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list sourcetypes",
+            "identifier": "list_sourcetypes",
+            "description": "List source types supported on this system",
+            "verbose": "List source types supported by the system",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.canAutoQuickScan",
+                    "data_type": "boolean",
+                    "column_name": "Revision",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get notification count",
+            "identifier": "get_notification_count",
+            "description": "List notification counts for the last N days in UTC time by default",
+            "verbose": "List notification counts the the last N days in UTC time by default",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "num_days": {
+                    "description": "Show counts for the last \"num_days\" [Default: 30]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "inteldocid": {
+                    "description": "filter by notifications with the given intel doc ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "scanconfigid": {
+                    "description": "filter by notifications with the given scan config ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.num_days",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "num_days",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.inteldocid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "inteldocid",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.scanconfigid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "scanconfigid",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get notification",
+            "identifier": "get_notification",
+            "description": "Show a single notification by ID",
+            "verbose": "Show a single notification by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the notification to show",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update notification",
+            "identifier": "update_notification",
+            "description": "Update the state of one or more notifications",
+            "verbose": "Update the state of one or more notifications",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "the ID of the notification to update, multiple occurrences are supported",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "state": {
+                    "description": "The new state for the notification",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [
+                        "unresolved",
+                        "inprogress",
+                        "ignored",
+                        "resolved"
+                    ],
+                    "default": "unresolved",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.state",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "state",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list notifications",
+            "identifier": "list_notifications",
+            "description": "List notifications with optional filtering, sorting, and pagination",
+            "verbose": "List notifications with optional filtering, sorting, and pagination",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "type": {
+                    "description": "Filter notifications by the specified type(s)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "sort": {
+                    "description": "A comma separated list of +/- pairs controlling sort ordering",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "limit": {
+                    "description": "The maximum number of notifications to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "offset": {
+                    "description": "The offset at which to begin listing notifications.",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "type",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "offset",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete notification",
+            "identifier": "delete_notification",
+            "description": "Delete one or more notifications",
+            "verbose": "Delete one or more notifications",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the notification to delete, multiple occurrences are supported",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "modify label",
+            "identifier": "modify_label",
+            "description": "Modify the properties of an existing label",
+            "verbose": "Modify the properties of an existing label.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the label to update",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "name": {
+                    "description": "The new name for the label",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "description": {
+                    "description": "The new description for the label",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get label",
+            "identifier": "get_label",
+            "description": "Request a single label by ID",
+            "verbose": "Request a single label by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the label to get",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete label",
+            "identifier": "delete_label",
+            "description": "Delete an existing label. Will fail if label is used in group configurations",
+            "verbose": "Delete an existing label. Will fail if label is used in group configurations.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the label that will be deleted",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create label",
+            "identifier": "create_label",
+            "description": "Create a new label",
+            "verbose": "Create a new label",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "User facing text to show for the label",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "description": {
+                    "description": "Describe the label",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "description",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list labels",
+            "identifier": "list_labels",
+            "description": "List all available labels in the system",
+            "verbose": "List all available labels in the system",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "limit": {
+                    "description": "The maximum number of labels to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Revision",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get intel",
+            "identifier": "get_intel",
+            "description": "Show a single Intel Document by ID",
+            "verbose": "Show a single Intel Document by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the intel document to show",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete intel",
+            "identifier": "delete_intel",
+            "description": "Delete the identified intel document",
+            "verbose": "Delete the identified intel document",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the intel document to delete",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list intel",
+            "identifier": "list_intel",
+            "description": "List intel documents",
+            "verbose": "List intel documents; Optional filtering, sorting, pagination",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "include only IntelDocs whose \"name\" matches the given field",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "description": {
+                    "description": "include only IntelDocs whose \"description\" matches the given field",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "type": {
+                    "description": "include only IntelDocs whose \"type: matches the given field",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "sort": {
+                    "description": "use to sort columns using \"+/-\", comma separate for multiples. Ex: -alertedAt,+name",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "limit": {
+                    "description": "The maximum number of IntelDocs to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "offset": {
+                    "description": "The offset number to begin listing alerts",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "nolimit": {
+                    "description": "if TRUE will not limit the number of items returned",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": "",
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "description"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "type"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit"
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "offset"
+                },
+                {
+                    "data_path": "action_result.parameter.nolimit",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "nolimit"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.unresolvedAlertCount",
+                    "data_type": "numeric",
+                    "column_name": "Unresolved Alert Count",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.typeVersion",
+                    "data_type": "string",
+                    "column_name": "Type Version",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.sourceId",
+                    "data_type": "numeric",
+                    "column_name": "Source ID"
+                },
+                {
+                    "data_path": "action_result.data.*.*.compiled",
+                    "data_type": "boolean",
+                    "column_name": "Compiled"
+                },
+                {
+                    "data_path": "action_result.data.*.*.revisionId",
+                    "data_type": "numeric",
+                    "column_name": "Updated At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.intrinsicId",
+                    "data_type": "string",
+                    "column_name": "Intrinsic ID"
+                },
+                {
+                    "data_path": "action_result.data.*.*.isSchemaValid",
+                    "data_type": "boolean",
+                    "column_name": "Is Schema Valid"
+                },
+                {
+                    "data_path": "action_result.data.*.*.alertCount",
+                    "data_type": "numeric",
+                    "column_name": "Alert Count",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "numeric",
+                    "column_name": "Updated At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5"
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.size",
+                    "data_type": "numeric",
+                    "column_name": "Size (KB)",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get counts group",
+            "identifier": "get_counts_group",
+            "description": "List alert counts grouped by computer name or intel id",
+            "verbose": "List alert counts grouped by computer name or intel id",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "groupby": {
+                    "description": "Group alerts by specified group name [Default: 'computerName', Alternate Values: ['intelId']]",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.groupby",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "groupby",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alert count",
+            "identifier": "get_alert_count",
+            "description": "List alert counts for the last N days, in UTC time by default",
+            "verbose": "List alert counts for the last N days, in UTC time by default.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "num_days": {
+                    "description": "Show counts for the last number of days. [Default: 30]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "inteldocid": {
+                    "description": "Filter by alerts with specified intel doc ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "scanconfigid": {
+                    "description": "Filter by alerts with the specified scan config ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.num_days",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "num_days",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.inteldocid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "inteldocid",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.scanconfigid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "scanconfigid",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alert",
+            "identifier": "get_alert",
+            "description": "Show a single alert by ID",
+            "verbose": "Show a single alert by ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the alert to show",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update state",
+            "identifier": "update_state",
+            "description": "Update the state of one or more alerts",
+            "verbose": "Update the state of one or more alerts",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the alert to update. Multiple occurrences are supported",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "state": {
+                    "description": "The new state for the alert.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [
+                        "unresolved",
+                        "inprogress",
+                        "ignored",
+                        "resolved"
+                    ],
+                    "default": "unresolved",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.state",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "state",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "identifier": "list_alerts",
+            "description": "List alerts",
+            "verbose": "List alerts with optional filtering, sorting, and pagination",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "state": {
+                    "description": "Filter alerts by the specified states",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "type": {
+                    "description": "Filter alerts by the specified types",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "priority": {
+                    "description": "Filter alerts by they specified priorities",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "severity": {
+                    "description": "Filter alerts by the specified severities",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "inteldocid": {
+                    "description": "Filter alerts by the specified intelDocIds",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "scanconfigid": {
+                    "description": "Filter alerts by the specified scanConfigIds",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "computername": {
+                    "description": "Filter alerts by the specified computerNames",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 6
+                },
+                "computeripaddress": {
+                    "description": "Filter alerts by the specified computerIpAddresses",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 7
+                },
+                "sort": {
+                    "description": "A comma-separated list of COLUMN:DIR pairs controlling sort ordering",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 8
+                },
+                "limit": {
+                    "description": "The maximum number of alerts to return. [Default: 100]",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 9
+                },
+                "offset": {
+                    "description": "The offset number to begin listing alerts",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.state",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "state",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.priority",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "priority",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "severity",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.inteldocid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "inteldocid",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.scanconfigid",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "scanconfigid",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.computername",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "computername",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.computeripaddress",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "computeripaddress",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "offset",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete alert",
+            "identifier": "delete_alert",
+            "description": "Delete one or more alerts",
+            "verbose": "Delete one or more alerts",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID of the alerts to delete",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+              "container_id": {
+                "data_type": "string",
+                "order": 0,
+                "description": "Container IDs to limit the ingestion to.",
+                "allow_list": true
+              },
+              "start_time": {
+                "data_type": "numeric",
+                "order": 1,
+                "description": "Start of time range, in epoch time (milliseconds)",
+                "verbose": "If not specified, the default is past 10 days"
+              },
+              "end_time": {
+                "data_type": "numeric",
+                "order": 2,
+                "description": "End of time range, in epoch time (milliseconds)",
+                "verbose": "If not specified, the default is now"
+              },
+              "container_count": {
+                "data_type": "numeric",
+                "order": 3,
+                "description": "Maximum number of container records to query for."
+              },
+              "artifact_count": {
+                "data_type": "numeric",
+                "order": 4,
+                "description": "Maximum number of artifact records to query for."
+              }
+            },
+            "output": [],
+            "versions":"EQ(*)"
+          }
+    ]
+}
