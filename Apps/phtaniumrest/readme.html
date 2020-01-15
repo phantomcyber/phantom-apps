@@ -1,44 +1,90 @@
-<!-- File: readme.html
-  Copyright (c) 2019-2020 Splunk Inc.
+<!DOCTYPE html>
+<html>
 
-  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
--->
-<p><b>Run Query Guidelines</b>
-  <ul>
-    <li>Two modes of operation are supported for the run query action:</li>
-    <ul>
-      <li>Saved Questions</li>
-      <ul>
-        <li> User can save a manually created question on the Tanium server, then provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to True for this to work correctly.</li>
-      </ul>
-      <li>Manual Questions
-      <ul>
-        <li>Users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to False for this to work correctly.</li>
-        <li>To run the query on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-        <li>If <b>group_name</b> parameter is not provided, then the query will be executed on all the registered IP addresses/hostnames.</li>
-      </ul>
-    </ul>
-  </ul>
- </p>
-<p><b>Terminate Process Guidelines</b>
-  <ul>
-    <li>Please follow the steps below to execute this action successfully:</li>
-    <ul>
-      <li>Create and save a package on the Tanium server with a meaningful package name and add a command to terminate the required process in the package's command section.</li>
-      <li>To terminate the process of particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-      <li>If <b>group_name</b> parameter is not provided, then the terminate process action will be executed on all the registered IP addresses/hostnames.</li>
-    </ul>
-  </ul>
-</p>
-<p><b>Execute Action Guidelines</b>
-  <ul>
-    <li>Please follow the steps below to execute this action successfully:</li>
-    <ul>
-      <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section.</li>
-      <li>To execute this action on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-      <li>If the <b>group_name</b> parameter is not provided, then the action will be executed on all the registered IP addresses/hostnames.</li>
-    </ul>
-  </ul>
-</p>
+<body>
+
+<h1 id="toc_0">How to Use the Tanium REST App</h1>
+
+<h2 id="toc_1">Running Actions - Examples</h2>
+
+<h3 id="toc_2">Run Query</h3>
+
+<p>The run query action can be used to either run previously existing Saved Questions or can run ad-hoc manual questions.  </p>
+
+<h4 id="toc_3">Example Parameters - Manual Questions</h4>
+
+<p><strong>Example 1 - Get Computer Name</strong>
+<code>
+timeout_seconds = 600
+is_saved_question = false
+query_text = Get Computer Name from all machines
+group_name = 
+</code></p>
+
+<p><strong>Example 2 - Get Computer Name for Specified Computer Group</strong>
+<code>
+timeout_seconds = 600
+is_saved_question = false
+query_text = Get Computer Name from all machines
+group_name = centos-computers
+</code></p>
+
+<p><strong>Example 3 - A Complex Query</strong>
+<code>
+timeout_seconds = 600
+is_saved_question = false
+query_text = Get Trace Executed Processes[1 month,1522723342293|1522726941293,0,0,10,0,rar.exe,&quot;&quot;,-hp,&quot;&quot;,&quot;&quot;,&quot;&quot;] from all machines
+group_name = 
+</code></p>
+
+<p><strong>Example 4 - List Process Details for a Specified Device</strong>
+<code>
+timeout_seconds = 600
+is_saved_question = false
+query_text = Get Process Details[&quot;&quot;,&quot;&quot;] from all machines with Computer Name contains localhost
+</code></p>
+
+<h4 id="toc_4">Example Parameters - Saved Question</h4>
+
+<p>Saved questions are queries that are pre-configured and saved through the Tanium UI.  A saved question can be invoked by providing the name of the saved question as opposed to the query string itself.</p>
+
+<ul>
+<li><p>The <code>is_saved_question</code> flag must be set to true when running a saved question.</p></li>
+<li><p>The <code>group_name</code> parameter is ignored for saved questions.</p></li>
+</ul>
+
+<p><strong>Example 1 - Run Saved Question</strong></p>
+
+<p>In this example, we are running a Saved Question entitled &#39;splunk-asset-data&#39;.  </p>
+
+<div><pre><code class="language-none">timeout_seconds = 600
+is_saved_question = true
+query_text = splunk-asset-data
+Number of results: 0</code></pre></div>
+
+<h3 id="toc_5">Run Action</h3>
+
+<p>The &#39;Run Action&#39; action will cause a specified Tanium Package to be executed on the specified group.  </p>
+
+<p>Any parameters required by the specified package must be supplied a valid JSON via the <em>action_paramters</em> parameter.  For example,
+<code>
+{&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}
+</code></p>
+
+<p><strong>Example 1 - Run &#39;Live Response - Linux&#39; Package</strong> 
+<code>
+expire_seconds = 600
+package_name = Live Response - Linux
+package_parameters = {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}
+action_group = Default
+action_name = matt-test-action-name
+group_name = centos-computers
+Successfully executed the action
+</code></p>
+
+
+
+
+</body>
+
+</html>
