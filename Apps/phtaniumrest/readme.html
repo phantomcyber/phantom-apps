@@ -22,31 +22,39 @@
           <br>
         <li>Example Run 1 - Get Computer Name:</li>
           <ul>
+            <code>
             <li><b>query text</b>: Get Computer Name from all machines</li>
-            <li><b>is saved question:</b>: False</li>
+            <li><b>is saved question</b>: False</li>
             <li><b>group name</b>: </li>
-            <li><b>timeout seconds</b>: 600</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
           </ul>
         <li>Example Run 2 - Get Computer Name for Specified Computer Group:</li>
           <ul>
+            <code>
             <li><b>query text</b>: Get Computer Name from all machines</li>
-            <li><b>is saved question:</b>: False</li>
+            <li><b>is saved question</b>: False</li>
             <li><b>group name</b>: centos-computers</li>
-            <li><b>timeout seconds</b>: 600</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
           </ul>
         <li>Example Run 3 - A Complex Query:</li>
           <ul>
-            <li><b>query text</b>: Get Trace Executed Processes[1 month,1522723342293|1522726941293,0,0,10,0,rar.exe,&quot;&quot;,-hp,&quot;&quot;,&quot;&quot;,&quot;&quot;] from all machines</li>
-            <li><b>is saved question:</b>: False</li>
+            <code>
+            <li><b>query text</b>: Get Trace Executed Processes[1 month,1522723342293|1522726941293,0,0,10,0,rar.exe,"",-hp,"","",""] from all machines</li>
+            <li><b>is saved question</b>: False</li>
             <li><b>group name</b>: </li>
-            <li><b>timeout seconds</b>: 600</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
           </ul>
         <li>Example Run 4 - List Process Details for a Specified Device:</li>
           <ul>
-            <li><b>query text</b>: Get Process Details[&quot;&quot;,&quot;&quot;] from all machines with Computer Name contains localhost</li>
-            <li><b>is saved question:</b>: False</li>
+            <code>
+            <li><b>query text</b>: Get Process Details["",""] from all machines with Computer Name contains localhost</li>
+            <li><b>is saved question</b>: False</li>
             <li><b>group name</b>: centos-computers</li>
-            <li><b>timeout seconds</b>: 600</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
           </ul>
       </ul>
       <br>
@@ -58,9 +66,11 @@
         <br>
         <li>Example Run:</li>
           <ul>
+            <code>
             <li><b>query text</b>: My Computers</li>
-            <li><b>is saved question:</b>: True</li>
-            <li><b>timeout seconds</b>: 600</li>
+            <li><b>is saved question</b>: True</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
           </ul>
       </ul>
     </ul>
@@ -89,11 +99,13 @@
       <li>If the <b>group_name</b> parameter is not provided, then the action will be executed on all the registered IP addresses/hostnames.</li>
       <li>Example Run:</li>
         <ul>
+          <code>
           <li><b>action name</b>: Splunk Live Response Test</li>
           <li><b>action group:</b>: Default</li>
           <li><b>package name</b>: Live Response - Linux</li>
           <li><b>package parameters</b>: {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}</li>
-          <li><b>group name</b>: centos-computers</li>
+          <li><b>group name</b>: centos-computers</li><br>
+          </code>
         </ul>
     </ul>
   </ul>
