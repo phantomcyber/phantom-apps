@@ -19,9 +19,32 @@
           <ul>
             <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
           </ul>
-        <li>Example Run:</li>
+          <br>
+        <li>Example Run 1 - Get Computer Name:</li>
           <ul>
             <li><b>query text</b>: Get Computer Name from all machines</li>
+            <li><b>is saved question:</b>: False</li>
+            <li><b>group name</b>: </li>
+            <li><b>timeout seconds</b>: 600</li>
+          </ul>
+        <li>Example Run 2 - Get Computer Name for Specified Computer Group:</li>
+          <ul>
+            <li><b>query text</b>: Get Computer Name from all machines</li>
+            <li><b>is saved question:</b>: False</li>
+            <li><b>group name</b>: centos-computers</li>
+            <li><b>timeout seconds</b>: 600</li>
+          </ul>
+        <li>Example Run 3 - A Complex Query:</li>
+          <ul>
+            <li><b>query text</b>: Get Trace Executed Processes[1 month,1522723342293|1522726941293,0,0,10,0,rar.exe,&quot;&quot;,-hp,&quot;&quot;,&quot;&quot;,&quot;&quot;] from all machines</li>
+            <li><b>is saved question:</b>: False</li>
+            <li><b>group name</b>: </li>
+            <li><b>timeout seconds</b>: 600</li>
+          </ul>
+        <li>Example Run 4 - List Process Details for a Specified Device:</li>
+          <ul>
+            <li><b>query text</b>: Get Process Details[&quot;&quot;,&quot;&quot;] from all machines with Computer Name contains localhost</li>
+            <li><b>is saved question:</b>: False</li>
             <li><b>group name</b>: centos-computers</li>
             <li><b>timeout seconds</b>: 600</li>
           </ul>
@@ -32,9 +55,10 @@
         <li>Users can created 'Saved Questions' on the Tanium UI under Content>Saved Questions and provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.
             For a guide on how to create/manage the Saved Questions on your Tanium instance, <a href="https://docs.tanium.com/interact/interact/saving_questions.html">click here.</a></li>
         <li>The <b>is_saved_question</b> box must be checked for this to work correctly.</li>
+        <br>
         <li>Example Run:</li>
           <ul>
-            <li><b>query text</b>: My computers</li>
+            <li><b>query text</b>: My Computers</li>
             <li><b>is saved question:</b>: True</li>
             <li><b>timeout seconds</b>: 600</li>
           </ul>
@@ -54,11 +78,24 @@
   <br>
 <h2>Execute Action Guidelines</h2>
   <ul>
-    <li>Please follow the steps below to execute this action successfully:</li>
+    <li>The &#39;Execute Action&#39; action will cause a specified Tanium Package to be executed on the specified group.</li>
     <ul>
-      <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section.</li>
+      <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section, or just use an existing package.</li>
+      <li>Any parameters required by the specified package must be supplied a valid JSON via the <b>package_parameters</b> parameter.  For example,
+      <code>
+      {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}
+      </code></li>
       <li>To execute this action on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
       <li>If the <b>group_name</b> parameter is not provided, then the action will be executed on all the registered IP addresses/hostnames.</li>
+      <li>Example Run:</li>
+        <ul>
+          <li><b>action name</b>: Splunk Live Response Test</li>
+          <li><b>action group:</b>: Default</li>
+          <li><b>package name</b>: Live Response - Linux</li>
+          <li><b>package parameters</b>: {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}</li>
+          <li><b>group name</b>: centos-computers</li>
+        </ul>
     </ul>
   </ul>
 </p>
+<br>
