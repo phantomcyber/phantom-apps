@@ -1948,7 +1948,7 @@
             "read_only": true,
             "parameters": {
                 "query_text": {
-                    "description": "Query to run",
+                    "description": "Query to run (in Tanium Question Syntax)",
                     "data_type": "string",
                     "contains": [
                         "taniumrest question text"
@@ -1958,13 +1958,13 @@
                     "order": 0
                 },
                 "group_name": {
-                    "description": "Computer group name on which the query will be executed",
+                    "description": "The Tanium Computer Group name on which the query will be executed. If left blank, will execute on all registered IP addresses/hostnames in your Tanium instance",
                     "data_type": "string",
                     "required": false,
                     "order": 1
                 },
                 "is_saved_question": {
-                    "description": "The query which is asked is saved or not",
+                    "description": "Check this box if your query text parameter refers to a 'Saved Question' on your Tanium instance",
                     "data_type": "boolean",
                     "required": false,
                     "order": 2

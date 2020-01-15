@@ -3,26 +3,33 @@
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
-<p><b>Run Query Guidelines</b>
+<h2>Run Query</h2>
   <ul>
     <li>Two modes of operation are supported for the run query action:</li>
+    <br>
     <ul>
-      <li>Saved Questions</li>
-      <ul>
-        <li> User can save a manually created question on the Tanium server, then provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to True for this to work correctly.</li>
-      </ul>
       <li>Manual Questions
       <ul>
-        <li>Users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to False for this to work correctly.</li>
-        <li>To run the query on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-        <li>If <b>group_name</b> parameter is not provided, then the query will be executed on all the registered IP addresses/hostnames.</li>
+        <li>Using Tanium question syntax, users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter.
+            For more information on Tanium's question syntax, <a href="https://docs.tanium.com/interact/interact/questions.html">click here.</a></li>
+        <li>Make sure the <b>is_saved_question</b> box is unchecked, since you are providing a question from scratch.</li>
+        <li>Use the <b>group name</b> parameter to run your query on a particular computer group in your Tanium instance. Users can create a computer group with specific IP addresses/hostnames on the Tanium UI under Administration>Computer Groups.
+            For a guide on how to create/manage computer groups in Tanium, <a href="https://docs.tanium.com/platform_user/platform_user/console_computer_groups.html">click here.</a></li>
+        <ul>
+          <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
+        </ul>
+      </ul>
+      <br>
+      <li>Saved Questions</li>
+      <ul>
+        <li>Users can created 'Saved Questions' on the Tanium UI under Content>Saved Questions and provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.
+            For a guide on how to create/manage the Saved Questions on your Tanium instance, <a href="https://docs.tanium.com/interact/interact/saving_questions.html">click here.</a></li>
+        <li>The <b>is_saved_question</b> box must be checked for this to work correctly.</li>
       </ul>
     </ul>
   </ul>
- </p>
-<p><b>Terminate Process Guidelines</b>
+  <br>
+<h2>Terminate Process Guidelines</h2>
   <ul>
     <li>Please follow the steps below to execute this action successfully:</li>
     <ul>
@@ -31,8 +38,8 @@
       <li>If <b>group_name</b> parameter is not provided, then the terminate process action will be executed on all the registered IP addresses/hostnames.</li>
     </ul>
   </ul>
-</p>
-<p><b>Execute Action Guidelines</b>
+  <br>
+<h2>Execute Action Guidelines</h2>
   <ul>
     <li>Please follow the steps below to execute this action successfully:</li>
     <ul>
