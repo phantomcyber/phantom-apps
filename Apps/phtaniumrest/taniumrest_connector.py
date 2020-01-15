@@ -184,9 +184,11 @@ class TaniumRestConnector(BaseConnector):
         msg = action_result.get_message()
 
         if msg and ("HTTP 403: Forbidden" in msg or "HTTP 401: Unauthorized" in msg):
+            self.debug_print("Refreshing Tanium API and re-trying request to [{0}] because API token was expired or invalid with error code [{1}]".format(url, msg))
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
+                self.debug_print("Attempt to refresh Tanium API session token failed!")
                 return action_result.get_status(), None
 
             headers.update({'session': str(self._session_id), 'Content-Type': 'application/json'})
@@ -194,6 +196,7 @@ class TaniumRestConnector(BaseConnector):
             ret_val, resp_json = self._make_rest_call(url, action_result, verify=verify, headers=headers, params=params, data=data, json=json, method=method)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("REST API Call Failure! Failed call to Tanium API endpoint {0} with error code {1}".format(url, msg))
             return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, resp_json
@@ -217,6 +220,7 @@ class TaniumRestConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call("{}{}".format(self._base_url, SESSION_URL), action_result, verify=self._verify, headers=headers, json=data, method='post')
 
         if (phantom.is_fail(ret_val)):
+            self.debug_print("Failed to fetch a session token from Tanium API!")
             return action_result.get_status()
 
         self._state['session_id'] = resp_json.get('data', {}).get('session')
@@ -226,7 +230,6 @@ class TaniumRestConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _handle_test_connectivity(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
@@ -457,21 +460,22 @@ class TaniumRestConnector(BaseConnector):
         sensor_dict = dict()
         sensor_dict["sensor"] = {"name": sensor_name}
         select_list.append(sensor_dict)
-
         data["selects"] = select_list
 
+        # Ask the 'List Processes' question to Tanium
         ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/questions", verify=self._verify, params=None, headers=None, json=data, method="post")
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
+        # Now that the question has been processed, fetch the results from the Tanium API
         question_id = response.get("data", {}).get("id")
-
+        self.debug_print("Successfully queried Tanium for list_proccesses action, got question results id {0}".format(question_id))
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
-
         response = self._question_result(timeout_seconds, endpoint, action_result)
 
         if response is None:
+            self.debug_print("Warning! Tanium returned empty response for list_processes action")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -480,6 +484,7 @@ class TaniumRestConnector(BaseConnector):
         if result_sets:
             row_count = result_sets[0].get("row_count")
         else:
+            self.debug_print("Warning! Tanium returned empty result set for list_processes action")
             row_count = 0
 
         summary = action_result.update_summary({})
@@ -561,6 +566,8 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide timeout seconds")
             data = dict()
             data['expire_seconds'] = timeout_seconds
+
+            # If a group_name was supplied, validate the group name is valid
             if group_name:
                 endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
                 ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
@@ -571,6 +578,8 @@ class TaniumRestConnector(BaseConnector):
                 group_id = response.get("data", {}).get("id")
                 data["context_group"] = {"id": group_id}
 
+            # Before executing the query, run the query text against the /parse_question
+            #   to ensure the query is in a valid Tanium syntax
             query_to_parse = {"text": query_text}
 
             ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/parse_question", verify=self._verify, params=None, headers=None,
