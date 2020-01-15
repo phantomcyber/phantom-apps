@@ -1950,7 +1950,7 @@
             "read_only": true,
             "parameters": {
                 "query_text": {
-                    "description": "Query to run",
+                    "description": "Query to run (in Tanium Question Syntax)",
                     "data_type": "string",
                     "contains": [
                         "taniumrest question text"
@@ -1960,13 +1960,13 @@
                     "order": 0
                 },
                 "group_name": {
-                    "description": "Computer group name on which the query will be executed (manual query only)",
+                    "description": "The Tanium Computer Group name on which the query will be executed (manual query only)",
                     "data_type": "string",
                     "required": false,
                     "order": 1
                 },
                 "is_saved_question": {
-                    "description": "This query is the name of a saved question",
+                    "description": "Check this box if the query text parameter refers to a 'Saved Question' on your Tanium",
                     "data_type": "boolean",
                     "required": false,
                     "order": 2

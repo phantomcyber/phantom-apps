@@ -183,7 +183,7 @@ class TaniumRestConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and "HTTP 403: Forbidden." in msg:
+        if msg and ("HTTP 403: Forbidden" in msg or "HTTP 401: Unauthorized" in msg):
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
