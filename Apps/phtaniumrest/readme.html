@@ -15,9 +15,15 @@
         <li>Make sure the <b>is_saved_question</b> box is unchecked, since you are providing a question from scratch.</li>
         <li>Use the <b>group name</b> parameter to run your query on a particular computer group in your Tanium instance. Users can create a computer group with specific IP addresses/hostnames on the Tanium UI under Administration>Computer Groups.
             For a guide on how to create/manage computer groups in Tanium, <a href="https://docs.tanium.com/platform_user/platform_user/console_computer_groups.html">click here.</a></li>
-        <ul>
-          <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
-        </ul>
+          <ul>
+            <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
+          </ul>
+        <li>Example Run:</li>
+          <ul>
+            <li><b>query text</b>: Get Computer Name from all machines</li>
+            <li><b>group name</b>: centos-computers</li>
+            <li><b>timeout seconds</b>: 600</li>
+          </ul>
       </ul>
       <br>
       <li>Saved Questions</li>
@@ -25,6 +31,12 @@
         <li>Users can created 'Saved Questions' on the Tanium UI under Content>Saved Questions and provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.
             For a guide on how to create/manage the Saved Questions on your Tanium instance, <a href="https://docs.tanium.com/interact/interact/saving_questions.html">click here.</a></li>
         <li>The <b>is_saved_question</b> box must be checked for this to work correctly.</li>
+        <li>Example Run:</li>
+          <ul>
+            <li><b>query text</b>: My computers</li>
+            <li><b>is saved question:</b>: True</li>
+            <li><b>timeout seconds</b>: 600</li>
+          </ul>
       </ul>
     </ul>
   </ul>
