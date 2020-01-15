@@ -561,6 +561,8 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide timeout seconds")
             data = dict()
             data['expire_seconds'] = timeout_seconds
+
+            # If a group_name was supplied, validate the group name is valid
             if group_name:
                 endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
                 ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
@@ -571,6 +573,8 @@ class TaniumRestConnector(BaseConnector):
                 group_id = response.get("data", {}).get("id")
                 data["context_group"] = {"id": group_id}
 
+            # Before executing the query, run the query text against the /parse_question
+            #   to ensure the query is in a valid Tanium syntax
             query_to_parse = {"text": query_text}
 
             ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/parse_question", verify=self._verify, params=None, headers=None,
