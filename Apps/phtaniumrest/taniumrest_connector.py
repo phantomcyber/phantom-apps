@@ -183,7 +183,7 @@ class TaniumRestConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and ("HTTP 403: Forbidden" in msg or "HTTP 401: Unauthorized" in msg):
+        if msg and ("403" in msg or "401" in msg):
             self.debug_print("Refreshing Tanium API and re-trying request to [{0}] because API token was expired or invalid with error code [{1}]".format(url, msg))
             ret_val = self._get_token(action_result)
 
