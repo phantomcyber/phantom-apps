@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "1.0.3",
+    "app_version": "1.0.4",
     "utctime_updated": "2019-10-09T22:28:52.000000Z",
     "package_name": "phantom_taniumrest",
     "main_module": "taniumrest_connector.pyc",
@@ -41,6 +41,13 @@
             "required": false,
             "default": false,
             "order": 1
+        },
+        "results_percentage": {
+            "description": "Consider question results complete at (% out of 100)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 99,
+            "order": 4
         }
     },
     "actions": [

@@ -9,6 +9,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from taniumrest_consts import *
 
+import os
 import requests
 import json
 from time import sleep
@@ -33,6 +34,7 @@ class TaniumRestConnector(BaseConnector):
         self._password = None
         self._verify = None
         self._session_id = None
+        self._percentage = None
 
     def _process_empty_response(self, response, action_result):
 
@@ -406,7 +408,7 @@ class TaniumRestConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _question_result(self, timeout_seconds, endpoint, action_result):
+    def _question_result(self, timeout_seconds, results_percentage, endpoint, action_result):
 
         max_range = int(timeout_seconds / WAIT_SECONDS) + (1 if timeout_seconds % WAIT_SECONDS == 0 else 2)
 
@@ -424,10 +426,23 @@ class TaniumRestConnector(BaseConnector):
             if (phantom.is_fail(ret_val)):
                 return None
 
+            # Checking to see if all the results have been returned by the question. Keeps questioning until all results have been returned.
+            question_id = os.path.basename(endpoint)
+            self.debug_print("Checking if Tanium question ID {} has completed and returned all results . . .".format(question_id))
+            mr_tested = response['data']['result_sets'][0]['mr_tested']
+            estimated_total = response['data']['result_sets'][0]['estimated_total']
+            percentage_returned = float(mr_tested) / float(estimated_total) * 100
+            self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total, percentage_returned, results_percentage))
+            if int(percentage_returned) < int(results_percentage):
+                self.debug_print("Tanium question ID {} is {}% done out of {}%. Fetching more results . . .".format(question_id, percentage_returned, results_percentage))
+                continue
+
             if response.get("data", {}).get("result_sets", [])[0].get("columns"):
                 return response
+
         else:
-            action_result.set_status(phantom.APP_ERROR, "Error while fetching the results from the Tanium server in '{}' expire seconds".format(timeout_seconds))
+            action_result.set_status(phantom.APP_ERROR, "Error while fetching the results from the Tanium server in '{}' expire seconds. Please try increasing the timeout value."
+                                        .format(timeout_seconds))
             return None
 
     def _handle_list_processes(self, param):
@@ -435,6 +450,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        config = self.get_config()
 
         sensor_name = param['sensor']
         group_name = param.get('group_name')
@@ -472,7 +488,8 @@ class TaniumRestConnector(BaseConnector):
         question_id = response.get("data", {}).get("id")
         self.debug_print("Successfully queried Tanium for list_proccesses action, got question results id {0}".format(question_id))
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
-        response = self._question_result(timeout_seconds, endpoint, action_result)
+        results_percentage = config.get('results_percentage', 99)
+        response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
 
         if response is None:
             self.debug_print("Warning! Tanium returned empty response for list_processes action")
@@ -532,6 +549,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        config = self.get_config()
 
         query_text = param.get('query_text')
         group_name = param.get('group_name')
@@ -614,7 +632,8 @@ class TaniumRestConnector(BaseConnector):
 
             endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
 
-            response = self._question_result(timeout_seconds, endpoint, action_result)
+            results_percentage = config.get('results_percentage', 99)
+            response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
 
             if response is None:
                 return action_result.get_status()
@@ -673,6 +692,7 @@ class TaniumRestConnector(BaseConnector):
         self._username = config['username']
         self._password = config['password']
         self._verify = config['verify_server_cert']
+        self._percentage = config['results_percentage']
 
         self._base_url = config['base_url'].encode('utf-8')
 
