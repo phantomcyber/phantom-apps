@@ -60,7 +60,7 @@
             "action": "context",
             "identifier": "context",
             "description": "Query Threat Response for Context",
-            "verbose": "Contextualizes an observable with Cisco Threat Response info.",
+            "verbose": "Contextualizes an observable with Cisco Threat Response info. <hr><p> Examples of observables: </p><p> 0b4eefc0d815ac0fdc20f22add8fd2d8113be99578a4e5189122b28b201ccbd9 - clean,</p> <p> b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967 - malicious, </p><p> f90cbce099715cfc41d793bfba4f03f8a735c0b549e1bc4d29c48dd03bbd13d0 - unkown, </p><p>  91.217.162[.]158 - suspicious, </p><p> 111.26.23[.]2 - suspicious. </p>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -248,7 +248,7 @@
             "action": "verdict",
             "identifier": "verdict",
             "description": "Query Threat Response for Verdict",
-            "verbose": "Provides Cisco Threat Response verdict for an observable.",
+            "verbose": "Provides Cisco Threat Response verdict for an observable. <hr><p> Examples of observables: </p><p> 0b4eefc0d815ac0fdc20f22add8fd2d8113be99578a4e5189122b28b201ccbd9 - clean,</p> <p> b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967 - malicious, </p><p> f90cbce099715cfc41d793bfba4f03f8a735c0b549e1bc4d29c48dd03bbd13d0 - unkown, </p><p>  91.217.162[.]158 - suspicious, </p><p> 111.26.23[.]2 - suspicious. </p>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
