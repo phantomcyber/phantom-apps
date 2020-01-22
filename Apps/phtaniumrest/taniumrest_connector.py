@@ -429,12 +429,15 @@ class TaniumRestConnector(BaseConnector):
             # Checking to see if all the results have been returned by the question. Keeps questioning until all results have been returned.
             question_id = os.path.basename(endpoint)
             self.debug_print("Checking if Tanium question ID {} has completed and returned all results . . .".format(question_id))
-            mr_tested = response['data']['result_sets'][0]['mr_tested']
-            estimated_total = response['data']['result_sets'][0]['estimated_total']
-            percentage_returned = float(mr_tested) / float(estimated_total) * 100
-            self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total, percentage_returned, results_percentage))
-            if int(percentage_returned) < int(results_percentage):
-                self.debug_print("Tanium question ID {} is {}% done out of {}%. Fetching more results . . .".format(question_id, percentage_returned, results_percentage))
+            mr_tested = response.get("data", {}).get("result_sets", [])[0].get("mr_tested")
+            estimated_total = response.get("data", {}).get("result_sets", [])[0].get("estimated_total")
+            if mr_tested and estimated_total:
+                percentage_returned = float(mr_tested) / float(estimated_total) * 100
+                self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total, percentage_returned, results_percentage))
+                if int(percentage_returned) < int(results_percentage):
+                    self.debug_print("Tanium question ID {} is {}% done out of {}%. Fetching more results . . .".format(question_id, percentage_returned, results_percentage))
+                    continue
+            else:
                 continue
 
             if response.get("data", {}).get("result_sets", [])[0].get("columns"):
