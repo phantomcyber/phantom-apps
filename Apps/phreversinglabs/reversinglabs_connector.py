@@ -18,6 +18,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 from collections import defaultdict
 
+from builtins import str
+
 
 class ReversinglabsConnector(BaseConnector):
 
@@ -49,7 +51,10 @@ class ReversinglabsConnector(BaseConnector):
         # Create a hash of a random string
         random_string = phantom.get_random_chars(size=10)
 
-        md5_hash = hashlib.md5(random_string).hexdigest()
+        try:
+            md5_hash = hashlib.md5(random_string).hexdigest()
+        except TypeError:  # py3
+            md5_hash = hashlib.md5(random_string.encode('UTF-8')).hexdigest()
 
         self.save_progress(REVERSINGLABS_GENERATED_RANDOM_HASH)
 
