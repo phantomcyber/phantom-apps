@@ -1,7 +1,7 @@
 {
     "appid": "00a4cb00-19a1-46f6-9923-f502a3dd346b",
     "name": "GitLab",
-    "description": "This app integrates with a GitLab instance to perform various lookups and execute CI/CD pipelines.",
+    "description": "This app integrates with a GitLab instance to perform various lookups and execute CI/CD pipelines",
     "type": "devops",
     "product_vendor": "GitLab",
     "logo": "gitlab.png",
@@ -9,7 +9,7 @@
     "product_name": "GitLab",
     "product_version_regex": ".*",
     "publisher": "Peter Bertel",
-    "license": "Copyright (c) Peter Bertel, 2019",
+    "license": "Copyright (c) Peter Bertel, 2020",
     "app_version": "1.0.0",
     "utctime_updated": "2019-08-26T01:28:27.791651Z",
     "package_name": "phantom_gitlab",
@@ -21,8 +21,6 @@
             "description": "The Hostname or IP address of the GitLab instance",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "personal_access_token": {
@@ -37,7 +35,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -48,7 +45,6 @@
             "action": "list users",
             "identifier": "list_users",
             "description": "List all the users in the GitLab instance",
-            "verbose": "List all the users in the GitLab instance",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -81,7 +77,6 @@
             "action": "list projects",
             "identifier": "list_projects",
             "description": "List all the projects in the GitLab instance",
-            "verbose": "List all the projects in the GitLab instance",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -128,7 +123,6 @@
             "action": "list branches",
             "identifier": "list_branches",
             "description": "List the branches of a GitLab project",
-            "verbose": "List the branches of a GitLab project",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -138,8 +132,6 @@
                     "required": true,
                     "primary": true,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -186,7 +178,6 @@
             "action": "create trigger",
             "identifier": "create_trigger",
             "description": "Create a new pipeline trigger for a GitLab project",
-            "verbose": "Create a new pipeline trigger for a GitLab project",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -196,8 +187,6 @@
                     "required": true,
                     "primary": true,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "trigger_name": {
@@ -206,8 +195,6 @@
                     "required": true,
                     "primary": true,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
@@ -263,7 +250,6 @@
             "action": "list triggers",
             "identifier": "list_triggers",
             "description": "List the pipeline triggers of a GitLab project",
-            "verbose": "List the triggers of a GitLab project",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -273,8 +259,6 @@
                     "required": true,
                     "primary": true,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -346,8 +330,6 @@
                     "required": true,
                     "primary": false,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "trigger_token": {
@@ -356,8 +338,6 @@
                     "required": true,
                     "primary": false,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "branch": {
@@ -366,7 +346,6 @@
                     "required": true,
                     "primary": false,
                     "contains": [],
-                    "value_list": [],
                     "default": "master",
                     "order": 2
                 }
