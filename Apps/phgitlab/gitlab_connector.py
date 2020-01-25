@@ -223,7 +223,7 @@ class GitlabConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        token_dict = {'tigger_token': response['token']}
+        token_dict = {'trigger_token': response['token']}
         summary = action_result.update_summary(token_dict)
 
         return action_result.set_status(phantom.APP_SUCCESS)
