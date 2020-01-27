@@ -6,11 +6,12 @@
 <h2>Asset Configuration</h2>
 <li><b>Consider question results complete at (% out of 100)</b></li>
 <ul>
-  <li>This asset parameter refers to the amount of question results you wish to be returned by actions <b>run query</b> and <b>list processes</b> before considering the action to be completed.
+  <li>Consider Tanium question results complete at this value, a percentage out of 100. This parameter impacts the <b>run query</b> and <b>list processes</b> actions only.
+      Note that a similar value can be defined in Tanium user preferences – you might want to reflect the same value in your app asset configuration as you use in your Tanium user configuration.
       The time spent returning your results is dependent on how much data you have on your Tanium instance and you may want your action to end with a certain percentage threshold instead of waiting for Tanium to return
-      100% of the results. This parameter is also configurable in your Tanium instance's preferences.</li>
+      100% of the results.</li>
 </ul>
-<h2>Run Query</h2>
+<h2>How to use Run Query Action</h2>
   <ul>
     <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions in order to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
     <li>Two modes of operation are supported for the run query action:</li>
@@ -83,7 +84,7 @@
     </ul>
   </ul>
   <br>
-<h2>Terminate Process Guidelines</h2>
+<h2>How to use Terminate Process Action</h2>
   <ul>
     <li>Please follow the steps below to execute this action successfully:</li>
     <ul>
@@ -93,7 +94,7 @@
     </ul>
   </ul>
   <br>
-<h2>Execute Action Guidelines</h2>
+<h2>How to use Execute Action</h2>
   <ul>
     <li>The &#39;Execute Action&#39; action will cause a specified Tanium Package to be executed on the specified group.</li>
     <ul>
