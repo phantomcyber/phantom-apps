@@ -695,7 +695,6 @@ class TaniumRestConnector(BaseConnector):
         self._username = config['username']
         self._password = config['password']
         self._verify = config['verify_server_cert']
-        self._percentage = config['results_percentage']
 
         self._base_url = config['base_url'].encode('utf-8')
 
