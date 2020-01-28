@@ -1,5 +1,5 @@
 # File: awssecurityhub_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -478,8 +478,8 @@ class AwsSecurityHubConnector(BaseConnector):
             if response.get('Findings'):
                 list_items.extend(response.get('Findings'))
 
-            if limit and len(list_items) >= limit:
-                return list_items[:limit]
+            if limit and len(list_items) >= int(limit):
+                return list_items[:int(limit)]
 
             next_token = response.get('NextToken')
             if not next_token:
