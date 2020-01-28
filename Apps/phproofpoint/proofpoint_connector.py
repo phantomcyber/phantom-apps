@@ -292,7 +292,7 @@ class ProofpointConnector(BaseConnector):
         }
 
         # Connect to the server
-        ret_val, data = self._make_rest_call(action_result, PP_API_PATH_ALL, method='get', params=params)
+        ret_val, data = self._make_rest_call(action_result, PP_API_PATH_ALL, params=params)
 
         if phantom.is_fail(ret_val):
             if "The sinceTime parameter gives a time too far into the past" in action_result.get_message():
@@ -332,7 +332,7 @@ class ProofpointConnector(BaseConnector):
 
         # Connect to the server
         ret_val, _ = self._make_rest_call(action_result,
-                                          PP_API_PATH_ALL, method="get", params=params)
+                                          PP_API_PATH_ALL, params=params)
         if phantom.is_fail(ret_val):
             return self.set_status_save_progress(phantom.APP_ERROR,
                                                  'Connection Failed.')
@@ -348,7 +348,7 @@ class ProofpointConnector(BaseConnector):
 
         params = {'format': 'json'}
 
-        ret_val, data = self._make_rest_call(action_result, campaign_url, method="get", params=params)
+        ret_val, data = self._make_rest_call(action_result, campaign_url, params=params)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -379,7 +379,7 @@ class ProofpointConnector(BaseConnector):
             if include_campaign_forensics:
                 params['includeCampaignForensics'] = include_campaign_forensics
         ret_val, data = self._make_rest_call(action_result,
-                                             PP_API_PATH_FORENSICS, method="get", params=params)
+                                             PP_API_PATH_FORENSICS, params=params)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
