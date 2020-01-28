@@ -151,7 +151,10 @@ class WhoisConnector(BaseConnector):
         ip_address_input = input_ip_address
 
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            try:
+                ipaddress.ip_address(unicode(ip_address_input))
+            except NameError:
+                ipaddress.ip_address(str(ip_address_input))
         except:
             return False
 
@@ -318,6 +321,6 @@ if __name__ == '__main__':
         connector = WhoisConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

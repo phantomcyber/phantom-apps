@@ -256,7 +256,17 @@ class ProofpointConnector(BaseConnector):
         # much a real time service and playing catch-up is rather pointless,
         # limit polling to the last hour.
 
-        start_at = ((datetime.utcnow() - timedelta(hours=1))
+        mins = self.get_config()['initial_ingestion_window']
+
+        try:
+            mins = int(mins)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, initial_ingestion_window, must be an integer between 1 and 60")
+
+        if not (1 <= mins <= 60):
+            return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, initial_ingestion_window, must be an integer between 1 and 60")
+
+        start_at = ((datetime.utcnow() - timedelta(minutes=mins))
                     .replace(microsecond=0).isoformat() + 'Z')
 
         if (not self._state or 'last_poll' not in self._state or
@@ -271,6 +281,8 @@ class ProofpointConnector(BaseConnector):
         ret_val, data = self._make_rest_call(action_result,
                                              PP_API_PATH_ALL, params)
         if phantom.is_fail(ret_val):
+            if "The sinceTime parameter gives a time too far into the past" in action_result.get_message():
+                action_result.append_to_message("It is possible the Phantom clock has drifted. Please re-sync it or consider lowering initial_ingestion_window")
             return action_result.get_status()
 
         config = self.get_config()
@@ -298,7 +310,7 @@ class ProofpointConnector(BaseConnector):
 
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(param))
-        start_at = ((datetime.utcnow() - timedelta(hours=1))
+        start_at = ((datetime.utcnow() - timedelta(minutes=5))
                     .replace(microsecond=0).isoformat() + 'Z')
 
         params = {
