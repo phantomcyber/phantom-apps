@@ -165,7 +165,8 @@ class GitlabConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully returned users")
 
@@ -181,7 +182,8 @@ class GitlabConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -199,7 +201,8 @@ class GitlabConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -242,7 +245,8 @@ class GitlabConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

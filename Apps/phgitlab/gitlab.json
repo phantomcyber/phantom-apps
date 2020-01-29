@@ -66,6 +66,24 @@
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.can_create_project",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 }
             ],
             "render": {
@@ -100,14 +118,14 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.name",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
                         "project-name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.path",
+                    "data_path": "action_result.data.*.path",
                     "data_type": "string",
                     "example_values": [
                         "path-to/project-name"
@@ -162,7 +180,7 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.name",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
                         "master"
@@ -289,14 +307,14 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
                         "Sample trigger description"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.token",
+                    "data_path": "action_result.data.*.token",
                     "data_type": "string",
                     "column_order": 3,
                     "example_values": [
@@ -304,7 +322,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "example_values": [
                         1
