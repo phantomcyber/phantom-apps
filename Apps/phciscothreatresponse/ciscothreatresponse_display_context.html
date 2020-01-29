@@ -79,48 +79,62 @@
     {% for result in results %}
         <h4 class="wf-h4-style">Summary</h4>
             <div class="domain_info overflow-column">
-                <table class="phantom-table dataTable">
-                    <tr>
-                        <th>Targets</th>
-                        <th>Observables</th>
-                        <th>Domains</th>
-                        <th>File Hash</th>
-                        <th>IP Address</th>
-                        <th>URLs</th>
-                    </tr>
-                    <tr>
-                        <td>{{ result.data.summary.targets }}</td>
-                        <td>{{ result.data.summary.observables }}</td>
-                        <td>{{ result.data.summary.domains }}</td>
-                        <td>{{ result.data.summary.file_hash }}</td>
-                        <td>{{ result.data.summary.ip_address }}</td>
-                        <td>{{ result.data.summary.urls }}</td>
-                    </tr>
+                <table class="phantom-table dataTable" id="summary">
+                    <thead>
+                        <tr>
+                            <th>Targets</th>
+                            <th>Observables</th>
+                            <th>Domains</th>
+                            <th>File Hash</th>
+                            <th>IP Address</th>
+                            <th>URLs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ result.data.summary.targets }}</td>
+                            <td>{{ result.data.summary.observables }}</td>
+                            <td>{{ result.data.summary.domains }}</td>
+                            <td>{{ result.data.summary.file_hash }}</td>
+                            <td>{{ result.data.summary.ip_address }}</td>
+                            <td>{{ result.data.summary.urls }}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         <h4 class="wf-h4-style">Context</h4>
             <div class="domain_info overflow-column">
-                <table class="phantom-table dataTable">
-                    <tr>
-                        <th>Observable</th>
-                        <th>Type</th>
-                        <th>Module</th>
-                        <th>Disposition</th>
-                        <th>Observed</th>
-                        <th>Sensor</th>
-                        <th>Target</th>
-                    </tr>
-                {% for context in result.data.context %}
-                    <tr>
-                        <td>{{ context.observable }}</td>
-                        <td>{{ context.type }}</td>
-                        <td>{{ context.module }}</td>
-                        <td>{{ context.disposition }}</td>
-                        <td>{{ context.observed }}</td>
-                        <td>{{ context.sensor }}</td>
-                        <td>{{ context.target }}</td>
-                    </tr>
-                {% endfor %}
+                <table class="phantom-table dataTable" id="context">
+                    <thead>
+                        <tr>
+                            <th>Observable</th>
+                            <th>Type</th>
+                            <th>Module</th>
+                            <th>Disposition</th>
+                            <th>Observed</th>
+                            <th>Sensor</th>
+                            <th>Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for context in result.data.context %}
+                            <tr>
+                                <td>
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip','ipv6','user name', 'domain', 'hash', 'sha256', 'md5', 'sha1', 'url', 'email', 'host name', 'mac address', 'file name', 'file path', 'email id', 'cisco threat response email subject', 'cisco threat response cisco mid', 'cisco threat response mutex', 'cisco threat response device', 'cisco threat response pki serial', 'cisco threat response imei', 'cisco threat response imsi', 'cisco threat response amp computer guid', 'cisco threat response odns identity', 'cisco threat response odns identity label'], 'value':'{{ context.observable }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ context.observable }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                    </a>
+                                </td>
+                                <td>{{ context.type }}</td>
+                                <td>{{ context.module }}</td>
+                                <td>{{ context.disposition }}</td>
+                                <td>{{ context.observed }}</td>
+                                <td>{{ context.sensor }}</td>
+                                <td>{{ context.target }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
     {% endfor %}

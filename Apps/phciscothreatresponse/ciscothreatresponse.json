@@ -399,7 +399,8 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "view": "ciscothreatresponse_view.display_view_verdict"
             },
             "versions": "EQ(*)"
         }
