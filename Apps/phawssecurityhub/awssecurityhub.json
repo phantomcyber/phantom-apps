@@ -1,5 +1,6 @@
 {
     "appid": "67f8edf1-61dc-4916-a017-f0b455eb866e",
+    "connector_id": "67f8edf1-61dc-4916-a017-f0b455eb866e",
     "name": "AWS Security Hub",
     "description": "This app integrates with AWS Security Hub to ingest findings",
     "type": "siem",
@@ -11,6 +12,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2019 Splunk Inc.",
     "app_version": "1.1.8",
+    "connector_version": "1.1.8",
     "utctime_updated": "2020-01-24T02:06:04.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.pyc",
