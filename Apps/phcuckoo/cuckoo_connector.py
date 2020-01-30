@@ -410,7 +410,7 @@ if __name__ == '__main__':
             exit(1)
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print ("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
