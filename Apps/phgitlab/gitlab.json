@@ -149,7 +149,9 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
-                    "contains": [],
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 }
             },
@@ -204,7 +206,9 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
-                    "contains": [],
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 },
                 "trigger_name": {
@@ -212,7 +216,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
+                    "contains": [
+                      "gitlab trigger"
+                    ],
                     "order": 1
                 }
             },
@@ -276,7 +282,9 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
-                    "contains": [],
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 }
             },
@@ -347,7 +355,9 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 },
                 "trigger_token": {
@@ -355,7 +365,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                      "gitlab trigger"
+                    ],
                     "order": 1
                 },
                 "branch": {
@@ -363,7 +375,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                      "branch name"
+                    ],
                     "default": "master",
                     "order": 2
                 }
