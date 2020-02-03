@@ -9,6 +9,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from taniumrest_consts import *
 
+import os
 import requests
 import json
 from time import sleep
@@ -33,6 +34,7 @@ class TaniumRestConnector(BaseConnector):
         self._password = None
         self._verify = None
         self._session_id = None
+        self._percentage = None
 
     def _process_empty_response(self, response, action_result):
 
@@ -183,10 +185,12 @@ class TaniumRestConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and "HTTP 403: Forbidden." in msg:
+        if msg and ("403" in msg or "401" in msg):
+            self.debug_print("Refreshing Tanium API and re-trying request to [{0}] because API token was expired or invalid with error code [{1}]".format(url, msg))
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
+                self.debug_print("Attempt to refresh Tanium API session token failed!")
                 return action_result.get_status(), None
 
             headers.update({'session': str(self._session_id), 'Content-Type': 'application/json'})
@@ -194,6 +198,7 @@ class TaniumRestConnector(BaseConnector):
             ret_val, resp_json = self._make_rest_call(url, action_result, verify=verify, headers=headers, params=params, data=data, json=json, method=method)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("REST API Call Failure! Failed call to Tanium API endpoint {0} with error code {1}".format(url, msg))
             return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, resp_json
@@ -217,6 +222,7 @@ class TaniumRestConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call("{}{}".format(self._base_url, SESSION_URL), action_result, verify=self._verify, headers=headers, json=data, method='post')
 
         if (phantom.is_fail(ret_val)):
+            self.debug_print("Failed to fetch a session token from Tanium API!")
             return action_result.get_status()
 
         self._state['session_id'] = resp_json.get('data', {}).get('session')
@@ -226,7 +232,6 @@ class TaniumRestConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _handle_test_connectivity(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
@@ -403,7 +408,7 @@ class TaniumRestConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _question_result(self, timeout_seconds, endpoint, action_result):
+    def _question_result(self, timeout_seconds, results_percentage, endpoint, action_result):
 
         max_range = int(timeout_seconds / WAIT_SECONDS) + (1 if timeout_seconds % WAIT_SECONDS == 0 else 2)
 
@@ -421,10 +426,26 @@ class TaniumRestConnector(BaseConnector):
             if (phantom.is_fail(ret_val)):
                 return None
 
+            # Checking to see if all the results have been returned by the question. Keeps questioning until all results have been returned.
+            question_id = os.path.basename(endpoint)
+            self.debug_print("Checking if Tanium question ID {} has completed and returned all results . . .".format(question_id))
+            mr_tested = response.get("data", {}).get("result_sets", [])[0].get("mr_tested")
+            estimated_total = response.get("data", {}).get("result_sets", [])[0].get("estimated_total")
+            if mr_tested and estimated_total:
+                percentage_returned = float(mr_tested) / float(estimated_total) * 100
+                self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total, percentage_returned, results_percentage))
+                if int(percentage_returned) < int(results_percentage):
+                    self.debug_print("Tanium question ID {} is {}% done out of {}%. Fetching more results . . .".format(question_id, percentage_returned, results_percentage))
+                    continue
+            else:
+                continue
+
             if response.get("data", {}).get("result_sets", [])[0].get("columns"):
                 return response
+
         else:
-            action_result.set_status(phantom.APP_ERROR, "Error while fetching the results from the Tanium server in '{}' expire seconds".format(timeout_seconds))
+            action_result.set_status(phantom.APP_ERROR, "Error while fetching the results from the Tanium server in '{}' expire seconds. Please try increasing the timeout value."
+                                        .format(timeout_seconds))
             return None
 
     def _handle_list_processes(self, param):
@@ -432,6 +453,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        config = self.get_config()
 
         sensor_name = param['sensor']
         group_name = param.get('group_name')
@@ -457,21 +479,23 @@ class TaniumRestConnector(BaseConnector):
         sensor_dict = dict()
         sensor_dict["sensor"] = {"name": sensor_name}
         select_list.append(sensor_dict)
-
         data["selects"] = select_list
 
+        # Ask the 'List Processes' question to Tanium
         ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/questions", verify=self._verify, params=None, headers=None, json=data, method="post")
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
+        # Now that the question has been processed, fetch the results from the Tanium API
         question_id = response.get("data", {}).get("id")
-
+        self.debug_print("Successfully queried Tanium for list_proccesses action, got question results id {0}".format(question_id))
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
-
-        response = self._question_result(timeout_seconds, endpoint, action_result)
+        results_percentage = config.get('results_percentage', 99)
+        response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
 
         if response is None:
+            self.debug_print("Warning! Tanium returned empty response for list_processes action")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -480,6 +504,7 @@ class TaniumRestConnector(BaseConnector):
         if result_sets:
             row_count = result_sets[0].get("row_count")
         else:
+            self.debug_print("Warning! Tanium returned empty result set for list_processes action")
             row_count = 0
 
         summary = action_result.update_summary({})
@@ -527,6 +552,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        config = self.get_config()
 
         query_text = param.get('query_text')
         group_name = param.get('group_name')
@@ -561,6 +587,8 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide timeout seconds")
             data = dict()
             data['expire_seconds'] = timeout_seconds
+
+            # If a group_name was supplied, validate the group name is valid
             if group_name:
                 endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
                 ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
@@ -571,6 +599,8 @@ class TaniumRestConnector(BaseConnector):
                 group_id = response.get("data", {}).get("id")
                 data["context_group"] = {"id": group_id}
 
+            # Before executing the query, run the query text against the /parse_question
+            #   to ensure the query is in a valid Tanium syntax
             query_to_parse = {"text": query_text}
 
             ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/parse_question", verify=self._verify, params=None, headers=None,
@@ -605,7 +635,8 @@ class TaniumRestConnector(BaseConnector):
 
             endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
 
-            response = self._question_result(timeout_seconds, endpoint, action_result)
+            results_percentage = config.get('results_percentage', 99)
+            response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
 
             if response is None:
                 return action_result.get_status()
