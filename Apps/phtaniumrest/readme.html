@@ -11,6 +11,45 @@
       The time spent returning your results is dependent on how much data you have on your Tanium instance and you may want your action to end with a certain percentage threshold instead of waiting for Tanium to return
       100% of the results.</li>
 </ul>
+
+<h2>Permissions for Interacting with Tanium REST API</h2>
+<li><b>Actions may fail if the account you are using to connect to Tanium does not have sufficient permissions.</b></li>
+<br>
+<ul>
+  <li>Computer Groups</li>
+  <ul>
+    <li>A component of Tanium permissions is the “Computer Groups” which an account is able to operate on.
+    Please ensure the account you used to configure the Tanium REST API app has access to any machines you run queries or actions on.</li>
+  </ul>
+  <br>
+  <li>Suggested Roles for Phantom Account in Tanium</li>
+  <ul>
+    <li>The following Tanium Roles shown below can be configured within Tanium and applied to the account used to connect to Phantom.
+      Note that these roles represent guidance by the Splunk Phantom team based on testing against Tanium 7.3.314.
+      <b>The permissions required in your environment may vary.</b></li>
+    <li>On Tanium 7.3.314, roles can be configured by selecting Permissions > Roles in the Tanium UI.
+        Roles can be applied to a user account by selecting Administration > Users > (View User) > Edit Roles in the Tanium UI.</li>
+      <br>
+      <code>
+        <b>Role #1 Name:</b> Phantom All Questions
+        <ul>
+          <li><b>Permissions:</b> Can Ask Question and Saved Question.  Needed for run query and list processes actions. </li>
+          <li><b>Ask Dynamic Question:</b> Yes</li>
+          <li><b>Show Interact:</b> Yes</li>
+          <li><b>Advanced Permissions:</b> Read Sensor, Read Saved Question</li>
+        </ul>
+        <br>
+        <b>Role #2 Name:</b> Phantom Actions
+        <ul>
+        <li><b>Permissions:</b> Can execute actions only. Needed for execute action and terminate process.</li>
+        <li><b>Show Interact:</b> Yes</li>
+        <li><b>Advanced Permissions:</b> Read Action, Write Action, Read Package</li>
+        </ul>
+      </code>
+  </ul>
+</ul>
+
+
 <h2>How to use Run Query Action</h2>
   <ul>
     <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions in order to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
