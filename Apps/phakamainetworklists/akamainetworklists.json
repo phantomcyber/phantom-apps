@@ -1,0 +1,1175 @@
+{
+    "appid": "7d0fede0-3b76-4867-8772-839b6b96ddb7",
+    "name": "Akamai Network Lists",
+    "description": "The Network Lists API allows you to manage a common set of lists for use in various Akamai security products such as Kona Site Defender, Web App Protector, and Bot Manager.",
+    "type": "devops",
+    "product_vendor": "Akamai",
+    "logo": "akamainetworklists.png",
+    "logo_dark": "akamainetworklists_dark.png",
+    "product_name": "Network Lists",
+    "product_version_regex": ".*",
+    "publisher": "Robert Drouin",
+    "license": "Copyright (c) Robert Drouin, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-02-04T18:01:43.047663Z",
+    "package_name": "phantom_akamainetworklists",
+    "main_module": "akamainetworklists_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL for the API. This URL is given to you when you setup the API Client in the Akamai Control Center. e.g. https://akaa-WWWWWWWWWWWW.luna.akamaiapis.net",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "access_token": {
+            "description": "Access Token for the API.",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        },
+        "client_token": {
+            "description": "Client Token for the API.",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        },
+        "client_secret": {
+            "description": "Client Secret for the API.",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration.",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list networks",
+            "identifier": "list_networks",
+            "description": "Get a network list.",
+            "verbose": "List all network lists available for an authenticated user who belongs to a group, optionally filtered by listType or based on a search string. Results appear within the networkLists array, which might be empty if no network lists are available to the client.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "search": {
+                    "description": "Only list items that match the specified substring in any network list’s name or list of items.",
+                    "data_type": "string",
+                    "required": false,
+                    "default": "",
+                    "order": 0
+                },
+                "extended": {
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": "",
+                    "order": 1
+                },
+                "includeelements": {
+                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.search",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.extended",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.includeelements",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.networkLists.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.createDate",
+                    "data_type": "string",
+                    "column_name": "Created Date",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.createdBy",
+                    "data_type": "string",
+                    "column_name": "Created By",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.updateDate",
+                    "data_type": "string",
+                    "column_name": "Updated Date",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.networkLists.*.updateBy",
+                    "data_type": "string",
+                    "column_name": "Updated By",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get network",
+            "identifier": "get_network",
+            "description": "Get a specific network list.",
+            "verbose": "Gets a network list’s most recent syncPoint version.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for each network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "extended": {
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. ",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": "",
+                    "order": 1
+                },
+                "includeelements": {
+                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.extended",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.includeelements",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.createDate",
+                    "data_type": "string",
+                    "column_name": "Created Date",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy",
+                    "data_type": "string",
+                    "column_name": "Created By",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.updateDate",
+                    "data_type": "string",
+                    "column_name": "Updated Date",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.updatedBy",
+                    "data_type": "string",
+                    "column_name": "Updated By",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create network",
+            "identifier": "create_network",
+            "description": "Create a network list.",
+            "verbose": "Creates a new network list.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Name for the new network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "type": {
+                    "description": "Type of the new network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": ["IP", "GEO"],
+                    "default": "",
+                    "order": 1
+                },
+                "description": {
+                    "description": "Description of the new network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 2
+                },
+                "list": {
+                    "description": "IP's for the new network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 3,
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete network",
+            "identifier": "delete_network",
+            "description": "Delete a network list.",
+            "verbose": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty out its list of elements.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0,
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.syncPoint",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update network",
+            "identifier": "update_network",
+            "description": "Update a network list.",
+            "verbose": "Modify the network list items and properties. Allows you to set the name, description and set of network list items to the resource. The current state of the list will be replaced with the properties and items you provide. The type cannot be changed.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for each network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "name": {
+                    "description": "Update or change the name of the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 1
+                },
+                "description": {
+                    "description": "Update or change the description of the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add element",
+            "identifier": "add_element",
+            "description": "Add element(s) to a network list.",
+            "verbose": "Adds the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "elements": {
+                    "description": "Element(s) to add to the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 1,
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.elements",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove element",
+            "identifier": "remove_element",
+            "description": "Remove element(s) to a network list.",
+            "verbose": "Remove the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "elements": {
+                    "description": "Element(s) to add to the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 1,
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.elements",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "activate network",
+            "identifier": "activate_network",
+            "description": "Activate a network list to STAGING or PRODUCTION.",
+            "verbose": "Activate the most recent syncPoint version of a network list in either the STAGING or PRODUCTION environment.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "environment": {
+                    "description": "Environment to activate the network to.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "value_list": ["PRODUCTION", "STAGING"],
+                    "order": 1,
+                    "allow_list": true
+                },
+                "comments": {
+                    "description": "Comments to add to the network.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 2
+                },
+                "notification": {
+                    "description": "Notification Recipients for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.environment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.notification",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.activationId",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.activationComments",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.activationStatus",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.syncPoint",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.fast",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.dispatchCount",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "activation status",
+            "identifier": "activation_status",
+            "description": "Shows a network list’s activation status.",
+            "verbose": "Shows a network list’s activation status on either the STAGING or PRODUCTION environment.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "environment": {
+                    "description": "Environment to activate the network to.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "value_list": ["PRODUCTION", "STAGING"],
+                    "order": 1,
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.environment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.activationId",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.activationComments",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.activationStatus",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.syncPoint",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.fast",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.dispatchCount",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "activation snapshot",
+            "identifier": "activation_snapshot",
+            "description": "Get a network list’s version when it was activated.",
+            "verbose": "Gets a version of a network list in its state when activated, with each version identified by its syncPoint value. You can only get syncPoint versions that have been activated.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "networklistid": {
+                    "description": "Unique identifier for the network list.",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "",
+                    "order": 0
+                },
+                "syncpoint": {
+                    "description": "The network list version for which to retrieve the snapshot.",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": "",
+                    "order": 1
+                },
+                "extended": {
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.networklistid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.syncpoint",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.extended",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.networkListType",
+                    "data_type": "string",
+                    "column_name": "Network List Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.elementCount",
+                    "data_type": "string",
+                    "column_name": "Element Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.list",
+                    "data_type": "string",
+                    "column_name": "List",
+                    "column_order": 4
+                },              
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string",
+                    "column_name": "Unique Id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
