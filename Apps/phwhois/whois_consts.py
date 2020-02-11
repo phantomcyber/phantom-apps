@@ -1,5 +1,5 @@
 # File: whois_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -8,6 +8,7 @@
 WHOIS_ERR_QUERY = "Whois query failed"
 WHOIS_SUCC_QUERY = "Whois query successful"
 WHOIS_ERR_QUERY_RETURNED_NO_DATA = "Whois query did not return any information"
+WHOIS_ERR_QUERY_RETURNED_NO_CONTACTS_DATA = "Whois query did not return any contacts information"
 WHOIS_ERR_PARSE_REPLY = "Unable to parse whois response"
 WHOIS_ERR_PARSE_INPUT = "Unable to parse input data"
 WHOIS_ERR_INVALID_DOMAIN = "Input does not seem to be a valid domain"
