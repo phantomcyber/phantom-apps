@@ -11,20 +11,17 @@ from phantom.vault import Vault
 
 # THIS Connector imports
 from jira_consts import *
-from bs4 import BeautifulSoup, UnicodeDammit
+from bs4 import BeautifulSoup
 
 from jira.client import JIRA
 from datetime import *
-from dateutil.parser import parse
 
-import dateutil
 import requests
 import tempfile
 import signal
 import json
 import time
 import os
-import pytz
 
 
 def timeout_handler(signum, frame):
@@ -57,7 +54,6 @@ class JiraConnector(phantom.BaseConnector):
         super(JiraConnector, self).__init__()
 
         self._jira = None
-        self._timezone = None
 
     def initialize(self):
 
@@ -66,7 +62,6 @@ class JiraConnector(phantom.BaseConnector):
         # Base URL
         self._base_url = config[JIRA_JSON_DEVICE_URL]
         self._host = self._base_url[self._base_url.find('//') + 2:]
-        self._timezone = config.get(JIRA_JSON_TIMEZONE, JIRA_JSON_DEFAULT_TIMEZONE)
 
         return phantom.APP_SUCCESS
 
@@ -129,15 +124,12 @@ class JiraConnector(phantom.BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
-            try:
-                error_text = "Cannot parse error details. Unparsed error: {0}".format(UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
-            except:
-                error_text = "Unable to parse the details of the error received in the output response"
+            error_text = "Cannot parse error details. Unparsed error: {0}".format(error_text)
 
         if "Epic Name is required" in error_text:
-            error_text = "{}. {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"custom_field\" : \"epic_name\" } ")
+            error_text = "{} {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"custom_field\" : \"epic_name\" } ")
 
-        return result_object.set_status(phantom.APP_ERROR, "{0}. Message: {1}".format(message, error_text))
+        return result_object.set_status(phantom.APP_ERROR, "{0}. Message from server: {1}".format(message, error_text))
 
     def _create_jira_object(self):
 
@@ -258,9 +250,7 @@ class JiraConnector(phantom.BaseConnector):
                 # replace them
                 input_fields[custom_id_to_name[field]] = input_fields.pop(field)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields ID with name. Error: {0}".format(
-                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None, custom_keys_present)
+            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields ID with name. Error: {0}".format(str(e))), None, custom_keys_present)
 
         return (phantom.APP_SUCCESS, input_fields, custom_keys_present)
 
@@ -274,9 +264,7 @@ class JiraConnector(phantom.BaseConnector):
                 # replace them
                 input_fields[custom_name_to_id[field]] = input_fields.pop(field)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields name with ID. Error: {0}".format(
-                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None)
+            return (action_result.set_status(phantom.APP_ERROR, "Failed to replace custom fields name with ID. Error: {0}".format(str(e))), None)
 
         return (phantom.APP_SUCCESS, input_fields)
 
@@ -292,9 +280,8 @@ class JiraConnector(phantom.BaseConnector):
         try:
             update_fields = json.loads(update_fields)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            return (action_result.set_status(phantom.APP_ERROR, '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(
-                                field_name=JIRA_JSON_UPDATE_FIELDS), UnicodeDammit(error_msg).unicode_markup.encode('utf-8').replace('{', '(').replace('}', ')'))), None)
+            return (action_result.set_status(phantom.APP_ERROR,
+                        '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_UPDATE_FIELDS), str(e).replace('{', '(').replace('}', ')'))), None)
 
         if (not update_fields):
             return (action_result.set_status(phantom.APP_ERROR, "The input dictionary seems to be empty"), None)
@@ -627,9 +614,8 @@ class JiraConnector(phantom.BaseConnector):
             try:
                 fields = json.loads(param.get(JIRA_JSON_FIELDS))
             except Exception as e:
-                error_msg = e.message if e.message else 'Unknown error occurred'
-                return action_result.set_status(phantom.APP_ERROR, '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_FIELDS),
-                                    UnicodeDammit(error_msg).unicode_markup.encode('utf-8').replace('{', '(').replace('}', ')')))
+                return action_result.set_status(phantom.APP_ERROR,
+                            '{0}. Error: {1}'.format(JIRA_ERR_FIELDS_JSON_PARSE.format(field_name=JIRA_JSON_FIELDS), str(e).replace('{', '(').replace('}', ')')))
 
             if ('fields' in fields):
                 if (len(fields.keys()) > 1):
@@ -677,8 +663,7 @@ class JiraConnector(phantom.BaseConnector):
                 self._jira.assign_issue(new_issue, assignee)
             except Exception as e:
                 self.debug_print("Exception for assignee")
-                error_msg = e.message if e.message else 'Unknown error occurred'
-                assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee, UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))
+                assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee, str(e))
 
         issue_id = new_issue.key
 
@@ -887,8 +872,7 @@ class JiraConnector(phantom.BaseConnector):
                 self._jira.add_attachment(issue=issue, attachment=f, filename=meta['name'])
         except Exception as e:
             self.debug_print("Error while attaching")
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            return JIRA_ERR_ATTACH_FAILED.format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))
+            return JIRA_ERR_ATTACH_FAILED.format(str(e))
 
         return ""
 
@@ -1219,7 +1203,7 @@ class JiraConnector(phantom.BaseConnector):
         if (phantom.is_fail(ret_val)):
             return phantom.APP_ERROR
 
-        vault_ret = Vault.add_attachment(tmp.name, container_id, UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
+        vault_ret = Vault.add_attachment(tmp.name, container_id, attachment.filename)
 
         if not vault_ret.get('succeeded'):
             self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
@@ -1227,7 +1211,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_json = {}
 
-        artifact_json['name'] = 'attachment - {0}'.format(UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8'))
+        artifact_json['name'] = 'attachment - {0}'.format(attachment.filename)
         artifact_json['label'] = 'attachment'
         artifact_json['container_id'] = container_id
         artifact_json['source_data_identifier'] = attachment.id
@@ -1236,7 +1220,7 @@ class JiraConnector(phantom.BaseConnector):
 
         artifact_cef['size'] = attachment.size
         artifact_cef['created'] = attachment.created
-        artifact_cef['filename'] = UnicodeDammit(attachment.filename).unicode_markup.encode('utf-8')
+        artifact_cef['filename'] = attachment.filename
         artifact_cef['mimeType'] = attachment.mimeType
         artifact_cef['author'] = attachment.author.name
         artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
@@ -1269,9 +1253,7 @@ class JiraConnector(phantom.BaseConnector):
 
             artifact_list.append(artifact_json)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the comment artifact. Error message: {0}".format(
-                        UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
+            action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the comment artifact. Error message: {0}".format(str(e)))
             return phantom.APP_ERROR
 
         return phantom.APP_SUCCESS
@@ -1287,9 +1269,7 @@ class JiraConnector(phantom.BaseConnector):
                 else:
                     issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS)
             except Exception as e:
-                error_msg = e.message if e.message else 'Unknown error occurred'
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of tickets (issues). Error: {0}".format(
-                            UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of tickets (issues). Error: {0}".format(str(e)))
                 return None
 
             if issues is None:
@@ -1379,8 +1359,7 @@ class JiraConnector(phantom.BaseConnector):
         try:
             self._jira.add_watcher(issue_id, username)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            self.save_progress("Response from the server: {0}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
+            self.save_progress("Response from the server: {0}".format(str(e)))
             return action_result.set_status(phantom.APP_ERROR, "Failed to add the watcher. Please check the provided parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added the user to the watchers list of the issue ID: {0}".format(issue_id))
@@ -1390,10 +1369,8 @@ class JiraConnector(phantom.BaseConnector):
         try:
             response = self._jira.watchers(issue_id)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            self.save_progress("Response from the server:{}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the watchers list. Error: {0}".format(
-                                UnicodeDammit(error_msg).unicode_markup.encode('utf-8'))), None
+            self.save_progress("Response from the server:{}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the watchers list. Error: {0}".format(str(e))), None
 
         watcher_list = list()
         for watcher in response.watchers:
@@ -1429,8 +1406,7 @@ class JiraConnector(phantom.BaseConnector):
         try:
             self._jira.remove_watcher(issue_id, username)
         except Exception as e:
-            error_msg = e.message if e.message else 'Unknown error occurred'
-            self.save_progress("Response from the server: {0}".format(UnicodeDammit(error_msg).unicode_markup.encode('utf-8')))
+            self.save_progress("Response from the server: {0}".format(str(e)))
             return action_result.set_status(phantom.APP_ERROR, "Failed to remove the watcher. Please check the provided parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed the user from the watchers list of the issue ID: {0}".format(issue_id))
@@ -1551,7 +1527,7 @@ class JiraConnector(phantom.BaseConnector):
 
         try:
             for attachment in issue.fields.attachment:
-                if not self._get_artifact_id(attachment.id, container_id, issue_type="attachment"):
+                if not self._get_artifact_id(attachment.id, container_id):
                     ret_val = self._handle_attachment(attachment, container_id, artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
@@ -1563,9 +1539,7 @@ class JiraConnector(phantom.BaseConnector):
 
             for comment in issue.fields.comment.comments:
 
-                full_artifact = self._get_artifact_id(comment.id, container_id, issue_type="comment", full_artifact=True)
-
-                if not full_artifact:
+                if not self._get_artifact_id(comment.id, container_id):
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
@@ -1573,27 +1547,11 @@ class JiraConnector(phantom.BaseConnector):
 
                     continue
 
-                # Comparing current updated time of comment with the already existing comment artifact
-                # 1. Fetch the current comment's updated time and convert it to UTC
-                comment_current_updated_time = comment.updated
-                comment_current_updated_time_jira_server_tz_specific = parse(comment_current_updated_time)
-                comment_current_updated_time_utc_tz_specific = comment_current_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
+                update_time = issue.fields.updated[:-5]
+                update_datetime = datetime.strptime(update_time, "%Y-%m-%dT%H:%M:%S.%f")
+                update_epoch = (update_datetime - datetime.utcfromtimestamp(0)).total_seconds()
 
-                # 2. Fetch the current comment's artifact's updated time and convert it to UTC
-                comment_artifact_current_updated_time = full_artifact.get("cef", {}).get("updated")
-
-                if comment_artifact_current_updated_time:
-                    comment_artifact_updated_time_jira_server_tz_specific = parse(comment_artifact_current_updated_time)
-                    comment_artifact_updated_time_utc_tz_specific = comment_artifact_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
-
-                # By default, we won't create the artifact for current comment
-                # to avoid duplicate artifacts for comments even if the fields are updated for the ticket
-                create_updated_comment_artifact_not_req = False
-
-                if str(comment_current_updated_time_utc_tz_specific) == str(comment_artifact_updated_time_utc_tz_specific):
-                    create_updated_comment_artifact_not_req = True
-
-                if self.is_poll_now() or not comment_artifact_current_updated_time or not create_updated_comment_artifact_not_req:
+                if self.is_poll_now() or (update_epoch > last_time):
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
@@ -1610,8 +1568,6 @@ class JiraConnector(phantom.BaseConnector):
         previous_full_artifact = self._get_artifact_id(issue.key, container_id, issue_type=issue_type, full_artifact=True)
 
         if not previous_full_artifact:
-            self.save_progress(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
-            self.debug_print(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
             return phantom.APP_ERROR
 
         to_create_updated_artifact = self._check_to_create_updated_artifact(container_id, issue, previous_full_artifact, action_result)
@@ -1729,11 +1685,6 @@ class JiraConnector(phantom.BaseConnector):
         # Add action result
         action_result = self.add_action_result(phantom.ActionResult(param))
 
-        if not state:
-            self.debug_print(JIRA_ERR_STATE_FILE_LOAD_ERROR)
-            self.save_progress(JIRA_ERR_STATE_FILE_LOAD_ERROR)
-            return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_STATE_FILE_LOAD_ERROR)
-
         # Get time from last poll, save now as time for this poll
         last_time = state.get('last_time', 0)
 
@@ -1748,15 +1699,6 @@ class JiraConnector(phantom.BaseConnector):
                 if last_time < 0:
                     last_time = 0
 
-                # Updating the timestamp based on the timezone mentioned
-                # in the asset configuration parameters
-                ts_dt = datetime.fromtimestamp(last_time)
-                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
-
-                timez = pytz.timezone(self._timezone)
-                ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
-                last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
-
             except:
                 return action_result.set_status(phantom.APP_ERROR,
                                                 "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
@@ -1764,15 +1706,11 @@ class JiraConnector(phantom.BaseConnector):
         # Build the query for the issue search
         query = ""
 
-        try:
-            project_key = UnicodeDammit(config.get(JIRA_JSON_PROJECT_KEY, "")).unicode_markup.encode('utf-8')
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid project key")
-
+        project_key = config.get(JIRA_JSON_PROJECT_KEY)
         if project_key:
             query = "project={0}".format(project_key)
 
-        action_query = UnicodeDammit(config.get(JIRA_JSON_QUERY, "")).unicode_markup.encode('utf-8')
+        action_query = config.get(JIRA_JSON_QUERY, "")
 
         if (len(action_query) > 0):
             query = "{0}{1}{2}".format(query, ' and ' if query else '', action_query)
@@ -1783,12 +1721,13 @@ class JiraConnector(phantom.BaseConnector):
 
         # If it's the first poll, don't filter based on update time
         elif (state.get('first_run', True)):
+            state['first_run'] = False
             max_tickets = int(config.get('first_run_max_tickets', -1))
 
         # If it's scheduled polling add a filter for update time being greater than the last poll time
         else:
             max_tickets = int(config.get('max_tickets', -1))
-            query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', last_time_str)
+            query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', datetime.fromtimestamp(last_time).strftime(JIRA_TIME_FORMAT))
 
         # Order by update time
         query = "{0} order by updated asc".format(query if query else '')
@@ -1807,14 +1746,8 @@ class JiraConnector(phantom.BaseConnector):
 
         if not self.is_poll_now() and issues:
             last_fetched_issue = self._jira.issue(issues[-1].key)
-            last_time_jira_server_tz_specific = parse(last_fetched_issue.fields.updated)
-            last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(dateutil.tz.tzlocal())
-            state['last_time'] = time.mktime(last_time_phantom_server_tz_specific.timetuple())
-
-        # Mark the first_run as False once the scheduled or ingestion polling
-        # first run or every run has been successfully completed
-        if not self.is_poll_now():
-            state['first_run'] = False
+            last_fetched_issue_updated_timestamp = time.mktime(datetime.strptime(last_fetched_issue.fields.updated[:-5], "%Y-%m-%dT%H:%M:%S.%f").timetuple())
+            state['last_time'] = last_fetched_issue_updated_timestamp
 
         # Check for save_state API, use it if it is present
         if (hasattr(self, 'save_state')):
@@ -1822,7 +1755,7 @@ class JiraConnector(phantom.BaseConnector):
         else:
             self._save_state(state)
 
-        if failed:
+        if (failed):
             return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_FAILURES)
 
         return action_result.set_status(phantom.APP_SUCCESS)
