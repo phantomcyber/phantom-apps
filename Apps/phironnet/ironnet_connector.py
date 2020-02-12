@@ -297,7 +297,7 @@ class IronnetConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         request = {
             'name': param['name'],
-            'description': param['description'],
+            'description': param.get('description', ''),
             'domain': param.get('domain', ''),
             'ip': param.get('ip', ''),
             'activity_start_time': fix_timestamp(param['activity_start_time']),
