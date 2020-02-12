@@ -9,10 +9,16 @@
 # --
 
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-from phantom.vault import Vault
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom.vault import Vault
+    from phantom import status as status_strings
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    from vault import Vault
+    import status as status_strings
 
 # Usage of the consts file is recommended
 # from cuckoo_consts import *
@@ -71,26 +77,26 @@ class CuckooConnector(BaseConnector):
         self._version = None
 
         self._state = self.load_state()
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
         # Save the state, this data is saved accross actions and app upgrades
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _process_empty_reponse(self, response, action_result):
 
         if response.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {})
+            return RetVal(status_strings.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
         if response.status_code == 200:
             # Let's actually try to parse it as a json first...
             ret_val, response = self._process_json_response(response, action_result)
-            if not phantom.is_fail(ret_val):
+            if not status_strings.is_fail(ret_val):
                 return RetVal(ret_val, response)
 
         # An html response, treat it like an error
@@ -110,7 +116,7 @@ class CuckooConnector(BaseConnector):
 
         message = message.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
 
@@ -118,17 +124,17 @@ class CuckooConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
+            return RetVal(status_strings.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
 
@@ -159,7 +165,7 @@ class CuckooConnector(BaseConnector):
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, json=None, files=None, method="get"):
 
@@ -170,7 +176,7 @@ class CuckooConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
         url = self._base_url + endpoint
@@ -187,26 +193,26 @@ class CuckooConnector(BaseConnector):
                 files=files
             )
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status( status_strings.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
     def _check_version(self, action_result):
         self.save_progress("Checking Cuckoo Version")
         ret_val, response = self._make_rest_call('/cuckoo/status', action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         try:
             version = response['version']
         except KeyError:
             return action_result.set_status(
-                phantom.APP_ERROR, "Error retrieving version information"
+                status_strings.APP_ERROR, "Error retrieving version information"
             )
 
         self._version = version
         self.save_progress("Using Version: {}".format(version))
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _queue_analysis(self, action_result, object_type, **kwargs):
         ret_val, response = self._make_rest_call(
@@ -215,14 +221,14 @@ class CuckooConnector(BaseConnector):
             method="post",
             **kwargs
         )
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val, None
 
         try:
-            return phantom.APP_SUCCESS, response['task_id']
+            return status_strings.APP_SUCCESS, response['task_id']
         except KeyError:
             return action_result.set_status(
-                phantom.APP_ERROR, "Unable to retrieve task id"
+                status_strings.APP_ERROR, "Unable to retrieve task id"
             ), None
 
     def _poll_for_task(self, action_result, task_id, key=""):
@@ -246,7 +252,7 @@ class CuckooConnector(BaseConnector):
         while count <= max_count:
             self.save_progress("Polling for task: Attempt {0} of {1}".format(count, max_count))
             ret_val, response = self._make_rest_call('/tasks/view/{}'.format(task_id), action_result)
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return ret_val
 
             result_data['task_status'] = response['task']
@@ -256,27 +262,27 @@ class CuckooConnector(BaseConnector):
                 time.sleep(POLL_SLEEP_SECS)
             elif status in ('reported'):
                 ret_val, response = self._make_rest_call('/tasks/report/{}'.format(task_id), action_result)
-                if phantom.is_fail(ret_val):
+                if status_strings.is_fail(ret_val):
                     return ret_val
                 result_data['report'] = response
-                return action_result.set_status(phantom.APP_SUCCESS)
+                return action_result.set_status(status_strings.APP_SUCCESS)
         # Timed out
-        return action_result.set_status(phantom.APP_SUCCESS, "Polling timed out, continue with get report")
+        return action_result.set_status(status_strings.APP_SUCCESS, "Polling timed out, continue with get report")
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_version(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
             return ret_val
 
         self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_detonate_file(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_version(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         vault_id = param['vault_id']
@@ -285,7 +291,7 @@ class CuckooConnector(BaseConnector):
         vault_info = Vault.get_file_info(vault_id=vault_id)
         if not vault_info:
             return action_result.set_status(
-                phantom.APP_ERROR, "Invalid Vault ID"
+                status_strings.APP_ERROR, "Invalid Vault ID"
             )
 
         file_info = vault_info[0]
@@ -297,7 +303,7 @@ class CuckooConnector(BaseConnector):
             payload = open(file_path, 'rb')
         except Exception as e:
             return action_result.set_status(
-                phantom.APP_ERROR, "Error opening file", e
+                status_strings.APP_ERROR, "Error opening file", e
             )
 
         files = {
@@ -305,7 +311,7 @@ class CuckooConnector(BaseConnector):
         }
 
         ret_val, task_id = self._queue_analysis(action_result, "file", files=files)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         return self._poll_for_task(action_result, task_id, key=file_name)
@@ -313,7 +319,7 @@ class CuckooConnector(BaseConnector):
     def _handle_detonate_url(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_version(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         url = param['url']
@@ -323,7 +329,7 @@ class CuckooConnector(BaseConnector):
         }
 
         ret_val, task_id = self._queue_analysis(action_result, 'url', data=data)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         return self._poll_for_task(action_result, task_id, key=url)
@@ -331,7 +337,7 @@ class CuckooConnector(BaseConnector):
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_version(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val
 
         task_id = param['id']
@@ -339,7 +345,7 @@ class CuckooConnector(BaseConnector):
 
     def handle_action(self, param):
 
-        ret_val = phantom.APP_SUCCESS
+        ret_val = status_strings.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()

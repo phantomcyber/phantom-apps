@@ -1,5 +1,6 @@
 {
     "appid": "1e73d5e4-f0ac-44cc-bafb-68f982f98559",
+    "connector_id": "1e73d5e4-f0ac-44cc-bafb-68f982f98559",
     "name": "Cuckoo",
     "description": "This app supports executing various investigative actions on the Cuckoo sandbox",
     "type": "sandbox",
@@ -11,6 +12,7 @@
     "publisher": "Phantom",
     "license": "Copyright (c) 2014-2020 Splunk Inc.",
     "app_version": "2.0.0",
+    "connector_version": "2.0.0",
     "utctime_updated": "2020-02-03T21:52:37.000000Z",
     "package_name": "phantom_cuckoo",
     "main_module": "cuckoo_connector.py",
