@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "1.0.2",
+    "app_version": "1.0.4",
     "utctime_updated": "2019-10-09T22:28:52.000000Z",
     "package_name": "phantom_taniumrest",
     "main_module": "taniumrest_connector.pyc",
@@ -41,6 +41,13 @@
             "required": false,
             "default": false,
             "order": 1
+        },
+        "results_percentage": {
+            "description": "Consider question results complete at (% out of 100)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 99,
+            "order": 4
         }
     },
     "actions": [
@@ -58,7 +65,7 @@
             "action": "list processes",
             "identifier": "list_processes",
             "description": "List the running processes of the devices registered on the Tanium server",
-            "verbose": "The action waits for <b>timeout_seconds</b> provided by the user in intervals of 5 seconds for fetching the results. The action is a success as soon as the results are retrieved or else it will timeout and fail.",
+            "verbose": "This action requires specifying a sensor to be used to list processes.  A standard Tanium sensor, 'Process Details' is used by default but a different sensor can be specified instead.  Note that the 'Process Details' sensor may not be available on all Tanium deployments.  Note that at this time this action only supports limiting the query to specified computer groups, but a generic Run Query action can be constructed to query an in individual computer's processes.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -66,6 +73,7 @@
                     "description": "Sensor which will list all the processes",
                     "data_type": "string",
                     "required": true,
+                    "default": "Process Details",
                     "order": 0
                 },
                 "group_name": {
@@ -382,7 +390,7 @@
         {
             "action": "parse question",
             "identifier": "parse_question",
-            "description": "Fetches all the parsed questions related to the query text entered",
+            "description": "Parses the supplied text into a valid Tanium query string",
             "verbose": "<p>When asked a non-saved question in the <b>query_text</b> parameter, it will parse the given query and give a list of suggestions that are related to it.</p><p>For example, on the Tanium platform, if one were to just ask the question, 'all IP addresses,' Tanium will give the suggestions:<br><ul><li>Get Static IP Addresses from all machines</li><li>Get IP Routes from all machines</li><li>Get IP Address from all machines</li><li>Get IP Connections from all machines</li><li>Get IP Route Details from all machines</li><li>Get Network IP Gateway from all machines</li></ul><br>Tanium sorts this list, from most-related to least-related.</p>",
             "type": "investigate",
             "read_only": true,
@@ -508,12 +516,13 @@
         {
             "action": "list questions",
             "identifier": "list_questions",
-            "description": "Retrieves all the saved questions or the question history of the Tanium server",
+            "description": "Retrieves either a history of the most recent questions or a list of saved questions",
+            "verbose": "If the 'list_saved_questions' parameter is true, this action will return a list of saved questions.  If the flag is not set, this action will return a history of recently asked questions",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "list_saved_questions": {
-                    "description": "Enabling this will list the saved questions",
+                    "description": "Retrieve Saved Questions",
                     "data_type": "boolean",
                     "required": false,
                     "default": true,
@@ -1376,12 +1385,12 @@
             "action": "execute action",
             "identifier": "execute_action",
             "description": "Execute an action on the Tanium server",
-            "verbose": "<li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>reissue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in <b>reissue_seconds</b> parameter.</li>",
+            "verbose": "<li>See top-level app documentation for example parameters.</li><li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>reissue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in <b>reissue_seconds</b> parameter.</li>",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "action_name": {
-                    "description": "Name of the action",
+                    "description": "Creates a name for the action executed",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -1389,23 +1398,24 @@
                 "action_group": {
                     "description": "Group of the action",
                     "data_type": "string",
+                    "default": "Default",
                     "required": true,
                     "order": 1
                 },
                 "package_name": {
-                    "description": "Package name that will be executed",
+                    "description": "Name of the Tanium package to be executed",
                     "data_type": "string",
                     "required": true,
                     "order": 2
                 },
                 "package_parameters": {
-                    "description": "Package parameters of the corresponding package",
+                    "description": "Parameter inputs of the corresponding package. Provide JSON format (i.e. {\"$1\": \"Standard_Collection\", \"$2\": \"SCP\"})",
                     "data_type": "string",
                     "required": false,
                     "order": 3
                 },
                 "group_name": {
-                    "description": "Computer group name of which the process will be terminated",
+                    "description": "The Tanium Computer Group name on which the action will be executed. If left blank, will execute on all registered IP addresses/hostnames in your Tanium instance",
                     "data_type": "string",
                     "required": false,
                     "order": 4
@@ -1943,12 +1953,12 @@
             "action": "run query",
             "identifier": "run_query",
             "description": "Run a search query on the devices registered on the Tanium server",
-            "verbose": "The following point is applicable only for <b>query_text</b> which is not available in saved questions list on the Tanium server. The action waits for <b>timeout_seconds</b> provided by the user in intervals of 5 seconds to fetch the results. The action is a success as soon as the results are retrieved or else it will timeout and fail.",
+            "verbose": "See top-level app documentation for example parameters. For manual questions only, the action waits for <b>timeout_seconds</b> provided by the user in intervals of 5 seconds to fetch the results. The action is a success as soon as the results are retrieved or else it will timeout and fail.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "query_text": {
-                    "description": "Query to run",
+                    "description": "Query to run (in Tanium Question Syntax)",
                     "data_type": "string",
                     "contains": [
                         "taniumrest question text"
@@ -1958,19 +1968,19 @@
                     "order": 0
                 },
                 "group_name": {
-                    "description": "Computer group name on which the query will be executed",
+                    "description": "The Tanium Computer Group name on which the query will be executed (manual query only)",
                     "data_type": "string",
                     "required": false,
                     "order": 1
                 },
                 "is_saved_question": {
-                    "description": "The query which is asked is saved or not",
+                    "description": "Check this box if the query text parameter refers to a 'Saved Question' on your Tanium",
                     "data_type": "boolean",
                     "required": false,
                     "order": 2
                 },
                 "timeout_seconds": {
-                    "description": "The number of seconds before the question expires",
+                    "description": "The number of seconds before the question expires (manual query only)",
                     "data_type": "numeric",
                     "required": false,
                     "default": 600,
