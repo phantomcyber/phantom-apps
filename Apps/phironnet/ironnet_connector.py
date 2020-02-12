@@ -168,7 +168,16 @@ class IronnetConnector(BaseConnector):
                 data=json.dumps(data),
                 **kwargs)
         except Exception as e:
-            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else "Unknown error occurred. Please check the asset configuration parameters."
+            if e.message:
+                if isinstance(e.message, basestring):
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    try:
+                        error_msg = str(e.message)
+                    except:
+                        error_msg = "Unknown error occurred. Please check the asset configuration parameters."
+            else:
+                error_msg = "Unknown error occurred. Please check the asset configuration parameters."
             self.save_progress("Error while issuing REST call - {}".format(error_msg))
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)),
