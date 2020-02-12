@@ -10,12 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "1.0.3",
-    "utctime_updated": "2019-07-16T21:52:21.000000Z",
+    "app_version": "2.0.0",
+    "utctime_updated": "2020-02-03T19:42:48.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
-    "main_module": "crowdstrikeoauthapi_connector.pyc",
+    "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.6.19142",
+    "latest_tested_versions": [
+        "Cloud, API api.crowdstrike.com, December 17 2019"
+    ],
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {

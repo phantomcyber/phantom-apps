@@ -3,26 +3,129 @@
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
-<p><b>Run Query Guidelines</b>
+<h2>Asset Configuration</h2>
+<li><b>Consider question results complete at (% out of 100)</b></li>
+<ul>
+  <li>Consider Tanium question results complete at this value, a percentage out of 100. This parameter impacts the <b>run query</b> and <b>list processes</b> actions only.
+      Note that a similar value can be defined in Tanium user preferences – you might want to reflect the same value in your app asset configuration as you use in your Tanium user configuration.
+      The time spent returning your results is dependent on how much data you have on your Tanium instance and you may want your action to end with a certain percentage threshold instead of waiting for Tanium to return
+      100% of the results.</li>
+</ul>
+
+<h2>Permissions for Interacting with Tanium REST API</h2>
+<li><b>Actions may fail if the account you are using to connect to Tanium does not have sufficient permissions.</b></li>
+<br>
+<ul>
+  <li>Computer Groups</li>
   <ul>
+    <li>A component of Tanium permissions is the “Computer Groups” which an account is able to operate on.
+    Please ensure the account you used to configure the Tanium REST API app has access to any machines you run queries or actions on.</li>
+  </ul>
+  <br>
+  <li>Suggested Roles for Phantom Account in Tanium</li>
+  <ul>
+    <li>The following Tanium Roles shown below can be configured within Tanium and applied to the account used to connect to Phantom.
+      Note that these roles represent guidance by the Splunk Phantom team based on testing against Tanium 7.3.314.
+      <b>The permissions required in your environment may vary.</b></li>
+    <li>On Tanium 7.3.314, roles can be configured by selecting Permissions > Roles in the Tanium UI.
+        Roles can be applied to a user account by selecting Administration > Users > (View User) > Edit Roles in the Tanium UI.</li>
+    <li>Alternatively, you can <b>Import from XML</b> directly under Permissions > Roles in the Tanium UI. The XML files containing
+        the roles described below are attached to this app's folder.</li>
+      <br>
+      <code>
+        <b>Role #1 Name:</b> Phantom All Questions
+        <ul>
+          <li><b>Permissions:</b> Can Ask Question and Saved Question.  Needed for run query and list processes actions. </li>
+          <li><b>Ask Dynamic Question:</b> Yes</li>
+          <li><b>Show Interact:</b> Yes</li>
+          <li><b>Advanced Permissions:</b> Read Sensor, Read Saved Question</li>
+        </ul>
+        <br>
+        <b>Role #2 Name:</b> Phantom Actions
+        <ul>
+        <li><b>Permissions:</b> Can execute actions only. Needed for execute action and terminate process.</li>
+        <li><b>Show Interact:</b> Yes</li>
+        <li><b>Advanced Permissions:</b> Read Action, Write Action, Read Package</li>
+        </ul>
+      </code>
+  </ul>
+</ul>
+
+
+<h2>How to use Run Query Action</h2>
+  <ul>
+    <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions in order to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
     <li>Two modes of operation are supported for the run query action:</li>
+    <br>
     <ul>
-      <li>Saved Questions</li>
-      <ul>
-        <li> User can save a manually created question on the Tanium server, then provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to True for this to work correctly.</li>
-      </ul>
       <li>Manual Questions
       <ul>
-        <li>Users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter to fetch appropriate results.</li>
-        <li>The <b>is_saved_question</b> parameter has to be set to False for this to work correctly.</li>
-        <li>To run the query on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-        <li>If <b>group_name</b> parameter is not provided, then the query will be executed on all the registered IP addresses/hostnames.</li>
+        <li>Using Tanium question syntax, users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter.
+            For more information on Tanium's question syntax, <a href="https://docs.tanium.com/interact/interact/questions.html">click here.</a></li>
+        <li>Make sure the <b>is_saved_question</b> box is unchecked, since you are providing a question from scratch.</li>
+        <li>Use the <b>group name</b> parameter to run your query on a particular computer group in your Tanium instance. Users can create a computer group with specific IP addresses/hostnames on the Tanium UI under Administration>Computer Groups.
+            For a guide on how to create/manage computer groups in Tanium, <a href="https://docs.tanium.com/platform_user/platform_user/console_computer_groups.html">click here.</a></li>
+          <ul>
+            <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
+          </ul>
+          <br>
+        <li>Example Run 1 - Get Computer Name:</li>
+          <ul>
+            <code>
+            <li><b>query text</b>: Get Computer Name from all machines</li>
+            <li><b>is saved question</b>: False</li>
+            <li><b>group name</b>: </li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
+          </ul>
+        <li>Example Run 2 - Get Computer Name for Specified Computer Group:</li>
+          <ul>
+            <code>
+            <li><b>query text</b>: Get Computer Name from all machines</li>
+            <li><b>is saved question</b>: False</li>
+            <li><b>group name</b>: centos-computers</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
+          </ul>
+        <li>Example Run 3 - A Complex Query:</li>
+          <ul>
+            <code>
+            <li><b>query text</b>: Get Trace Executed Processes[1 month,1522723342293|1522726941293,0,0,10,0,rar.exe,"",-hp,"","",""] from all machines</li>
+            <li><b>is saved question</b>: False</li>
+            <li><b>group name</b>: </li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
+          </ul>
+        <li>Example Run 4 - List Process Details for a Specified Device:</li>
+          <ul>
+            <code>
+            <li><b>query text</b>: Get Process Details["",""] from all machines with Computer Name contains localhost</li>
+            <li><b>is saved question</b>: False</li>
+            <li><b>group name</b>: centos-computers</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
+          </ul>
+      </ul>
+      <br>
+      <li>Saved Questions</li>
+      <ul>
+        <li>Users can create 'Saved Questions' on the Tanium UI under Content>Saved Questions and provide the name of that saved question in the <b>query_text</b> parameter to fetch appropriate results.
+            For a guide on how to create/manage the Saved Questions on your Tanium instance, <a href="https://docs.tanium.com/interact/interact/saving_questions.html">click here.</a></li>
+        <li>The <b>is_saved_question</b> box must be checked for this to work correctly.</li>
+        <br>
+        <li>Example Run:</li>
+          <ul>
+            <code>
+            <li><b>query text</b>: My Computers</li>
+            <li><b>is saved question</b>: True</li>
+            <li><b>timeout seconds</b>: 600</li><br>
+            </code>
+          </ul>
       </ul>
     </ul>
   </ul>
- </p>
-<p><b>Terminate Process Guidelines</b>
+  <br>
+<h2>How to use Terminate Process Action</h2>
   <ul>
     <li>Please follow the steps below to execute this action successfully:</li>
     <ul>
@@ -31,14 +134,29 @@
       <li>If <b>group_name</b> parameter is not provided, then the terminate process action will be executed on all the registered IP addresses/hostnames.</li>
     </ul>
   </ul>
-</p>
-<p><b>Execute Action Guidelines</b>
+  <br>
+<h2>How to use Execute Action</h2>
   <ul>
-    <li>Please follow the steps below to execute this action successfully:</li>
+    <li>The &#39;Execute Action&#39; action will cause a specified Tanium Package to be executed on the specified group.</li>
     <ul>
-      <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section.</li>
+      <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section, or just use an existing package.</li>
+      <li>Any parameters required by the specified package must be supplied a valid JSON via the <b>package_parameters</b> parameter.  For example,
+      <code>
+      {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}
+      </code></li>
       <li>To execute this action on particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
       <li>If the <b>group_name</b> parameter is not provided, then the action will be executed on all the registered IP addresses/hostnames.</li>
+      <li>Example Run:</li>
+        <ul>
+          <code>
+          <li><b>action name</b>: Splunk Live Response Test</li>
+          <li><b>action group:</b>: Default</li>
+          <li><b>package name</b>: Live Response - Linux</li>
+          <li><b>package parameters</b>: {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}</li>
+          <li><b>group name</b>: centos-computers</li><br>
+          </code>
+        </ul>
     </ul>
   </ul>
 </p>
+<br>

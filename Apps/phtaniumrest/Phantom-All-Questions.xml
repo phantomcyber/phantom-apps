@@ -1,0 +1,41 @@
+<!-- Exported using version "7_3_314_3424" on Monday, February 03, 2020 2:44:26 PM -->
+<content>
+    <content_set_role>
+        <name>Phantom-All-Questions</name>
+        <description>All questions role for phantom app interaction</description>
+        <reserved_name></reserved_name>
+        <deny_flag>0</deny_flag>
+        <all_content_sets_flag>1</all_content_sets_flag>
+        <category>advanced</category>
+        <meta_data/>
+        <content_set_role_privileges>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>read sensor</name>
+                    <reserved_name>read sensor</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>read saved question</name>
+                    <reserved_name>read saved question</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>define question</name>
+                    <reserved_name>define question</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+        </content_set_role_privileges>
+    </content_set_role>
+</content>
