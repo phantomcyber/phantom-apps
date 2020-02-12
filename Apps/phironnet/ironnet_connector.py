@@ -196,6 +196,7 @@ class IronnetConnector(BaseConnector):
         if phantom.is_success(ret_val):
             return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity to IronAPI Passed")
         else:
+            self.save_progress("Error occurred in Test Connectivity: {}".format(action_result.get_message()))
             return action_result.set_status(phantom.APP_ERROR, "Test Connectivity to IronAPI Failed")
 
     def _handle_irondefense_rate_alert(self, param):
@@ -225,8 +226,8 @@ class IronnetConnector(BaseConnector):
             self.debug_print("Alert rating was successful")
             return action_result.set_status(phantom.APP_SUCCESS, "Alert rating was successful")
         else:
-            self.debug_print("Alert rating failed")
-            return action_result.set_status(phantom.APP_ERROR, "Alert rating failed")
+            self.debug_print("Alert rating failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Alert rating failed. Error: {}".format(action_result.get_message()))
 
     def _handle_irondefense_set_alert_status(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -254,8 +255,8 @@ class IronnetConnector(BaseConnector):
             self.debug_print("Setting alert staus was successful")
             return action_result.set_status(phantom.APP_SUCCESS, "Setting alert staus was successful")
         else:
-            self.debug_print("Settings alert status failed")
-            return action_result.set_status(phantom.APP_ERROR, "Settings alert status failed")
+            self.debug_print("Settings alert status failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Settings alert status failed. Error: {}".format(action_result.get_message()))
 
     def _handle_irondefense_comment_on_alert(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -282,8 +283,8 @@ class IronnetConnector(BaseConnector):
             self.debug_print("Adding comment to alert was successful")
             return action_result.set_status(phantom.APP_SUCCESS, "Adding comment to alert was successful")
         else:
-            self.debug_print("Adding comment failed")
-            return action_result.set_status(phantom.APP_ERROR, "Adding comment failed")
+            self.debug_print("Adding comment failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Adding comment failed. Error: {}".format(action_result.get_message()))
 
     def _handle_irondefense_report_observed_bad_activity(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -315,8 +316,8 @@ class IronnetConnector(BaseConnector):
             self.debug_print("Reporting bad activity to IronDefense was successful")
             return action_result.set_status(phantom.APP_SUCCESS, "Reporting bad activity to IronDefense was successful")
         else:
-            self.debug_print("Reporting bad activity to IronDefense failed")
-            return action_result.set_status(phantom.APP_ERROR, "Reporting bad activity to IronDefense failed")
+            self.debug_print("Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
