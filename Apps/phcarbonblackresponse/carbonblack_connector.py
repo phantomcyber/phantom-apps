@@ -4,11 +4,25 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-from phantom.vault import Vault
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom.vault import Vault
+    from phantom import status as status_strings
+    from phantom import json_keys
+    from phantom import utils
+    from phantom import progress
+    from phantom import consts
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    from vault import Vault
+    import status as status_strings
+    import json_keys
+    import utils
+    import progress
+    import consts
 
 # THIS Connector imports
 from carbonblack_consts import *
@@ -80,7 +94,7 @@ class CarbonblackConnector(BaseConnector):
 
     def finalize(self):
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def initialize(self):
 
@@ -93,7 +107,7 @@ class CarbonblackConnector(BaseConnector):
         self._headers = {'X-Auth-Token': self._api_token, 'Content-Type': 'application/json'}
         self._rest_uri = "{0}/api".format(self._base_url)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _normalize_reply(self, reply):
 
@@ -124,29 +138,29 @@ class CarbonblackConnector(BaseConnector):
         request_func = getattr(requests, method)
 
         if (not request_func):
-            return (action_result.set_status(phantom.APP_ERROR, "Invalid method call: {0} for requests module".format(method)), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "Invalid method call: {0} for requests module".format(method)), None)
 
         if (data is not None):
             data = json.dumps(data)
 
         try:
-            r = request_func(url, headers=headers, params=params, files=files, data=data, verify=config[phantom.APP_JSON_VERIFY])
+            r = request_func(url, headers=headers, params=params, files=files, data=data, verify=config[json_keys.APP_JSON_VERIFY])
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "REST Api to server failed", e), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "REST Api to server failed", e), None)
 
         # It's ok if r.text is None, dump that
         # action_result.add_debug_data({'r_text': r.text if r else 'r is None'})
 
         if (r.status_code in additional_succ_codes):
             response = additional_succ_codes[r.status_code]
-            return (phantom.APP_SUCCESS, response if response is not None else r.text)
+            return (status_strings.APP_SUCCESS, response if response is not None else r.text)
 
         # Look for errors
         if (r.status_code != requests.codes.ok):  # pylint: disable=E1101
             # return (action_result.set_status(phantom.APP_ERROR, "REST Api Call returned error, status_code: {0}, data: {1}".format(r.status_code,
             #     self._normalize_reply(r.text))), r.text)
 
-            return (action_result.set_status(phantom.APP_ERROR, "REST Api Call returned error, status_code: {0}".format(r.status_code)), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "REST Api Call returned error, status_code: {0}".format(r.status_code)), None)
 
         resp_json = None
 
@@ -156,12 +170,12 @@ class CarbonblackConnector(BaseConnector):
             try:
                 resp_json = r.json()
             except:
-                return (action_result.set_status(phantom.APP_ERROR, "Unable to parse response as a JSON status_code: {0}, data: {1}".format(r.status_code,
+                return (action_result.set_status(status_strings.APP_ERROR, "Unable to parse response as a JSON status_code: {0}, data: {1}".format(r.status_code,
                     self._normalize_reply(r.text))), None)
         else:
             resp_json = r
 
-        return (phantom.APP_SUCCESS, resp_json)
+        return (status_strings.APP_SUCCESS, resp_json)
 
     def _get_system_info_from_cb(self, ip_hostname, action_result, sensor_id=None):
 
@@ -170,7 +184,7 @@ class CarbonblackConnector(BaseConnector):
 
         if (sensor_id is None):
             # first get the data, use ip if given
-            if (phantom.is_ip(ip_hostname)):
+            if (utils.is_ip(ip_hostname)):
                 query_parameters = {'ip': ip_hostname}
             else:
                 query_parameters = {'hostname': ip_hostname}
@@ -179,13 +193,13 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, sensors = self._make_rest_call(endpoint, action_result, params=query_parameters, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.update_summary({CARBONBLACK_JSON_TOTAL_ENDPOINTS: 0})
 
         if (not sensors):
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(status_strings.APP_SUCCESS)
 
         if (type(sensors) != list):
             sensors = [sensors]
@@ -211,7 +225,7 @@ class CarbonblackConnector(BaseConnector):
 
             sensor[CARBONBLACK_JSON_IPS] = ','.join(ips)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _get_connections_for_process(self, params, action_result):
         """ Get a list of all processes matching the search parameters """
@@ -232,15 +246,15 @@ class CarbonblackConnector(BaseConnector):
         # First get a call with 0 results go get the total number of processes
         params['rows'] = 0
         ret_val, json_resp = self._make_rest_call('/v1/process', action_result, params=params)
-        if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Error finding processes")
+        if (status_strings.is_fail(ret_val)):
+            return action_result.set_status(status_strings.APP_ERROR, "Error finding processes")
 
         if (json_resp['total_results'] == 0):
-            return action_result.set_status(phantom.APP_ERROR, "No connections found")
+            return action_result.set_status(status_strings.APP_ERROR, "No connections found")
         # Make same call to get all of the processes
         params['rows'] = json_resp['total_results']
         ret_val, json_resp = self._make_rest_call('/v1/process', action_result, params=params)
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         process_list = json_resp["results"]
@@ -266,7 +280,7 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.update_summary({"total_processes": total_processes})
         action_result.update_summary({"total_connections": len(action_result.get_data())})
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved connections for process")
+        return action_result.set_status(status_strings.APP_SUCCESS, "Successfully retrieved connections for process")
 
     def _get_connections_for_process_event(self, cb_id, segment_id, action_result):
 
@@ -281,7 +295,7 @@ class CarbonblackConnector(BaseConnector):
         endpoint = "/v1/process/{}/{}/event".format(cb_id, segment_id)
 
         ret_val, event_json = self._make_rest_call(endpoint, action_result, params={'cb.legacy_5x_mode': False})
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return
 
         if ('process' not in event_json or 'netconn_complete' not in event_json['process']):
@@ -337,7 +351,7 @@ class CarbonblackConnector(BaseConnector):
         # get a list of all the sessions
         ret_val, sessions = self._make_rest_call('/v1/cblr/session', action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return None
 
         # get sessions belonging to the sensor we are interested in
@@ -368,14 +382,14 @@ class CarbonblackConnector(BaseConnector):
             data = {'sensor_id': int(sensor_id)}
             ret_val, resp = self._make_rest_call('/v1/cblr/session', action_result, data=data, method='post')
 
-            if phantom.is_fail(ret_val) or resp is None:
+            if status_strings.is_fail(ret_val) or resp is None:
                 action_result.append_to_message("Failed to create a new live session.")
                 return (action_result.get_status(), None)
 
             session_id = resp.get('id')
 
             if not session_id:
-                return (action_result.set_status(phantom.APP_ERROR, 'Did not get a session id in the response from a new session creation'), None)
+                return (action_result.set_status(status_strings.APP_ERROR, 'Did not get a session id in the response from a new session creation'), None)
 
         # Now we either have a newly created session id, an existing pending session id, or an existing active session id
         status = 'unknown'
@@ -397,11 +411,11 @@ class CarbonblackConnector(BaseConnector):
 
             tries += 1
 
-            if (phantom.is_fail(ret_val)):
+            if (status_strings.is_fail(ret_val)):
                 if ((resp) and ('Session {} not found'.format(session_id) not in resp)):
                     continue
                 else:
-                    return (action_result.set_status(phantom.APP_ERROR, "Unable to find session on the server"), None)
+                    return (action_result.set_status(status_strings.APP_ERROR, "Unable to find session on the server"), None)
 
             status = resp.get('status')
 
@@ -409,9 +423,9 @@ class CarbonblackConnector(BaseConnector):
                 break
 
         if (status != 'active'):
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_POLL_TIMEOUT.format(max_tries=MAX_POLL_TRIES)), None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_POLL_TIMEOUT.format(max_tries=MAX_POLL_TRIES)), None)
 
-        return (phantom.APP_SUCCESS, session_id)
+        return (status_strings.APP_SUCCESS, session_id)
 
     def _execute_live_session_command(self, session_id, action_result, command, additional_data={}):
 
@@ -425,13 +439,13 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, resp = self._make_rest_call(url, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), resp)
 
         command_id = resp.get('id')
 
         if (command_id is None):
-            return (action_result.set_status(phantom.APP_ERROR, "Did not get the command id from the server"), resp)
+            return (action_result.set_status(status_strings.APP_ERROR, "Did not get the command id from the server"), resp)
 
         # Now make the rest call to wait for the command to finish
         url = '{0}/{1}'.format(url, command_id)
@@ -439,7 +453,7 @@ class CarbonblackConnector(BaseConnector):
         self.save_progress("Waiting for command completion")
         ret_val, resp = self._make_rest_call(url, action_result, params={'wait': 'true'})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), resp)
 
         result_code = resp.get('result_code')
@@ -452,35 +466,35 @@ class CarbonblackConnector(BaseConnector):
                 msg = CARBONBLACK_ERR_FILE_EXISTS + msg
             if result_code == 2147942403:
                 msg = "Windows cannot find specified path " + msg
-            return (action_result.set_status(phantom.APP_ERROR, msg), resp)
+            return (action_result.set_status(status_strings.APP_ERROR, msg), resp)
 
-        return (phantom.APP_SUCCESS, resp)
+        return (status_strings.APP_SUCCESS, resp)
 
     def _get_process_list(self, sensor_id, action_result):
 
         if (sensor_id is None):
-            return action_result.set_status(phantom.APP_ERROR, "Sensor ID not found")
+            return action_result.set_status(status_strings.APP_ERROR, "Sensor ID not found")
 
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if (not session_id):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
         data = {'session_id': session_id, 'object': ''}
         ret_val, resp = self._execute_live_session_command(session_id, action_result, 'process list', data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         processes = resp.get('processes')
 
         if (processes is None):
-            return action_result.set_status(phantom.APP_ERROR, "Processes information missing from server response")
+            return action_result.set_status(status_strings.APP_ERROR, "Processes information missing from server response")
 
         for process in processes:
             try:
@@ -493,20 +507,20 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.update_summary({'total_processes': len(processes)})
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _terminate_process_on_endpoint(self, sensor_id, action_result, pid):
 
         if (sensor_id is None):
-            return action_result.set_status(phantom.APP_ERROR, "Sensor ID not found")
+            return action_result.set_status(status_strings.APP_ERROR, "Sensor ID not found")
 
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if (not session_id):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
@@ -514,7 +528,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, resp = self._execute_live_session_command(session_id, action_result, 'kill', data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(resp)
@@ -524,17 +538,17 @@ class CarbonblackConnector(BaseConnector):
         except:
             pass
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _terminate_process(self, param):
 
-        ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
+        ip_hostname = param.get(json_keys.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
         pid = param[CARBONBLACK_JSON_PID]
 
         if ((not ip_hostname) and (sensor_id is None)):
             action_result = self.add_action_result(ActionResult(param))
-            return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
+            return action_result.set_status(status_strings.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(json_keys.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         if (sensor_id is not None):
@@ -543,7 +557,7 @@ class CarbonblackConnector(BaseConnector):
             action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id, CARBONBLACK_JSON_PID: pid}))
 
             if sensor_id and not self._is_valid_integer(sensor_id):
-                return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+                return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
             self._terminate_process_on_endpoint(sensor_id, action_result, pid)
             return action_result.get_status()
@@ -552,7 +566,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.add_action_result(sys_info_ar)
             return sys_info_ar.get_status()
 
@@ -576,24 +590,24 @@ class CarbonblackConnector(BaseConnector):
                 systems_error += '<li>{0}</li>'.format(system.get('computer_name'))
 
             systems_error += "</ul>"
-            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_MSG_MORE_THAN_ONE.format(systems_error=systems_error))
+            return sys_info_ar.set_status(status_strings.APP_ERROR, CARBONBLACK_MSG_MORE_THAN_ONE.format(systems_error=systems_error))
 
         system = systems[0]
 
-        action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: ip_hostname, CARBONBLACK_JSON_PID: pid}))
+        action_result = self.add_action_result(ActionResult({json_keys.APP_JSON_IP_HOSTNAME: ip_hostname, CARBONBLACK_JSON_PID: pid}))
 
         self._terminate_process_on_endpoint(system.get('id'), action_result, pid)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _list_processes(self, param):
 
-        ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
+        ip_hostname = param.get(json_keys.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
 
         if ((not ip_hostname) and (sensor_id is None)):
             action_result = self.add_action_result(ActionResult(param))
-            return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
+            return action_result.set_status(status_strings.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(json_keys.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         if (sensor_id is not None):
@@ -602,7 +616,7 @@ class CarbonblackConnector(BaseConnector):
             action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id}))
 
             if sensor_id and not self._is_valid_integer(sensor_id):
-                return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+                return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
             self._get_process_list(sensor_id, action_result)
             return action_result.get_status()
@@ -611,7 +625,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.add_action_result(sys_info_ar)
             return sys_info_ar.get_status()
 
@@ -624,13 +638,13 @@ class CarbonblackConnector(BaseConnector):
             return sys_info_ar.get_status()
 
         for system in systems:
-            action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
+            action_result = self.add_action_result(ActionResult({json_keys.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
             if (system.get('status') != 'Online'):
-                action_result.set_status(phantom.APP_ERROR, "Ignoring Offline Endpoint")
+                action_result.set_status(status_strings.APP_ERROR, "Ignoring Offline Endpoint")
                 continue
             self._get_process_list(system.get('id'), action_result)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _get_file_summary(self, sample_hash, action_result=ActionResult(), additional_succ_codes={}):
 
@@ -639,10 +653,10 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(url, action_result, additional_succ_codes=additional_succ_codes)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
-        return (phantom.APP_SUCCESS, response)
+        return (status_strings.APP_SUCCESS, response)
 
     def _download_file_to_vault(self, action_result, file_summary, sample_hash):
 
@@ -650,7 +664,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(url, action_result, parse_response_json=False)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Create a tmp directory on the vault partition
@@ -667,7 +681,7 @@ class CarbonblackConnector(BaseConnector):
         try:
             os.makedirs(local_dir)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
+            return action_result.set_status(status_strings.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
 
         zip_file_path = "{0}/{1}.zip".format(local_dir, sample_hash)
 
@@ -685,7 +699,7 @@ class CarbonblackConnector(BaseConnector):
             # extract them
             zf.extractall(local_dir)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to extract the zip file", e)
+            return action_result.set_status(status_strings.APP_ERROR, "Unable to extract the zip file", e)
 
         # create the file_path
         file_path = "{0}/filedata".format(local_dir)
@@ -714,22 +728,22 @@ class CarbonblackConnector(BaseConnector):
         curr_data[CARBONBLACK_JSON_FILE_DETAILS] = file_summary
 
         if (vault_ret_dict['succeeded']):
-            curr_data[phantom.APP_JSON_VAULT_ID] = vault_ret_dict[phantom.APP_JSON_HASH]
-            curr_data[phantom.APP_JSON_NAME] = file_name
-            wanted_keys = [phantom.APP_JSON_VAULT_ID, phantom.APP_JSON_NAME]
+            curr_data[json_keys.APP_JSON_VAULT_ID] = vault_ret_dict[json_keys.APP_JSON_HASH]
+            curr_data[json_keys.APP_JSON_NAME] = file_name
+            wanted_keys = [json_keys.APP_JSON_VAULT_ID, json_keys.APP_JSON_NAME]
             summary = {x: curr_data[x] for x in wanted_keys}
             if (contains):
                 summary.update({'file_type': ','.join(contains)})
             action_result.update_summary(summary)
-            action_result.set_status(phantom.APP_SUCCESS)
+            action_result.set_status(status_strings.APP_SUCCESS)
         else:
-            action_result.set_status(phantom.APP_ERROR, phantom.APP_ERR_FILE_ADD_TO_VAULT)
+            action_result.set_status(status_strings.APP_ERROR, status_strings.APP_ERR_FILE_ADD_TO_VAULT)
             action_result.append_to_message(vault_ret_dict['message'])
 
         # remove the /tmp/<> temporary directory
         shutil.rmtree(local_dir)
 
-        return phantom.APP_ERROR
+        return status_strings.APP_ERROR
 
     def _save_file_to_vault(self, action_result, response, sample_hash):
 
@@ -747,7 +761,7 @@ class CarbonblackConnector(BaseConnector):
         try:
             os.makedirs(local_dir)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
+            return action_result.set_status(status_strings.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
 
         zip_file_path = "{0}/{1}.zip".format(local_dir, sample_hash)
 
@@ -765,7 +779,7 @@ class CarbonblackConnector(BaseConnector):
             # extract them
             zf.extractall(local_dir)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to extract the zip file", e)
+            return action_result.set_status(status_strings.APP_ERROR, "Unable to extract the zip file", e)
 
         # create the file_path
         file_path = "{0}/filedata".format(local_dir)
@@ -798,17 +812,17 @@ class CarbonblackConnector(BaseConnector):
         curr_data[CARBONBLACK_JSON_FILE_DETAILS] = file_summary
 
         if (vault_ret_dict['succeeded']):
-            curr_data[phantom.APP_JSON_VAULT_ID] = vault_ret_dict[phantom.APP_JSON_HASH]
-            curr_data[phantom.APP_JSON_NAME] = file_name
-            wanted_keys = [phantom.APP_JSON_VAULT_ID, phantom.APP_JSON_NAME]
+            curr_data[json_keys.APP_JSON_VAULT_ID] = vault_ret_dict[json_keys.APP_JSON_HASH]
+            curr_data[json_keys.APP_JSON_NAME] = file_name
+            wanted_keys = [json_keys.APP_JSON_VAULT_ID, json_keys.APP_JSON_NAME]
             summary = {x: curr_data[x] for x in wanted_keys}
             if (contains):
                 summary.update({'file_type': ','.join(contains)})
             summary.update({CARBONBLACK_JSON_FILE_CB_URL: '{0}/#/binary/{1}'.format(self._base_url, sample_hash)})
             action_result.update_summary(summary)
-            action_result.set_status(phantom.APP_SUCCESS)
+            action_result.set_status(status_strings.APP_SUCCESS)
         else:
-            action_result.set_status(phantom.APP_ERROR, phantom.APP_ERR_FILE_ADD_TO_VAULT)
+            action_result.set_status(status_strings.APP_ERROR, status_strings.APP_ERR_FILE_ADD_TO_VAULT)
             action_result.append_to_message(vault_ret_dict['message'])
 
         # remove the /tmp/<> temporary directory
@@ -825,31 +839,31 @@ class CarbonblackConnector(BaseConnector):
         try:
             data = json.loads(param['data'])
         except:
-            return action_result.set_status(phantom.APP_ERROR,
+            return action_result.set_status(status_strings.APP_ERROR,
                     'Error while parsing json string provided in data parameter. Please provide a valid JSON string.')
 
         if sensor_id and not self._is_valid_integer(sensor_id):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
         # First get a session id
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not session_id:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
         ret_val, resp = self._execute_live_session_command(session_id, action_result, command, data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _execute_program(self, param):
 
@@ -858,7 +872,7 @@ class CarbonblackConnector(BaseConnector):
         sensor_id = param[CARBONBLACK_JSON_SENSOR_ID]
 
         if sensor_id and not self._is_valid_integer(sensor_id):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
         data = {
             'object': param['entire_executable_path'],
@@ -872,22 +886,22 @@ class CarbonblackConnector(BaseConnector):
         # First get a session id
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not session_id:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
         ret_val, resp = self._execute_live_session_command(session_id, action_result, 'create process', data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _memory_dump(self, param):
 
@@ -896,7 +910,7 @@ class CarbonblackConnector(BaseConnector):
         sensor_id = param[CARBONBLACK_JSON_SENSOR_ID]
 
         if sensor_id and not self._is_valid_integer(sensor_id):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
         data = {
             'object': param['destination_path'],
@@ -906,22 +920,22 @@ class CarbonblackConnector(BaseConnector):
         # First get a session id
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not session_id:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
         ret_val, resp = self._execute_live_session_command(session_id, action_result, 'memdump', data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _put_file(self, param):
 
@@ -932,16 +946,16 @@ class CarbonblackConnector(BaseConnector):
         sensor_id = param[CARBONBLACK_JSON_SENSOR_ID]
 
         if sensor_id and not self._is_valid_integer(sensor_id):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
         # First get a session id
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not session_id:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+            return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
         self.save_progress("Got live session ID: {0}".format(session_id))
 
@@ -952,7 +966,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(url, action_result, files=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Get the file_id from the Upload File to Server response
@@ -963,12 +977,12 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, resp = self._execute_live_session_command(session_id, action_result, 'put file', data)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _get_file(self, param):
 
@@ -982,11 +996,11 @@ class CarbonblackConnector(BaseConnector):
 
             ret_val, response = self._make_rest_call(url, action_result, parse_response_json=False, additional_succ_codes={404: CARBONBLACK_MSG_FILE_NOT_FOUND})
 
-            if (phantom.is_fail(ret_val)):
+            if (status_strings.is_fail(ret_val)):
                 return action_result.get_status()
 
             if (response == CARBONBLACK_MSG_FILE_NOT_FOUND):
-                return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
+                return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
 
             return self._save_file_to_vault(action_result, response, sample_hash)
         else:
@@ -998,23 +1012,23 @@ class CarbonblackConnector(BaseConnector):
             sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
 
             if sensor_id and not self._is_valid_integer(sensor_id):
-                return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+                return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
             if not file_source:
-                return action_result.set_status(phantom.APP_ERROR,
+                return action_result.set_status(status_strings.APP_ERROR,
                         'Please provide either hash or file_source parameter value')
             elif not sensor_id:
-                return action_result.set_status(phantom.APP_ERROR,
+                return action_result.set_status(status_strings.APP_ERROR,
                         'Please provide sensor_id if file is fetched using file_source parameter value')
 
             # First get a session id
             ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if (status_strings.is_fail(ret_val)):
                 return action_result.get_status()
 
             if not session_id:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid session id")
+                return action_result.set_status(status_strings.APP_ERROR, "Invalid session id")
 
             self.save_progress("Got live session ID: {0}".format(session_id))
 
@@ -1027,7 +1041,7 @@ class CarbonblackConnector(BaseConnector):
             # Get file and file id
             ret_val, response = self._execute_live_session_command(session_id, action_result, 'get file', data)
 
-            if (phantom.is_fail(ret_val)):
+            if (status_strings.is_fail(ret_val)):
                 return action_result.get_status()
 
             file_id = response.get('id')
@@ -1050,7 +1064,7 @@ class CarbonblackConnector(BaseConnector):
             try:
                 os.makedirs(local_dir)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
+                return action_result.set_status(status_strings.APP_ERROR, "Unable to create temporary folder {0}.".format(temp_dir), e)
 
             zip_file_path = "{0}/{1}.zip".format(local_dir, file_source)
 
@@ -1066,14 +1080,14 @@ class CarbonblackConnector(BaseConnector):
             curr_data = action_result.add_data({ 'session_id': session_id, 'file_id': file_id })
 
             if (vault_ret_dict['succeeded']):
-                curr_data[phantom.APP_JSON_VAULT_ID] = vault_ret_dict[phantom.APP_JSON_HASH]
-                curr_data[phantom.APP_JSON_NAME] = file_name
-                wanted_keys = [phantom.APP_JSON_VAULT_ID, phantom.APP_JSON_NAME]
+                curr_data[json_keys.APP_JSON_VAULT_ID] = vault_ret_dict[json_keys.APP_JSON_HASH]
+                curr_data[json_keys.APP_JSON_NAME] = file_name
+                wanted_keys = [json_keys.APP_JSON_VAULT_ID, json_keys.APP_JSON_NAME]
                 summary = {x: curr_data[x] for x in wanted_keys}
                 action_result.update_summary(summary)
-                action_result.set_status(phantom.APP_SUCCESS)
+                action_result.set_status(status_strings.APP_SUCCESS)
             else:
-                action_result.set_status(phantom.APP_ERROR, phantom.APP_ERR_FILE_ADD_TO_VAULT)
+                action_result.set_status(status_strings.APP_ERROR, status_strings.APP_ERR_FILE_ADD_TO_VAULT)
                 action_result.append_to_message(vault_ret_dict['message'])
 
             # remove the /tmp/<> temporary directory
@@ -1090,11 +1104,11 @@ class CarbonblackConnector(BaseConnector):
         # now try to get info about the file from CarbonBlack
         ret_val, file_summary = self._get_file_summary(sample_hash, action_result, additional_succ_codes={404: CARBONBLACK_MSG_FILE_NOT_FOUND})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if (file_summary == CARBONBLACK_MSG_FILE_NOT_FOUND):
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
+            return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
 
         curr_data = action_result.add_data({})
         curr_data[CARBONBLACK_JSON_FILE_DETAILS] = file_summary
@@ -1110,7 +1124,7 @@ class CarbonblackConnector(BaseConnector):
         download = param.get(CARBONBLACK_JSON_DOWNLOAD, False)
 
         if (not download):
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(status_strings.APP_SUCCESS)
 
         return self._download_file_to_vault(action_result, file_summary, sample_hash)
 
@@ -1119,15 +1133,15 @@ class CarbonblackConnector(BaseConnector):
         """
 
         if (sensor_id is None):
-            return action_result.set_status(phantom.APP_ERROR, "Sensor ID not found")
+            return action_result.set_status(status_strings.APP_ERROR, "Sensor ID not found")
 
         ret_val, sensor = self._make_rest_call("/v1/sensor/{0}".format(sensor_id), action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not sensor or 'status' not in sensor or sensor['status'] != 'Online':
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to find valid sensor to sync"), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "Unable to find valid sensor to sync"), None)
 
         # any time in the future should work, but the official API uses now + 24h, so we will use that as well
         # the timezone is hard-coded to match what was seen in the web interface
@@ -1135,10 +1149,10 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, body = self._make_rest_call("/v1/sensor/{0}".format(sensor_id), action_result, data=sensor, method="put", additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_SYNC_EVENTS)
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_SYNC_EVENTS)
 
     def _is_valid_integer(self, input_value):
         try:
@@ -1155,12 +1169,12 @@ class CarbonblackConnector(BaseConnector):
           " The flush is done by writing a future datetime to the sensor's event_log_flush_time and PUTing the new sensor data
         """
 
-        ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
+        ip_hostname = param.get(json_keys.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
 
         if ((not ip_hostname) and (sensor_id is None)):
             action_result = self.add_action_result(ActionResult(param))
-            return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
+            return action_result.set_status(status_strings.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(json_keys.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         if (sensor_id is not None):
@@ -1169,7 +1183,7 @@ class CarbonblackConnector(BaseConnector):
             action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id}))
 
             if sensor_id and not self._is_valid_integer(sensor_id):
-                return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+                return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
             self._sync_sensor_events(sensor_id, action_result)
             return action_result.get_status()
@@ -1178,7 +1192,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
 
-        if (phantom.is_fail(ret_val) or not sys_info_ar.get_data()):
+        if (status_strings.is_fail(ret_val) or not sys_info_ar.get_data()):
             self.add_action_result(sys_info_ar)
             return sys_info_ar.get_status()
 
@@ -1187,26 +1201,26 @@ class CarbonblackConnector(BaseConnector):
         self.save_progress("Got {0} systems".format(len(systems)))
 
         for system in systems:
-            action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
+            action_result = self.add_action_result(ActionResult({json_keys.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
             if (system.get('status') != 'Online'):
-                action_result.set_status(phantom.APP_ERROR, "Ignoring Offline Endpoint")
+                action_result.set_status(status_strings.APP_ERROR, "Ignoring Offline Endpoint")
                 continue
             self._sync_sensor_events(system.get('id'), action_result)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _get_system_info(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
 
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
-        ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
+        ip_hostname = param.get(json_keys.APP_JSON_IP_HOSTNAME)
 
         if sensor_id and not self._is_valid_integer(sensor_id):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_INTEGER_VALUE)
 
         if ((not ip_hostname) and (sensor_id is None)):
-            return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
+            return action_result.set_status(status_strings.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(json_keys.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         return self._get_system_info_from_cb(ip_hostname, action_result, sensor_id)
@@ -1215,31 +1229,31 @@ class CarbonblackConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(param))
 
-        ip_hostname = param[phantom.APP_JSON_IP_HOSTNAME]
+        ip_hostname = param[json_keys.APP_JSON_IP_HOSTNAME]
 
         ret_val, response = self._set_isolate_state(ip_hostname, action_result, True)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_QUARANTINE)
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_QUARANTINE)
 
     def _unquarantine_device(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
 
-        ip_hostname = param[phantom.APP_JSON_IP_HOSTNAME]
+        ip_hostname = param[json_keys.APP_JSON_IP_HOSTNAME]
 
         ret_val, response = self._set_isolate_state(ip_hostname, action_result, False)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_UNQUARANTINE)
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_UNQUARANTINE)
 
     def _set_isolate_state(self, ip_hostname, action_result, state=True):
 
-        if (phantom.is_ip(ip_hostname)):
+        if (utils.is_ip(ip_hostname)):
             query_parameters = {'ip': ip_hostname}
         else:
             query_parameters = {'hostname': ip_hostname}
@@ -1247,29 +1261,29 @@ class CarbonblackConnector(BaseConnector):
         # make a rest call to get the sensors
         ret_val, sensors = self._make_rest_call("/v1/sensor", action_result, params=query_parameters, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
         if (not sensors):
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to find endpoint, sensor list was empty"), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "Unable to find endpoint, sensor list was empty"), None)
 
         sensors = [x for x in sensors if x.get('status') == 'Online']
 
         if (not sensors):
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to find an online endpoint, sensor list was empty"), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "Unable to find an online endpoint, sensor list was empty"), None)
 
         num_endpoints = len(sensors)
 
         if (num_endpoints > 1):
             # add the sensors found in the action_result
             self._add_sensor_info_to_result(sensors, action_result)
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_MULTI_ENDPOINTS.format(num_endpoints=num_endpoints)), None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_MULTI_ENDPOINTS.format(num_endpoints=num_endpoints)), None)
 
         # get the id, of the 1st one, that's what we will be working on
         data = sensors[0]
 
         if ('id' not in data):
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to find endpoint id in response"), None)
+            return (action_result.set_status(status_strings.APP_ERROR, "Unable to find endpoint id in response"), None)
 
         endpoint_id = data['id']
 
@@ -1280,10 +1294,10 @@ class CarbonblackConnector(BaseConnector):
         ret_val, response = self._make_rest_call("/v1/sensor/{0}".format(endpoint_id), action_result, method="put",
                 data=data, params=query_parameters, parse_response_json=False, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
-        return (phantom.APP_SUCCESS, sensors)
+        return (status_strings.APP_SUCCESS, sensors)
 
     def _unblock_hash(self, param):
 
@@ -1297,13 +1311,13 @@ class CarbonblackConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, method="delete", parse_response_json=False,
                 additional_succ_codes={409: None})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if ('does not exist' in response):
-            return action_result.set_status(phantom.APP_ERROR, 'Supplied MD5 is not currently banned/blocked.')
+            return action_result.set_status(status_strings.APP_ERROR, 'Supplied MD5 is not currently banned/blocked.')
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_UNBLOCK if (not response or type(response) != str) else response)
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_UNBLOCK if (not response or type(response) != str) else response)
 
     def _get_license(self, param):
 
@@ -1314,7 +1328,7 @@ class CarbonblackConnector(BaseConnector):
         # make a rest call
         ret_val, response = self._make_rest_call(url, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -1324,7 +1338,7 @@ class CarbonblackConnector(BaseConnector):
         except:
             pass
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _block_hash(self, param):
 
@@ -1351,10 +1365,10 @@ class CarbonblackConnector(BaseConnector):
         ret_val, response = self._make_rest_call("/v1/banning/blacklist", action_result, method="post",
                 data=data, parse_response_json=False, additional_succ_codes={409: None})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_BLOCK if (not response or type(response) != str) else response)
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_BLOCK if (not response or type(response) != str) else response)
 
     def _add_sensor_info_to_result(self, sensors, action_result):
 
@@ -1383,17 +1397,17 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, sensors = self._make_rest_call("/v1/sensor", action_result, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.set_summary({CARBONBLACK_JSON_TOTAL_ENDPOINTS: len(sensors)})
 
         if (not sensors):
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(status_strings.APP_SUCCESS)
 
         self._add_sensor_info_to_result(sensors, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _get_watchlists(self, action_result, wl_id=None):
 
@@ -1404,10 +1418,10 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, watchlists = self._make_rest_call(endpoint, action_result, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
-        return (phantom.APP_SUCCESS, watchlists)
+        return (status_strings.APP_SUCCESS, watchlists)
 
     def _list_alerts(self, param):
 
@@ -1415,7 +1429,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, watchlists = self._get_watchlists(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.set_summary({CARBONBLACK_JSON_TOTAL_WATCHLISTS: len(watchlists)})
@@ -1428,7 +1442,7 @@ class CarbonblackConnector(BaseConnector):
                 pass
             action_result.add_data(watchlist)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _run_query(self, param):
 
@@ -1437,27 +1451,27 @@ class CarbonblackConnector(BaseConnector):
         query_type = param[CARBONBLACK_JSON_QUERY_TYPE]
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
+            return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
 
         query = param[CARBONBLACK_JSON_QUERY]
 
         ret_val, start, rows = self._parse_range(param, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         self.save_progress(CARBONBLACK_RUNNING_QUERY)
 
         ret_val, search_results = self._search(query_type, action_result, query, start=start, rows=rows)
 
-        if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_PROCESS_SEARCH)
+        if (status_strings.is_fail(ret_val)):
+            return action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_PROCESS_SEARCH)
 
         action_result.add_data(search_results)
 
         action_result.set_summary({CARBONBLACK_JSON_NUM_RESULTS: len(search_results.get('results', []))})
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_DISPLAYING_RESULTS_TOTAL,
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_DISPLAYING_RESULTS_TOTAL,
                 displaying=len(search_results.get('results', [])), query_type=query_type, total=search_results.get('total_results', 'Unknown'))
 
     def _create_alert(self, param):
@@ -1467,7 +1481,7 @@ class CarbonblackConnector(BaseConnector):
         query_type = param[CARBONBLACK_JSON_ALERT_TYPE]
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
+            return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
 
         query = param[CARBONBLACK_JSON_QUERY]
 
@@ -1501,7 +1515,7 @@ class CarbonblackConnector(BaseConnector):
             # no logic to detect unescaped '%' characters
             for c in kvpair.split('=')[1]:
                 if c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~%":
-                    return action_result.set_status(phantom.APP_ERROR, "Unescaped non-reserved character '{0}' found in query; use percent-encoding".format(c))
+                    return action_result.set_status(status_strings.APP_ERROR, "Unescaped non-reserved character '{0}' found in query; use percent-encoding".format(c))
 
         request = {
                 'index_type': index_type,
@@ -1511,7 +1525,7 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, watchlist = self._make_rest_call("/v1/watchlist", action_result, method="post", data=request)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         self.save_progress(CARBONBLACK_ADDED_WATCHLIST)
@@ -1519,11 +1533,11 @@ class CarbonblackConnector(BaseConnector):
         self.save_progress(CARBONBLACK_FETCHING_WATCHLIST_INFO)
 
         if ('id' not in watchlist):
-            return action_result.set_status(phantom.APP_ERROR, "Watchlist ID not found in the recently added watchlist")
+            return action_result.set_status(status_strings.APP_ERROR, "Watchlist ID not found in the recently added watchlist")
 
         ret_val, watchlist = self._get_watchlists(action_result, watchlist['id'])
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         try:
@@ -1536,7 +1550,7 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.set_summary({CARBONBLACK_JSON_ADDED_WL_ID: watchlist['id']})
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _parse_range(self, param, action_result):
 
@@ -1546,13 +1560,13 @@ class CarbonblackConnector(BaseConnector):
 
         # Check if the format of the range is correct
         if (p is None):
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
 
         if not self._is_valid_integer(p['start']):
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
 
         if not self._is_valid_integer(p['end']):
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
 
         # get the values in int
         start = int(p['start'])
@@ -1560,7 +1574,7 @@ class CarbonblackConnector(BaseConnector):
 
         # Validate the range set
         if (end < start):
-            return (action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
+            return (action_result.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_INVALID_RANGE), None, None)
 
         # get the rows
         rows = end - start
@@ -1569,7 +1583,7 @@ class CarbonblackConnector(BaseConnector):
         if (rows == 0):
             rows = 1
 
-        return (phantom.APP_SUCCESS, start, rows)
+        return (status_strings.APP_SUCCESS, start, rows)
 
     def _search(self, search_type, action_result, query, start, rows):
 
@@ -1584,10 +1598,10 @@ class CarbonblackConnector(BaseConnector):
         # Search results are returned as lists
         ret_val, response = self._make_rest_call("/v1/{0}".format(search_type), action_result, method="post", data=data, additional_succ_codes={204: []})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return (action_result.get_status(), None)
 
-        return (phantom.APP_SUCCESS, response)
+        return (status_strings.APP_SUCCESS, response)
 
     def _hunt_file(self, param):
 
@@ -1600,11 +1614,11 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val, start, rows = self._parse_range(param, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
+            return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE, types=', '.join(VALID_QUERY_TYPE))
 
         data = action_result.add_data({query_type: None})
 
@@ -1613,7 +1627,7 @@ class CarbonblackConnector(BaseConnector):
         # Binary search
         ret_val, results = self._search(query_type, action_result, "md5:{0}".format(param[CARBONBLACK_JSON_HASH]), start=start, rows=rows)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if (phantom.is_success(ret_val) and results):
@@ -1624,7 +1638,7 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.set_summary({ "device_count": results.get('total_results', 'Unknown')})
 
-        return action_result.set_status(phantom.APP_SUCCESS, summary)
+        return action_result.set_status(status_strings.APP_SUCCESS, summary)
 
     def _list_connections(self, param):
         """ All of the parameters for this optional, but of course some need to present
@@ -1647,7 +1661,7 @@ class CarbonblackConnector(BaseConnector):
           "  how to turn the criteria into parameters for a process search
           " Then, you'll need to decide if ip_hostname is required to be used with it
         """
-        ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME, "")
+        ip_hostname = param.get(json_keys.APP_JSON_IP_HOSTNAME, "")
         pid = param.get(CARBONBLACK_JSON_PID, "")
         process = param.get(CARBONBLACK_JSON_PROCESS_NAME, "")
         cb_id = param.get(CARBONBLACK_JSON_CB_ID, "")
@@ -1658,7 +1672,7 @@ class CarbonblackConnector(BaseConnector):
             action_result = self.add_action_result(ActionResult(param))
             msg = "Need to specify at least one of {}, {}, or {}".format(CARBONBLACK_JSON_PROCESS_NAME,
                     CARBONBLACK_JSON_PID, CARBONBLACK_JSON_CB_ID)
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            return action_result.set_status(status_strings.APP_ERROR, msg)
 
         # Searching by carbonblack id is a bit different
         if (cb_id):
@@ -1671,14 +1685,14 @@ class CarbonblackConnector(BaseConnector):
             action_result = self.add_action_result(ActionResult(param))
             msg = "Need to specify an IP or hostname to search by {} or {}".format(CARBONBLACK_JSON_PROCESS_NAME,
                     CARBONBLACK_JSON_PID)
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            return action_result.set_status(status_strings.APP_ERROR, msg)
 
         # Get a list of systems matching ip/hostname
         sys_info_ar = ActionResult(param)
 
         ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.add_action_result(sys_info_ar)
             return sys_info_ar.get_status()
 
@@ -1686,7 +1700,7 @@ class CarbonblackConnector(BaseConnector):
 
         if (not systems):
             self.add_action_result(sys_info_ar)
-            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
+            return sys_info_ar.set_status(status_strings.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         # Generate query parameters
         query_parameters = {}
@@ -1699,28 +1713,28 @@ class CarbonblackConnector(BaseConnector):
 
         # Find process / pid on each system
         for system in systems:
-            action_result = self.add_action_result(ActionResult(dict(d, **{phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')})))
+            action_result = self.add_action_result(ActionResult(dict(d, **{json_keys.APP_JSON_IP_HOSTNAME: system.get('computer_name')})))
             if (system.get('status') != 'Online'):
-                action_result.set_status(phantom.APP_ERROR, "Ignoring Offline Endpoint")
+                action_result.set_status(status_strings.APP_ERROR, "Ignoring Offline Endpoint")
                 continue
             query_parameters['cb.q.hostname'] = system.get('computer_name')
             self._get_connections_for_process(query_parameters, action_result)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _validate_version(self, action_result):
 
         # make a rest call to get the info
         ret_val, info = self._make_rest_call("/info", action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             action_result.append_to_message("Product version validation failed.")
             return action_result.get_status()
 
         # get the version of the device
         device_version = info.get('version')
         if (not device_version):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to get version from the device")
+            return action_result.set_status(status_strings.APP_ERROR, "Unable to get version from the device")
 
         self.save_progress("Got device version: {0}".format(device_version))
 
@@ -1728,7 +1742,7 @@ class CarbonblackConnector(BaseConnector):
         version_regex = self.get_product_version_regex()
         if (not version_regex):
             # assume that it matches
-            return phantom.APP_SUCCESS
+            return status_strings.APP_SUCCESS
 
         match = re.match(version_regex, device_version)
 
@@ -1738,7 +1752,7 @@ class CarbonblackConnector(BaseConnector):
 
         self.save_progress("Version validation done")
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _reset_session(self, param):
 
@@ -1751,13 +1765,13 @@ class CarbonblackConnector(BaseConnector):
         # make a rest call to get the info
         ret_val, response = self._make_rest_call(url, action_result, additional_succ_codes={404: error_msg})
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if (response == error_msg):
-            return action_result.set_status(phantom.APP_ERROR, response)
+            return action_result.set_status(status_strings.APP_ERROR, response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_RESET_SESSION.format(session_id=session_id))
+        return action_result.set_status(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_RESET_SESSION.format(session_id=session_id))
 
     def _on_poll(self, param):
         DT_STR_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -1770,10 +1784,10 @@ class CarbonblackConnector(BaseConnector):
         endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(self._state['last_ingested_time'])
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.debug_print(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, action_result.get_message())
-            return phantom.APP_ERROR
+            self.set_status(status_strings.APP_ERROR, action_result.get_message())
+            return status_strings.APP_ERROR
         else:
             self._state['last_ingested_time'] = datetime.datetime.now().strftime(DT_STR_FORMAT)
             self.save_state(self._state)
@@ -1803,12 +1817,12 @@ class CarbonblackConnector(BaseConnector):
                 cont['artifacts'] = artList
 
             status, msg, container_id_ = self.save_container(cont)
-            if status == phantom.APP_ERROR:
+            if status == status_strings.APP_ERROR:
                 self.debug_print("Failed to store: {}".format(msg))
                 self.debug_print('stat/msg {}/{}'.format(status, msg))
-                action_result.set_status(phantom.APP_ERROR, 'Container creation failed: {}'.format(msg))
+                action_result.set_status(status_strings.APP_ERROR, 'Container creation failed: {}'.format(msg))
                 return status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _test_connectivity(self, param):
 
@@ -1819,19 +1833,19 @@ class CarbonblackConnector(BaseConnector):
         host = url[url.find('//') + 2:]
 
         # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, host)
+        self.save_progress(progress.APP_PROG_CONNECTING_TO_ELLIPSES, host)
 
         action_result = ActionResult()
 
         # validate the version, this internally makes all the rest calls to validate the config also
         ret_val = self._validate_version(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.set_status(ret_val, action_result.get_message())
             self.append_to_message(CARBONBLACK_ERR_CONNECTIVITY_TEST)
             return self.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, CARBONBLACK_SUCC_CONNECTIVITY_TEST)
+        return self.set_status_save_progress(status_strings.APP_SUCCESS, CARBONBLACK_SUCC_CONNECTIVITY_TEST)
 
     def handle_action(self, param):
 
@@ -1839,10 +1853,10 @@ class CarbonblackConnector(BaseConnector):
         action = self.get_action_identifier()
 
         # test connectivity is handled differently
-        if (action != phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        if (action != consts.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             action_result = ActionResult(param)
             # validate the version, this internally makes all the rest calls to validate the config also
-            if (phantom.is_fail(self._validate_version(action_result))):
+            if (status_strings.is_fail(self._validate_version(action_result))):
                 self.add_action_result(action_result)
                 return action_result.get_status()
 
@@ -1878,7 +1892,7 @@ class CarbonblackConnector(BaseConnector):
             result = self._unblock_hash(param)
         elif (action == self.ACTION_ID_LIST_CONNECTIONS):
             result = self._list_connections(param)
-        elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        elif (action == consts.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             result = self._test_connectivity(param)
         elif (action == self.ACTION_ID_GET_LICENSE):
             result = self._get_license(param)
