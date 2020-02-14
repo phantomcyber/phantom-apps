@@ -354,7 +354,7 @@
                     "description": "The ID of the GitLab project",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                       "gitlab project id"
                     ],
@@ -364,7 +364,7 @@
                     "description": "The trigger token required for executing a pipeline",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                       "gitlab trigger"
                     ],
@@ -374,7 +374,7 @@
                     "description": "The branch containing the .gitlab-ci.yml file to run. Defaults to 'master'",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                       "branch name"
                     ],
