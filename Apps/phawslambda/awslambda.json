@@ -9,12 +9,15 @@
     "product_name": "Lambda",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.1",
+    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_awslambda",
-    "main_module": "awslambda_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "awslambda_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "latest_tested_versions": [
+        "Cloud API, February 3, 2020"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
