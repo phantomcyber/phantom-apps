@@ -402,7 +402,7 @@
                     "data_type": "string",
                     "contains": [],
                     "column_name": "branch",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary.pipeline_id",
@@ -411,7 +411,7 @@
                     "example_values": [
                         "21"
                     ],
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary.pipeline_web_url",
@@ -420,13 +420,13 @@
                     "example_values": [
                         "https://gitlab.domain.com/test-group/test-project/pipelines/21"
                     ],
-                    "column_order": 2
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 3
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.message",
