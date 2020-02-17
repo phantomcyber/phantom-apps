@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import functools
 import json
 import re
+from bs4 import UnicodeDammit
 
 import humanize
 import requests
@@ -20,6 +21,11 @@ from collections import Counter
 from requests.exceptions import HTTPError, ConnectionError
 from threatresponse import ThreatResponse
 from threatresponse.exceptions import RegionError
+
+
+class RetVal(tuple):
+    def __new__(cls, val1, val2=None):
+        return tuple.__new__(RetVal, (val1, val2))
 
 
 class ScopeError(Exception):
@@ -110,7 +116,7 @@ class CiscoThreatResponseConnector(BaseConnector):
                             'type', '---'),
                         self.targets(doc.get('targets',
                                              mock_for_no_targets)[0].get(
-                            'observables', {})) or '---'
+                            'observables', '---'))
                     )
 
                     # Update responses with
@@ -170,8 +176,12 @@ class CiscoThreatResponseConnector(BaseConnector):
         }
 
     def targets(self, targets):
-        return ', '.join("'{}': '{}'".format(e['type'],
-                                            e['value']) for e in targets)
+        return str([{e.values()[0].encode(): e.values()[-1].encode()
+                     for e in targets if type(e) == dict}]). \
+            replace('[', ''). \
+            replace(']', ''). \
+            replace('{', ''). \
+            replace('}', '')
 
     def build_context_dict(self, observable, type, module,
                            observed, sensor,
@@ -234,7 +244,7 @@ class CiscoThreatResponseConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", action_id)
+        self.debug_print("action_id", self.get_action_identifier())
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -302,7 +312,7 @@ class CiscoThreatResponseConnector(BaseConnector):
 
         except ScopeError as error:
             self.debug_print(repr(error))
-            message = error.args[0]
+            message = error.message
 
         except HTTPError as error:
             self.debug_print(repr(error))
@@ -345,6 +355,7 @@ class CiscoThreatResponseConnector(BaseConnector):
         self._action_result = self.add_action_result(ActionResult())
 
         self._client_id = config['client_id']
+        self._client_id = UnicodeDammit(self._client_id).unicode_markup.encode('utf-8')
         self._client_password = config['client_password']
         self._region = str(config['region']).lower()
         if self._region == 'us':
