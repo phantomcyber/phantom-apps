@@ -68,7 +68,7 @@
             "description": "Get a network list.",
             "verbose": "List all network lists available for an authenticated user who belongs to a group, optionally filtered by listType or based on a search string. Results appear within the networkLists array, which might be empty if no network lists are available to the client.",
             "type": "generic",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "search": {
                     "description": "Only list items that match the specified substring in any network list’s name or list of items.",
@@ -135,7 +135,10 @@
                     "data_path": "action_result.data.*.networkLists.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.networkLists.*.uniqueId",
@@ -143,7 +146,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -206,18 +209,19 @@
             "description": "Get a specific network list.",
             "verbose": "Gets a network list’s most recent syncPoint version.",
             "type": "generic",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for each network list. Comma seperate list allowed.",
                     "data_type": "string",
+                    "contains": [
+                        "akamai networklist id"
+                    ],
                     "required": true,
                     "default": "",
                     "order": 0,
                     "allow_list": true,
-                    "contains": [
-                        "akamai network list id"
-                    ]
+                    "primary": true
                 },
                 "extended": {
                     "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. ",
@@ -247,7 +251,7 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -280,7 +284,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -288,7 +295,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -352,6 +359,7 @@
             "verbose": "Creates a new network list.",
             "type": "generic",
             "read_only": false,
+            "undo": "delete_network",
             "parameters": {
                 "name": {
                     "description": "Name for the new network list.",
@@ -381,7 +389,11 @@
                     "required": true,
                     "default": "",
                     "order": 3,
-                    "allow_list": true
+                    "allow_list": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -409,7 +421,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -433,7 +448,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -441,7 +459,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -475,6 +493,7 @@
             "verbose": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty out its list of elements.",
             "type": "generic",
             "read_only": false,
+            "undo": "create_network",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
@@ -483,8 +502,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -502,7 +522,7 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -517,14 +537,17 @@
                     "column_name": "Name",
                     "column_order": 2,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 3
+                    "column_order": 3,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -559,8 +582,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "name": {
                     "description": "Update or change the name of the network list.",
@@ -592,7 +616,7 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -625,7 +649,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -633,7 +660,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -667,6 +694,7 @@
             "verbose": "Adds the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
+            "undo": "remove_element",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
@@ -675,8 +703,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "elements": {
                     "description": "Element(s) to add to the network list. Comma seperate list allowed.",
@@ -684,7 +713,11 @@
                     "required": true,
                     "default": "",
                     "order": 1,
-                    "allow_list": true
+                    "allow_list": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -702,12 +735,15 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.elements",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -731,7 +767,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -739,7 +778,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -779,6 +818,7 @@
             "verbose": "Remove the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
+            "undo": "add_element",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
@@ -787,8 +827,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "elements": {
                     "description": "Element(s) to add to the network list. Comma seperate list allowed.",
@@ -796,7 +837,11 @@
                     "required": true,
                     "default": "",
                     "order": 1,
-                    "allow_list": true
+                    "allow_list": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -814,12 +859,15 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.elements",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -843,7 +891,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -851,7 +902,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -899,8 +950,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "environment": {
                     "description": "Environment to activate the network to.",
@@ -940,7 +992,7 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -959,7 +1011,10 @@
                     "data_path": "action_result.data.*.activationId",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "akamai networklist activationid"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.activationComments",
@@ -977,7 +1032,10 @@
                     "data_path": "action_result.data.*.syncPoint",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -985,7 +1043,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -1033,8 +1091,9 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "environment": {
                     "description": "Environment to activate the network to.",
@@ -1060,7 +1119,7 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -1070,26 +1129,32 @@
                 {
                     "data_path": "action_result.data.*.activationId",
                     "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 1
+                    "column_name": "Activation ID",
+                    "column_order": 1,
+                    "contains": [
+                        "akamai networklist activationid"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.activationComments",
                     "data_type": "string",
-                    "column_name": "Network List Type",
+                    "column_name": "Activation Comments",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.activationStatus",
                     "data_type": "string",
-                    "column_name": "Element Count",
+                    "column_name": "Activation Status",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
                     "data_type": "string",
-                    "column_name": "List",
-                    "column_order": 4
+                    "column_name": "Sync Point",
+                    "column_order": 4,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -1097,19 +1162,19 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fast",
                     "data_type": "string",
-                    "column_name": "Type",
+                    "column_name": "Fast",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.dispatchCount",
                     "data_type": "string",
-                    "column_name": "Description",
+                    "column_name": "Dispatch Count",
                     "column_order": 7
                 },
                 {
@@ -1145,15 +1210,20 @@
                     "default": "",
                     "order": 0,
                     "contains": [
-                        "akamai network list id"
-                    ]
+                        "akamai networklist id"
+                    ],
+                    "primary": true
                 },
                 "syncpoint": {
                     "description": "The network list version for which to retrieve the snapshot.",
                     "data_type": "numeric",
                     "required": true,
                     "default": "",
-                    "order": 1
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },
                 "extended": {
                     "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments.",
@@ -1178,12 +1248,15 @@
                     "data_path": "action_result.parameter.networklistid",
                     "data_type": "string",
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.syncpoint",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.extended",
@@ -1211,7 +1284,10 @@
                     "data_path": "action_result.data.*.list",
                     "data_type": "string",
                     "column_name": "List",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "ip"
+                    ]
                 },              
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -1219,7 +1295,7 @@
                     "column_name": "Unique Id",
                     "column_order": 5,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
@@ -1227,6 +1303,15 @@
                     "data_type": "string",
                     "column_name": "Type",
                     "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.syncPoint",
+                    "data_type": "string",
+                    "column_name": "Sync Point",
+                    "column_order": 6,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1259,7 +1344,11 @@
                     "data_type": "string",
                     "required": true,
                     "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primay": true,
+                    "contains": [
+                        "akamai networklist activationid"
+                    ]
                 }
             },
             "output": [
@@ -1275,13 +1364,19 @@
                 },
                 {
                     "data_path": "action_result.parameter.activationid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "akamai networklist activationid"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.activationId",
                     "data_type": "string",
                     "column_name": "Activation ID",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "akamai networklist activationid"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.createDate",
@@ -1323,7 +1418,10 @@
                     "data_path": "action_result.data.*.syncPoint",
                     "data_type": "string",
                     "column_name": "Sync Point",
-                    "column_order": 8
+                    "column_order": 8,
+                    "contains": [
+                        "akamai networklist syncpoint"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.uniqueId",
@@ -1331,7 +1429,7 @@
                     "column_name": "Unique ID",
                     "column_order": 9,
                     "contains": [
-                        "akamai network list id"
+                        "akamai networklist id"
                     ]
                 },
                 {
