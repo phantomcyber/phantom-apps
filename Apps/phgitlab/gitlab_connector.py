@@ -11,6 +11,7 @@ from phantom.action_result import ActionResult
 import requests
 import json
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -55,7 +56,7 @@ class GitlabConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+                                                                      error_text)
 
         message = message.replace(u'{', '{{').replace(u'}', '}}')
 
@@ -75,7 +76,7 @@ class GitlabConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+            r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -106,7 +107,7 @@ class GitlabConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -123,16 +124,26 @@ class GitlabConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{0}{1}".format(self._base_url, endpoint)
         self.save_progress("Connecting to endpoint: {}".format(url))
         try:
             r = request_func(
-                            url,
-                            # auth=(username, password),  # basic authentication
-                            verify=config.get('verify_server_cert', False),
-                            **kwargs)
+                url,
+                # auth=(username, password),  # basic authentication
+                verify=config.get('verify_server_cert', False),
+                **kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            if e.message:
+                if isinstance(e.message, basestring):
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    try:
+                        error_msg = str(e.message)
+                    except:
+                        error_msg = "Unknown error occurred. Please check the asset configuration parameters."
+            else:
+                error_msg = "Unknown error occurred. Please check the asset configuration parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(error_msg))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -142,7 +153,8 @@ class GitlabConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         # make rest call
-        ret_val, response = self._make_rest_call('/users', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call(
+            '/users', action_result, params=None, headers=self._rest_auth_header)
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
@@ -161,13 +173,15 @@ class GitlabConnector(BaseConnector):
 
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call('/users', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call(
+            '/users', action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -190,11 +204,13 @@ class GitlabConnector(BaseConnector):
 
     def _handle_list_projects(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call(
+            '/projects', action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -206,13 +222,15 @@ class GitlabConnector(BaseConnector):
 
     def _handle_list_branches(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         project_id = param['project_id']
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/repository/branches'.format(project_id), action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects/{}/repository/branches'.format(
+            project_id), action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -225,7 +243,8 @@ class GitlabConnector(BaseConnector):
     def _handle_create_trigger(self, param):
 
         # Implement the handler here
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -235,27 +254,30 @@ class GitlabConnector(BaseConnector):
         trigger_data = {'description': trigger_name}
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(project_id), action_result, method="post", params=None, headers=self._rest_auth_header, data=trigger_data)
+        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(
+            project_id), action_result, method="post", params=None, headers=self._rest_auth_header, data=trigger_data)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        token_dict = {'tigger_token': response['token']}
-        summary = action_result.update_summary(token_dict)
+        # token_dict = {'tigger_token': response['token']}
+        # summary = action_result.update_summary(token_dict)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_triggers(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         project_id = param['project_id']
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(project_id), action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(
+            project_id), action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -268,7 +290,8 @@ class GitlabConnector(BaseConnector):
     def _handle_run_pipeline(self, param):
 
         # Implement the handler here
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -280,16 +303,17 @@ class GitlabConnector(BaseConnector):
         rest_params = {'token': trigger_token, 'ref': branch}
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/trigger/pipeline'.format(project_id), action_result, \
-            method="post", params=rest_params, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects/{}/trigger/pipeline'.format(project_id), action_result,
+                                                 method="post", params=rest_params, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary_dict = {'pipeline_id': response['id'], 'pipeline_web_url': response['web_url']}
-        summary = action_result.update_summary(summary_dict)
+        # summary_dict = {
+        #     'pipeline_id': response['id'], 'pipeline_web_url': response['web_url']}
+        # summary = action_result.update_summary(summary_dict)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -344,8 +368,9 @@ class GitlabConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = "{}/api/v4".format(config['gitlab_location'])
-        self._personal_access_token=config['personal_access_token']
+        self._base_url = "{0}/api/v4".format(UnicodeDammit(
+            config['gitlab_location']).unicode_markup.encode('UTF-8'))
+        self._personal_access_token = config['personal_access_token']
         self._rest_auth_header = {"PRIVATE-TOKEN": self._personal_access_token}
 
         return phantom.APP_SUCCESS
@@ -386,7 +411,7 @@ if __name__ == '__main__':
         try:
             login_url = GitlabConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -399,11 +424,12 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False,
+                               data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -419,6 +445,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
