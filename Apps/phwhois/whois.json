@@ -18,7 +18,9 @@
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
     "latest_tested_versions": [
-        "v2.4.3"
+        "pythonwhois v2.4.3",
+        "ipwhois v1.1.0",
+        "dnspython v1.16.0"
     ],
     "pip_dependencies": {
         "wheel": [
@@ -29,6 +31,18 @@
             {
                 "module": "requests-file",
                 "input_file": "wheels/requests_file-1.4.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pythonwhois",
+                "input_file": "wheels/pythonwhois-2.4.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "dns",
+                "input_file": "wheels/dnspython-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "ipwhois",
+                "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
             }
         ]
     },
