@@ -1,0 +1,729 @@
+{
+    "appid": "4a88011b-0841-4d49-9ce9-cb35960988b1",
+    "name": "Check Point Firewall",
+    "description": "This app supports a variety of endpoint and network based containment actions on Check Point Firewall",
+    "publisher": "Splunk",
+    "package_name": "phantom_checkpoint",
+    "type": "firewall",
+    "license": "Copyright (c) 2017-2020 Splunk Inc.",
+    "main_module": "checkpoint_connector.pyc",
+    "app_version": "1.0.18",
+    "utctime_updated": "2018-12-07T01:34:33.000000Z",
+    "product_vendor": "Check Point Software Technologies",
+    "product_name": "Check Point Firewall",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.5.15922",
+    "logo": "checkpoint.png",
+    "configuration": {
+        "url": {
+            "description": "Management Server URL with port (e.g. https://10.10.10.10:443)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
+            "required": true,
+            "order": 1,
+            "default": true
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "domain": {
+            "description": "Domain",
+            "data_type": "string",
+            "required": false,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "verbose": "This action logs into the device using a REST API call to check the connection and credentials configured",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "description": "List policies",
+            "type": "investigate",
+            "identifier": "list_policies",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "List Policies"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.uid",
+                    "data_type": "string",
+                    "column_name": "Policy UID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.name",
+                    "data_type": "string",
+                    "column_name": "Policy Name",
+                    "column_order": 0,
+                    "contains": [
+                        "check point policy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.packages.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list layers",
+            "description": "List access layers",
+            "type": "investigate",
+            "identifier": "list_layers",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "List Layers"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.uid",
+                    "data_type": "string",
+                    "column_name": "Layer UID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.name",
+                    "data_type": "string",
+                    "column_name": "Layer Name",
+                    "column_order": 0,
+                    "contains": [
+                        "check point layer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.access-layers.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block ip",
+            "description": "Block an IP/subnet",
+            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to block an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID</li><li>Check for an existing network object for the supplied IP/subnet</li><li>Add the network object if it does not already exist</li><li>Check for a rule associated with the network object if it already exists</li><li>Create a rule at the top of the policy that drops all traffic going to the supplied IP/subnet</li><li>Publish the session</li><li>Push the changes to the policy's configured firewalls</li></ul>",
+            "type": "contain",
+            "identifier": "block_ip",
+            "undo": "unblock ip",
+            "read_only": false,
+            "parameters": {
+                "ip": {
+                    "description": "IP to block",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "policy": {
+                    "description": "Policy",
+                    "data_type": "string",
+                    "contains": [
+                        "check point policy"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 1
+                },
+                "layer": {
+                    "description": "Layer",
+                    "data_type": "string",
+                    "contains": [
+                        "check point layer"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Block IP"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpn.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.enabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.lock",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creation-time.posix",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creation-time.iso-8601",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modifier",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modify-time.posix",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modify-time.iso-8601",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.validation-state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.install-on.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data-negate",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.domain.uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.domain.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destination.*.domain.domain-type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.track-alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom-fields.field-1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom-fields.field-2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom-fields.field-3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source-negate",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data-direction",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.service-negate",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.action-settings.enable-identity-captive-portal",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.destination-negate",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.layer",
+                    "data_type": "string",
+                    "column_name": "Layer",
+                    "column_order": 2,
+                    "contains": [
+                        "check point layer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string",
+                    "column_name": "Policy",
+                    "column_order": 1,
+                    "contains": [
+                        "check point policy"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock ip",
+            "description": "Unblock an IP/subnet ",
+            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to unblock an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID</li><li>Check for an existing network object for the supplied IP/subnet</li><li>Check for a rule associated with the network object if it exists</li><li>Delete the rule if it exists</li><li>Publish the session</li><li>Push the changes to the policy's configured firewalls</li></ul>",
+            "type": "correct",
+            "identifier": "unblock_ip",
+            "undo": "block ip",
+            "read_only": false,
+            "parameters": {
+                "ip": {
+                    "description": "IP to unblock",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "policy": {
+                    "description": "Policy",
+                    "data_type": "string",
+                    "contains": [
+                        "check point policy"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 1
+                },
+                "layer": {
+                    "description": "Layer",
+                    "data_type": "string",
+                    "contains": [
+                        "check point layer"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Unblock IP"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.layer",
+                    "data_type": "string",
+                    "column_name": "Layer",
+                    "column_order": 2,
+                    "contains": [
+                        "check point layer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string",
+                    "column_name": "Policy",
+                    "column_order": 1,
+                    "contains": [
+                        "check point policy"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}

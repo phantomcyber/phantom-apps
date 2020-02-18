@@ -60,7 +60,7 @@ class JiraConnector(phantom.BaseConnector):
         config = self.get_config()
 
         # Base URL
-        self._base_url = config[JIRA_JSON_DEVICE_URL].encode('utf-8')
+        self._base_url = config[JIRA_JSON_DEVICE_URL]
         self._host = self._base_url[self._base_url.find('//') + 2:]
 
         return phantom.APP_SUCCESS
@@ -1187,7 +1187,7 @@ class JiraConnector(phantom.BaseConnector):
             self.debug_print("Error downloading file: ", e)
             return phantom.APP_ERROR
 
-        os.chmod(local_file_path, 0660)
+        os.chmod(local_file_path, 0o660)
 
         return phantom.APP_SUCCESS
 
@@ -1376,7 +1376,7 @@ class JiraConnector(phantom.BaseConnector):
         for watcher in response.watchers:
             watcher_list.append(str(watcher.name))
 
-        return phantom.APP_SUCCESS, map(str.lower, watcher_list)
+        return phantom.APP_SUCCESS, list(map(str.lower, watcher_list))
 
     def _handle_remove_watcher(self, param):
 
@@ -1806,22 +1806,64 @@ class JiraConnector(phantom.BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import pudb
+    import argparse
+
     pudb.set_trace()
 
-    if (len(sys.argv) < 2):
-        print "No test json specified as input"
-        exit(0)
+    argparser = argparse.ArgumentParser()
 
-    with open(sys.argv[1]) as f:
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        try:
+            print ("Accessing the Login page")
+            r = requests.get(phantom.BaseConnector._get_phantom_base_url() + "login", verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = phantom.BaseConnector._get_phantom_base_url() + 'login'
+
+            print ("Logging into Platform to get the session id")
+            r2 = requests.post(phantom.BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = JiraConnector()
         connector.print_progress_message = True
+
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print (json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

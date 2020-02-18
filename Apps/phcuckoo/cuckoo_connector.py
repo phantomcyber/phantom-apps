@@ -1,7 +1,7 @@
 # --
 # File: cuckoo_connector.py
 #
-# Copyright (c) 2014-2019 Splunk Inc.
+# Copyright (c) 2014-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -410,7 +410,7 @@ if __name__ == '__main__':
             exit(1)
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print ("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:

@@ -36,8 +36,12 @@ class RssConnector(BaseConnector):
     def _init_feed(self):
         config = self.get_config()
         feed_url = config['rss_feed']
+        ignore_perrors = config.get('ignore_perrors', False)
         self._feed = feedparser.parse(feed_url)
         if self._feed.bozo == 1:
+            ex_type = type(self._feed.bozo_exception)
+            if ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
+               return phantom.APP_SUCCESS
             error_msg = self._feed.bozo_exception
             self.save_progress("Error reading feed: {}".format(error_msg))
             self.save_progress("Is this an RSS Feed?")

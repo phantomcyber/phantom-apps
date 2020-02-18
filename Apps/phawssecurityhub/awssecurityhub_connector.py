@@ -1,5 +1,5 @@
 # File: awssecurityhub_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -394,7 +394,7 @@ class AwsSecurityHubConnector(BaseConnector):
             for ip_add in resource_ec2_ipv4_address_list:
                 if ip_add:
                     try:
-                        ipaddress.ip_address(unicode(ip_add))
+                        ipaddress.ip_address(str(ip_add))
                         ip_add_list.append({"Cidr": ip_add})
                     except:
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
@@ -412,7 +412,7 @@ class AwsSecurityHubConnector(BaseConnector):
             for ip_add in network_source_ipv4_list:
                 if ip_add:
                     try:
-                        ipaddress.ip_address(unicode(ip_add))
+                        ipaddress.ip_address(str(ip_add))
                         ip_add_list.append({"Cidr": ip_add})
                     except:
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
@@ -478,8 +478,8 @@ class AwsSecurityHubConnector(BaseConnector):
             if response.get('Findings'):
                 list_items.extend(response.get('Findings'))
 
-            if limit and len(list_items) >= limit:
-                return list_items[:limit]
+            if limit and len(list_items) >= int(limit):
+                return list_items[:int(limit)]
 
             next_token = response.get('NextToken')
             if not next_token:
@@ -719,7 +719,7 @@ class AwsSecurityHubConnector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
