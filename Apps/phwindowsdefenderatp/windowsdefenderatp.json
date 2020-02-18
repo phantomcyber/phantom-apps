@@ -9,12 +9,12 @@
     "product_name": "Windows Defender ATP",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.4",
-    "utctime_updated": "2019-05-14T20:08:52.000000Z",
+    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2019-05-13T22:41:58.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "rest_handler": "windowsdefenderatp_connector._handle_rest_request",
     "configuration": {
@@ -171,7 +171,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "cb908a36-1a14-4e7c-a39a-dca5d8e09997",
                         "6925706d-3a7e-4596-b2d7-321fca9cd965"
                     ],
                     "contains": [
@@ -184,7 +183,6 @@
                     "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-10T12:30:47.3902185Z",
                         "2019-05-03T08:50:05.8076226Z"
                     ]
                 },
@@ -192,7 +190,6 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "example_values": [
-                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
@@ -245,7 +242,6 @@
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
-                        "14b61d76-0ab2-4108-b6c5-2f42b2a2a6a2",
                         "6925706d-3a7e-4596-b2d7-321fca9cd965"
                     ],
                     "contains": [
@@ -264,7 +260,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Event id: 14b61d76-0ab2-4108-b6c5-2f42b2a2a6a2, Quarantine status: InProgress",
                         "Event id: 6925706d-3a7e-4596-b2d7-321fca9cd965, Quarantine status: Pending"
                     ]
                 },
@@ -344,7 +339,6 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
                     "example_values": [
-                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
@@ -374,7 +368,6 @@
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-11T06:37:03.876372Z",
                         "2019-05-03T08:52:22.7708738Z"
                     ]
                 },
@@ -389,7 +382,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "9553d967-bddb-4c02-996c-0ec184667c32",
                         "cb15e6e0-1d53-4762-9c37-f14d412ece9e"
                     ],
                     "contains": [
@@ -402,7 +394,6 @@
                     "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-11T06:37:03.876372Z",
                         "2019-05-03T08:52:22.7708738Z"
                     ]
                 },
@@ -410,7 +401,6 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "example_values": [
-                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
@@ -443,8 +433,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
-                        "Pending"
+                        "InProgress"
                     ],
                     "column_name": " Unquarantine Status",
                     "column_order": 4
@@ -462,7 +451,6 @@
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
-                        "9553d967-bddb-4c02-996c-0ec184667c32",
                         "cb15e6e0-1d53-4762-9c37-f14d412ece9e"
                     ],
                     "contains": [
@@ -473,7 +461,6 @@
                     "data_path": "action_result.summary.unquarantine_status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
                         "Pending"
                     ]
                 },
@@ -481,7 +468,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Event id: 9553d967-bddb-4c02-996c-0ec184667c32, Unquarantine status: InProgress",
                         "Event id: cb15e6e0-1d53-4762-9c37-f14d412ece9e, Unquarantine status: Pending"
                     ]
                 },
@@ -536,7 +522,6 @@
                     "data_path": "action_result.parameter.event_id",
                     "data_type": "string",
                     "example_values": [
-                        "8ee4bf1f-4b37-48dc-a49d-ab0a75117942",
                         "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
                     ],
                     "contains": [
@@ -559,7 +544,6 @@
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-12T11:38:11.6114543Z",
                         "2019-05-03T09:01:19.3478911Z"
                     ]
                 },
@@ -581,7 +565,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "8ee4bf1f-4b37-48dc-a49d-ab0a75117942",
                         "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
                     ],
                     "contains": [
@@ -592,7 +575,6 @@
                     "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-12T11:38:37.8975956Z",
                         "2019-05-03T09:01:27.6955788Z"
                     ],
                     "column_name": "Last Update Time",
@@ -602,7 +584,6 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "example_values": [
-                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
@@ -648,7 +629,6 @@
                     "data_path": "action_result.data.*.requestorComment",
                     "data_type": "string",
                     "example_values": [
-                        "From phantom",
                         "test"
                     ],
                     "column_name": "Comment",
@@ -668,8 +648,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "Succeeded",
-                        "InProgress"
+                        "Succeeded"
                     ],
                     "column_name": "Event Status",
                     "column_order": 2
@@ -1011,7 +990,6 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
                     "example_values": [
-                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
@@ -1024,7 +1002,6 @@
                     "data_path": "action_result.parameter.file_hash",
                     "data_type": "string",
                     "example_values": [
-                        "e1049556edc2b28ef25b2932c722e4dc927e9d04",
                         "2dba4c14a5e97312f9edf617e1c8b0cc0d387fd8"
                     ],
                     "contains": [
@@ -1055,7 +1032,6 @@
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-12T12:17:13.5187442Z",
                         "2019-05-03T06:00:00.2740597Z"
                     ]
                 },
@@ -1097,7 +1073,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "17413c5c-663e-425d-8582-3013b47a3454",
                         "76e82ecd-54b8-400d-83be-a05d582b3546"
                     ],
                     "contains": [
@@ -1110,7 +1085,6 @@
                     "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-12T12:17:29.2879612Z",
                         "2019-05-03T06:00:00.2740597Z"
                     ]
                 },
@@ -1118,7 +1092,6 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "example_values": [
-                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
@@ -1156,8 +1129,7 @@
                     "data_path": "action_result.data.*.requestorComment",
                     "data_type": "string",
                     "example_values": [
-                        "file quarantine",
-                        "dfgf"
+                        "file quarantine"
                     ]
                 },
                 {
@@ -1174,8 +1146,6 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "Succeeded",
-                        "InProgress",
                         "Pending"
                     ],
                     "column_name": "Quarantine Status",
@@ -1194,7 +1164,6 @@
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
-                        "17413c5c-663e-425d-8582-3013b47a3454",
                         "76e82ecd-54b8-400d-83be-a05d582b3546"
                     ],
                     "contains": [
@@ -1205,15 +1174,13 @@
                     "data_path": "action_result.summary.quarantine_status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
-                        "Pending"
+                        "InProgress"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Event id: 17413c5c-663e-425d-8582-3013b47a3454, Quarantine status: InProgress",
                         "Event id: 76e82ecd-54b8-400d-83be-a05d582b3546, Quarantine status: Pending"
                     ]
                 },
@@ -1252,8 +1219,7 @@
                     "value_list": [
                         "All",
                         "Domain",
-                        "File Hash",
-                        "IP"
+                        "File Hash"
                     ],
                     "default": "All"
                 },
@@ -1269,6 +1235,13 @@
                         "md5",
                         "domain"
                     ]
+                },
+                "limit": {
+                    "description": "Maximum number of alerts to return (Maximum: 10000)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 100,
+                    "order": 2
                 }
             },
             "output": [
@@ -1284,14 +1257,20 @@
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
                     "example_values": [
-                        "10.0.1.2"
+                        "filehash"
                     ],
                     "contains": [
-                        "ip",
                         "sha1",
                         "sha256",
                         "md5",
                         "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -1330,7 +1309,6 @@
                     "data_path": "action_result.data.*.firstSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-04T05:19:51.5099989Z",
                         "2019-04-16T00:27:12.2677222Z"
                     ]
                 },
@@ -1354,7 +1332,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e",
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
@@ -1521,7 +1498,7 @@
                     "order": 1
                 },
                 "limit": {
-                    "description": "Maximum number of alerts to return (Default: 100)",
+                    "description": "Maximum number of alerts to return (Maximum: 10000)",
                     "data_type": "numeric",
                     "required": false,
                     "default": 100,
@@ -1567,7 +1544,6 @@
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
                     "example_values": [
-                        7,
                         100
                     ]
                 },
@@ -1659,7 +1635,6 @@
                     "data_path": "action_result.data.*.firstEventTime",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-06T06:11:39.7694679Z",
                         "2019-05-02T23:03:43.2077683Z"
                     ]
                 },
@@ -1667,7 +1642,6 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "636664544975761381_-2060171509",
                         "636924432519012302_1685044642"
                     ],
                     "column_name": "Alert ID",
@@ -1698,7 +1672,6 @@
                     "data_path": "action_result.data.*.lastEventTime",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-06T06:15:56.4358958Z",
                         "2019-05-02T23:03:43.2077683Z"
                     ]
                 },
@@ -1730,7 +1703,6 @@
                     "data_path": "action_result.data.*.resolvedTime",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-06T06:14:57.3215921Z",
                         "2019-05-03T01:29:51.7614303Z"
                     ]
                 },
@@ -1747,7 +1719,6 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "New",
                         "Resolved"
                     ],
                     "column_name": "Status",
@@ -1767,7 +1738,6 @@
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "Windows Defender AV detected 'EICAR_Test_File' malware",
                         "Windows Defender AV detected 'Fuery' malware"
                     ],
                     "column_name": "Title",
@@ -1785,7 +1755,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total alerts: 7",
                         "Total alerts: 12"
                     ]
                 },

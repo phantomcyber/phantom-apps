@@ -1,5 +1,5 @@
 # File: windowsdefenderatp_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -196,8 +196,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._refresh_token = None
         self._client_secret = None
 
-    @staticmethod
-    def _process_empty_response(response, action_result):
+    def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: response data
@@ -208,11 +207,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Response Code: {0}. Empty response and no information in the header".format(response.status_code)),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)),
                       None)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: response data
@@ -259,40 +257,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         message = None
-        error_code = None
+
         # Check whether the response contains error and error description fields
         # This condition will be used in test_connectivity
-        if resp_json.get('error') and resp_json.get('error_description'):
-            message = "Error from server. Status Code: {0} Data from server: \"error\": {1}, " \
-                      "\"error_description\": {2}".format(response.status_code, resp_json['error'],
-                                                          resp_json['error_description'])
-
-            error_code = resp_json.get('error_codes')
+        if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
+            err = "Error:{0}, Error Description:{1}".format(resp_json.get('error'), resp_json.get('error_description'))
+            err += " Please check your asset configuration parameters and run the test connectivity."
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
-        elif resp_json.get('error', {}).get('message'):
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                         resp_json['error']['message'])
-            # Need to verify this
-            error_code = resp_json.get('error', {}).get('code')
-
-        if error_code:
-            if error_code == 'NotFound':
-                device_actions = ['quarantine_device', 'unquarantine_device', 'scan_device']
-                file_actions = ['quarantine_file']
-                event_actions = ['get_status']
-                if self.get_action_identifier() in device_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_DEVICE_FOUND_MSG)
-                elif self.get_action_identifier() in file_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_FILE_DEVICE_FOUND_MSG)
-                elif self.get_action_identifier() in event_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_EVENT_FOUND_MSG)
-                else:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_DATA_FOUND_MSG)
+        if isinstance(resp_json.get('error'), dict) and resp_json.get('error', {}).get('code'):
+            message = "Error from server. Status Code: {0} Error Code: {1} Data from server: {2}".format(
+                response.status_code, resp_json.get('error', {}).get('code'), resp_json.get('error', {}).get('message'))
 
         if not message:
             message = "Error from server. Status Code: {0} Data from server: {1}"\
@@ -359,7 +335,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'client_id': self._client_id,
             'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
             'refresh_token': self._refresh_token,
-            'client_secret': self._client_secret
+            'client_secret': self._client_secret,
+            'resource': DEFENDERATP_RESOURCE_URL
         }
 
         if not self._access_token:
@@ -509,8 +486,24 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._state[DEFENDERATP_TOKEN_STRING] = resp_json
         self._access_token = resp_json[DEFENDERATP_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
+
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
+
+        self._state = self.load_state()
+
+        # Scenario -
+        #
+        # If the corresponding state file doesn't have correct owner, owner group or permissions,
+        # the newely generated token is not being saved to state file and automatic workflow for token has been stopped.
+        # So we have to check that token from response and token which are saved to state file after successful generation of new token are same or not.
+
+        if self._access_token != self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING):
+            message = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."
+            message += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
+            message += "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)."
+            return action_result.set_status(phantom.APP_ERROR, message)
+
         return phantom.APP_SUCCESS
 
     def _wait(self, action_result):
@@ -537,7 +530,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if not time_out:
             self.send_progress('')
-            return action_result.set_status(phantom.APP_ERROR, status_message='Timeout. Please try again later.')
+            return action_result.set_status(phantom.APP_ERROR, "Timeout. Please try again later.")
         self.send_progress('Authenticated')
         return phantom.APP_SUCCESS
 
@@ -621,49 +614,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
-        # self.save_progress(DEFENDERATP_ALERTS_INFO_MSG)
-        self.save_progress(DEFENDERATP_DEVICES_INFO_MSG)
+        self.save_progress(DEFENDERATP_ALERTS_INFO_MSG)
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINES_ENDPOINT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
-
-        while True:
-
-            # make rest call
-            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
-
-            if phantom.is_fail(ret_val):
-                if DEFENDERATP_NO_DATA_FOUND_MSG in action_result.get_message() and action_result.get_data_size():
-                    break
-                return action_result.get_status()
-
-            if response:
-                for machine in response.get('value', []):
-                    action_result.add_data(machine)
-            else:
-                break
-
-            # If no link for next page present then break
-            if response and not response.get(DEFENDERATP_NEXT_LINK_STRING):
-                break
-
-            url = response[DEFENDERATP_NEXT_LINK_STRING]
-
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No device found")
-
-        '''
         url = '{}{}'.format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_ALERTS_ENDPOINT)
         params = {
             '$top': 1
         }
         ret_val, response = self._update_request(action_result=action_result, endpoint=url, params=params)
         if phantom.is_fail(ret_val):
+            self.send_progress('')
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
         self.save_progress(DEFENDERATP_RECEIVED_ALERT_INFO_MSG)
-        '''
-
         self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_PASSED_MSG)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -816,17 +779,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
 
         if phantom.is_fail(ret_val):
-            if DEFENDERATP_NO_EVENT_FOUND_MSG not in action_result.get_message():
-                return action_result.get_status()
-
-            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_FILEMACHINEACTIONS_ENDPOINT
-                                       .format(action_id=event_id))
-
-            # make rest call
-            ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
-
-            if phantom.is_fail(response):
-                return action_result.get_status()
+            return action_result.get_status()
 
         action_result.add_data(response)
 
@@ -1011,6 +964,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
         input_type = param[DEFENDERATP_JSON_INPUT_TYPE]
         input = param.get(DEFENDERATP_JSON_INPUT)
 
+        limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+
+        try:
+            limit = int(limit)
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+
+        default_limit = DEFENDERATP_ALERT_DEFAULT_LIMIT
+        if limit < DEFENDERATP_ALERT_DEFAULT_LIMIT:
+            default_limit = limit
+
         endpoint = ""
         # Check if input type is All
         if input_type == DEFENDERATP_ALL_CONST:
@@ -1021,16 +987,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
 
         elif input and input_type:
-            # Check for valid IP
-            if input_type == DEFENDERATP_IP_CONST:
-                try:
-                    ipaddress.ip_address(unicode(input))
-                except:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_IP_CONST))
-                endpoint = DEFENDERATP_IP_MACHINES_ENDPOINT.format(input=input)
             # Check for valid domain
-            elif input_type == DEFENDERATP_DOMAIN_CONST:
+            if input_type == DEFENDERATP_DOMAIN_CONST:
                 if phantom.is_domain(input):
                     endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
                 else:
@@ -1044,7 +1002,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                     .format(DEFENDERATP_FILE_HASH_CONST))
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
 
         while True:
 
@@ -1091,7 +1049,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
-        if not isinstance(limit, int) or limit <= 0:
+        try:
+            limit = int(limit)
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
 
         default_limit = DEFENDERATP_ALERT_DEFAULT_LIMIT
@@ -1256,6 +1218,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
+
         return phantom.APP_SUCCESS
 
 
