@@ -211,9 +211,13 @@ class WhoisConnector(BaseConnector):
         if (should_update):
             # Set the updated time
             self._state[WHOIS_JSON_CACHE_UPDATE_TIME] = datetime.datetime.utcnow().strftime(ISO_TIME_FORMAT)
-        if result.suffix:
+
+        domain = ""
+        if result.suffix and result.domain:
             domain = "{0}.{1}".format(result.domain, result.suffix)  # pylint: disable=E1101
-        else:
+        elif result.suffix:
+            domain = "{0}".format(result.suffix)  # pylint: disable=E1101
+        elif result.domain:
             domain = "{0}".format(result.domain)  # pylint: disable=E1101
 
         return domain
