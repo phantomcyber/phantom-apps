@@ -133,7 +133,7 @@ class GitlabConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
         except requests.exceptions.ConnectionError:
-            error_msg = "Connection refused by the server"
+            error_msg = "Connection refused by the server: {0}".format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(error_msg))), resp_json)
         except Exception as e:
             if e.message:
@@ -141,12 +141,12 @@ class GitlabConnector(BaseConnector):
                     error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
                 else:
                     try:
-                        error_msg = UnicodeDammit(str(e.message)).unicode_markup.encode('utf-8')
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
                     except:
-                        error_msg = "Unknown error occurred. Please check the asset configuration parameters."
+                        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
             else:
-                error_msg = "Unknown error occurred. Please check the asset configuration parameters."
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(error_msg))), resp_json)
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -326,6 +326,8 @@ class GitlabConnector(BaseConnector):
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
+
+        self.debug_print("action_id", self.get_action_identifier())
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
