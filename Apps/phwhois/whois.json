@@ -1,5 +1,6 @@
 {
     "appid": "e6723c2e-06ef-415a-8098-62c46c1cb71f",
+    "connector_id": "e6723c2e-06ef-415a-8098-62c46c1cb71f",
     "name": "WHOIS",
     "description": "This app implements investigative actions that query the whois database",
     "package_name": "phantom_whois",
@@ -7,6 +8,7 @@
     "type": "information",
     "main_module": "whois_connector.py",
     "app_version": "2.0.0",
+    "connector_version": "2.0.0",
     "utctime_updated": "2020-02-19T19:02:24.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
