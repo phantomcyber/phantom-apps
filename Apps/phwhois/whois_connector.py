@@ -96,7 +96,7 @@ class WhoisConnector(BaseConnector):
 
         try:
             obj_whois = IPWhois(ip)
-            whois_response = obj_whois.lookup_whois()
+            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
         except IPDefinedError as e_defined:
             self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
             return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
