@@ -359,7 +359,7 @@
             "verbose": "Creates a new network list.",
             "type": "generic",
             "read_only": false,
-            "undo": "delete_network",
+            "undo": "delete network",
             "parameters": {
                 "name": {
                     "description": "Name for the new network list.",
@@ -493,7 +493,7 @@
             "verbose": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty out its list of elements.",
             "type": "generic",
             "read_only": false,
-            "undo": "create_network",
+            "undo": "create network",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
@@ -534,7 +534,7 @@
                 {
                     "data_path": "action_result.data.*.uniqueId",
                     "data_type": "string",
-                    "column_name": "Name",
+                    "column_name": "Unique ID",
                     "column_order": 2,
                     "contains": [
                         "akamai networklist id"
@@ -543,7 +543,7 @@
                 {
                     "data_path": "action_result.data.*.syncPoint",
                     "data_type": "string",
-                    "column_name": "Name",
+                    "column_name": "Sync Point",
                     "column_order": 3,
                     "contains": [
                         "akamai networklist syncpoint"
@@ -694,7 +694,7 @@
             "verbose": "Adds the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
-            "undo": "remove_element",
+            "undo": "remove element",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
@@ -818,7 +818,7 @@
             "verbose": "Remove the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
-            "undo": "add_element",
+            "undo": "add element",
             "parameters": {
                 "networklistid": {
                     "description": "Unique identifier for the network list.",
