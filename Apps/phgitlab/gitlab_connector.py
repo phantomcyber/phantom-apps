@@ -132,13 +132,16 @@ class GitlabConnector(BaseConnector):
                 # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
+        except requests.exceptions.ConnectionError:
+            error_msg = "Connection refused by the server"
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(error_msg))), resp_json)
         except Exception as e:
             if e.message:
                 if isinstance(e.message, basestring):
                     error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
                 else:
                     try:
-                        error_msg = str(e.message)
+                        error_msg = UnicodeDammit(str(e.message)).unicode_markup.encode('utf-8')
                     except:
                         error_msg = "Unknown error occurred. Please check the asset configuration parameters."
             else:
@@ -296,7 +299,7 @@ class GitlabConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        trigger_token = param['trigger_token']
+        trigger_token = UnicodeDammit(param['trigger_token']).unicode_markup.encode('utf-8')
         project_id = param['project_id']
         branch = param['branch']
 
@@ -323,8 +326,6 @@ class GitlabConnector(BaseConnector):
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
-
-        self.debug_print("action_id", self.get_action_identifier())
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)

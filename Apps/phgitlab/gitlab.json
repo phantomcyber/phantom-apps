@@ -9,7 +9,7 @@
     "product_name": "GitLab",
     "product_version_regex": ".*",
     "publisher": "Peter Bertel",
-    "license": "Copyright (c) Peter Bertel, 2019-2020",
+    "license": "Copyright (c) Peter Bertel, 2020",
     "app_version": "1.0.0",
     "utctime_updated": "2019-08-26T01:28:27.791651Z",
     "package_name": "phantom_gitlab",
@@ -45,7 +45,6 @@
             "action": "list users",
             "identifier": "list_users",
             "description": "List all the users in the GitLab instance",
-            "verbose": "List all the users in the GitLab instance.",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -62,6 +61,14 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -82,7 +89,6 @@
             "action": "list projects",
             "identifier": "list_projects",
             "description": "List all the projects in the GitLab instance",
-            "verbose": "List all the projects in the GitLab instance.",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -99,6 +105,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -133,7 +143,6 @@
             "action": "list branches",
             "identifier": "list_branches",
             "description": "List the branches of a GitLab project",
-            "verbose": "List the branches of a GitLab project.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -166,6 +175,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
@@ -190,7 +203,6 @@
             "action": "create trigger",
             "identifier": "create_trigger",
             "description": "Create a new pipeline trigger for a GitLab project",
-            "verbose": "Create a new pipeline trigger for a GitLab project.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -244,6 +256,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
@@ -294,6 +310,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
@@ -311,7 +331,7 @@
                 {
                     "data_path": "action_result.data.*.*.token",
                     "data_type": "string",
-                    "column_order": 3,
+                    "column_order": 2,
                     "column_name":"Token",
                     "example_values": [
                         "123456abcdef"
@@ -407,6 +427,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
