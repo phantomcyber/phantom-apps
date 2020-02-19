@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import hashlib
 # import pudb
 from taniumdetect_consts import *
+from bs4 import UnicodeDammit
 
 # Phantom App imports
 import phantom.app as phantom
@@ -85,13 +86,20 @@ class TaniumDetectConnector(BaseConnector):
         header = {'X-Requested-With': 'REST API',
            'Content-type': 'application/json',
            'Accept': 'application/json'}
-        login_url = self._base_url + '/auth'
+        login_url = "{0}/auth".format(UnicodeDammit(self._base_url).unicode_markup.encode('utf-8'))
         try:
             req = requests.post(login_url, auth=(username, password), verify=False, headers=header)
             if req.status_code >= 200 and req.status_code <= 204:
                 header['session'] = req.text
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Logging Into Server. Details: {0}').format(str(e))), json.loads(req.text))
+            if e.message:
+                if isinstance(e.message, basestring):
+                    err_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                else:
+                    err_msg = str(e.message)
+            else:
+                err_msg = "Unknown error occurred"
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Logging Into Server. Details: {0}').format(str(err_msg))), resp_json)
         else:
             try:
                 request_func = getattr(requests, method)
@@ -120,8 +128,6 @@ class TaniumDetectConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/v1/sources', action_result, params=None)
 
         if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Test Connectivity Failed: {}').format(action_result.get_message()))
             self.save_progress('Test Connectivity Failed.')
             return action_result.get_status()
 
@@ -160,13 +166,20 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # name = param['name']
         config = param.get('config', '')
         description = param.get('description', '')
         inteldocid = param.get('inteldocid', '')
 
-        data = json.dumps(config + description + inteldocid)
-
+        try:
+            if inteldocid:
+                inteldocid = int(inteldocid)
+        except ValueError as ve:
+            return action_result.set_status("Please provide a valid integer in [inteldocid] action parameter. Error: {}".format(str(ve)))
+        except Exception as e:
+            return action_result.set_status("Error: {}".format(str(e)))
+        config = UnicodeDammit(config).unicode_markup.encode("utf-8")
+        description = UnicodeDammit(description).unicode_markup.encode("utf-8")
+        data = json.dumps(str(config) + str(description) + str(inteldocid))
         ret_val, response = self._make_rest_call('/v1/suppression-rules', action_result, method='post', data=data, params=None)
 
         if phantom.is_fail(ret_val):
@@ -1001,6 +1014,8 @@ class TaniumDetectConnector(BaseConnector):
         if len(params) > 0:
             endpoint += "?"
             for param, value in params.items():
+                if isinstance(value, unicode):
+                    value = UnicodeDammit(value).unicode_markup.encode("utf-8")
                 if first_param:
                     endpoint += "{}={}".format(param, value)
                     first_param = False
