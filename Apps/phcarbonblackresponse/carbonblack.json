@@ -1,11 +1,13 @@
 {
     "appid": "56e81e6b-8022-4613-82ba-a779debac564",
+    "connector_id": "56e81e6b-8022-4613-82ba-a779debac564",
     "name": "Carbon Black Response",
     "description": "This app supports executing various endpoint-based investigative and containment actions on Carbon Black Response",
     "publisher": "Phantom",
     "type": "endpoint",
     "main_module": "carbonblack_connector.py",
     "app_version": "2.0.0",
+    "connector_version": "2.0.0",
     "utctime_updated": "2020-02-03T21:26:57.000000Z",
     "package_name": "phantom_carbonblack",
     "product_vendor": "Bit9",
