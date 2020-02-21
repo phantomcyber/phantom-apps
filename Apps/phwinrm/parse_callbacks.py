@@ -16,8 +16,7 @@ import base64
 from collections import OrderedDict
 
 from builtins import str
-from future.utils import iteritems
-
+import six
 
 def basic(action_result, response):
     # Default one, just add the data to the action result
@@ -217,7 +216,7 @@ def filtered_rule(
         else:
             return False
 
-    for k, v in iteritems(kwargs):
+    for k, v in six.iteritems(kwargs):
         if rule.get(k, '').lower() != v.lower():
             return False
 
@@ -360,7 +359,7 @@ def _parse_rule(rule):
         rule.get('Conditions', {}).pop('FilePathCondition', None)
         if len(rule.get('Conditions', {})) == 0:
             rule.pop('Conditions', None)
-    for k, v in iteritems(rule):
+    for k, v in six.iteritems(rule):
         # Add anything left over
         d[k] = v
     return d

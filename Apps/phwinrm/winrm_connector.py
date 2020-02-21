@@ -28,8 +28,7 @@ from base64 import b64encode
 import requests
 
 from builtins import str
-from future.utils import iteritems
-
+import six
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
@@ -101,7 +100,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         arg_str = ""
         for arg in args:
             if type(arg) is dict:
-                for k, v in iteritems(arg):
+                for k, v in six.iteritems(arg):
                     if (whitelist_args and k not in whitelist_args) or not k.isalpha():
                         return RetVal(action_result.set_status(
                             phantom.APP_ERROR, "Invalid argument: {}".format(k)
@@ -380,7 +379,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        for k, v in iteritems(param):
+        for k, v in six.iteritems(param):
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k), v)))
                 argument_str += argument + ' '
@@ -447,7 +446,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        for k, v in iteritems(param):
+        for k, v in six.iteritems(param):
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k), v)))
                 argument_str += argument + ' '
