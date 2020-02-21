@@ -160,6 +160,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
@@ -172,6 +191,13 @@
                     "data_type": "string",
                     "example_values": [
                         "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -223,6 +249,13 @@
                     "example_values": [
                         "Selective",
                         "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string",
+                    "example_values": [
+                        "Full"
                     ]
                 },
                 {
@@ -372,6 +405,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
@@ -383,6 +435,13 @@
                     "data_type": "string",
                     "example_values": [
                         "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -437,10 +496,15 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress"
+                        "InProgress",
+                        "Pending"
                     ],
                     "column_name": "Unquarantine Status",
                     "column_order": 4
@@ -548,6 +612,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
@@ -559,6 +642,13 @@
                     "data_type": "string",
                     "example_values": [
                         "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -640,6 +730,10 @@
                     ],
                     "column_name": "Comment",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sha1",
@@ -804,6 +898,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
@@ -817,6 +930,13 @@
                     "data_type": "string",
                     "example_values": [
                         "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -874,10 +994,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string",
+                    "example_values": [
+                        "Quick"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress"
+                        "InProgress",
+                        "Pending"
                     ],
                     "column_name": "Scan Status",
                     "column_order": 3
@@ -1036,6 +1164,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
@@ -1047,6 +1194,13 @@
                     "data_type": "string",
                     "example_values": [
                         "None"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -1140,6 +1294,10 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.sha1",
                     "data_type": "string",
                     "example_values": [
@@ -1215,6 +1373,7 @@
             "action": "list devices",
             "identifier": "list_devices",
             "description": "List of recently seen devices",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machines\" target=\"_blank\">List Machines API Documentation</a>), the user can get devices last seen in the past 30 days; maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1244,7 +1403,7 @@
                     ]
                 },
                 "limit": {
-                    "description": "Maximum number of alerts to return (Maximum: 10000)",
+                    "description": "Maximum number of devices to return (Maximum: 10,000)",
                     "data_type": "numeric",
                     "required": false,
                     "default": 100,
@@ -1274,17 +1433,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        100
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.input_type",
                     "data_type": "string",
                     "example_values": [
                         "All"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -1311,6 +1470,13 @@
                     ],
                     "column_name": "Computer Name",
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.exposureLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.firstSeen",
@@ -1389,6 +1555,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.machineTags",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Tag -21"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.osBuild",
                     "data_type": "numeric",
                     "example_values": [
@@ -1406,6 +1579,13 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.data.*.osProcessor",
+                    "data_type": "string",
+                    "example_values": [
+                        "x64"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.osVersion",
                     "data_type": "string",
                     "example_values": [
@@ -1421,7 +1601,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.rbacGroupName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "GROUP1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.riskScore",
@@ -1435,6 +1618,13 @@
                     "data_type": "string",
                     "example_values": [
                         ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1809"
                     ]
                 },
                 {
@@ -1475,6 +1665,7 @@
             "action": "list alerts",
             "identifier": "list_alerts",
             "description": "List all alerts of a given type",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1506,7 +1697,7 @@
                     "order": 1
                 },
                 "limit": {
-                    "description": "Maximum number of alerts to return (Maximum: 10000)",
+                    "description": "Maximum number of alerts to return (Maximum: 10,000)",
                     "data_type": "numeric",
                     "required": false,
                     "default": 100,
@@ -1556,6 +1747,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.aadTenantId",
+                    "data_type": "string",
+                    "example_values": [
+                        "7810-b62a-4fc0-bbbb-20165d183d7f"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.alertCreationTime",
                     "data_type": "string",
                     "example_values": [
@@ -1563,7 +1761,7 @@
                         "2019-05-03T01:20:51.8699882Z"
                     ],
                     "column_name": "Creation Time",
-                    "column_order": 6
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.assignedTo",
@@ -1576,7 +1774,7 @@
                         "email"
                     ],
                     "column_name": "Assigned To",
-                    "column_order": 7
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.data.*.category",
@@ -1585,7 +1783,7 @@
                         "General"
                     ],
                     "column_name": "Category",
-                    "column_order": 5
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.classification",
@@ -1617,6 +1815,15 @@
                     "example_values": [
                         "2019-05-01T13:21:37.869889Z"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp1"
+                    ],
+                    "column_name": "Computer DNS Name",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.description",
@@ -1653,7 +1860,7 @@
                         "636924432519012302_1685044642"
                     ],
                     "column_name": "Alert ID",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.incidentId",
@@ -1721,7 +1928,7 @@
                         "Informational"
                     ],
                     "column_name": "Severity",
-                    "column_order": 4
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.status",
@@ -1730,7 +1937,7 @@
                         "Resolved"
                     ],
                     "column_name": "Status",
-                    "column_order": 3
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.threatFamilyName",
@@ -1740,7 +1947,7 @@
                         "Fuery"
                     ],
                     "column_name": "Threat Family",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.title",
@@ -1749,7 +1956,7 @@
                         "Windows Defender AV detected 'Fuery' malware"
                     ],
                     "column_name": "Title",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary.total_alerts",
@@ -1790,6 +1997,7 @@
             "action": "list sessions",
             "identifier": "list_sessions",
             "description": "List all logged in users on a machine",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machine-log-on-users\" target=\"_blank\">List Sessions API Documentation</a>), the user can query on machines last seen in the past 30 days; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1824,6 +2032,16 @@
                     ],
                     "column_name": "Device ID",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.accountDomain",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp1"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.accountDomainName",
@@ -1879,7 +2097,10 @@
                         false
                     ],
                     "column_name": "Domain Admin",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.isOnlyNetworkUser",

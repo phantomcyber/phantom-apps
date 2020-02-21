@@ -1010,10 +1010,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
 
-        default_limit = DEFENDERATP_ALERT_DEFAULT_LIMIT
-        if limit < DEFENDERATP_ALERT_DEFAULT_LIMIT:
-            default_limit = limit
-
         endpoint = ""
         # Check if input type is All
         if input_type == DEFENDERATP_ALL_CONST:
@@ -1049,29 +1045,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     self.debug_print(
                         "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit)
 
-        while True:
+        # make rest call
+        ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-            # make rest call
-            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                if DEFENDERATP_NO_DATA_FOUND_MSG in action_result.get_message() and action_result.get_data_size():
-                    break
-                return action_result.get_status()
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
 
-            if response:
-                for machine in response.get('value', []):
-                    action_result.add_data(machine)
-            else:
-                break
-
-            # If no link for next page present then break
-            if response and not response.get(DEFENDERATP_NEXT_LINK_STRING):
-                break
-
-            url = response[DEFENDERATP_NEXT_LINK_STRING]
+        for machine in response.get('value', []):
+            action_result.add_data(machine)
 
         if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, "No device found")
@@ -1104,10 +1090,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
         except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
-
-        default_limit = DEFENDERATP_ALERT_DEFAULT_LIMIT
-        if limit < DEFENDERATP_ALERT_DEFAULT_LIMIT:
-            default_limit = limit
 
         endpoint = ""
 
@@ -1153,33 +1135,23 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     self.debug_print(
                         "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit)
 
-        alert_count = 0
-        # Get alerts until the limit set by user or default limit is met
-        while alert_count < limit:
+        # make rest call
+        ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-            # make rest call
-            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
 
-            for alert in response.get('value', []):
-                action_result.add_data(alert)
-                alert_count += 1
-                # Check if alert count reached given limit
-                if alert_count == limit:
-                    break
-
-            # If no link for next page then break
-            if not response.get(DEFENDERATP_NEXT_LINK_STRING):
-                break
-
-            url = response[DEFENDERATP_NEXT_LINK_STRING]
+        for alert in response.get('value', []):
+            action_result.add_data(alert)
 
         if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+
         summary = action_result.update_summary({})
         summary['total_alerts'] = action_result.get_data_size()
 
