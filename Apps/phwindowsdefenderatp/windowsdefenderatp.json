@@ -16,32 +16,39 @@
     "main_module": "windowsdefenderatp_connector.pyc",
     "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
+    "latest_tested_versions": [
+        "Cloud"
+    ],
     "rest_handler": "windowsdefenderatp_connector._handle_rest_request",
     "configuration": {
-        "client_id": {
-            "description": "Client ID",
-            "data_type": "string",
-            "required": true,
-            "order": 0
-        },
         "tenant_id": {
             "description": "Tenant ID",
             "data_type": "string",
             "required": true,
+            "order": 0
+        },
+        "ph": {
+            "data_type": "ph",
             "order": 1
+        },
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 2
         },
         "client_secret": {
             "description": "Client Secret",
             "data_type": "password",
             "required": true,
-            "order": 2
+            "order": 3
         }
     },
     "actions": [
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -435,7 +442,7 @@
                     "example_values": [
                         "InProgress"
                     ],
-                    "column_name": " Unquarantine Status",
+                    "column_name": "Unquarantine Status",
                     "column_order": 4
                 },
                 {
@@ -703,7 +710,7 @@
             "description": "Scan a device for virus",
             "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 1 hour.",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "device_id": {
                     "description": "ID of the device to scan",
@@ -755,7 +762,7 @@
                     "column_name": "Comment",
                     "column_order": 2,
                     "example_values": [
-                        "Scanning from Phantom"
+                        "Scanning from Test"
                     ]
                 },
                 {
@@ -863,7 +870,7 @@
                     "data_path": "action_result.data.*.requestorComment",
                     "data_type": "string",
                     "example_values": [
-                        "From phantom"
+                        "From Test"
                     ]
                 },
                 {
@@ -948,6 +955,7 @@
                     "description": "Identifier of the file",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
                     "contains": [
                         "sha1"
                     ],
@@ -980,8 +988,7 @@
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "file quarantine",
-                        "dfgf"
+                        "Test comment for file quarantine"
                     ],
                     "column_name": "Comment",
                     "column_order": 2
@@ -1224,12 +1231,12 @@
                     "default": "All"
                 },
                 "input": {
-                    "description": "Input filter of type Domain, File hash or IP",
+                    "description": "Input filter of type Domain, File hash or All",
                     "data_type": "string",
                     "order": 1,
                     "required": false,
+                    "primary": true,
                     "contains": [
-                        "ip",
                         "sha1",
                         "sha256",
                         "md5",
@@ -1488,6 +1495,7 @@
                     "description": "Input filter of type Domain, File Hash and IP",
                     "data_type": "string",
                     "required": false,
+                    "primary": true,
                     "contains": [
                         "domain",
                         "sha1",
@@ -1614,7 +1622,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that Windows Defender has stopped the malware from delivering its payload. However, it is prudent to check the machine for signs of infection."
+                        "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks. This detection might indicate that Windows Defender has stopped the malware from delivering its payload. However, it is prudent to check the machine for signs of infection."
                     ]
                 },
                 {
@@ -1696,7 +1704,7 @@
                     "data_path": "action_result.data.*.recommendedAction",
                     "data_type": "string",
                     "example_values": [
-                        "Collect artifacts and determine scope\n\u2022\tReview the machine timeline for suspicious activities that may have occurred before and after the time of the alert, and record additional related artifacts (files, IPs/URLs) \n\u2022\tLook for the presence of relevant artifacts on other systems. Identify commonalities and differences between potentially compromised systems.\n\u2022\tSubmit relevant files for deep analysis and review resulting detailed behavioral information.\n\u2022\tSubmit undetected files to the MMPC malware portal\n\nInitiate containment & mitigation \n\u2022\tContact the user to verify intent and initiate local remediation actions as needed.\n\u2022\tUpdate AV signatures and run a full scan. The scan might reveal and remove previously-undetected malware components.\n\u2022\tEnsure that the machine has the latest security updates. In particular, ensure that you have installed the latest software, web browser, and Operating System versions.\n\u2022\tIf credential theft is suspected, reset all relevant users passwords.\n\u2022\tBlock communication with relevant URLs or IPs at the organization\u2019s perimeter."
+                        "Collect artifacts and determine scope Review the machine timeline for suspicious activities that may have occurred before and after the time of the alert, and record additional related artifacts (files, IPs/URLs) Look for the presence of relevant artifacts on other systems. Identify commonalities and differences between potentially compromised systems. Submit relevant files for deep analysis and review resulting detailed behavioral information. Submit undetected files to the MMPC malware portal Initiate containment & mitigation Contact the user to verify intent and initiate local remediation actions as needed. Update AV signatures and run a full scan. The scan might reveal and remove previously-undetected malware components. Ensure that the machine has the latest security updates. In particular, ensure that you have installed the latest software, web browser, and Operating System versions. If credential theft is suspected, reset all relevant users passwords. Block communication with relevant URLs or IPs at the organization's perimeter."
                     ]
                 },
                 {

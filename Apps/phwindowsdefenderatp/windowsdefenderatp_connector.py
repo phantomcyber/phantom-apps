@@ -13,7 +13,7 @@ import ipaddress
 import pwd
 import grp
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 from django.http import HttpResponse
 
 import phantom.app as phantom
@@ -230,7 +230,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text.encode('utf-8'))
+        if not error_text:
+            error_text = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -244,7 +247,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        # Try a json parse
         try:
             # Process a json response
             resp_json = response.json()
@@ -261,18 +263,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # Check whether the response contains error and error description fields
         # This condition will be used in test_connectivity
         if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
-            err = "Error:{0}, Error Description:{1}".format(resp_json.get('error'), resp_json.get('error_description'))
+            err = "Error:{0}, Error Description:{1}".format(
+                    UnicodeDammit(resp_json.get('error')).unicode_markup.encode('utf-8'), UnicodeDammit(resp_json.get('error_description')).unicode_markup.encode('utf-8'))
             err += " Please check your asset configuration parameters and run the test connectivity."
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
         if isinstance(resp_json.get('error'), dict) and resp_json.get('error', {}).get('code'):
             message = "Error from server. Status Code: {0} Error Code: {1} Data from server: {2}".format(
-                response.status_code, resp_json.get('error', {}).get('code'), resp_json.get('error', {}).get('message'))
+                response.status_code, resp_json.get('error', {}).get('code'), UnicodeDammit(resp_json.get('error', {}).get('message')).unicode_markup.encode('utf-8'))
 
         if not message:
             message = "Error from server. Status Code: {0} Data from server: {1}"\
-                .format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+                .format(response.status_code, UnicodeDammit(response.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -311,7 +314,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            response.status_code, UnicodeDammit(response.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -397,10 +400,21 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-                response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
+            response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
+            if e.message:
+                if isinstance(e.message, basestring):
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    try:
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                    except:
+                        error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+            else:
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
-                                                   .format(str(e))), resp_json)
+                                                   .format(error_msg)), resp_json)
 
         return self._process_response(response, action_result)
 
@@ -480,6 +494,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
                                                   data=urllib.urlencode(data), method="post")
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -673,7 +688,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -724,7 +744,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -770,7 +795,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        event_id = param[DEFENDERATP_EVENT_ID]
+        event_id = UnicodeDammit(param[DEFENDERATP_EVENT_ID]).unicode_markup.encode('utf-8')
 
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINEACTIONS_ENDPOINT
                                    .format(action_id=event_id))
@@ -803,7 +828,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT:
@@ -856,7 +886,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -963,6 +998,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         input_type = param[DEFENDERATP_JSON_INPUT_TYPE]
         input = param.get(DEFENDERATP_JSON_INPUT)
+        if input:
+            input = UnicodeDammit(input).unicode_markup.encode('utf-8')
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
@@ -989,18 +1026,28 @@ class WindowsDefenderAtpConnector(BaseConnector):
         elif input and input_type:
             # Check for valid domain
             if input_type == DEFENDERATP_DOMAIN_CONST:
-                if phantom.is_domain(input):
+                try:
+                    if phantom.is_domain(input):
+                        endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_DOMAIN_CONST))
+                except:
                     endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_DOMAIN_CONST))
+                    self.debug_print("Validation for the valid domain returned an exception. Hence, ignoring the validation and continuing the action execution.")
+
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
-                if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                try:
+                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                        endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_FILE_HASH_CONST))
+                except:
                     endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_FILE_HASH_CONST))
+                    self.debug_print(
+                        "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
         url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
 
@@ -1046,6 +1093,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         input_type = param.get(DEFENDERATP_JSON_INPUT_TYPE, DEFENDERATP_ALL_CONST)
         input = param.get(DEFENDERATP_JSON_INPUT, "")
+        if input:
+            input = UnicodeDammit(input).unicode_markup.encode('utf-8')
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
@@ -1081,18 +1130,28 @@ class WindowsDefenderAtpConnector(BaseConnector):
                 endpoint = DEFENDERATP_IP_ALERTS_ENDPOINT.format(input=input)
             # Check for valid domain
             elif input_type == DEFENDERATP_DOMAIN_CONST:
-                if phantom.is_domain(input):
+                try:
+                    if phantom.is_domain(input):
+                        endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_DOMAIN_CONST))
+                except:
                     endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_DOMAIN_CONST))
+                    self.debug_print("Validation for the valid domain returned an exception. Hence, ignoring the validation and continuing the action execution.")
+
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
-                if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                try:
+                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                        endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_FILE_HASH_CONST))
+                except:
                     endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_FILE_HASH_CONST))
+                    self.debug_print(
+                        "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
         url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
 
@@ -1198,11 +1257,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._tenant = config[DEFENDERATP_CONFIG_TENANT_ID].encode('utf-8')
-        self._client_id = config[DEFENDERATP_CONFIG_CLIENT_ID].encode('utf-8')
+        self._tenant = UnicodeDammit(config[DEFENDERATP_CONFIG_TENANT_ID]).unicode_markup.encode('utf-8')
+        self._client_id = UnicodeDammit(config[DEFENDERATP_CONFIG_CLIENT_ID]).unicode_markup.encode('utf-8')
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
-        self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET].encode('utf-8')
+        self._client_secret = UnicodeDammit(config[DEFENDERATP_CONFIG_CLIENT_SECRET]).unicode_markup.encode('utf-8')
 
         return phantom.APP_SUCCESS
 
