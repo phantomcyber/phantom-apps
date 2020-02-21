@@ -3,10 +3,17 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import consts
+    from phantom import status as status_strings
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import consts
+    import status as status_strings
 
 # Local imports
 import phishtank_consts
@@ -28,7 +35,7 @@ class PhishtankConnector(BaseConnector):
         action_id = self.get_action_identifier()
         if action_id == self.ACTION_ID_WHOIS_DOMAIN:
             result = self.check_url(param)
-        elif action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
+        elif action_id == consts.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self.test_asset_connectivity(param)
         return result
 
@@ -51,7 +58,7 @@ class PhishtankConnector(BaseConnector):
         except Exception as e:
             self.debug_print('test_asset_connectivity: ', e)
             self.set_status(
-                 phantom.APP_ERROR,
+                 status_strings.APP_ERROR,
                  phishtank_consts.PHISHTANK_ERR_CONNECTIVITY_TEST, e)
             self.append_to_message(
                  phishtank_consts.PHISHTANK_MSG_CHECK_CONNECTIVITY)
@@ -59,10 +66,10 @@ class PhishtankConnector(BaseConnector):
 
         if response_code == 200:
             return self.set_status_save_progress(
-                 phantom.APP_SUCCESS,
+                 status_strings.APP_SUCCESS,
                  phishtank_consts.PHISHTANK_SUCC_CONNECTIVITY_TEST)
         else:
-            self.set_status(phantom.APP_ERROR,
+            self.set_status(status_strings.APP_ERROR,
                             phishtank_consts.
                             PHISHTANK_SERVER_RETURNED_ERROR_CODE.
                             format(code=response_code))
@@ -77,7 +84,7 @@ class PhishtankConnector(BaseConnector):
         summary = action_result.update_summary({})
         if param is None or param['url'] is None:
             self.debug_print('Mandatory action parameters missing')
-            action_result.set_status(phantom.APP_ERROR,
+            action_result.set_status(status_strings.APP_ERROR,
                                      phishtank_consts.
                                      PHISHTANK_ERR_MSG_ACTION_PARAM)
             return action_result.get_status()
@@ -97,7 +104,7 @@ class PhishtankConnector(BaseConnector):
                                           data=api_params)
             except Exception as e:
                 self.debug_print('check_url: ', e)
-                action_result.set_status(phantom.APP_ERROR,
+                action_result.set_status(status_strings.APP_ERROR,
                                          phishtank_consts.
                                          PHISHTANK_SERVER_CONNECTION_ERROR, e)
                 return action_result.get_status()
@@ -107,12 +114,12 @@ class PhishtankConnector(BaseConnector):
             self.debug_print('status_code', query_res.status_code)
             if query_res.status_code == 509:
                 return action_result.set_status(
-                                         phantom.APP_ERROR,
+                                         status_strings.APP_ERROR,
                                          phishtank_consts.
                                          PHISHTANK_SERVER_ERROR_RATE_LIMIT)
             if query_res.status_code != 200:
                 return action_result.set_status(
-                                         phantom.APP_ERROR,
+                                         status_strings.APP_ERROR,
                                          phishtank_consts.
                                          PHISHTANK_SERVER_RETURNED_ERROR_CODE.
                                          format(code=query_res.status_code))
@@ -121,7 +128,7 @@ class PhishtankConnector(BaseConnector):
             except Exception as e:
                 self.debug_print('Response from server not a valid JSON', e)
                 return action_result.set_status(
-                                         phantom.APP_ERROR,
+                                         status_strings.APP_ERROR,
                                          'Response from server not' + ' a valid JSON')
 
             if 'results' in result:
@@ -130,7 +137,7 @@ class PhishtankConnector(BaseConnector):
                     phishtank_consts.PHISHTANK_SERVICE_SUCC_MSG)
             else:
                 action_result.set_status(
-                    phantom.APP_ERROR,
+                    status_strings.APP_ERROR,
                     phishtank_consts.PHISHTANK_ERR_MSG_OBJECT_QUERIED)
                 return action_result.get_status()
             try:
@@ -156,12 +163,12 @@ class PhishtankConnector(BaseConnector):
                     status_summary['Valid'] = status["valid"]
                 summary.update(status_summary)
             except Exception as e:
-                action_result.set_status(phantom.APP_ERROR, 'Error populating summary', e)
+                action_result.set_status(status_strings.APP_ERROR, 'Error populating summary', e)
                 return action_result.get_status()
 
             action_result.add_data(status)
-            action_result.set_status(phantom.APP_SUCCESS)
-            return phantom.APP_SUCCESS
+            action_result.set_status(status_strings.APP_SUCCESS)
+            return status_strings.APP_SUCCESS
 
 
 if __name__ == '__main__':

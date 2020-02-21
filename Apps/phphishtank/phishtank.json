@@ -1,5 +1,6 @@
 {
     "appid": "c193026d-46cf-4f17-b4b9-f22525d2d87e",
+    "connector_id": "c193026d-46cf-4f17-b4b9-f22525d2d87e",
     "name": "PhishTank",
     "description": "This app implements URL investigative capabilities utilizing PhishTank",
     "publisher": "Splunk",
@@ -8,7 +9,8 @@
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "main_module": "phishtank_connector.py",
     "app_version": "2.0.0",
-    "utctime_updated": "2019-11-19T01:05:00.000000Z",
+    "connector_version": "2.0.0",
+    "utctime_updated": "2020-02-12T21:52:46.000000Z",
     "product_vendor": "OpenDNS",
     "product_name": "PhishTank",
     "product_version_regex": ".*",

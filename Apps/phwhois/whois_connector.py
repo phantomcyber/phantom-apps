@@ -4,11 +4,18 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-# Phantom imports
-import phantom.app as phantom
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status as status_strings
+    from phantom import json_keys
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status as status_strings
+    import json_keys
 
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
 
 # THIS Connector imports
 from whois_consts import *
@@ -51,11 +58,11 @@ class WhoisConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _response_no_data(self, response, obj):
 
@@ -80,15 +87,15 @@ class WhoisConnector(BaseConnector):
 
     def _whois_ip(self, param):
 
-        ip = param[phantom.APP_JSON_IP]
+        ip = param[json_keys.APP_JSON_IP]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Validation for checking valid IP or not (IPV4 as well as IPV6)
         if not self._is_ip(ip):
-            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid IPV4 or IPV6 address')
+            return action_result.set_status(status_strings.APP_ERROR, 'Please provide a valid IPV4 or IPV6 address')
 
-        action_result.set_param({phantom.APP_JSON_IP: ip})
+        action_result.set_param({json_keys.APP_JSON_IP: ip})
 
         self.debug_print("Validating/Querying IP '{0}'".format(ip))
 
@@ -99,10 +106,13 @@ class WhoisConnector(BaseConnector):
             whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
         except IPDefinedError as e_defined:
             self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
-            return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
+            return action_result.set_status(status_strings.APP_SUCCESS, str(e_defined))
         except Exception as e:
             self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(e)))
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+            return action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_QUERY, e)
+
+        if not whois_response:
+            return action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
 
         if not whois_response:
             return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
@@ -138,7 +148,7 @@ class WhoisConnector(BaseConnector):
                 message += '\nRange: {0}'.format(summary_net['range'])
                 message += '\nAddress: {0}'.format(summary_net['address'])
 
-        action_result.set_status(phantom.APP_SUCCESS, message)
+        action_result.set_status(status_strings.APP_SUCCESS, message)
 
         # This sleep is required between two calls, else the server might
         # throttle the queries when done in quick succession, which leads
@@ -236,11 +246,11 @@ class WhoisConnector(BaseConnector):
             else:
                 whois_response = pythonwhois.get_whois(domain)
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+            action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_QUERY, e)
             return None
 
         if not whois_response:
-            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
+            action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
             return None
 
         return whois_response
@@ -249,13 +259,13 @@ class WhoisConnector(BaseConnector):
 
         config = self.get_config()
 
-        server = config.get(phantom.APP_JSON_SERVER, None)
+        server = config.get(json_keys.APP_JSON_SERVER, None)
 
-        domain = param[phantom.APP_JSON_DOMAIN]
+        domain = param[json_keys.APP_JSON_DOMAIN]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        action_result.set_param({phantom.APP_JSON_DOMAIN: domain})
+        action_result.set_param({json_keys.APP_JSON_DOMAIN: domain})
 
         # This sleep is required between two calls, else the server might
         # throttle the queries when done in quick succession, which leads
@@ -268,11 +278,11 @@ class WhoisConnector(BaseConnector):
         try:
             domain = self._get_domain(domain)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_INPUT, e)
+            return action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_PARSE_INPUT, e)
 
         self.debug_print("Validating/Querying Domain {0}".format(repr(domain)))
 
-        action_result.update_summary({phantom.APP_JSON_DOMAIN: domain})
+        action_result.update_summary({json_keys.APP_JSON_DOMAIN: domain})
 
         self.save_progress("Querying...")
 
@@ -306,11 +316,11 @@ class WhoisConnector(BaseConnector):
             whois_response = json.loads(whois_response)
             action_result.add_data(whois_response)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_REPLY, e)
+            return action_result.set_status(status_strings.APP_ERROR, WHOIS_ERR_PARSE_REPLY, e)
 
         # Even if the query was successfull the data might not be available
         if (self._response_no_data(whois_response, domain)):
-            return action_result.set_status(phantom.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_ERR_QUERY_RETURNED_NO_CONTACTS_DATA))
+            return action_result.set_status(status_strings.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_ERR_QUERY_RETURNED_NO_CONTACTS_DATA))
         else:
             # get the registrant
             if whois_response.get('contacts') and whois_response.get('contacts').get('registrant'):
@@ -318,11 +328,11 @@ class WhoisConnector(BaseConnector):
                 wanted_keys = ['organization', 'name', 'city', 'country']
                 summary = {x: registrant[x] for x in wanted_keys if x in registrant}
                 action_result.update_summary(summary)
-                action_result.set_status(phantom.APP_SUCCESS)
+                action_result.set_status(status_strings.APP_SUCCESS)
             else:
-                action_result.set_status(phantom.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_SUCC_QUERY_RETURNED_NO_REGISTRANT_DATA))
+                action_result.set_status(status_strings.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_SUCC_QUERY_RETURNED_NO_REGISTRANT_DATA))
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def handle_action(self, param):
         """Function that handles all the actions

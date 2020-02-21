@@ -3,10 +3,15 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status as status_strings
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status as status_strings
 
 # THIS Connector imports
 from crowdstrikeoauthapi_consts import *
@@ -53,11 +58,11 @@ class CrowdstrikeConnector(BaseConnector):
         self._state = self.load_state()
         self._oauth_access_token = self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _paginator(self, action_result, endpoint, param):
         """
@@ -81,14 +86,14 @@ class CrowdstrikeConnector(BaseConnector):
             param.update({"offset": offset})
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
 
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return None
 
             offset = response.get('meta', {}).get("pagination", {}).get("offset")
             total = response.get('meta', {}).get("pagination", {}).get("total")
 
             if offset is None or total is None:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
+                return action_result.set_status(status_strings.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
 
             if response.get("resources"):
                 list_ids.extend(response.get("resources"))
@@ -108,7 +113,7 @@ class CrowdstrikeConnector(BaseConnector):
         # initially set the token for first time
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if not param:
@@ -118,18 +123,18 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.save_progress(CROWDSTRIKE_ERR_CONNECTIVITY_TEST)
-            return phantom.APP_ERROR
+            return status_strings.APP_ERROR
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
+        return self.set_status_save_progress(status_strings.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
 
     def _get_ids(self, action_result, endpoint, param):
 
         limit = param.get("limit")
 
         if (limit and not str(limit).isdigit()) or limit == 0:
-            action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_LIMIT)
+            action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_LIMIT)
             return None
 
         id_list = self._paginator(action_result, endpoint, param)
@@ -151,7 +156,7 @@ class CrowdstrikeConnector(BaseConnector):
             param = {"ids": list_ids[:min(100, len(list_ids))]}
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
 
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return None
 
             if response.get("resources"):
@@ -185,7 +190,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_devices'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_groups(self, param):
 
@@ -211,7 +216,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_host_groups'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _check_params(self, action_result, param):
 
@@ -222,17 +227,17 @@ class CrowdstrikeConnector(BaseConnector):
         intermediate_device_ids = list()
 
         if not device_id and not hostname:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_NO_PARAMETER_ERROR), None
+            return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_NO_PARAMETER_ERROR), None
 
         if device_id:
             device_ids = [x.strip() for x in device_id.split(',')]
             device_ids = ' '.join(device_ids).split()
             if len(device_ids) == 0:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_INPUT_ERROR), None
+                return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_INPUT_ERROR), None
 
             ret_val, device_id_flag, interim_devices_list = self._set_error_flag_inputs(action_result, device_ids, "device_id")
 
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return action_result.get_status(), None
 
             intermediate_device_ids.extend(interim_devices_list)
@@ -241,25 +246,25 @@ class CrowdstrikeConnector(BaseConnector):
             hostnames = [x.strip() for x in hostname.split(',')]
             hostnames = ' '.join(hostnames).split()
             if len(hostnames) == 0:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_INPUT_ERROR), None
+                return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_INPUT_ERROR), None
 
             ret_val, hostname_flag, interim_hostnames_list = self._set_error_flag_inputs(action_result, hostnames, "hostname")
 
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return action_result.get_status(), None
 
             intermediate_device_ids.extend(interim_hostnames_list)
 
         if device_id_flag and hostname_flag:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_AND_HOSTNAME_ERROR), None
+            return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_AND_HOSTNAME_ERROR), None
         elif device_id_flag:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_ERROR), None
+            return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_ERROR), None
         elif hostname_flag:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_HOSTNAME_ERROR), None
+            return action_result.set_status(status_strings.APP_ERROR, CROWDSTRIKE_INVALID_HOSTNAME_ERROR), None
         else:
             ids.extend(intermediate_device_ids)
 
-        return action_result.set_status(phantom.APP_SUCCESS), list(set(ids))
+        return action_result.set_status(status_strings.APP_SUCCESS), list(set(ids))
 
     def _set_error_flag_inputs(self, action_result, list_items, key):
 
@@ -280,7 +285,7 @@ class CrowdstrikeConnector(BaseConnector):
             flag = True
             check_list_items = []
 
-        return phantom.APP_SUCCESS, flag, check_list_items
+        return status_strings.APP_SUCCESS, flag, check_list_items
 
     def _perform_device_action(self, action_result, param):
 
@@ -288,14 +293,14 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, list_ids = self._check_params(action_result, param)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             msg = action_result.get_message()
             if "Invalid filter expression supplied" in msg:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while validating given input parameters. Error : {}".format(msg))
+                return action_result.set_status(status_strings.APP_ERROR, "Error occurred while validating given input parameters. Error : {}".format(msg))
             return action_result.get_status()
 
         if not list_ids:
-            return action_result.set_status(phantom.APP_ERROR, "No correct device IDs could be found for the provided input parameters values")
+            return action_result.set_status(status_strings.APP_ERROR, "No correct device IDs could be found for the provided input parameters values")
 
         data = {}
         endpoint = None
@@ -314,11 +319,11 @@ class CrowdstrikeConnector(BaseConnector):
 
                 ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params, data=json.dumps(data), method="post")
 
-                if phantom.is_fail(ret_val):
+                if status_strings.is_fail(ret_val):
                     return action_result.get_status()
 
                 if not response.get("resources"):
-                    return action_result.set_status(phantom.APP_ERROR, "No action could be performed on the provided devices")
+                    return action_result.set_status(status_strings.APP_ERROR, "No action could be performed on the provided devices")
 
                 for device in response.get("resources"):
                     action_result.add_data(device)
@@ -332,7 +337,7 @@ class CrowdstrikeConnector(BaseConnector):
             elif action_name == "lift_containment":
                 summary['total_unquarantined_device'] = action_result.get_data_size()
 
-            return phantom.APP_SUCCESS
+            return status_strings.APP_SUCCESS
 
         elif action_name == "add-hosts" or action_name == "remove-hosts":
 
@@ -351,13 +356,13 @@ class CrowdstrikeConnector(BaseConnector):
 
                 ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params, data=json.dumps(data), method="post")
 
-                if phantom.is_fail(ret_val):
+                if status_strings.is_fail(ret_val):
                     return action_result.get_status()
 
                 del list_ids[:min(100, len(list_ids))]
 
             if not response.get("resources"):
-                return action_result.set_status(phantom.APP_ERROR, "No action could be performed on the provided devices")
+                return action_result.set_status(status_strings.APP_ERROR, "No action could be performed on the provided devices")
 
             for device in response.get("resources"):
                 action_result.add_data(device)
@@ -369,10 +374,10 @@ class CrowdstrikeConnector(BaseConnector):
             elif action_name == "remove-hosts":
                 summary['total_removed_device'] = count
 
-            return phantom.APP_SUCCESS
+            return status_strings.APP_SUCCESS
 
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Incorrect action name")
+            return action_result.set_status(status_strings.APP_ERROR, "Incorrect action name")
 
     def _handle_quarantine_device(self, param):
 
@@ -386,10 +391,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_unquarantine_device(self, param):
 
@@ -403,10 +408,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_assign_hosts(self, param):
 
@@ -420,10 +425,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_remove_hosts(self, param):
 
@@ -437,23 +442,23 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         if response.status_code == 200 or response.status_code == 202:
-            return RetVal(phantom.APP_SUCCESS, {})
+            return RetVal(status_strings.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, "Empty response and no information in the header"),
                       None)
 
     def _process_html_response(self, response, action_result):
@@ -461,7 +466,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         # An html response, treat it like an error
@@ -486,26 +491,26 @@ class CrowdstrikeConnector(BaseConnector):
         if len(message) > 500:
             message = 'Error occured while connecting to the CrowdStrike server'
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         # Try a json parse
         try:
             resp_json = response.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Unable to parse JSON response. Error: {0}".
                                                    format(str(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
+            return RetVal(status_strings.APP_SUCCESS, resp_json)
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
                                                                                      response.text.replace('{', '{{')
@@ -520,14 +525,14 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             message = "Error from server. Status Code: {0}".format(response.status_code)
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         # store the r_text in debug data, it will get dumped in the logs if the action fails
@@ -554,7 +559,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Reset_password returns empty body
         if not response.text and 200 <= response.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, {})
+            return RetVal(status_strings.APP_SUCCESS, {})
 
         # it's not content-type that is to be parsed, handle an empty response
         if not response.text:
@@ -564,7 +569,7 @@ class CrowdstrikeConnector(BaseConnector):
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _make_rest_call_oauth2(self, endpoint, action_result, headers=None, params=None, data=None, json=None, method="get"):
         """ Function that makes the REST call to the app.
@@ -576,7 +581,7 @@ class CrowdstrikeConnector(BaseConnector):
         :param data: request body
         :param json: JSON object
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
 
@@ -585,12 +590,12 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {0}"
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Error connecting to server. Details: {0}"
                                                    .format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
@@ -605,7 +610,7 @@ class CrowdstrikeConnector(BaseConnector):
         :param data: request body
         :param json: JSON object
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
 
@@ -617,7 +622,7 @@ class CrowdstrikeConnector(BaseConnector):
         if not token.get('access_token'):
             ret_val = self._get_token(action_result)
 
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return action_result.get_status(), None
 
         headers.update({
@@ -636,17 +641,17 @@ class CrowdstrikeConnector(BaseConnector):
 
             ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
-        return phantom.APP_SUCCESS, resp_json
+        return status_strings.APP_SUCCESS, resp_json
 
     def _get_token(self, action_result, from_action=False):
         """ This function is used to get a token via REST Call.
 
         :param action_result: Object of action result
         :param from_action: Boolean object of from_action
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         data = {
@@ -663,14 +668,14 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
         self._oauth_access_token = resp_json[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
         self.save_state(self._state)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def handle_action(self, param):
 
@@ -688,7 +693,7 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         action = self.get_action_identifier()
-        action_execution_status = phantom.APP_SUCCESS
+        action_execution_status = status_strings.APP_SUCCESS
 
         if action in action_mapping.keys():
             action_function = action_mapping[action]

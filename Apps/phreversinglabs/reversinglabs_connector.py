@@ -3,10 +3,21 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import json_keys
+    from phantom import utils
+    from phantom import status
+    from phantom import consts
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import json_keys
+    import utils
+    import status
+    import consts
 
 # THIS Connector imports
 from reversinglabs_consts import *
@@ -39,17 +50,17 @@ class ReversinglabsConnector(BaseConnector):
 
         config = self.get_config()
         # setup the auth
-        self._auth = HTTPBasicAuth(phantom.get_req_value(config, phantom.APP_JSON_USERNAME),
-                phantom.get_req_value(config, phantom.APP_JSON_PASSWORD))
+        self._auth = HTTPBasicAuth(utils.get_req_value(config, json_keys.APP_JSON_USERNAME),
+                utils.get_req_value(config, json_keys.APP_JSON_PASSWORD))
 
         self.debug_print('self.status', self.get_status())
 
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     def _test_asset_connectivity(self, param):
 
         # Create a hash of a random string
-        random_string = phantom.get_random_chars(size=10)
+        random_string = utils.get_random_chars(size=10)
 
         try:
             md5_hash = hashlib.md5(random_string).hexdigest()
@@ -69,20 +80,20 @@ class ReversinglabsConnector(BaseConnector):
         config = self.get_config()
 
         try:
-            r = requests.post(MAL_PRESENCE_API_URL, verify=config[phantom.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
+            r = requests.post(MAL_PRESENCE_API_URL, verify=config[json_keys.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
         except Exception as e:
-            self.set_status(phantom.APP_ERROR, 'Request to server failed', e)
+            self.set_status(status.APP_ERROR, 'Request to server failed', e)
             self.save_progress(REVERSINGLABS_SUCC_CONNECTIVITY_TEST)
             return self.get_status()
 
         if (r.status_code != 200):
-            self.set_status(phantom.APP_ERROR)
+            self.set_status(status.APP_ERROR)
             status_message = '{0}. {1}. HTTP status_code: {2}, reason: {3}'.format(REVERSINGLABS_ERR_CONNECTIVITY_TEST,
                 REVERSINGLABS_MSG_CHECK_CREDENTIALS, r.status_code, r.reason)
             self.append_to_message(status_message)
             return self.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, REVERSINGLABS_SUCC_CONNECTIVITY_TEST)
+        return self.set_status_save_progress(status.APP_SUCCESS, REVERSINGLABS_SUCC_CONNECTIVITY_TEST)
 
     def _handle_samples(self, action_result, samples):
 
@@ -115,13 +126,13 @@ class ReversinglabsConnector(BaseConnector):
 
     def _get_hash_type(self, hash_to_query):
 
-        if (phantom.is_md5(hash_to_query)):
+        if (utils.is_md5(hash_to_query)):
             return 'md5'
 
-        if (phantom.is_sha1(hash_to_query)):
+        if (utils.is_sha1(hash_to_query)):
             return 'sha1'
 
-        if (phantom.is_sha256(hash_to_query)):
+        if (utils.is_sha256(hash_to_query)):
             return 'sha256'
 
         return None
@@ -133,13 +144,13 @@ class ReversinglabsConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # get the hash
-        hash_to_query = param[phantom.APP_JSON_HASH]
+        hash_to_query = param[json_keys.APP_JSON_HASH]
 
         # get the hash type
         hash_type = self._get_hash_type(hash_to_query)
 
         if (not hash_type):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to detect Hash Type")
+            return action_result.set_status(status.APP_ERROR, "Unable to detect Hash Type")
 
         tree = lambda: defaultdict(tree)
 
@@ -151,25 +162,25 @@ class ReversinglabsConnector(BaseConnector):
         self.save_progress(REVERSINGLABS_MSG_CONNECTING_WITH_URL, url=MAL_PRESENCE_API_URL, hash_type=hash_type)
 
         try:
-            r = requests.post(MAL_PRESENCE_API_URL, verify=config[phantom.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
+            r = requests.post(MAL_PRESENCE_API_URL, verify=config[json_keys.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Request to server failed", e)
+            return action_result.set_status(status.APP_ERROR, "Request to server failed", e)
 
         if (r.status_code != 200):
-            return action_result.set_status(phantom.APP_ERROR, REVERSINGLABS_ERR_MALWARE_PRESENCE_QUERY_FAILED, ret_code=r.status_code)
+            return action_result.set_status(status.APP_ERROR, REVERSINGLABS_ERR_MALWARE_PRESENCE_QUERY_FAILED, ret_code=r.status_code)
 
         try:
             rl_result = r.json()
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Response does not seem to be a valid JSON", e)
+            return action_result.set_status(status.APP_ERROR, "Response does not seem to be a valid JSON", e)
 
         # set the status to success
-        action_result.set_status(phantom.APP_SUCCESS)
+        action_result.set_status(status.APP_SUCCESS)
 
         entries = rl_result.get('rl', {}).get('entries')
 
         if (not entries):
-            return action_result.set_status(phantom.APP_ERROR, "Response does contains empty or None 'entries'")
+            return action_result.set_status(status.APP_ERROR, "Response does contains empty or None 'entries'")
 
         # Queried for a hash, so it should be present in the return value
         entry = entries[0]
@@ -185,34 +196,34 @@ class ReversinglabsConnector(BaseConnector):
 
         if (hash_data[REVERSINGLABS_JSON_STATUS] not in self._malicious_status):
             # No need to do anything more for this hash
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(status.APP_SUCCESS)
 
         self.save_progress(REVERSINGLABS_MSG_CONNECTING_WITH_URL, url=XREF_API_URL, hash_type=hash_type)
 
         try:
-            r = requests.post(XREF_API_URL, verify=config[phantom.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
+            r = requests.post(XREF_API_URL, verify=config[json_keys.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "XREF API Request to server failed", e)
+            return action_result.set_status(status.APP_ERROR, "XREF API Request to server failed", e)
 
         if (r.status_code != 200):
             self.debug_print("status code", r.status_code)
-            return action_result.set_status(phantom.APP_ERROR, "XREF API Request to server error: {0}".format(r.status_code))
+            return action_result.set_status(status.APP_ERROR, "XREF API Request to server error: {0}".format(r.status_code))
 
         try:
             rl_result = r.json()
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "XREF Response does not seem to be a valid JSON", e)
+            return action_result.set_status(status.APP_ERROR, "XREF Response does not seem to be a valid JSON", e)
 
         action_result.add_debug_data(rl_result)
 
         samples = rl_result.get('rl', {}).get('samples')
 
         if (not samples):
-            return action_result.set_status(phantom.APP_ERROR, "Response contains empty or none 'samples'")
+            return action_result.set_status(status.APP_ERROR, "Response contains empty or none 'samples'")
 
         self._handle_samples(action_result, samples)
 
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     def handle_action(self, param):
         """Function that handles all the actions
@@ -228,7 +239,7 @@ class ReversinglabsConnector(BaseConnector):
 
         if (action == self.ACTION_ID_QUERY_FILE):
             result = self._query_file(param)
-        elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        elif (action == consts.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             result = self._test_asset_connectivity(param)
 
         return result

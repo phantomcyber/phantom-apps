@@ -1,12 +1,14 @@
 {
     "appid": "1e1618e7-2f70-4fc0-916a-f96facc2d2e1",
+    "connector_id": "1e1618e7-2f70-4fc0-916a-f96facc2d2e1",
     "name": "Jira",
     "description": "This app integrates with JIRA to perform several ticket management actions",
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "2.0.35",
-    "utctime_updated": "2019-11-20T22:52:13.000000Z",
+    "app_version": "2.0.37",
+    "connector_version": "2.0.36",
+    "utctime_updated": "2020-02-20T01:02:03.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
@@ -22,6 +24,38 @@
     "pip_dependencies": {
         "wheel": [
             {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2019.11.28-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cffi",
+                "input_file": "wheels/cffi-1.14.0-cp36-cp36m-manylinux1_x86_64.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cryptography",
+                "input_file": "wheels/cryptography-2.8-cp34-abi3-manylinux2010_x86_64.whl"
+            },
+            {
+                "module": "defusedxml",
+                "input_file": "wheels/defusedxml-0.6.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "enum34",
+                "input_file": "wheels/enum34-1.1.6-py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "ipaddress",
+                "input_file": "wheels/ipaddress-1.0.23-py2.py3-none-any.whl"
+            },
+            {
                 "module": "jira",
                 "input_file": "wheels/jira-2.0.0-py2.py3-none-any.whl"
             },
@@ -34,8 +68,16 @@
                 "input_file": "wheels/pbr-5.4.4-py2.py3-none-any.whl"
             },
             {
+                "module": "pycparser",
+                "input_file": "wheels/pycparser-2.19-py2.py3-none-any.whl"
+            },
+            {
                 "module": "PyJWT",
                 "input_file": "wheels/PyJWT-1.7.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.22.0-py2.py3-none-any.whl"
             },
             {
                 "module": "requests_oauthlib",
@@ -44,6 +86,18 @@
             {
                 "module": "requests_toolbelt",
                 "input_file": "wheels/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "setuptools",
+                "input_file": "wheels/setuptools-44.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.14.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.25.8-py2.py3-none-any.whl"
             }
         ]
     },

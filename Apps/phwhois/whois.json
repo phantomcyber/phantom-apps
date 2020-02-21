@@ -1,13 +1,15 @@
 {
     "appid": "e6723c2e-06ef-415a-8098-62c46c1cb71f",
+    "connector_id": "e6723c2e-06ef-415a-8098-62c46c1cb71f",
     "name": "WHOIS",
     "description": "This app implements investigative actions that query the whois database",
     "package_name": "phantom_whois",
     "publisher": "Splunk",
     "type": "information",
     "main_module": "whois_connector.py",
-    "app_version": "2.0.0",
-    "utctime_updated": "2020-02-19T19:02:24.000000Z",
+    "app_version": "2.0.5",
+    "connector_version": "2.0.5",
+    "utctime_updated": "2020-02-21T19:52:37.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
@@ -15,8 +17,8 @@
     "python_version": "3",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "app_config_render": "default",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "latest_tested_versions": [
         "pythonwhois v2.4.3",
         "ipwhois v1.1.0",
@@ -43,6 +45,10 @@
             {
                 "module": "ipwhois",
                 "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "bs4",
+                "input_file": "wheels/beautifulsoup4-4.8.2-py3-none-any.whl"
             }
         ]
     },
