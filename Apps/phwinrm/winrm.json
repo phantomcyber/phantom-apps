@@ -8,19 +8,23 @@
     "logo_dark": "logo_microsoft_dark.svg",
     "product_name": "Windows Remote Management",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2018 Splunk Inc.",
-    "app_version": "1.0.19",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-20T22:27:33.000000Z",
     "package_name": "phantom_winrm",
-    "main_module": "winrm_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "winrm_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "On-premise, Windows 7 Ultimate SP1"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "pywinrm",
-                "input_file": "wheels/pywinrm-0.3.0-py2.py3-none-any.whl"
+                "input_file": "wheels/pywinrm-0.4.1-py2.py3-none-any.whl"
             },
             {
                 "module": "requests_ntlm",
