@@ -59,7 +59,7 @@
             "action": "quarantine device",
             "identifier": "quarantine_device",
             "description": "Quarantine the device",
-            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>Maximum timeout period for status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
             "read_only": false,
             "undo": "unquarantine device",
@@ -327,7 +327,7 @@
             "action": "unquarantine device",
             "identifier": "unquarantine_device",
             "description": "Unquarantine the device",
-            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "correct",
             "read_only": false,
             "undo": "quarantine device",
@@ -802,7 +802,7 @@
             "action": "scan device",
             "identifier": "scan_device",
             "description": "Scan a device for virus",
-            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 1 hour.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 hour.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1065,7 +1065,7 @@
             "action": "quarantine file",
             "identifier": "quarantine_file",
             "description": "Quarantine a file",
-            "verbose": "This action can take a while to complete execution. The action retries at interval of 5 seconds within specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>Maximum timeout period for status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -1373,7 +1373,7 @@
             "action": "list devices",
             "identifier": "list_devices",
             "description": "List of recently seen devices",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machines\" target=\"_blank\">List Machines API Documentation</a>), the user can get devices last seen in the past 30 days; maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machines\" target=\"_blank\">List Machines API Documentation</a>), the user can get devices last seen in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1665,7 +1665,7 @@
             "action": "list alerts",
             "identifier": "list_alerts",
             "description": "List all alerts of a given type",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1829,7 +1829,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks. This detection might indicate that Windows Defender has stopped the malware from delivering its payload. However, it is prudent to check the machine for signs of infection."
+                        "Malware and unwanted software are undesirable applications that perform annoying, disruptive or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others can able to receive commands from remote attackers and perform activities associated with cyber attacks. This detection might indicate that Windows Defender has stopped the malware from delivering its payload. However, it is prudent to check the machine for signs of infection."
                     ]
                 },
                 {
@@ -1911,7 +1911,7 @@
                     "data_path": "action_result.data.*.recommendedAction",
                     "data_type": "string",
                     "example_values": [
-                        "Collect artifacts and determine scope Review the machine timeline for suspicious activities that may have occurred before and after the time of the alert, and record additional related artifacts (files, IPs/URLs) Look for the presence of relevant artifacts on other systems. Identify commonalities and differences between potentially compromised systems. Submit relevant files for deep analysis and review resulting detailed behavioral information. Submit undetected files to the MMPC malware portal Initiate containment & mitigation Contact the user to verify intent and initiate local remediation actions as needed. Update AV signatures and run a full scan. The scan might reveal and remove previously-undetected malware components. Ensure that the machine has the latest security updates. In particular, ensure that you have installed the latest software, web browser, and Operating System versions. If credential theft is suspected, reset all relevant users passwords. Block communication with relevant URLs or IPs at the organization's perimeter."
+                        "Collect artifacts and determine scope Review the machine timeline for suspicious activities that may have occurred before and after the time of the alert, and record additional related artifacts (files, IPs/URLs) Look for the presence of relevant artifacts on other systems. Identify commonalities and differences between potentially compromised systems. Submit relevant files for deep analysis and review resulting in detailed behavioral information. Submit undetected files to the MMPC malware portal Initiate containment & mitigation Contact the user to verify intent and initiate local remediation actions as needed. Update AV signatures and run a full scan. The scan might reveal and remove previously-undetected malware components. Ensure that the machine has the latest security updates. In particular, ensure that you have installed the latest software, web browser, and Operating System versions. If credential theft is suspected, reset all relevant users' passwords. Block communication with relevant URLs or IPs at the organization's perimeter."
                     ]
                 },
                 {
