@@ -1,5 +1,5 @@
 # File: winrm_connector.py
-# Copyright (c) 2018 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -25,7 +25,10 @@ import base64
 import textwrap
 import ipaddress
 from base64 import b64encode
+import requests
 
+from builtins import str
+import six
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
@@ -43,7 +46,8 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if param in {'any', 'localsubnet', 'dns', 'dhcp', 'wins', 'defaultgateway'}:
             return True
         try:
-            ipaddress.ip_network(param.decode('utf-8'))
+            # ipaddress.ip_network(param.decode('utf-8'))
+            ipaddress.ip_network(str(param))
         except:
             return False
         return True
@@ -96,7 +100,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         arg_str = ""
         for arg in args:
             if type(arg) is dict:
-                for k, v in arg.iteritems():
+                for k, v in six.iteritems(arg):
                     if (whitelist_args and k not in whitelist_args) or not k.isalpha():
                         return RetVal(action_result.set_status(
                             phantom.APP_ERROR, "Invalid argument: {}".format(k)
@@ -219,6 +223,8 @@ class WindowsRemoteManagementConnector(BaseConnector):
                 self._protocol.close_shell(shell_id)
                 if len(resp.std_err):
                     resp.std_err = self._session._clean_error_msg(resp.std_err)
+                    if isinstance(resp.std_err, bytes):
+                        resp.std_err = resp.std_err.decode('UTF-8')
             elif async_:
                 encoded_ps = b64encode(script.encode('utf_16_le')).decode('ascii')
                 shell_id = self._protocol.open_shell()
@@ -373,7 +379,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        for k, v in param.iteritems():
+        for k, v in six.iteritems(param):
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k), v)))
                 argument_str += argument + ' '
@@ -440,7 +446,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        for k, v in param.iteritems():
+        for k, v in six.iteritems(param):
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k), v)))
                 argument_str += argument + ' '
@@ -486,6 +492,9 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         volume = -1
         std_out = action_result.get_data()[0]['std_out']
+        if isinstance(std_out, bytes):  # py3
+            std_out = std_out.decode('UTF-8')
+
         try:
             for line in std_out.splitlines():
                 if line.strip().lower().endswith('system'):
@@ -751,7 +760,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         # Windows servers have a limit of 2074 characters per command, so we break it up into chunks
         sent_first = False  # Sent the first chunk
-        chunks = textwrap.wrap(encoded_file, 1650)
+        try:
+            chunks = textwrap.wrap(encoded_file, 1650)
+        except TypeError:
+            chunks = textwrap.wrap(encoded_file.decode('UTF-8'), 1650)
         num_chunks = len(chunks)
         for i, chunk in enumerate(chunks):
             ps_script = consts.SEND_FILE_START.format(
@@ -839,7 +851,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             custom_parser = None
 
         if arguments:
-            arguments = csv.reader([arguments], skipinitialspace=True).next()
+            arguments = next(csv.reader([arguments], skipinitialspace=True))
 
         ret_val = self._run_cmd(action_result, command, arguments, custom_parser, async_=async_, command_id=command_id, shell_id=shell_id)
         if phantom.is_fail(ret_val):
@@ -974,22 +986,65 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import pudb
+    import argparse
+
     pudb.set_trace()
 
-    if (len(sys.argv) < 2):
-        print "No test json specified as input"
-        exit(0)
+    argparser = argparse.ArgumentParser()
 
-    with open(sys.argv[1]) as f:
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        try:
+            print("Accessing the Login page")
+            login_url = BaseConnector._get_phantom_base_url() + 'login'
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = WindowsRemoteManagementConnector()
         connector.print_progress_message = True
+
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

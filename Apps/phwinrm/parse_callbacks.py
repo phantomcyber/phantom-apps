@@ -1,5 +1,5 @@
 # File: parse_callbacks.py
-# Copyright (c) 2018 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -15,6 +15,8 @@ import tempfile
 import base64
 from collections import OrderedDict
 
+from builtins import str
+import six
 
 def basic(action_result, response):
     # Default one, just add the data to the action result
@@ -42,6 +44,11 @@ def check_exit(action_result, response):
 
 def check_exit_no_data(action_result, response):
     if response.status_code:
+        if isinstance(response.std_err, bytes):
+            try:
+                response.std_err = response.std_err.decode('UTF-8')
+            except:
+                pass
         return action_result.set_status(
             phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
         )
@@ -132,10 +139,20 @@ def list_connections(action_result, response):
         columns = line.split()
         try:
             connection['protocol'] = columns[0]
-            local_address = columns[1].rsplit(':', 1)
+
+            try:
+                local_address = columns[1].rsplit(':', 1)
+            except TypeError:  # py3
+                local_address = (columns[1].decode('UTF-8')).rsplit(':', 1)
+
             connection['local_address_ip'] = local_address[0]
             connection['local_address_port'] = local_address[1]
-            foreign_address = columns[2].rsplit(':', 1)
+
+            try:
+                foreign_address = columns[2].rsplit(':', 1)
+            except TypeError:  # py3
+                foreign_address = (columns[2].decode('UTF-8')).rsplit(':', 1)
+
             connection['foreign_address_ip'] = foreign_address[0]
             connection['foreign_address_port'] = foreign_address[1]
             connection['state'] = columns[3]
@@ -199,7 +216,7 @@ def filtered_rule(
         else:
             return False
 
-    for k, v in kwargs.iteritems():
+    for k, v in six.iteritems(kwargs):
         if rule.get(k, '').lower() != v.lower():
             return False
 
@@ -216,8 +233,13 @@ def list_firewall_rules(action_result, response, **kwargs):
             phantom.APP_SUCCESS,
             "No firewall rules were found"
         )
+    lines = list()
 
-    lines = response.std_out.splitlines()
+    if isinstance(response.std_out, str):
+        lines = response.std_out.splitlines()
+    else:
+        lines = response.std_out.decode('UTF-8').splitlines()
+
     rule_lines = None
     for line in lines:
         # start of a new rule
@@ -269,7 +291,11 @@ def delete_firewall_rule(action_result, response):
 
 
 def list_sessions(action_result, response):
-    lines = response.std_out.splitlines()
+    if isinstance(response.std_out, bytes):
+        lines = (response.std_out.decode('UTF-8')).splitlines()
+    else:
+        lines = response.std_out.splitlines()
+
     username_index = lines[0].find('USERNAME')
     type_index = lines[0].find('TYPE')
     device_index = lines[0].find('DEVICE')
@@ -333,7 +359,7 @@ def _parse_rule(rule):
         rule.get('Conditions', {}).pop('FilePathCondition', None)
         if len(rule.get('Conditions', {})) == 0:
             rule.pop('Conditions', None)
-    for k, v in rule.iteritems():
+    for k, v in six.iteritems(rule):
         # Add anything left over
         d[k] = v
     return d
@@ -347,6 +373,8 @@ def list_applocker_policies(action_result, response):
     try:
         # Get rid of all the linebreaks to prevent errors during reading
         data = xmltodict.parse("".join(response.std_out.splitlines()))
+    except TypeError:
+        data = xmltodict.parse("".join((response.std_out.decode('utf-8')).splitlines()))
     except Exception as e:
         return action_result.set_status(
             phantom.APP_ERROR, "Error parsing XML response: {}".format(str(e))
@@ -384,6 +412,8 @@ def list_applocker_policies(action_result, response):
 
 def decodeb64_add_to_vault(action_result, response, container_id, file_name):
     if response.status_code:
+        if isinstance(response.std_err, bytes):
+            response.std_err = response.std_err.decode('UTF-8')
         return action_result.set_status(
             phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
         )
@@ -392,7 +422,7 @@ def decodeb64_add_to_vault(action_result, response, container_id, file_name):
 
     try:
         if hasattr(Vault, 'create_attachment'):
-            resp = Vault.create_attachment(base64.b64decode(b64string), container_id)
+            resp = Vault.create_attachment(base64.b64decode(b64string), container_id, file_name=file_name)
         else:
             tmp_file = tempfile.NamedTemporaryFile(mode='wb', delete=False, dir='/opt/phantom/vault/tmp')
             tmp_file.write(base64.b64decode(b64string))

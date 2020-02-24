@@ -1,6 +1,7 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: gitlab_connector.py
+# Copyright (c) Peter Bertel, 2020
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
@@ -32,6 +33,7 @@ class GitlabConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         # self._base_url = "{}/api/v4".format(config.get('gitlab_location'))
+
         self._base_url = None
 
     def _process_empty_response(self, response, action_result):
@@ -156,98 +158,74 @@ class GitlabConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/users', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/users', action_result, params=None, headers=self._rest_auth_header)
+
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
-        # self.save_progress(response)
         self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity passed.")
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+        return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity passed")
 
     def _handle_list_users(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/users', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/users', action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully returned users")
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def _handle_list_projects(self, param):
 
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/projects', action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects', action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_branches(self, param):
 
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         project_id = param['project_id']
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/repository/branches'.format(
-            project_id), action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects/{}/repository/branches'.format(project_id), action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
-
+        for item in response:
+            action_result.add_data(item)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_trigger(self, param):
 
         # Implement the handler here
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -265,36 +243,34 @@ class GitlabConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # token_dict = {'tigger_token': response['token']}
-        # summary = action_result.update_summary(token_dict)
+        summary = action_result.update_summary({})
+        summary['trigger_token'] = response['token']
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_triggers(self, param):
 
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         project_id = param['project_id']
 
         # make rest call
-        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(
-            project_id), action_result, params=None, headers=self._rest_auth_header)
+        ret_val, response = self._make_rest_call('/projects/{}/triggers'.format(project_id), action_result, params=None, headers=self._rest_auth_header)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for item in response:
+            action_result.add_data(item)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_run_pipeline(self, param):
 
         # Implement the handler here
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -314,10 +290,10 @@ class GitlabConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # summary_dict = {
-        #     'pipeline_id': response['id'], 'pipeline_web_url': response['web_url']}
-        # summary = action_result.update_summary(summary_dict)
+        summary_dict = {'pipeline_id': response['id'], 'pipeline_web_url': response['web_url']}
 
+        summary = action_result.update_summary({})
+        summary.update(summary_dict)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -371,9 +347,9 @@ class GitlabConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = "{0}/api/v4".format(UnicodeDammit(
-            config['gitlab_location']).unicode_markup.encode('UTF-8'))
+        self._base_url = "{0}/api/v4".format(UnicodeDammit(config['gitlab_location']).unicode_markup.encode('UTF-8'))
         self._personal_access_token = config['personal_access_token']
+
         self._rest_auth_header = {"PRIVATE-TOKEN": self._personal_access_token}
 
         return phantom.APP_SUCCESS
@@ -428,8 +404,7 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False,
-                               data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))

@@ -4,18 +4,49 @@
     "description": "This app integrates with JIRA to perform several ticket management actions",
     "publisher": "Splunk",
     "type": "ticketing",
-    "main_module": "jira_connector.pyc",
+    "main_module": "jira_connector.py",
     "app_version": "2.0.35",
     "utctime_updated": "2019-11-20T22:52:13.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.6.19142",
+    "latest_tested_versions": [
+        "On prem v7.1.9"
+    ],
     "python_version": "3",
     "logo": "logo_atlassian.svg",
     "logo_dark": "logo_atlassian_dark.svg",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "jira",
+                "input_file": "wheels/jira-2.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "oauthlib",
+                "input_file": "wheels/oauthlib-3.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pbr",
+                "input_file": "wheels/pbr-5.4.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "PyJWT",
+                "input_file": "wheels/PyJWT-1.7.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests_oauthlib",
+                "input_file": "wheels/requests_oauthlib-1.3.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests_toolbelt",
+                "input_file": "wheels/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "device_url": {
             "data_type": "string",

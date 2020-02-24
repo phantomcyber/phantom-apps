@@ -78,6 +78,24 @@
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.can_create_project",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 }
             ],
             "render": {
@@ -150,6 +168,10 @@
                     "description": "The ID of the GitLab project",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 }
             },
@@ -187,7 +209,7 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.name",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
                         "master"
@@ -210,12 +232,20 @@
                     "description": "The ID of the GitLab project",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 },
                 "trigger_name": {
                     "description": "The name of the new trigger",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab trigger"
+                    ],
                     "order": 1
                 }
             },
@@ -285,6 +315,10 @@
                     "description": "The ID of the GitLab project",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 }
             },
@@ -322,23 +356,22 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
                         "Sample trigger description"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.token",
+                    "data_path": "action_result.data.*.token",
                     "data_type": "string",
                     "column_order": 2,
-                    "column_name":"Token",
                     "example_values": [
                         "123456abcdef"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "example_values": [
                         1
@@ -362,18 +395,30 @@
                     "description": "The ID of the GitLab project",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
                     "order": 0
                 },
                 "trigger_token": {
                     "description": "The trigger token required for executing a pipeline",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab trigger"
+                    ],
                     "order": 1
                 },
                 "branch": {
                     "description": "The branch containing the .gitlab-ci.yml file to run. Defaults to 'master'",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                      "branch name"
+                    ],
                     "default": "master",
                     "order": 2
                 }
