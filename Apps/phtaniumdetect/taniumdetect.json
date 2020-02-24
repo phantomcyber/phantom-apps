@@ -1,7 +1,7 @@
 {
     "appid": "b3b0294c-cfb3-4547-a5cf-4012329a485b",
     "name": "Tanium Detect",
-    "description": "This app provides integration between Phantom and Tanium Detect",
+    "description": "This app integrates with Tanium Detect to perform several investigate, generic, and ingest type of actions",
     "type": "network security",
     "product_vendor": "Tanium",
     "logo": "logo_taniumdetect.svg",
@@ -57,8 +57,8 @@
             "action": "get suppression rule",
             "identifier": "get_suppression_rule",
             "description": "Get a suppression rule by ID",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the suppression rule",
@@ -204,8 +204,8 @@
             "action": "list suppression rules",
             "identifier": "list_suppression_rules",
             "description": "List all available suppression rules in the system",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "limit": {
                     "description": "The maximum number of rules to return. [Default: 100]",
@@ -354,8 +354,8 @@
             "identifier": "get_source",
             "description": "Get a single source",
             "verbose": "Get a single source by ID.",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the source to show",
@@ -468,8 +468,8 @@
             "action": "list sources",
             "identifier": "list_sources",
             "description": "List sources configured to manage IOC's in the system",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "limit": {
                     "description": "The maximum number of sources to return. [Default: 100]",
@@ -573,8 +573,8 @@
             "identifier": "get_sourcetype",
             "description": "Show details for a single source type",
             "verbose": "Show details for a single source type by ID.",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the source type to show",
@@ -630,8 +630,8 @@
             "action": "list sourcetypes",
             "identifier": "list_sourcetypes",
             "description": "List source types supported on this system",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {},
             "output": [
                 {
@@ -698,8 +698,8 @@
             "action": "get notification count",
             "identifier": "get_notification_count",
             "description": "List notification counts for the last N days in UTC by default",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "num_days": {
                     "description": "Show counts for the last \"num_days\" [Default: 30]",
@@ -776,8 +776,8 @@
             "action": "get notification",
             "identifier": "get_notification",
             "description": "Show a single notification by ID",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the notification to show",
@@ -908,8 +908,8 @@
             "action": "list notifications",
             "identifier": "list_notifications",
             "description": "List notifications with optional filtering, sorting, and pagination",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "type": {
                     "description": "Filter notifications by the specified type(s)",
@@ -1135,8 +1135,8 @@
             "action": "get label",
             "identifier": "get_label",
             "description": "Request a single label by ID",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the label to get",
@@ -1318,8 +1318,8 @@
             "action": "list labels",
             "identifier": "list_labels",
             "description": "List all available labels in the system",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "limit": {
                     "description": "The maximum number of labels to return. [Default: 100]",
@@ -1404,8 +1404,8 @@
             "action": "get intel",
             "identifier": "get_intel",
             "description": "Show a single Intel Document by ID",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the intel document to show",
@@ -1519,8 +1519,8 @@
             "identifier": "list_intel",
             "description": "List intel documents",
             "verbose": "List intel documents; Optional filtering, sorting, pagination.",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "name": {
                     "description": "include only IntelDocs whose \"name\" matches the given field",
@@ -1725,8 +1725,8 @@
             "action": "get counts group",
             "identifier": "get_counts_group",
             "description": "List alert counts grouped by computer name or intel id",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "groupby": {
                     "description": "Group alerts by specified group name [Default: 'computerName', Alternate Values: ['intelId']]",
@@ -1782,8 +1782,8 @@
             "action": "get alert count",
             "identifier": "get_alert_count",
             "description": "List alert counts for the last N days, in UTC by default",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "num_days": {
                     "description": "Show counts for the last number of days. [Default: 30]",
@@ -1860,8 +1860,8 @@
             "action": "get alert",
             "identifier": "get_alert",
             "description": "Show a single alert by ID",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "id": {
                     "description": "The ID of the alert to show",
@@ -1993,8 +1993,8 @@
             "identifier": "list_alerts",
             "description": "Lists all the alerts from the Tanium Detect server",
             "verbose": "List alerts with optional filtering, sorting, and pagination.",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "state": {
                     "description": "Filter alerts by the specified states",
@@ -2214,7 +2214,7 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingests functionality",
+            "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,

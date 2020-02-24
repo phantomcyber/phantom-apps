@@ -93,13 +93,13 @@ class TaniumDetectConnector(BaseConnector):
                 header['session'] = req.text
         except Exception as e:
             if e.message:
-                if isinstance(e.message, basestring):
-                    err_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                else:
-                    err_msg = str(e.message)
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
             else:
-                err_msg = "Unknown error occurred"
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Logging Into Server. Details: {0}').format(str(err_msg))), resp_json)
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Logging Into Server. Details: {0}').format(str(error_msg))), resp_json)
         else:
             try:
                 request_func = getattr(requests, method)
@@ -179,7 +179,7 @@ class TaniumDetectConnector(BaseConnector):
             return action_result.set_status("Error: {}".format(str(e)))
         config = UnicodeDammit(config).unicode_markup.encode("utf-8")
         description = UnicodeDammit(description).unicode_markup.encode("utf-8")
-        data = json.dumps(str(config) + str(description) + str(inteldocid))
+        data = json.dumps(config + description + str(inteldocid))
         ret_val, response = self._make_rest_call('/v1/suppression-rules', action_result, method='post', data=data, params=None)
 
         if phantom.is_fail(ret_val):
