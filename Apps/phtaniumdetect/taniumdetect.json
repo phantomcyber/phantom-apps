@@ -40,6 +40,12 @@
             "data_type": "password",
             "required": true,
             "order": 3
+        },
+        "timezone": {
+            "required": true,
+            "order": 4,
+            "data_type": "timezone",
+            "description": "Tanium server timezone"
         }
     },
     "actions": [
