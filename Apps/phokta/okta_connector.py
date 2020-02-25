@@ -837,7 +837,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            login_url = AwsEc2Connector._get_phantom_base_url() + '/login'
+            login_url = BaseConnector._get_phantom_base_url() + '/login'
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
