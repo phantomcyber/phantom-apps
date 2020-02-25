@@ -1,22 +1,27 @@
 {
     "appid": "e6723c2e-06ef-415a-8098-62c46c1cb71f",
     "name": "WHOIS",
-    "description": "This App implements investigative actions that query the whois database",
+    "description": "This app implements investigative actions that query the whois database",
     "package_name": "phantom_whois",
     "publisher": "Splunk",
     "type": "information",
-    "main_module": "whois_connector.pyc",
-    "app_version": "1.2.40",
-    "utctime_updated": "2019-09-19T05:31:17.000000Z",
+    "main_module": "whois_connector.py",
+    "app_version": "2.0.6",
+    "utctime_updated": "2020-02-24T19:15:04.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.6.19142",
     "python_version": "3",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "app_config_render": "default",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "latest_tested_versions": [
+        "pythonwhois v2.4.3",
+        "ipwhois v1.1.0",
+        "dnspython v1.16.0"
+    ],
     "pip_dependencies": {
         "wheel": [
             {
@@ -26,6 +31,18 @@
             {
                 "module": "requests-file",
                 "input_file": "wheels/requests_file-1.4.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pythonwhois",
+                "input_file": "wheels/pythonwhois-2.4.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "dns",
+                "input_file": "wheels/dnspython-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "ipwhois",
+                "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
             }
         ]
     },
@@ -69,7 +86,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -87,7 +105,7 @@
                     "data_path": "action_result.data.*.contacts.admin",
                     "data_type": "string",
                     "example_values": [
-                        "John Smith"
+                        "Test User"
                     ]
                 },
                 {
@@ -245,7 +263,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "abusecomplaints@markmonitor.com"
+                        "abusecomplaints@testmonitor.com"
                     ]
                 },
                 {
@@ -273,16 +291,16 @@
                     "data_path": "action_result.data.*.raw",
                     "data_type": "string",
                     "example_values": [
-                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-16T06:11:04Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n",
-                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-15T05:36:26Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n",
-                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-14T14:50:03Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n"
+                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.testmonitor.com\n   Registrar URL: http://www.testmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: TestMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@testmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-16T06:11:04Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n",
+                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.testmonitor.com\n   Registrar URL: http://www.testmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: TestMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@testmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-15T05:36:26Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n",
+                        "   Domain Name: SPLUNK.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.testmonitor.com\n   Registrar URL: http://www.testmonitor.com\n   Updated Date: 2018-02-21T18:36:40Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2020-09-14T04:00:00Z\n   Registrar: TestMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@testmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.SPLUNK.COM\n   Name Server: NS2.SPLUNK.COM\n   Name Server: NS3.SPLUNK.COM\n   Name Server: NS4.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2018-11-14T14:50:03Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.registrar",
                     "data_type": "string",
                     "example_values": [
-                        "MarkMonitor Inc."
+                        "TestMonitor Inc."
                     ]
                 },
                 {
@@ -303,7 +321,7 @@
                     "data_path": "action_result.data.*.whois_server",
                     "data_type": "string",
                     "example_values": [
-                        "whois.markmonitor.com"
+                        "whois.testmonitor.com"
                     ]
                 },
                 {
@@ -385,7 +403,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -404,8 +423,8 @@
                 {
                     "data_path": "action_result.data.*.asn",
                     "data_type": "string",
-                    "column_name": "Asn",
-                    "column_order": 2,
+                    "column_name": "ASN",
+                    "column_order": 1,
                     "example_values": [
                         "18207"
                     ]
@@ -413,8 +432,8 @@
                 {
                     "data_path": "action_result.data.*.asn_cidr",
                     "data_type": "string",
-                    "column_name": "Asn Cidr",
-                    "column_order": 3,
+                    "column_name": "ASN CIDR",
+                    "column_order": 2,
                     "example_values": [
                         "203.88.139.0/24"
                     ]
@@ -422,8 +441,8 @@
                 {
                     "data_path": "action_result.data.*.asn_country_code",
                     "data_type": "string",
-                    "column_name": "Asn Country Code",
-                    "column_order": 4,
+                    "column_name": "ASN Country Code",
+                    "column_order": 3,
                     "example_values": [
                         "US"
                     ]
@@ -431,8 +450,8 @@
                 {
                     "data_path": "action_result.data.*.asn_date",
                     "data_type": "string",
-                    "column_name": "Asn Date",
-                    "column_order": 5,
+                    "column_name": "ASN Date",
+                    "column_order": 4,
                     "example_values": [
                         "2000-04-27"
                     ]
@@ -440,8 +459,8 @@
                 {
                     "data_path": "action_result.data.*.asn_registry",
                     "data_type": "string",
-                    "column_name": "Asn Registry",
-                    "column_order": 6,
+                    "column_name": "ASN Registry",
+                    "column_order": 5,
                     "example_values": [
                         "apnic"
                     ]
@@ -453,22 +472,22 @@
                     "contains": [
                         "email"
                     ],
-                    "column_order": 7
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.nets.*.address",
                     "data_type": "string",
                     "column_name": "Address",
-                    "column_order": 8,
+                    "column_order": 7,
                     "example_values": [
-                        "1600 Amphitheatre Parkway"
+                        "1600 AmphiLane Markway"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.nets.*.cidr",
                     "data_type": "string",
-                    "column_name": "Cidr",
-                    "column_order": 9,
+                    "column_name": "CIDR",
+                    "column_order": 8,
                     "example_values": [
                         "203.88.128.0/20"
                     ]
@@ -477,7 +496,7 @@
                     "data_path": "action_result.data.*.nets.*.city",
                     "data_type": "string",
                     "column_name": "City",
-                    "column_order": 10,
+                    "column_order": 9,
                     "example_values": [
                         "San Franscisco"
                     ]
@@ -486,7 +505,7 @@
                     "data_path": "action_result.data.*.nets.*.country",
                     "data_type": "string",
                     "column_name": "Country",
-                    "column_order": 11,
+                    "column_order": 10,
                     "example_values": [
                         "US"
                     ]
@@ -495,15 +514,15 @@
                     "data_path": "action_result.data.*.nets.*.created",
                     "data_type": "string",
                     "column_name": "Created",
-                    "column_order": 12
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.data.*.nets.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 13,
+                    "column_order": 12,
                     "example_values": [
-                        "Level 3 Parent, LLC"
+                        "Level 3 Test, LLC"
                     ]
                 },
                 {
@@ -512,7 +531,8 @@
                     "contains": [
                         "email"
                     ],
-                    "column_order": 7,
+                    "column_name": "Emails",
+                    "column_order": 13,
                     "example_values": [
                         "ipaddressing@level3.com"
                     ]
@@ -631,7 +651,7 @@
                     "data_path": "action_result.summary.nets.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "100 CenturyLink Drive"
+                        "100 Century DriveLinks"
                     ]
                 },
                 {
@@ -652,7 +672,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Registry: arin ASN: 15169 Country: US Nets: Range: 8.0.0.0 - 8.127.255.255 Address: 100 CenturyLink Drive Range: None Address: 1600 Amphitheatre Parkway"
+                        "Registry: arin ASN: 15169 Country: US Nets: Range: 8.0.0.0 - 8.127.255.255 Address: 100 Century DriveLinks Range: None Address: 1600 AmphiLane Markway"
                     ]
                 },
                 {
