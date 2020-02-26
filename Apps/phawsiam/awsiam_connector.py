@@ -1,5 +1,5 @@
 # File: awsiam_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -8,12 +8,16 @@ import hmac
 import hashlib
 import datetime
 import collections
-from urllib import urlencode, unquote
 from collections import OrderedDict
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
 from awsiam_consts import *
+
+try:
+    from urllib import urlencode, unquote
+except ImportError:
+    from urllib.parse import urlencode, unquote
 
 # Phantom App imports
 import phantom.app as phantom
@@ -274,8 +278,8 @@ class AwsIamConnector(BaseConnector):
         resp_json = None
 
         try:
-            self._access_key = self._access_key.encode('utf-8')
-            self._secret_key = self._secret_key.encode('utf-8')
+            self._access_key = self._access_key
+            self._secret_key = self._secret_key
         except:
             self.debug_print(AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG)
             return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG),
@@ -838,8 +842,7 @@ class AwsIamConnector(BaseConnector):
             return action_result.get_status()
 
         response_dict = response[AWSIAM_JSON_CREATE_ROLE_RESPONSE][AWSIAM_JSON_CREATE_ROLE_RESULT][AWSIAM_JSON_ROLE]
-        response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT]).\
-            decode('utf-8').encode('utf-8')
+        response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT])
 
         # 3. Attach role with created container instance profile in step 1
         params = OrderedDict()
@@ -1208,8 +1211,7 @@ class AwsIamConnector(BaseConnector):
         # Add the roles data in action_result
         for role in roles_dict[AWSIAM_JSON_LIST_RESPONSE]:
             role[AWSIAM_JSON_REQUEST_ID] = roles_dict[AWSIAM_JSON_REQUEST_ID]
-            role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT]).\
-                decode('utf-8').encode('utf-8')
+            role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT])
             action_result.add_data(role)
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -1395,7 +1397,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1408,11 +1410,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1428,6 +1430,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
