@@ -1,8 +1,25 @@
 {
+    "appid": "8650fa8a-fdb1-4563-9aad-53d8b6cfab6b",
     "product_version_regex": ".*",
     "description": "This app supports various identity management actions on Okta",
     "package_name": "phantom_okta",
     "utctime_updated": "2019-01-26T03:20:40.000000Z",
+    "product_vendor": "Okta",
+    "logo": "logo_okta.svg",
+    "logo_dark": "logo_okta_dark.svg",
+    "publisher": "Splunk",
+    "name": "Okta",
+    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "min_phantom_version": "4.6.19142",
+    "product_name": "Okta",
+    "app_wizard_version": "1.0.0",
+    "app_version": "2.0.0",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud tested 2-24-2020"
+    ],
+    "type": "identity management",
+    "main_module": "okta_connector.py",
     "actions": [
         {
             "read_only": true,
@@ -67,7 +84,7 @@
                     "data_path": "action_result.parameter.email",
                     "example_values": [
                         "00uby4va2hynIj0mS0h7",
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "data_type": "string",
                     "column_order": 0,
@@ -169,7 +186,7 @@
                 {
                     "data_path": "action_result.parameter.filter",
                     "example_values": [
-                        "herman"
+                        "test"
                     ],
                     "data_type": "string"
                 },
@@ -184,7 +201,7 @@
                 {
                     "data_path": "action_result.parameter.query",
                     "example_values": [
-                        "herman"
+                        "test"
                     ],
                     "data_type": "string"
                 },
@@ -286,7 +303,7 @@
                 {
                     "data_path": "action_result.data.*.profile.displayName",
                     "example_values": [
-                        "Herman Edwards"
+                        "First Last"
                     ],
                     "data_type": "string"
                 },
@@ -296,22 +313,21 @@
                     ],
                     "data_path": "action_result.data.*.profile.email",
                     "example_values": [
-                        "herman@phantom.us",
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.firstName",
                     "example_values": [
-                        "Herman"
+                        "First"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.lastName",
                     "example_values": [
-                        "Edwards"
+                        "Last Name"
                     ],
                     "data_type": "string"
                 },
@@ -321,14 +337,14 @@
                     ],
                     "data_path": "action_result.data.*.profile.login",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.middleName",
                     "example_values": [
-                        "C\u00e9dille"
+                        "Middle"
                     ],
                     "data_type": "string"
                 },
@@ -348,7 +364,7 @@
                     ],
                     "data_path": "action_result.data.*.profile.secondEmail",
                     "example_values": [
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -362,7 +378,7 @@
                 {
                     "data_path": "action_result.data.*.profile.title",
                     "example_values": [
-                        "Leader of Herman's Hermits"
+                        "Software Engineer"
                     ],
                     "data_type": "string"
                 },
@@ -430,7 +446,7 @@
                     ],
                     "data_path": "action_result.data.*.credentials.emails.*.value",
                     "example_values": [
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 }
@@ -485,7 +501,7 @@
                 {
                     "data_path": "action_result.parameter.filter",
                     "example_values": [
-                        "herman"
+                        "test"
                     ],
                     "data_type": "string"
                 },
@@ -500,7 +516,7 @@
                 {
                     "data_path": "action_result.parameter.query",
                     "example_values": [
-                        "herman"
+                        "test"
                     ],
                     "data_type": "string"
                 },
@@ -981,8 +997,7 @@
                     ],
                     "data_path": "action_result.parameter.id",
                     "example_values": [
-                        "00uby4va2hynIj0mS0h7",
-                        "herman@phantom.us"
+                        "00uby4va2hynIj0mS0h7"
                     ],
                     "data_type": "string"
                 },
@@ -1194,21 +1209,21 @@
                     ],
                     "data_path": "action_result.data.*.profile.email",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.firstName",
                     "example_values": [
-                        "Herman"
+                        "First Name"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.lastName",
                     "example_values": [
-                        "Edwards"
+                        "Last Name"
                     ],
                     "data_type": "string"
                 },
@@ -1218,7 +1233,7 @@
                     ],
                     "data_path": "action_result.data.*.profile.login",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1233,7 +1248,7 @@
                     ],
                     "data_path": "action_result.data.*.profile.secondEmail",
                     "example_values": [
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1298,7 +1313,7 @@
                     ],
                     "data_path": "action_result.data.*.credentials.emails.*.value",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1312,21 +1327,21 @@
                 {
                     "data_path": "action_result.data.*.profile.displayName",
                     "example_values": [
-                        "Herman Edwards"
+                        "First Last"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.title",
                     "example_values": [
-                        "Leader of Herman's Hermits"
+                        "Software Engineer"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.middleName",
                     "example_values": [
-                        "C\u00e9dille"
+                        "Middle"
                     ],
                     "data_type": "string"
                 },
@@ -1783,7 +1798,7 @@
                 {
                     "data_path": "action_result.data.*.profile.displayName",
                     "example_values": [
-                        "Herman Edwards"
+                        "First Last"
                     ],
                     "data_type": "string"
                 },
@@ -1793,21 +1808,21 @@
                     ],
                     "data_path": "action_result.data.*.profile.email",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.firstName",
                     "example_values": [
-                        "Herman"
+                        "First"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.lastName",
                     "example_values": [
-                        "Edwards"
+                        "Last"
                     ],
                     "data_type": "string"
                 },
@@ -1817,14 +1832,14 @@
                     ],
                     "data_path": "action_result.data.*.profile.login",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.middleName",
                     "example_values": [
-                        "C\u00e9dille"
+                        "Middle"
                     ],
                     "data_type": "string"
                 },
@@ -1844,7 +1859,7 @@
                     ],
                     "data_path": "action_result.data.*.profile.secondEmail",
                     "example_values": [
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1858,7 +1873,7 @@
                 {
                     "data_path": "action_result.data.*.profile.title",
                     "example_values": [
-                        "Leader of Herman's Hermits"
+                        "Software Engineer"
                     ],
                     "data_type": "string"
                 },
@@ -1923,8 +1938,7 @@
                     ],
                     "data_path": "action_result.data.*.credentials.emails.*.value",
                     "example_values": [
-                        "herman@phantom.us",
-                        "herman@splunk.com"
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -2860,7 +2874,6 @@
             "verbose": ""
         }
     ],
-    "logo": "logo_okta.svg",
     "configuration": {
         "api_key": {
             "required": true,
@@ -2881,17 +2894,5 @@
             "data_type": "boolean",
             "order": 2
         }
-    },
-    "product_vendor": "Okta",
-    "logo_dark": "logo_okta_dark.svg",
-    "publisher": "Phantom",
-    "name": "Okta",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
-    "min_phantom_version": "3.5.210",
-    "product_name": "Okta",
-    "appid": "8650fa8a-fdb1-4563-9aad-53d8b6cfab6b",
-    "app_wizard_version": "1.0.0",
-    "app_version": "1.0.10",
-    "type": "identity management",
-    "main_module": "okta_connector.pyc"
+    }
 }
