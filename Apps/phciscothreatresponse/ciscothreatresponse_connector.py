@@ -23,11 +23,6 @@ from threatresponse import ThreatResponse
 from threatresponse.exceptions import RegionError
 
 
-class RetVal(tuple):
-    def __new__(cls, val1, val2=None):
-        return tuple.__new__(RetVal, (val1, val2))
-
-
 class ScopeError(Exception):
     """ Raised when scope check fails. """
 
@@ -116,7 +111,7 @@ class CiscoThreatResponseConnector(BaseConnector):
                             'type', '---'),
                         self.targets(doc.get('targets',
                                              mock_for_no_targets)[0].get(
-                            'observables', '---'))
+                            'observables', {})) or '---'
                     )
 
                     # Update responses with
@@ -176,12 +171,8 @@ class CiscoThreatResponseConnector(BaseConnector):
         }
 
     def targets(self, targets):
-        return str([{e.values()[0].encode(): e.values()[-1].encode()
-                     for e in targets if type(e) == dict}]). \
-            replace('[', ''). \
-            replace(']', ''). \
-            replace('{', ''). \
-            replace('}', '')
+        return ', '.join("'{}': '{}'".format(e['type'],
+                                            e['value']) for e in targets)
 
     def build_context_dict(self, observable, type, module,
                            observed, sensor,
@@ -244,7 +235,7 @@ class CiscoThreatResponseConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id", action_id)
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -312,7 +303,7 @@ class CiscoThreatResponseConnector(BaseConnector):
 
         except ScopeError as error:
             self.debug_print(repr(error))
-            message = error.message
+            message = error.args[0]
 
         except HTTPError as error:
             self.debug_print(repr(error))
