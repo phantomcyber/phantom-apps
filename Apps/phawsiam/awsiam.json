@@ -1,5 +1,6 @@
 {
     "appid": "d86b47a3-cba1-419a-8e35-09c27c0f7b0c",
+    "connector_id": "d86b47a3-cba1-419a-8e35-09c27c0f7b0c",
     "name": "AWS IAM",
     "description": "This app integrates with Amazon Web Services Identity Access Management (AWS IAM) to support various containment, corrective and investigate actions",
     "type": "identity management",
@@ -11,6 +12,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2020 Splunk Inc.",
     "app_version": "2.0.0",
+    "connector_version": "2.0.0",
     "utctime_updated": "2019-06-07T17:52:30.000000Z",
     "package_name": "phantom_awsiam",
     "python_version": "3",
@@ -20,6 +22,14 @@
         "Cloud, February 25 2020"
     ],
     "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "xmltodict",
+                "input_file": "wheels/xmltodict-0.12.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "access_key": {
             "description": "Access key ID",
