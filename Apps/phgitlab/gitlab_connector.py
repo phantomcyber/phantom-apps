@@ -11,8 +11,7 @@ from phantom.action_result import ActionResult
 # Usage of the consts file is recommended
 import requests
 import json
-from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
+from bs4 import BeautifulSoup, UnicodeDammit
 
 
 class RetVal(tuple):
