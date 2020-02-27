@@ -22,6 +22,14 @@
     ],
     "type": "identity management",
     "main_module": "okta_connector.py",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "bs4",
+                "input_file": "wheels/beautifulsoup4-4.8.2-py3-none-any.whl"
+            }
+        ]
+    },
     "actions": [
         {
             "read_only": true,
