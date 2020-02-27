@@ -32,7 +32,7 @@ import ipaddress
 
 class PassivetotalConnector(BaseConnector):
 
-    # actions supported by this script
+    # Actions supported by this script
     ACTION_ID_LOOKUP_IP = "lookup_ip"
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
     ACTION_ID_WHOIS_IP = "whois_ip"
