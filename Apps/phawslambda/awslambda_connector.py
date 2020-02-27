@@ -1,5 +1,5 @@
 # File: awslambda_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -18,6 +18,7 @@ import botocore.paginate as bp
 import requests
 import json
 import base64
+import six
 
 
 class RetVal(tuple):
@@ -48,7 +49,7 @@ class AwsLambdaConnector(BaseConnector):
 
         if isinstance(cur_obj, dict):
             new_dict = {}
-            for k, v in cur_obj.iteritems():
+            for k, v in six.iteritems(cur_obj):
                 if isinstance(v, br.StreamingBody):
                     content = v.read()
                     new_dict[k] = json.loads(content)
@@ -88,7 +89,7 @@ class AwsLambdaConnector(BaseConnector):
                 if empty_payload:
                     resp_json['Payload'] = {'body': "", 'statusCode': resp_json['StatusCode']}
             except Exception as e:
-                exception_message = e.args[0].encode('utf-8').strip()
+                exception_message = e.args[0].strip()
                 return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Lambda failed', exception_message), None)
         else:
             try:
@@ -174,7 +175,10 @@ class AwsLambdaConnector(BaseConnector):
         if log_type:
             args['LogType'] = log_type
         if client_context:
-            args['ClientContext'] = base64.b64encode(str(client_context)).decode('utf-8')
+            try:
+                args['ClientContext'] = base64.b64encode(str(client_context)).decode('utf-8')
+            except TypeError:  # py3
+                args['ClientContext'] = base64.b64encode(client_context.encode('UTF-8')).decode('utf-8')
         if payload:
             args['Payload'] = payload
         if qualifier:
@@ -379,7 +383,7 @@ if __name__ == '__main__':
     if (username and password):
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -392,11 +396,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -412,6 +416,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

@@ -9,18 +9,22 @@
     "product_name": "Lambda",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.1",
+    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_awslambda",
-    "main_module": "awslambda_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "awslambda_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API, February 3, 2020"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+                "input_file": "wheels/boto3-1.10.31-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
@@ -28,7 +32,7 @@
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+                "input_file": "wheels/botocore-1.13.31-py2.py3-none-any.whl"
             },
             {
                 "module": "futures",
@@ -36,7 +40,31 @@
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip3_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/boto3-1.10.31-py2.py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/botocore-1.13.31-py2.py3-none-any.whl"
+            },
+            {
+                "module": "docutils",
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
