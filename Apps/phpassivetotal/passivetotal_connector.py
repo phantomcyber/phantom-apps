@@ -8,16 +8,17 @@
 try:
     from phantom.base_connector import BaseConnector
     from phantom.action_result import ActionResult
+    import phantom.utils as ph_utils
     from phantom import status as status_strings
     from phantom import progress
     from phantom import consts
 except:
     from base_connector import BaseConnector
     from action_result import ActionResult
+    import utils as ph_utils
     import status as status_strings
     import progress
     import consts
-import phantom.utils as ph_utils
 
 # THIS Connector imports
 from passivetotal_consts import *
