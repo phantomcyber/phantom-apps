@@ -1,5 +1,6 @@
 {
     "appid": "069cbeb1-a1c7-429f-b9e8-5a02bafe6daf",
+    "connector_id": "069cbeb1-a1c7-429f-b9e8-5a02bafe6daf",
     "name": "AWS Lambda",
     "description": "This app integrates with AWS Lambda to perform lambda functions",
     "type": "devops",
@@ -11,6 +12,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
     "app_version": "2.0.0",
+    "connector_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_awslambda",
     "main_module": "awslambda_connector.py",

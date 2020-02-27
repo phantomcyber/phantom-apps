@@ -4,9 +4,14 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status as status_strings
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status as status_strings
 
 # Usage of the consts file is recommended
 from awslambda_consts import *
@@ -83,22 +88,22 @@ class AwsLambdaConnector(BaseConnector):
             try:
                 boto_func = getattr(self._client, method)
             except AttributeError:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
+                return RetVal(action_result.set_status(status_strings.APP_ERROR, "Invalid method: {0}".format(method)), None)
             try:
                 resp_json = boto_func(**kwargs)
                 if empty_payload:
                     resp_json['Payload'] = {'body': "", 'statusCode': resp_json['StatusCode']}
             except Exception as e:
                 exception_message = e.args[0].strip()
-                return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Lambda failed', exception_message), None)
+                return RetVal(action_result.set_status(status_strings.APP_ERROR, 'boto3 call to Lambda failed', exception_message), None)
         else:
             try:
                 paginator = self._client.get_paginator(method)
                 resp_json = paginator.paginate(**kwargs)
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Lambda failed', e), None)
+                return RetVal(action_result.set_status(status_strings.APP_ERROR, 'boto3 call to Lambda failed', e), None)
 
-        return phantom.APP_SUCCESS, self._sanitize_data(resp_json)
+        return status_strings.APP_SUCCESS, self._sanitize_data(resp_json)
 
     def _create_client(self, action_result):
 
@@ -122,9 +127,9 @@ class AwsLambdaConnector(BaseConnector):
                     region_name=self._region,
                     config=boto_config)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+            return action_result.set_status(status_strings.APP_ERROR, "Could not create boto3 client: {0}".format(e))
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _handle_test_connectivity(self, param):
 
@@ -139,13 +144,13 @@ class AwsLambdaConnector(BaseConnector):
         # make rest call
         ret_val, resp_json = self._make_boto_call(action_result, 'list_functions', MaxItems=1)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_invoke_lambda(self, param):
 
@@ -190,7 +195,7 @@ class AwsLambdaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_boto_call(action_result, 'invoke', False, empty_payload, **args)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -200,11 +205,11 @@ class AwsLambdaConnector(BaseConnector):
         summary = action_result.update_summary({})
         if response.get('FunctionError'):
             summary['status'] = 'Lambda invoked and returned FunctionError'
-            return action_result.set_status(phantom.APP_ERROR, "Lambda invoked and returned FunctionError")
+            return action_result.set_status(status_strings.APP_ERROR, "Lambda invoked and returned FunctionError")
         else:
             summary['status'] = 'Successfully invoked lambda'
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_functions(self, param):
 
@@ -231,11 +236,11 @@ class AwsLambdaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_boto_call(action_result, 'list_functions', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         if response.get('error', None) is not None:
-            return action_result.set_status(phantom.APP_ERROR, "{}".format(response.get('error')))
+            return action_result.set_status(status_strings.APP_ERROR, "{}".format(response.get('error')))
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -246,7 +251,7 @@ class AwsLambdaConnector(BaseConnector):
         if response.get('NextMarker'):
             summary['next_token'] = response.get('NextMarker', 'Unavailable')
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_add_permission(self, param):
 
@@ -288,7 +293,7 @@ class AwsLambdaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_boto_call(action_result, 'add_permission', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -298,11 +303,11 @@ class AwsLambdaConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['status'] = "Successfully added permission"
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def handle_action(self, param):
 
-        ret_val = phantom.APP_SUCCESS
+        ret_val = status_strings.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
@@ -346,13 +351,13 @@ class AwsLambdaConnector(BaseConnector):
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
 
 if __name__ == '__main__':
