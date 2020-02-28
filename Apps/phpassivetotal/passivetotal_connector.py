@@ -8,14 +8,12 @@
 try:
     from phantom.base_connector import BaseConnector
     from phantom.action_result import ActionResult
-    import phantom.utils as ph_utils
     from phantom import status as status_strings
     from phantom import progress
     from phantom import consts
 except:
     from base_connector import BaseConnector
     from action_result import ActionResult
-    import utils as ph_utils
     import status as status_strings
     import progress
     import consts
@@ -28,6 +26,7 @@ from datetime import timedelta
 import requests
 import json
 import ipaddress
+import urllib.parse as urlparse
 
 
 class PassivetotalConnector(BaseConnector):
@@ -50,7 +49,7 @@ class PassivetotalConnector(BaseConnector):
         if (self._base_url.endswith('/')):
             self._base_url = self._base_url[:-1]
 
-        self._host = ph_utils.get_host_from_url(self._base_url)
+        self._host = urlparse.urlparse(self._base_url).hostname
 
         self._params = {}
 
