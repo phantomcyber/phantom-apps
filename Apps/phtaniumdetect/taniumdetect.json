@@ -286,9 +286,7 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "Limit"
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
@@ -732,7 +730,10 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect sourcetype id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -906,7 +907,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.scanconfigid",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect scan config id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -1750,10 +1754,7 @@
                     "description": "User facing text to show for the label.",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "contains": [
-                        "tanium detect label id"
-                    ],
+                    "primary": false,
                     "order": 0
                 },
                 "description": {
