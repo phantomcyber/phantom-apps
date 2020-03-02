@@ -1,0 +1,543 @@
+{
+    "appid": "21e986c0-6855-4ab0-89a9-080f92f323dc",
+    "name": "Cisco Threat Response",
+    "description": "Cisco Threat Response app for Phantom provides actions allowing users to query Cisco Threat Response for verdicts and context on observables within a Phantom instance",
+    "type": "information",
+    "product_vendor": "Cisco Security",
+    "logo": "logo_ciscothreatresponse.svg",
+    "logo_dark": "logo_ciscothreatresponse_dark.svg",
+    "product_name": "Cisco Threat Response",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-11-25T14:17:29.991850Z",
+    "package_name": "phantom_ciscothreatresponse",
+    "main_module": "ciscothreatresponse_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "pypi": [
+            {
+                "module": "requests"
+            },
+            {
+                "module": "bs4"
+            },
+            {
+                "module": "pudb"
+            },
+            {
+                "module": "argparse"
+            },
+            {
+                "module": "threatresponse"
+            },
+            {
+                "module": "humanize"
+            }
+        ]
+    },
+    "configuration": {
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "client_password": {
+            "description": "Client Password",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "region": {
+            "description": "Region",
+            "data_type": "string",
+            "value_list": [
+                "US",
+                "APJC",
+                "EU"
+            ],
+            "default": "US",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "context query",
+            "identifier": "context",
+            "description": "Query Threat Response for Context",
+            "verbose": "Contextualizes an observable with Cisco Threat Response info. <hr><p> Examples of observables: </p><p> 0b4eefc0d815ac0fdc20f22add8fd2d8113be99578a4e5189122b28b201ccbd9 - clean,</p> <p> b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967 - malicious, </p><p> f90cbce099715cfc41d793bfba4f03f8a735c0b549e1bc4d29c48dd03bbd13d0 - unkown,</p><p>  91.217.162[.]158 - suspicious, </p><p> 111.26.23[.]2 - suspicious. </p>",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "observable": {
+                    "description": "Observable to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.observable",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.disposition",
+                    "data_type": "string",
+                    "example_values": [
+                        "Clean",
+                        "Malicious",
+                        "Suspicious",
+                        "Common",
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.module",
+                    "data_type": "string",
+                    "example_values": [
+                        "AMP File Reputation",
+                        "Talos Intelligence",
+                        "Umbrella",
+                        "VirusTotal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.observable",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ],
+                    "example_values": [
+                        "1.1.1.1",
+                        "cisco.com",
+                        "https://www.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.observed",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-16 09:59:13"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.sensor",
+                    "data_type": "string",
+                    "example_values": [
+                        "endpoint",
+                        "network",
+                        "process",
+                        "process.sandbox"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.target",
+                    "data_type": "string",
+                    "example_values": [
+                        "'ip': '236.199.225.24', 'hostname': 'Demo_iOS_1', 'mac_address': 'd4:0f:e7:a0:8f:f3', 'amp_computer_guid': '7c76e5e8-fcf7-488c-b4fd-696217b180e6'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip",
+                        "ipv6",
+                        "user",
+                        "domain",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "hostname",
+                        "mac_address",
+                        "file_name",
+                        "file_path",
+                        "email_messageid",
+                        "email_subject",
+                        "cisco_mid",
+                        "mutex",
+                        "device",
+                        "pki_serial",
+                        "imei",
+                        "imsi",
+                        "amp_computer_guid",
+                        "odns_identity",
+                        "odns_identity_label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.domains",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.file_hash",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.ip_address",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.observables",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.targets",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.summary.*.urls",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "ciscothreatresponse_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "verdict query",
+            "identifier": "verdict",
+            "description": "Query Threat Response for Verdict",
+            "verbose": "Provides Cisco Threat Response verdict for an observable. <hr><p> Examples of observables: </p><p> 0b4eefc0d815ac0fdc20f22add8fd2d8113be99578a4e5189122b28b201ccbd9 - clean,</p> <p> b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967 - malicious, </p><p> f90cbce099715cfc41d793bfba4f03f8a735c0b549e1bc4d29c48dd03bbd13d0 - unkown,</p><p>  91.217.162[.]158 - suspicious, </p><p> 111.26.23[.]2 - suspicious. </p>",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "observable": {
+                    "description": "Observable to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.observable",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdicts.*.disposition_name",
+                    "data_type": "string",
+                    "column_name": "Disposition",
+                    "column_order": 3,
+                    "example_values": [
+                        "Clean",
+                        "Malicious",
+                        "Suspicious",
+                        "Common",
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdicts.*.expiration",
+                    "data_type": "string",
+                    "column_name": "Expiration",
+                    "column_order": 4,
+                    "example_values": [
+                        "Indefinite",
+                        "29 days from now",
+                        "yesterday"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdicts.*.module",
+                    "data_type": "string",
+                    "column_name": "Module",
+                    "column_order": 2,
+                    "example_values": [
+                        "AMP File Reputation",
+                        "Talos Intelligence",
+                        "Umbrella",
+                        "VirusTotal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdicts.*.observable_type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1,
+                    "example_values": [
+                        "ip",
+                        "ipv6",
+                        "user",
+                        "domain",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "hostname",
+                        "mac_address",
+                        "file_name",
+                        "file_path",
+                        "email_messageid",
+                        "email_subject",
+                        "cisco_mid",
+                        "mutex",
+                        "device",
+                        "pki_serial",
+                        "imei",
+                        "imsi",
+                        "amp_computer_guid",
+                        "odns_identity",
+                        "odns_identity_label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdicts.*.observable_value",
+                    "data_type": "string",
+                    "column_name": "Observable",
+                    "column_order": 0,
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "user name",
+                        "domain",
+                        "hash",
+                        "sha256",
+                        "md5",
+                        "sha1",
+                        "url",
+                        "email",
+                        "host name",
+                        "mac address",
+                        "file name",
+                        "file path",
+                        "email id",
+                        "cisco threat response email subject",
+                        "cisco threat response cisco mid",
+                        "cisco threat response mutex",
+                        "cisco threat response device",
+                        "cisco threat response pki serial",
+                        "cisco threat response imei",
+                        "cisco threat response imsi",
+                        "cisco threat response amp computer guid",
+                        "cisco threat response odns identity",
+                        "cisco threat response odns identity label"
+                    ],
+                    "example_values": [
+                        "1.1.1.1",
+                        "cisco.com",
+                        "https://www.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "ciscothreatresponse_view.display_view_verdict"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

@@ -1,0 +1,164 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+{% block widget_content %}
+
+<!-- File: ciscothreatresponse_display_context.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+    .ciscothreatresponse a:hover {
+        text-decoration:underline;
+    }
+
+    .ciscothreatresponse .wf-h4-style {
+        font-size : 20px
+    }
+
+    .ciscothreatresponse .wf-table-vertical .dataTable td {
+        vertical-align: top;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+    }
+
+    .ciscothreatresponse .wf-table-vertical {
+        width: initial;
+        font-size: 12px;
+    }
+
+    .ciscothreatresponse .wf-table-vertical td{
+        padding: 5px;
+        border: 1px solid !important;
+    }
+
+    .ciscothreatresponse .wf-table-vertical tr td:first-child {
+        font-weight: bold;
+    }
+
+    .ciscothreatresponse .dataTable th.widget-th {
+        border-top: 1px solid !important;
+        border-bottom: 1px solid !important;
+    }
+
+    .ciscothreatresponse .impact_table {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .ciscothreatresponse .dataTable td {
+        vertical-align: top;
+    }
+
+    .ciscothreatresponse .dataTable td.widget-td a{
+        font-size: 12px;
+    }
+
+    .ciscothreatresponse .dataTable {
+        font-size: 12px;
+    }
+
+    .ciscothreatresponse .overflow-column {
+        overflow: auto;
+    }
+
+
+</style>
+
+<div class="ciscothreatresponse" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px">
+    {% for result in results %}
+        <h4 class="wf-h4-style">Summary</h4>
+            <div class="domain_info overflow-column">
+                <table class="phantom-table dataTable" id="summary">
+                    <thead>
+                        <tr>
+                            <th>Targets</th>
+                            <th>Observables</th>
+                            <th>Domains</th>
+                            <th>File Hash</th>
+                            <th>IP Address</th>
+                            <th>URLs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ result.data.summary.targets }}</td>
+                            <td>{{ result.data.summary.observables }}</td>
+                            <td>{{ result.data.summary.domains }}</td>
+                            <td>{{ result.data.summary.file_hash }}</td>
+                            <td>{{ result.data.summary.ip_address }}</td>
+                            <td>{{ result.data.summary.urls }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <h4 class="wf-h4-style">Context</h4>
+            <div class="domain_info overflow-column">
+                <table class="phantom-table dataTable" id="context">
+                    <thead>
+                        <tr>
+                            <th>Observable</th>
+                            <th>Type</th>
+                            <th>Module</th>
+                            <th>Disposition</th>
+                            <th>Observed</th>
+                            <th>Sensor</th>
+                            <th>Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for context in result.data.context %}
+                            <tr>
+                                <td>
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip','ipv6','user name', 'domain', 'hash', 'sha256', 'md5', 'sha1', 'url', 'email', 'host name', 'mac address', 'file name', 'file path', 'email id', 'cisco threat response email subject', 'cisco threat response cisco mid', 'cisco threat response mutex', 'cisco threat response device', 'cisco threat response pki serial', 'cisco threat response imei', 'cisco threat response imsi', 'cisco threat response amp computer guid', 'cisco threat response odns identity', 'cisco threat response odns identity label'], 'value':'{{ context.observable }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ context.observable }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                    </a>
+                                </td>
+                                <td>{{ context.type }}</td>
+                                <td>{{ context.module }}</td>
+                                <td>{{ context.disposition }}</td>
+                                <td>{{ context.observed }}</td>
+                                <td>{{ context.sensor }}</td>
+                                <td>{{ context.target }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    {% endfor %}
+</div>
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+
+
+{% endblock %}
