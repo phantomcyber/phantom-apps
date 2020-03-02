@@ -217,13 +217,19 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Get the parameter data
-        param_networklistid = param.get('networklistid').split(",")
+        params = {}
+
+        if param.get("includeelements"):
+            params['includeelements'] = param.get("includeelements")
+        if param.get("extended"):
+            params['extended'] = param.get("extended")
+        if param.get('networklistid'):
+            param_networklistid = param.get('networklistid').split(",")
 
         # Loop through each Network ID to retrive the data.
         for networklist in param_networklistid:
             # Format the URI
-            endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT + "/{}".format(networklist), param)
+            endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT + "/{}".format(networklist), params)
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
@@ -242,8 +248,6 @@ class AkamaiNetworkListsConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_add_element(self, param):
-        # pudb.set_trace()
-
         # Use  POST /network-list/v2/network-lists/{networkListId}/append since you can add more than one element to a list.
         # Should be easier than using the 'Add an element' function which you can only add one at a time.
 
@@ -357,7 +361,6 @@ class AkamaiNetworkListsConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_network(self, param):
-
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
