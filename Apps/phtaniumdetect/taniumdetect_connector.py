@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020 Splunk Inc.
+# Copyright (c) 2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -225,16 +225,19 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, param)
+        ids = param.get("id").split(",")
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
+        for id in ids:
+            endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, id)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Failed to delete suppression rule: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
-        action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                self.save_progress(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, ('Failed to delete suppression rule: {}').format(action_result.get_message()))
+                return action_result.get_status()
+
+            action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS), response
 
@@ -401,21 +404,22 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        state = param.get('state', '')
+        ids = param.get("id").split(",")
+        state = param.get("state", "")
 
-        endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, id)
+        for id in ids:
+            endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, id)
 
-        data = json.dumps(state)
+            data = json.dumps(state)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='put', data=data, params=None)
+            rret_val, response = self._make_rest_call(endpoint, action_result, method='put', data=data, params=None)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Failed to update notification: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                self.save_progress(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, ('Failed to update notification: {}').format(action_result.get_message()))
+                return action_result.get_status()
 
-        action_result.add_data(response)
+            action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS), response
 
@@ -448,16 +452,19 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_NOTIFICATIONS, param)
+        ids = param.get("id").split(",")
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
+        for id in ids:
+            endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, id)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Failed to delete notification: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
-        action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                self.save_progress(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, ('Failed to delete notification: {}').format(action_result.get_message()))
+                return action_result.get_status()
+
+            action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS), response
 
@@ -719,21 +726,22 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        state = param.get('state', '')
+        ids = param.get("id").split(",")
+        state = param.get("state", "")
 
-        endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
+        for id in ids:
+            endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
 
-        data = json.dumps(state)
+            data = json.dumps(state)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='put', data=data, params=None)
+            ret_val, response = self._make_rest_call(endpoint, action_result, method='put', data=data, params=None)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Failed to update state: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                self.save_progress(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, ('Failed to update state: {}').format(action_result.get_message()))
+                return action_result.get_status()
 
-        action_result.add_data(response)
+            action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS), response
 
@@ -777,16 +785,19 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS, param)
+        ids = param.get("id").split(",")
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
+        for id in ids:
+            endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, ('Failed to delete alert: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
-        action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                self.save_progress(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, ('Failed to delete alert: {}').format(action_result.get_message()))
+                return action_result.get_status()
+
+            action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
