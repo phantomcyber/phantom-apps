@@ -182,7 +182,16 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT, param)
+        params = {}
+
+        if param.get("includeelements"):
+            params['includeelements'] = param.get("includeelements")
+        if param.get("extended"):
+            params['extended'] = param.get("extended")
+        if param.get("search"):
+            params['search'] = param.get("search")
+
+        endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT, params)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
