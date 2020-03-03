@@ -1,5 +1,5 @@
 # File: skybox_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -16,16 +16,18 @@ import base64
 import ssl
 
 from datetime import datetime
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 from urllib2 import HTTPSHandler
-from suds.client import Client 
-from suds.cache import NoCache
+from suds.client import Client
+# from suds.cache import NoCache
 from suds.sudsobject import asdict
 from suds.transport.https import HttpAuthenticated
+
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
+
 
 class NoVerifyTransport(HttpAuthenticated):
     def u2handlers(self):
@@ -33,6 +35,7 @@ class NoVerifyTransport(HttpAuthenticated):
         context = ssl._create_unverified_context()
         handlers.append(HTTPSHandler(context=context))
         return handlers
+
 
 class SkyboxConnector(BaseConnector):
 
@@ -45,7 +48,6 @@ class SkyboxConnector(BaseConnector):
         self._base_url = None
 
     def _create_client(self, action_result, service):
-
         try:
             try:
                 _create_unverified_https_context = ssl._create_unverified_context
@@ -53,17 +55,26 @@ class SkyboxConnector(BaseConnector):
                 pass
             else:
                 ssl._create_default_https_context = _create_unverified_https_context
-
             wsdl_url = SKYBOX_WSDL.format(base_url=self._base_url, service=service)
             base64string = base64.encodestring('%s:%s' % (self._username, self._password)).replace('\n', '')
             authenticationHeader = {
-                "Authorization" : "Basic %s" % base64string
+                "Authorization": "Basic %s" % base64string
             }
             self._client = Client(url=wsdl_url, headers=authenticationHeader)
 
         except Exception as e:
-            #self.save_progress("Last Sent: {}\r\n\r\nLast Received: {}".format(self._client.last_sent(), self._client.last_received()))
-            return action_result.set_status(phantom.APP_ERROR, 'Could not connect to the Skybox Security API endpoint', e)
+            if e.message:
+                if isinstance(e.message, basestring):
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    try:
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                    except:
+                        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            else:
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            # self.save_progress("Last Sent: {}\r\n\r\nLast Received: {}".format(self._client.last_sent(), self._client.last_received()))
+            return action_result.set_status(phantom.APP_ERROR, 'Could not connect to the Skybox Security API endpoint {0}'.format(error_msg))
 
         return phantom.APP_SUCCESS
 
@@ -147,8 +158,6 @@ class SkyboxConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
-        config = self.get_config()
-
         resp_json = None
 
         try:
@@ -170,7 +179,6 @@ class SkyboxConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _suds_to_dict(self, sud_obj):
-
         if hasattr(sud_obj, '__keylist__'):
 
             sud_dict = asdict(sud_obj)
@@ -216,7 +224,7 @@ class SkyboxConnector(BaseConnector):
                     'start': 0,
                     'size': 10000
                 }
-            
+
                 response = self._client.service.getVulnerabilities(vuln_filter, subRange)
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, 'SOAP call to Skybox failed', e)
@@ -228,8 +236,6 @@ class SkyboxConnector(BaseConnector):
 
             if len(vulns):
                 asset.update({'vulnerabilities': vulns})
-
-
         return RetVal(phantom.APP_SUCCESS, assets)
 
     def _handle_test_connectivity(self, param):
@@ -237,9 +243,8 @@ class SkyboxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Testing network service for connectivity...")
-        
-        ret_val = self._create_client(action_result, SKYBOX_SERVICE_NETWORK)
 
+        ret_val = self._create_client(action_result, SKYBOX_SERVICE_NETWORK)
         if (phantom.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
@@ -259,9 +264,7 @@ class SkyboxConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
         ip = param['ip']
-
         ret_val = self._create_client(action_result, SKYBOX_SERVICE_NETWORK)
 
         if phantom.is_fail(ret_val):
@@ -272,10 +275,10 @@ class SkyboxConnector(BaseConnector):
                 'start': 0,
                 'size': 10000
             }
-        
+
             response = self._client.service.findAssetsByIps(ip, subRange)
         except Exception as e:
-            #self.save_progress("Last Sent: {}\r\n\r\nLast Received: {}".format(self._client.last_sent(), self._client.last_received()))
+            # self.save_progress("Last Sent: {}\r\n\r\nLast Received: {}".format(self._client.last_sent(), self._client.last_received()))
             return action_result.set_status(phantom.APP_ERROR, 'SOAP call to Skybox failed', e)
 
         if not response:
@@ -319,10 +322,11 @@ class SkyboxConnector(BaseConnector):
         config = self.get_config()
 
         self._base_url = config.get(SKYBOX_CONFIG_BASE_URL).rstrip('/')
-        self._auth = base64.b64encode('{0}:{1}'.format(config[SKYBOX_CONFIG_USERNAME], config[SKYBOX_CONFIG_PASSWORD]))
-        self._username = config[SKYBOX_CONFIG_USERNAME]
-        self._password = config[SKYBOX_CONFIG_PASSWORD]
-
+        self._base_url = UnicodeDammit(self._base_url).unicode_markup.encode('utf-8')
+        self._username = UnicodeDammit(config[SKYBOX_CONFIG_USERNAME]).unicode_markup.encode('utf-8')
+        self._password = UnicodeDammit(config[SKYBOX_CONFIG_PASSWORD]).unicode_markup.encode('utf-8')
+        self._auth = base64.b64encode('{0}:{1}'.format(self._username, self._password))
+        self._auth = UnicodeDammit(self._auth).unicode_markup.encode('utf-8')
         return phantom.APP_SUCCESS
 
     def finalize(self):

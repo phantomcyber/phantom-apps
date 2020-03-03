@@ -1,20 +1,20 @@
 {
     "appid": "0152eaca-38bd-4be6-8ff2-f64edcfa8b9e",
     "name": "Skybox",
-    "description": "This app integrates with Skybox to provide several investigative actions",
+    "description": "This app integrates with Skybox to provide several investigative action",
     "type": "information",
     "product_vendor": "Skybox Security",
-    "logo": "skybox.svg",
-    "logo_dark": "skybox_dark.svg",
+    "logo": "logo_skybox.svg",
+    "logo_dark": "logo_skybox_dark.svg",
     "product_name": "Skybox",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
+    "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.3",
     "utctime_updated": "2019-08-08T20:41:59.051390Z",
     "package_name": "phantom_skybox",
     "main_module": "skybox_connector.pyc",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -59,7 +59,7 @@
             "action": "lookup ip",
             "identifier": "lookup_ip",
             "description": "Checks Skybox for the existence of the IP among the model's assets",
-            "verbose": "If an CIDR block is specified, the action will return all assets in that range.",
+            "verbose": "If a CIDR block is specified, the action will return all assets in that range.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -67,8 +67,11 @@
                     "description": "IP (or CIDR) to lookup",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 0
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -86,7 +89,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
