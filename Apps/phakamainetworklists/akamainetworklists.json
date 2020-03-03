@@ -21,7 +21,6 @@
             "description": "Base URL for the API. This URL is given to you when you setup the API Client in the Akamai Control Center. e.g. https://akaa-WWWWWWWWWWWW.luna.akamaiapis.net",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "",
             "order": 0
         },
@@ -29,7 +28,6 @@
             "description": "Access Token for the API.",
             "data_type": "password",
             "required": true,
-            "value_list": [],
             "default": "",
             "order": 1
         },
@@ -37,7 +35,6 @@
             "description": "Client Token for the API.",
             "data_type": "password",
             "required": true,
-            "value_list": [],
             "default": "",
             "order": 2
         },
@@ -45,7 +42,6 @@
             "description": "Client Secret for the API.",
             "data_type": "password",
             "required": true,
-            "value_list": [],
             "default": "",
             "order": 3
         }
@@ -55,7 +51,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration.",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -74,21 +69,20 @@
                     "description": "Only list items that match the specified substring in any network list’s name or list of items.",
                     "data_type": "string",
                     "required": false,
-                    "default": "",
                     "order": 0
                 },
                 "extended": {
-                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments.",
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. (Default: false)",
                     "data_type": "boolean",
                     "required": false,
-                    "default": "",
+                    "default": false,
                     "order": 1
                 },
                 "includeelements": {
-                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects.",
+                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects. (Default: false)",
                     "data_type": "boolean",
                     "required": false,
-                    "default": "",
+                    "default": false,
                     "order": 2
                 }
             },
@@ -206,8 +200,7 @@
         {
             "action": "get network",
             "identifier": "get_network",
-            "description": "Get a specific network list.",
-            "verbose": "Gets a network list’s most recent syncPoint version.",
+            "description": "Gets a network list’s most recent syncPoint version.",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -218,23 +211,22 @@
                         "akamai networklist id"
                     ],
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "allow_list": true,
                     "primary": true
                 },
                 "extended": {
-                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. ",
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. (Default: false)",
                     "data_type": "boolean",
                     "required": false,
-                    "default": "",
+                    "default": false,
                     "order": 1
                 },
                 "includeelements": {
-                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects.",
+                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects. (Default: false)",
                     "data_type": "boolean",
                     "required": false,
-                    "default": "",
+                    "default": false,
                     "order": 2
                 }
             },
@@ -276,7 +268,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -355,8 +347,7 @@
         {
             "action": "create network",
             "identifier": "create_network",
-            "description": "Create a network list.",
-            "verbose": "Creates a new network list.",
+            "description": "Create a new network list.",
             "type": "generic",
             "read_only": false,
             "undo": "delete network",
@@ -365,7 +356,6 @@
                     "description": "Name for the new network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0
                 },
                 "type": {
@@ -373,21 +363,19 @@
                     "data_type": "string",
                     "required": true,
                     "value_list": ["IP", "GEO"],
-                    "default": "",
+                    "default": "IP",
                     "order": 1
                 },
                 "description": {
                     "description": "Description of the new network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 2
                 },
                 "list": {
                     "description": "IP(s) for the new network list. Comma seperate list allowed.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 3,
                     "allow_list": true,
                     "contains": [
@@ -440,7 +428,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -489,8 +477,7 @@
         {
             "action": "delete network",
             "identifier": "delete_network",
-            "description": "Delete a network list.",
-            "verbose": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty out its list of elements.",
+            "description": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty out its list of elements.",
             "type": "generic",
             "read_only": false,
             "undo": "create network",
@@ -499,7 +486,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -542,7 +528,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Sync Point",
                     "column_order": 3,
                     "contains": [
@@ -570,8 +556,7 @@
         {
             "action": "update network",
             "identifier": "update_network",
-            "description": "Update a network list.",
-            "verbose": "Modify the network list items and properties. Allows you to set the name, description and set of network list items to the resource. The current state of the list will be replaced with the properties and items you provide. The type cannot be changed.",
+            "description": "Update the network list items and properties. Allows you to set the name, description and set of network list items to the resource. The current state of the list will be replaced with the properties and items you provide. The type cannot be changed.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -579,7 +564,6 @@
                     "description": "Unique identifier for each network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -590,14 +574,12 @@
                     "description": "Update or change the name of the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 1
                 },
                 "description": {
                     "description": "Update or change the description of the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 2
                 }
             },
@@ -641,7 +623,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -690,8 +672,7 @@
         {
             "action": "add element",
             "identifier": "add_element",
-            "description": "Add element(s) to a network list.",
-            "verbose": "Adds the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
+            "description": "Adds the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
             "undo": "remove element",
@@ -700,7 +681,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -711,7 +691,6 @@
                     "description": "Element(s) to add to the network list. Comma seperate list allowed.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 1,
                     "allow_list": true,
                     "contains": [
@@ -759,7 +738,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -814,8 +793,7 @@
         {
             "action": "remove element",
             "identifier": "remove_element",
-            "description": "Remove element(s) to a network list.",
-            "verbose": "Remove the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
+            "description": "Remove the specified element(s) to a list. If the network list’s type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "read_only": false,
             "undo": "add element",
@@ -824,7 +802,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -835,7 +812,6 @@
                     "description": "Element(s) to add to the network list. Comma seperate list allowed.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 1,
                     "allow_list": true,
                     "contains": [
@@ -883,7 +859,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -938,8 +914,7 @@
         {
             "action": "activate network",
             "identifier": "activate_network",
-            "description": "Activate a network list to STAGING or PRODUCTION.",
-            "verbose": "Activate the most recent syncPoint version of a network list in either the STAGING or PRODUCTION environment.",
+            "description": "Activate the most recent syncPoint version of a network list in either the STAGING or PRODUCTION environment.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -947,7 +922,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -955,10 +929,10 @@
                     "primary": true
                 },
                 "environment": {
-                    "description": "Environment to activate the network to.",
+                    "description": "Environment to activate the network to. (Default: STAGING)",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
+                    "default": "STAGING",
                     "value_list": ["PRODUCTION", "STAGING"],
                     "order": 1
                 },
@@ -966,14 +940,12 @@
                     "description": "Comments to add to the network.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 2
                 },
                 "notification": {
                     "description": "Notification Recipients for the network list. Comma seperate list allowed.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 3,
                     "allow_list": true
                 }
@@ -1009,7 +981,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.activationId",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Name",
                     "column_order": 1,
                     "contains": [
@@ -1030,7 +1002,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "List",
                     "column_order": 4,
                     "contains": [
@@ -1048,13 +1020,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.fast",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "column_name": "Type",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.dispatchCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Description",
                     "column_order": 7
                 },
@@ -1079,8 +1051,7 @@
         {
             "action": "activation status",
             "identifier": "activation_status",
-            "description": "Shows a network list’s activation status.",
-            "verbose": "Shows a network list’s activation status on either the STAGING or PRODUCTION environment.",
+            "description": "Shows a network list’s activation status on either the STAGING or PRODUCTION environment.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1088,7 +1059,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -1096,10 +1066,10 @@
                     "primary": true
                 },
                 "environment": {
-                    "description": "Environment to activate the network to.",
+                    "description": "Environment to activate the network to. (Default: STAGING)",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
+                    "default": "STAGING",
                     "value_list": ["PRODUCTION", "STAGING"],
                     "order": 1
                 }
@@ -1128,7 +1098,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.activationId",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Activation ID",
                     "column_order": 1,
                     "contains": [
@@ -1149,7 +1119,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Sync Point",
                     "column_order": 4,
                     "contains": [
@@ -1167,13 +1137,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.fast",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "column_name": "Fast",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.dispatchCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Dispatch Count",
                     "column_order": 7
                 },
@@ -1198,8 +1168,7 @@
         {
             "action": "activation snapshot",
             "identifier": "activation_snapshot",
-            "description": "Get a network list’s version when it was activated.",
-            "verbose": "Gets a version of a network list in its state when activated, with each version identified by its syncPoint value. You can only get syncPoint versions that have been activated.",
+            "description": "Gets a version of a network list in its state when activated, with each version identified by its syncPoint value. You can only get syncPoint versions that have been activated.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1207,7 +1176,6 @@
                     "description": "Unique identifier for the network list.",
                     "data_type": "string",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "contains": [
                         "akamai networklist id"
@@ -1218,7 +1186,6 @@
                     "description": "The network list version for which to retrieve the snapshot.",
                     "data_type": "numeric",
                     "required": true,
-                    "default": "",
                     "order": 1,
                     "primary": true,
                     "contains": [
@@ -1226,10 +1193,10 @@
                     ]
                 },
                 "extended": {
-                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments.",
+                    "description": "When enabled, provides additional response data identifying who created and updated the list and when, and the network list’s deployment status in both STAGING and PRODUCTION environments. (Default: false)",
                     "data_type": "boolean",
                     "required": false,
-                    "default": "",
+                    "default": false,
                     "order": 2
                 }
             },
@@ -1253,14 +1220,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.syncpoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "akamai networklist syncpoint"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.extended",
-                    "data_type": "string"
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -1276,7 +1243,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.elementCount",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Element Count",
                     "column_order": 3
                 },
@@ -1306,7 +1273,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Sync Point",
                     "column_order": 6,
                     "contains": [
@@ -1335,15 +1302,13 @@
             "action": "activation details",
             "identifier": "activation_details",
             "description": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the Get activation status operation.",
-            "verbose": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the Get activation status operation.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "activationid": {
                     "description": "Unique identifier for the network list.",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "required": true,
-                    "default": "",
                     "order": 0,
                     "primay": true,
                     "contains": [
@@ -1364,14 +1329,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.activationid",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "akamai networklist activationid"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.activationId",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Activation ID",
                     "column_order": 1,
                     "contains": [
@@ -1398,7 +1363,7 @@
                 },              
                 {
                     "data_path": "action_result.data.*.fast",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "column_name": "Fast",
                     "column_order": 5
                 },
@@ -1416,7 +1381,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.syncPoint",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Sync Point",
                     "column_order": 8,
                     "contains": [
