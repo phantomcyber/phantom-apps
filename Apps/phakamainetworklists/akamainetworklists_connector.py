@@ -169,7 +169,6 @@ class AkamaiNetworkListsConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS), response
 
     def _handle_list_networks(self, param):
-        # pudb.set_trace()
         """ This function is used list out all the networks lists details. We can also search by name to get a specific network list.
         :param param: Dictionary of input parameters
         :return: status success/failure
