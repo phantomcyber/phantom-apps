@@ -623,9 +623,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
                 else:
                     endpoint += "&{}={}".format(param, value)
         else:
-            self.save_progress('Error while processing parameters for endpoint {endpoint}. '
-                               'No parameters to process!'.format(endpoint=endpoint))
-            return self.set_status(phantom.APP_ERROR)
+            endpoint = endpoint
 
         return endpoint
 
