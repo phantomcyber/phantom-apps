@@ -19,7 +19,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup, UnicodeDammit
 from urllib2 import HTTPSHandler
 from suds.client import Client
-# from suds.cache import NoCache
 from suds.sudsobject import asdict
 from suds.transport.https import HttpAuthenticated
 
@@ -55,6 +54,7 @@ class SkyboxConnector(BaseConnector):
                 pass
             else:
                 ssl._create_default_https_context = _create_unverified_https_context
+
             wsdl_url = SKYBOX_WSDL.format(base_url=self._base_url, service=service)
             base64string = base64.encodestring('%s:%s' % (self._username, self._password)).replace('\n', '')
             authenticationHeader = {
@@ -64,13 +64,10 @@ class SkyboxConnector(BaseConnector):
 
         except Exception as e:
             if e.message:
-                if isinstance(e.message, basestring):
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
-                else:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
             else:
                 error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
             # self.save_progress("Last Sent: {}\r\n\r\nLast Received: {}".format(self._client.last_sent(), self._client.last_received()))
@@ -324,9 +321,8 @@ class SkyboxConnector(BaseConnector):
         self._base_url = config.get(SKYBOX_CONFIG_BASE_URL).rstrip('/')
         self._base_url = UnicodeDammit(self._base_url).unicode_markup.encode('utf-8')
         self._username = UnicodeDammit(config[SKYBOX_CONFIG_USERNAME]).unicode_markup.encode('utf-8')
-        self._password = UnicodeDammit(config[SKYBOX_CONFIG_PASSWORD]).unicode_markup.encode('utf-8')
+        self._password = config[SKYBOX_CONFIG_PASSWORD]
         self._auth = base64.b64encode('{0}:{1}'.format(self._username, self._password))
-        self._auth = UnicodeDammit(self._auth).unicode_markup.encode('utf-8')
         return phantom.APP_SUCCESS
 
     def finalize(self):

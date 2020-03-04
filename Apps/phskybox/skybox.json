@@ -1,7 +1,7 @@
 {
     "appid": "0152eaca-38bd-4be6-8ff2-f64edcfa8b9e",
     "name": "Skybox",
-    "description": "This app integrates with Skybox to provide several investigative action",
+    "description": "This app integrates with Skybox to provide an investigative action",
     "type": "information",
     "product_vendor": "Skybox Security",
     "logo": "logo_skybox.svg",
@@ -95,10 +95,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
