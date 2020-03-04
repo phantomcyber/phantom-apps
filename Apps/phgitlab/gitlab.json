@@ -4,8 +4,8 @@
     "description": "This app integrates with a GitLab instance to perform various lookups and execute CI/CD pipelines",
     "type": "devops",
     "product_vendor": "GitLab",
-    "logo": "gitlab.png",
-    "logo_dark": "gitlab_dark.png",
+    "logo": "logo_gitlab.svg",
+    "logo_dark": "logo_gitlab_dark.svg",
     "product_name": "GitLab",
     "product_version_regex": ".*",
     "publisher": "Peter Bertel",
@@ -14,7 +14,7 @@
     "utctime_updated": "2019-08-26T01:28:27.791651Z",
     "package_name": "phantom_gitlab",
     "main_module": "gitlab_connector.py",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "gitlab_location": {
@@ -45,18 +45,30 @@
             "action": "list users",
             "identifier": "list_users",
             "description": "List all the users in the GitLab instance",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {},
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -95,18 +107,26 @@
             "action": "list projects",
             "identifier": "list_projects",
             "description": "List all the projects in the GitLab instance",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {},
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -118,14 +138,14 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.name",
+                    "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
                     "example_values": [
                         "project-name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.path",
+                    "data_path": "action_result.data.*.*.path",
                     "data_type": "string",
                     "example_values": [
                         "path-to/project-name"
@@ -141,7 +161,7 @@
             "action": "list branches",
             "identifier": "list_branches",
             "description": "List the branches of a GitLab project",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "project_id": {
@@ -159,18 +179,25 @@
                 {
                     "data_path": "action_result.parameter.project_id",
                     "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "project_id",
+                    "column_name": "Project ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -226,21 +253,19 @@
                 {
                     "data_path": "action_result.parameter.project_id",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "trigger_name",
+                    "column_name": "Project ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.trigger_name",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "trigger_name",
+                    "column_name": "Trigger Name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary.trigger_token",
                     "data_type": "string",
-                    "column_name": "trigger_name",
+                    "column_name": "Trigger Token",
                     "example_values": [
                         "100fadfa454da4b3e1d4d3b9243d78"
                     ],
@@ -249,11 +274,19 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -274,7 +307,8 @@
             "action": "list triggers",
             "identifier": "list_triggers",
             "description": "List the pipeline triggers of a GitLab project",
-            "type": "generic",
+            "verbose": "List the triggers of a GitLab project.",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "project_id": {
@@ -292,18 +326,25 @@
                 {
                     "data_path": "action_result.parameter.project_id",
                     "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "project_id",
+                    "column_name": "Project ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -386,50 +427,55 @@
                 {
                     "data_path": "action_result.parameter.project_id",
                     "data_type": "numeric",
-                    "contains": [],
-                    "column_name": "project_id",
+                    "column_name": "Project ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.trigger_token",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "trigger_token",
+                    "column_name": "Trigger Token",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.branch",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "branch",
-                    "column_order": 2
+                    "column_name": "Branch",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary.pipeline_id",
                     "data_type": "string",
-                    "column_name": "pipeline_id",
+                    "column_name": "Pipeline ID",
                     "example_values": [
                         "21"
-                    ],
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.summary.pipeline_web_url",
-                    "data_type": "string",
-                    "column_name": "pipeline_web_url",
-                    "example_values": [
-                        "https://gitlab.domain.com/test-group/test-project/pipelines/21"
                     ],
                     "column_order": 4
                 },
                 {
+                    "data_path": "action_result.summary.pipeline_web_url",
+                    "data_type": "string",
+                    "column_name": "Pipeline Web URL",
+                    "example_values": [
+                        "https://gitlab.domain.com/test-group/test-project/pipelines/21"
+                    ],
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 5
+                    "column_name": "Status",
+                    "column_order": 5,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
