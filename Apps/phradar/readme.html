@@ -1,0 +1,37 @@
+<!--
+File: readme.html
+Copyright (c) 2020 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+    <head></head>
+    <body>
+        <h2>Why Radar</h2>
+        <p>Every day, organizations experience privacy and security incidents involving regulated data. Both privacy and security teams are challenged to keep up with ever-changing global data breach notification laws. Furthermore, these teams must efficiently and accurately determine which incidents require notification to regulators or customers based on a patchwork of increasingly complex data breach regulations. That’s why we created Radar.</p>
+        <p>Organizations rely on Radar to reduce risk, save time and cost, and build trust by demonstrating a strong culture of compliance through a consistent and defensible incident response management process.</p>
+        <h3>Incident Response Automation</h3>
+        <p>Automation in incident response eliminates the subjectivity and inconsistency that is inherent in manual approaches. Leveraging technology ensures consistency, accelerates the decision-making process, and eliminates the risk of over- and under-notifying. </p>
+        <h3>Reduce Risk</h3>
+        <p>With a streamlined incident response process your organization can eliminate subjectivity with consistent incident risk scoring and our patented law engine that provides accurate data breach notification guidance.</p>
+        <h3>Save Time & Cost</h3>
+        <p>Radar will cut your team’s incident response efforts in half with our automated guidance based on state, federal, and global data breach notification regulations.</p>
+        <h3>Build Trust</h3>
+        <p>With Radar you can make accurate notification decisions every time and demonstrate a strong culture of compliance. Incident details, assessment results, notifications, and benchmarking data are easily accessible and stored in a central repository, meeting the needs of auditors, regulators, and senior management.</p>
+
+        <!--TODO: include steps here for enabling the connector in Radar-->
+        <!--<h2>Authentication Steps and Configuration</h2>-->
+
+        <h2>Asset Configuration</h2>
+        <p>Configuration that must be set are under the "Asset Settings" tab. Below lists some details for each configuration setting:</p>
+        <ul>
+            <li>Radar API Bearer Token - A valid Radar bearer token with privileges for reading and writing radar incidents and notes.</li>
+            <li>Radar API URL - defaults to the production URL, but can be set to a test or staging URL.</li>
+            <li>Incident Group ID - must be set to the incident group of the user associated with the bearer token.</li>
+            <li>Time Zone - The timezone to be associated with the asset. Used to set the Radar incident 'discovered' time.</li>
+        </ul>
+        <h4>Environment Variables</h4>
+        <p>Under the 'Advanced' section of the asset settings, set environment variables to configure the app settings:</p>
+        <p><b>ALLOW_SELF_SIGNED_CERTS</b> - Should be set to '1' to turn off verification of SSL Certificates during action requests.</p>
+    </body>
+</html>
