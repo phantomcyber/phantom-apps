@@ -306,7 +306,7 @@
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "The ID of the rule to delete, Multiple occurrences are supported",
+                    "description": "The ID of the rule to delete; multiple occurrences are supported",
                     "data_type": "numeric",
                     "required": true,
                     "order": 0
@@ -358,8 +358,7 @@
         {
             "action": "get source",
             "identifier": "get_source",
-            "description": "Get a single source",
-            "verbose": "Get a single source by ID.",
+            "description": "Get a single source by ID",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -577,8 +576,7 @@
         {
             "action": "get sourcetype",
             "identifier": "get_sourcetype",
-            "description": "Show details for a single source type",
-            "verbose": "Show details for a single source type by ID.",
+            "description": "Show details for a single source type by ID",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -708,17 +706,17 @@
             "read_only": true,
             "parameters": {
                 "num_days": {
-                    "description": "Show counts for the last \"num_days\" [Default: 30]",
+                    "description": "Past number of days to account for (Default: 30)",
                     "data_type": "numeric",
                     "order": 0
                 },
                 "inteldocid": {
-                    "description": "filter by notifications with the given intel doc ID",
+                    "description": "Intel doc ID to filter by",
                     "data_type": "numeric",
                     "order": 1
                 },
                 "scanconfigid": {
-                    "description": "filter by notifications with the given scan config ID",
+                    "description": "Scan config ID to filter by",
                     "data_type": "numeric",
                     "order": 2
                 }
@@ -843,7 +841,7 @@
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "the ID of the notification to update, multiple occurrences are supported",
+                    "description": "The ID of the notification to update, multiple occurrences are supported",
                     "data_type": "numeric",
                     "required": true,
                     "order": 0
@@ -923,7 +921,7 @@
                     "order": 0
                 },
                 "sort": {
-                    "description": "A comma separated list of +/- pairs controlling sort ordering",
+                    "description": "A comma-separated list of +/- pairs controlling sort ordering",
                     "data_type": "string",
                     "order": 1
                 },
@@ -1524,27 +1522,26 @@
             "action": "list intel",
             "identifier": "list_intel",
             "description": "List intel documents",
-            "verbose": "List intel documents; Optional filtering, sorting, pagination.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "name": {
-                    "description": "include only IntelDocs whose \"name\" matches the given field",
+                    "description": "Include only IntelDocs whose \"name\" matches the given field",
                     "data_type": "string",
                     "order": 0
                 },
                 "description": {
-                    "description": "include only IntelDocs whose \"description\" matches the given field",
+                    "description": "Include only IntelDocs whose \"description\" matches the given field",
                     "data_type": "string",
                     "order": 1
                 },
                 "type": {
-                    "description": "include only IntelDocs whose \"type: matches the given field",
+                    "description": "Include only IntelDocs whose \"type\" matches the given field",
                     "data_type": "string",
                     "order": 2
                 },
                 "sort": {
-                    "description": "use to sort columns using \"+/-\", comma separate for multiples. Ex: -alertedAt,+name",
+                    "description": "Use to sort columns using \"+/-\", comma-separate for multiples. Ex: -alertedAt,+name",
                     "data_type": "string",
                     "order": 3
                 },
@@ -1559,7 +1556,7 @@
                     "order": 5
                 },
                 "nolimit": {
-                    "description": "if TRUE will not limit the number of items returned",
+                    "description": "If TRUE will not limit the number of items returned",
                     "data_type": "boolean",
                     "order": 6
                 }
@@ -1792,7 +1789,7 @@
             "read_only": true,
             "parameters": {
                 "num_days": {
-                    "description": "Show counts for the last number of days. [Default: 30]",
+                    "description": "Past number of days to account for (Default: 30)",
                     "data_type": "numeric",
                     "order": 0
                 },
