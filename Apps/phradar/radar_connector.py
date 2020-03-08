@@ -66,12 +66,10 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
-        # Try a json parse
         resp_json = None
         try:
             resp_json = r.json()
             if r.links and r.links["ui"]:
-                self.save_progress(f"Link info {r.links['ui']}")
                 resp_json["url"] = r.links["ui"]["url"]
         except ValueError as ex:
             if 200 <= r.status_code < 399:
@@ -93,8 +91,9 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, resp, action_result):
-        # store the r_text in debug data, it will get dumped in the logs if the action fails
-        # if hasattr(action_result, "add_debug_data"):
+        self.save_progress(f"process response")
+
+        # store the r_text in debug data, it will get dumped in the logs if the action fail
         action_result.add_debug_data({"r_status_code": resp.status_code})
         action_result.add_debug_data({"r_text": resp.text})
         action_result.add_debug_data({"r_headers": resp.headers})
@@ -122,28 +121,25 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
-        # **kwargs can be any additional parameters that requests.request accepts
-        self.save_progress(f"In _make_rest_call: {method}")
+        self.save_progress(f"make rest call")
+
+        url = f"{self._api_url}{endpoint}"
         config = self.get_config()
         resp_json = None
+        request_headers = {
+            "User-Agent": "Splunk Phantom",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {config['radar_api_token']}"
+        }
+
+        self.save_progress(f"send {method} request to {url}")
 
         try:
-            self.save_progress(f"HTTP Method {method}")
             request_func = getattr(requests, method)
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
-            self.save_progress("Creating Radar headers")
-            request_headers = {
-                "User-Agent": "Splunk Phantom",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {config['radar_api_token']}"
-            }
-
-            url = f"{self._api_url}{endpoint}"
-            self.save_progress(f"Url to Radar: {url}")
-
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
             return self._process_response(resp, action_result)
 
@@ -157,22 +153,23 @@ class RadarConnector(BaseConnector):
             )
 
     def _handle_test_connectivity(self, param):
+        self.save_progress("connect to Radar")
+
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("Connecting to Radar")
-
         radar_val, response = self._make_rest_call("/incidents", action_result, method="get", params=None)
         if phantom.is_fail(radar_val):
-            self.save_progress("Radar Test Connectivity Failed.")
+            self.save_progress("Radar test connectivity fail.")
             return action_result.get_status()
 
-        self.save_progress("Radar Test Connectivity Passed")
+        self.save_progress("radar test connectivity success")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_privacy_incident(self, param):
+        self.save_progress(f"run action {self.get_action_identifier()}")
+
         # Add an action result object to self (BaseConnector) to represent the action for this param
-        self.save_progress(f"Adding action result for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param.get("name", "Default name")
         description = param.get("description", "Default description")
@@ -192,7 +189,7 @@ class RadarConnector(BaseConnector):
 
         uri = f"{phantom_base_url}{container_path}"
 
-        self.save_progress("Setting up payload")
+        self.save_progress(f"create payload")
 
         body = {
             "incident_group_id": incident_group,
@@ -209,10 +206,7 @@ class RadarConnector(BaseConnector):
             }
         }
 
-        # make rest call
-        self.save_progress(f"Creating Radar incident: {self.get_action_identifier()}")
         radar_val, data = self._make_rest_call("/incidents", action_result, method="post", data=json.dumps(body))
-        self.save_progress("Processing response")
 
         if phantom.is_fail(radar_val):
             return action_result.get_status()
@@ -223,17 +217,15 @@ class RadarConnector(BaseConnector):
         data["group"] = incident_group
         data["discovered"] = f"{date_time} / {time_zone}"
 
-        # Add the response into the data section
-        self.save_progress("Adding data to action result")
+        self.save_progress("add data to action result")
         action_result.add_data(data)
 
-        self.save_progress("Creating dictionary")
-
         # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_system_settings(self):
+        self.save_progress("get system settings")
+
         url = f"{self.get_phantom_base_url()}rest/system_settings"
         try:
             resp = requests.get(url, verify=False)
@@ -244,8 +236,9 @@ class RadarConnector(BaseConnector):
         return resp_json
 
     def _handle_add_note_to_privacy_incident(self, param):
+        self.save_progress(f"run action {self.get_action_identifier()}")
+
         # Add an action result object to self (BaseConnector) to represent the action for this param
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         content = param.get("content")
         category = "Splunk Phantom"
@@ -267,12 +260,10 @@ class RadarConnector(BaseConnector):
         data["content"] = content
         data["category"] = category
 
-        # Add the response into the data section
-        self.save_progress("Adding data to action result")
+        self.save_progress("add data to action result")
         action_result.add_data(data)
 
         # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -280,8 +271,6 @@ class RadarConnector(BaseConnector):
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
-
-        self.debug_print("action_id", self.get_action_identifier())
 
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
