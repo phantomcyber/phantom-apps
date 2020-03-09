@@ -42,7 +42,7 @@ class RadarConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _process_empty_response(self, response, action_result):
-        if response.status_code == 200:
+        if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response, no information in header"), None)
@@ -65,15 +65,15 @@ class RadarConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_json_response(self, r, action_result):
+    def _process_json_response(self, response, action_result):
         resp_json = None
         try:
-            resp_json = r.json()
-            if r.links and r.links["ui"]:
-                resp_json["url"] = r.links["ui"]["url"]
+            resp_json = response.json()
+            if response.links and response.links["ui"]:
+                resp_json["url"] = response.links["ui"]["url"]
         except ValueError as ex:
-            if 200 <= r.status_code < 399:
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(r.headers)})
+            if 200 <= response.status_code < 399:
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
             else:
                 return RetVal(
                     action_result.set_status(
@@ -83,10 +83,10 @@ class RadarConnector(BaseConnector):
                     None
                 )
 
-        if 200 <= r.status_code < 399:
+        if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = f"JSON Response Status Code: {r.status_code}: {r.text.replace(u'{', '{{').replace(u'}', '}}')}"
+        message = f"JSON Response Status Code: {response.status_code}: {response.text.replace(u'{', '{{').replace(u'}', '}}')}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
