@@ -106,12 +106,12 @@ class RadarConnector(BaseConnector):
 
         # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY"s return HTML, this function parses
+        # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
         if "html" in resp.headers.get("Content-Type", ""):
             return self._process_html_response(resp, action_result)
 
-        # it"s not content-type that is to be parsed, handle an empty response
+        # it's not content-type that is to be parsed, handle an empty response
         if not resp.text:
             return self._process_empty_response(resp, action_result)
 
