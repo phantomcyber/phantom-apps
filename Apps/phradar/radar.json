@@ -412,8 +412,8 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "create incident",
-      "identifier": "create_incident",
+      "action": "create privacy incident",
+      "identifier": "create_privacy_incident",
       "description": "Create Radar Privacy Incident",
       "verbose": "<p>This action creates a privacy incident in Radar using the following phantom system and app configurations:</p>\n<h4>Company Settings</h4>\n<p><b>Base URL For Phantom Appliance</b> - used to link the created incident's 'intake method' to this instance of Phantom.</p>\n\n<h4>Asset Configuration</h4>\n<p>Asset configuration values are used as follows to create the incident:</p>\n<p><b>Incident Group ID</b> - must be specified in the asset configuration for authorization.</p>\n<p><b>Time Zone</b> - the current moment that this action is triggered is used to set the created incident's 'discovered' date and time. The asset <b>Time Zone</b> is used to specify the 'discovered' time zone offset.</p>\n\n\n<h4>Container Information</h4>\n<p>The container ID for the associated phantom event or case is use to specify the Radar incident channel ID. This is used to associate the created incident to the container</p>\n\n<h4>Action Parameters</h4>\n<p>The action parameters are used to set the Radar incident <b>name</b> and <b>description</b></p>\n",
       "type": "generic",
