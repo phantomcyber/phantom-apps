@@ -166,7 +166,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("radar test connectivity success")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_create_privacy_incident(self, param):
+    def _handle_create_incident(self, param):
         self.save_progress(f"run action {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -235,7 +235,7 @@ class RadarConnector(BaseConnector):
 
         return resp_json
 
-    def _handle_add_note_to_privacy_incident(self, param):
+    def _handle_add_note(self, param):
         self.save_progress(f"run action {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -275,11 +275,11 @@ class RadarConnector(BaseConnector):
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == "create_privacy_incident":
-            ret_val = self._handle_create_privacy_incident(param)
+        elif action_id == "create_incident":
+            ret_val = self._handle_create_incident(param)
 
-        elif action_id == "add_note_to_privacy_incident":
-            ret_val = self._handle_add_note_to_privacy_incident(param)
+        elif action_id == "add_note":
+            ret_val = self._handle_add_note(param)
 
         return ret_val
 
