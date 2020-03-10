@@ -77,7 +77,10 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             {% for incident in incidents %}
             <tr>
             <td>
-                {{incident.id}}
+                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.id }}' }], 0, {{ container.id }}, null, false);">
+                    {{incident.id}}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
             </td>
             <td>
                 {{incident.name}}
@@ -111,10 +114,16 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             {% for note in notes %}
             <tr>
                 <td>
-                    {{note.incident_id}}
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                        {{note.incident_id}}
+                        &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
                 </td>
                 <td>
-                    {{note.id}}
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
+                        {{note.id}}
+                        &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
                 </td>
                 <td>
                     {{note.category}}
