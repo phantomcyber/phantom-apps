@@ -57,7 +57,8 @@ class RadarConnector(BaseConnector):
             split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = "\n".join(split_lines)
-        except:
+        except Exception as ex:
+            self.debug_print(f"Process HTML error during action: {self.get_action_identifier()}. Error:", ex)
             error_text = "Cannot parse error details"
 
         message = f"HTML Response Status Code: {status_code}: {error_text}\n"
@@ -75,6 +76,7 @@ class RadarConnector(BaseConnector):
             if 200 <= response.status_code < 399:
                 return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
             else:
+                self.debug_print(f"Parse JSON error during action: {self.get_action_identifier()}. Error:", ex)
                 return RetVal(
                     action_result.set_status(
                         phantom.APP_ERROR,
@@ -136,7 +138,8 @@ class RadarConnector(BaseConnector):
 
         try:
             request_func = getattr(requests, method)
-        except AttributeError:
+        except AttributeError as aex:
+            self.debug_print(f"Get request {method} attribute error during action: {self.get_action_identifier()}. Error:", aex)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
@@ -144,6 +147,7 @@ class RadarConnector(BaseConnector):
             return self._process_response(resp, action_result)
 
         except Exception as ex:
+            self.debug_print(f"Make REST call during action: {self.get_action_identifier()}. Error:", ex)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
@@ -230,8 +234,8 @@ class RadarConnector(BaseConnector):
         try:
             resp = requests.get(url, verify=False)
             resp_json = resp.json()
-        except Exception as e:
-            self.debug_print("Unable to query system settings: ", e)
+        except Exception as ex:
+            self.debug_print(f"Get system settings during action: {self.get_action_identifier()}. Error:", ex)
 
         return resp_json
 
