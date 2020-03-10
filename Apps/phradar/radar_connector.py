@@ -91,7 +91,7 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, resp, action_result):
-        self.save_progress(f"process response")
+        self.save_progress(f"Process response")
 
         # store the r_text in debug data, it will get dumped in the logs if the action fail
         action_result.add_debug_data({"r_status_code": resp.status_code})
@@ -121,7 +121,7 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
-        self.save_progress(f"make rest call")
+        self.save_progress(f"Make rest call")
 
         url = f"{self._api_url}{endpoint}"
         config = self.get_config()
@@ -132,7 +132,7 @@ class RadarConnector(BaseConnector):
             "Authorization": f"Bearer {config['radar_api_token']}"
         }
 
-        self.save_progress(f"send {method} request to {url}")
+        self.save_progress(f"Send {method} request to {url}")
 
         try:
             request_func = getattr(requests, method)
@@ -153,7 +153,7 @@ class RadarConnector(BaseConnector):
             )
 
     def _handle_test_connectivity(self, param):
-        self.save_progress("connect to Radar")
+        self.save_progress("Connect to Radar")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -163,11 +163,11 @@ class RadarConnector(BaseConnector):
             self.save_progress("Radar test connectivity fail.")
             return action_result.get_status()
 
-        self.save_progress("radar test connectivity success")
+        self.save_progress("Radar test connectivity success")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_incident(self, param):
-        self.save_progress(f"run action {self.get_action_identifier()}")
+        self.save_progress(f"Run action {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -189,7 +189,7 @@ class RadarConnector(BaseConnector):
 
         uri = f"{phantom_base_url}{container_path}"
 
-        self.save_progress(f"create payload")
+        self.save_progress(f"Create payload")
 
         body = {
             "incident_group_id": incident_group,
@@ -217,14 +217,14 @@ class RadarConnector(BaseConnector):
         data["group"] = incident_group
         data["discovered"] = f"{date_time} / {time_zone}"
 
-        self.save_progress("add data to action result")
+        self.save_progress("Add data to action result")
         action_result.add_data(data)
 
         # Return success, no need to set the message, only the status
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_system_settings(self):
-        self.save_progress("get system settings")
+        self.save_progress("Get system settings")
 
         url = f"{self.get_phantom_base_url()}rest/system_settings"
         try:
@@ -236,7 +236,7 @@ class RadarConnector(BaseConnector):
         return resp_json
 
     def _handle_add_note(self, param):
-        self.save_progress(f"run action {self.get_action_identifier()}")
+        self.save_progress(f"Run action {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -260,7 +260,7 @@ class RadarConnector(BaseConnector):
         data["content"] = content
         data["category"] = category
 
-        self.save_progress("add data to action result")
+        self.save_progress("Add data to action result")
         action_result.add_data(data)
 
         # Return success, no need to set the message, only the status
