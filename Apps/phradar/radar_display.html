@@ -12,7 +12,8 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 {% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
 {% block body_color %}{{ body_color|default:'white' }}{% endblock %}
 {% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
-{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%;
+    background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
 {% block custom_tools %}
@@ -22,7 +23,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
     <style>
 
         a:hover {
-            text-decoration:underline;
+            text-decoration: underline;
         }
 
         .wf-table-vertical td {
@@ -52,88 +53,91 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         }
 
         .wf-h3-style {
-            font-size : 20px
+            font-size: 20px
         }
 
         .display-container {
             overflow: auto;
             width: 100%;
             height: 100%;
-            padding-left:10px;
-            padding-right:10px
+            padding-left: 10px;
+            padding-right: 10px
         }
 
     </style>
     <div class="display-container">
         {% if incidents %}
-        <h3 class="wf-h3-style">Radar Privacy Incidents</h3>
-        <table class="wf-table-horizontal">
-            <th>incident id</th>
-            <th>incident name</th>
-            <th>description</th>
-            <th>incident group id</th>
-            <th>discovered</th>
-            <th>radar incident url</th>
-            {% for incident in incidents %}
-            <tr>
-            <td>
-                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.id }}' }], 0, {{ container.id }}, null, false);">
-                    {{incident.id}}
-                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-            </td>
-            <td>
-                {{incident.name}}
-            </td>
-            <td>
-                {{incident.description }}
-            </td>
-            <td>
-                {{incident.group }}
-            </td>
-            <td>
-                {{incident.discovered}}
-            </td>
-            <td>
-                <a href="{{incident.url}}">{{incident.url}}</a>
-            </td>
-            </tr>
-            {% endfor %}
-        </table>
+            <h3 class="wf-h3-style">Radar Privacy Incidents</h3>
+            <table class="wf-table-horizontal">
+                <th>incident id</th>
+                <th>incident name</th>
+                <th>description</th>
+                <th>incident group id</th>
+                <th>discovered</th>
+                <th>radar incident url</th>
+                {% for incident in incidents %}
+                    <tr>
+                        <td>
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ incident.id }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                        <td>
+                            {{ incident.name }}
+                        </td>
+                        <td>
+                            {{ incident.description }}
+                        </td>
+                        <td>
+                            {{ incident.group }}
+                        </td>
+                        <td>
+                            {{ incident.discovered }}
+                        </td>
+                        <td>
+                            <a href="{{ incident.url }}">{{ incident.url }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         {% else %}
-        <p> No incident</p>
+            <p> No incident</p>
         {% endif %}
 
         {% if notes %}
-        <h2 class="wf-h3-style">Radar Incident Notes</h2>
-        <table class="wf-table-horizontal">
-            <th>incident id</th>
-            <th>note id</th>
-            <th>note category</th>
-            <th>note content</th>
-            {% for note in notes %}
-            <tr>
-                <td>
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
-                        {{note.incident_id}}
-                        &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                    </a>
-                </td>
-                <td>
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
-                        {{note.id}}
-                        &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                    </a>
-                </td>
-                <td>
-                    {{note.category}}
-                </td>
-                <td>
-                    {{note.content}}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+            <h2 class="wf-h3-style">Radar Incident Notes</h2>
+            <table class="wf-table-horizontal">
+                <th>incident id</th>
+                <th>note id</th>
+                <th>note category</th>
+                <th>note content</th>
+                {% for note in notes %}
+                    <tr>
+                        <td>
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ note.incident_id }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ note.id }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                        <td>
+                            {{ note.category }}
+                        </td>
+                        <td>
+                            {{ note.content }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         {% endif %}
     </div>
 
