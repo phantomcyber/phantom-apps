@@ -552,7 +552,6 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-        config = self.get_config()
 
         query_text = param.get('query_text')
         group_name = param.get('group_name')
@@ -585,65 +584,18 @@ class TaniumRestConnector(BaseConnector):
         else:
             if not timeout_seconds:
                 return action_result.set_status(phantom.APP_ERROR, "Please provide timeout seconds")
-            data = dict()
-            data['expire_seconds'] = timeout_seconds
 
-            # If a group_name was supplied, validate the group name is valid
-            if group_name:
-                endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
-                ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
-
-                if (phantom.is_fail(ret_val)):
-                    return action_result.get_status()
-
-                group_id = response.get("data", {}).get("id")
-                data["context_group"] = {"id": group_id}
-
-            # Before executing the query, run the query text against the /parse_question
-            #   to ensure the query is in a valid Tanium syntax
-            query_to_parse = {"text": query_text}
-
-            ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/parse_question", verify=self._verify, params=None, headers=None,
-                                json=query_to_parse, method="post")
-
-            if (phantom.is_fail(ret_val)):
+            question_data = self._parse_manual_question(query_text, action_result, group_name=group_name or None)
+            if not question_data:
                 return action_result.get_status()
 
-            if len(response.get("data")) != 1:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid parsed question accepted by Tanium server")
-
-            resp_text = response.get("data")[0].get("question_text", "").replace('"', '').replace("'", "")
-            query_text_updated = query_text.replace('"', '').replace("'", "")
-
-            if resp_text != query_text_updated:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid parsed question accepted by Tanium server")
-
-            if response.get("data"):
-                try:
-                    del response.get("data")[0]["from_canonical_text"]
-                except:
-                    pass
-
-                data.update(response.get("data")[0])
-
-            ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/questions", verify=self._verify, params=None, headers=None, json=data, method="post")
-
-            if (phantom.is_fail(ret_val)):
+            self.save_progress(json.dumps(question_data))
+            response = self._ask_question(question_data, action_result, timeout_seconds=timeout_seconds)
+            if action_result.get_status() == phantom.APP_ERROR:
                 return action_result.get_status()
-
-            question_id = response.get("data", {}).get("id")
-
-            endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
-
-            results_percentage = config.get('results_percentage', 99)
-            response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
-
-            if response is None:
-                return action_result.get_status()
-
             action_result.add_data(response)
 
-            summary["timeout_seconds"] = timeout_seconds
+        summary["timeout_seconds"] = timeout_seconds
 
         result_sets = response.get("data", {}).get("result_sets")
         if result_sets:
@@ -653,7 +605,134 @@ class TaniumRestConnector(BaseConnector):
 
         summary['number_of_results'] = row_count
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Question asked successfully")
+
+    def _make_parameterized_query(self, parse_response, action_result):
+        """ Create the data structure to issue a parameterized sensor question to Tanium """
+        sensors = [select["sensor"] for select in parse_response["selects"]]
+        self.save_progress("Sensors:\n" + json.dumps(sensors))
+        param_index = 0
+        param_list = parse_response["parameter_values"]
+        sensor_data = []
+
+        for sensor in sensors:
+            sensor_name = sensor["name"]
+            endpoint = TANIUMREST_GET_SENSOR_BY_NAME.format(sensor_name=sensor_name)
+            ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify)
+            if (phantom.is_fail(ret_val)):
+                action_result.set_status(phantom.APP_ERROR, "Failed to get sensor definition from Tanium")
+                return
+
+            self.save_progress("Parameter Definition:\n" + response["data"].get("parameter_definition", ""))
+            parameter_definition = json.loads(response["data"].get("parameter_definition", ""))
+
+            if parameter_definition:
+                # Parameterized Sensor
+                parameter_keys = [parameter["key"] for parameter in parameter_definition["parameters"]]
+                self.save_progress("Parameter Keys:\n" + json.dumps(parameter_keys))
+
+                parameters = []
+                for parameter_key in parameter_keys:
+                    parameter = {
+                        "key": "||%s||" % parameter_key,
+                        "value": param_list[param_index] }
+                    parameters.append(parameter)
+                    param_index += 1
+
+                formatted_sensor = {
+                    "source_hash": sensor["hash"],
+                    "parameters": parameters }
+                sensor_data.append({"sensor": formatted_sensor})
+            else:
+                # Regular Sensor, can use as-is
+                sensor_data.append({"sensor": sensor})
+
+        self.save_progress("Sensor Data:\n" + json.dumps(sensor_data))
+        question_data = { "selects": sensor_data,
+                          "question_text": parse_response["question_text"]}
+        if "group" in parse_response:
+            # Add in filters
+            question_data["group"] = parse_response["group"]
+
+        return question_data
+
+    def _parse_manual_question(self, query_text, action_result, group_name=None):
+        # Prepare data struction for posting to /questions
+        data = dict()
+
+        # If a group_name was supplied, validate the group name is valid
+        if group_name:
+            endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
+            ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
+
+            if (phantom.is_fail(ret_val)):
+                action_result.set_status(phantom.APP_ERROR, "Failed to get group")
+                return
+
+            group_id = response.get("data", {}).get("id")
+            data["context_group"] = {"id": group_id}
+
+        # Before executing the query, run the query text against the /parse_question
+        #   to ensure the query is in a valid Tanium syntax
+        query_to_parse = {"text": query_text}
+
+        ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/parse_question", verify=self._verify, params=None, headers=None,
+                                                        json=query_to_parse, method="post")
+        self.save_progress("Parsed Question:\n" + json.dumps(response))
+
+        if (phantom.is_fail(ret_val)):
+            action_result.set_status(phantom.APP_ERROR, "failed to parse question")
+            return
+
+        if len(response.get("data")) != 1:
+            action_result.set_status(phantom.APP_ERROR, "Please provide a valid parsed question accepted by Tanium server")
+            return
+
+        resp_text = response.get("data")[0].get("question_text", "").lower().replace('"', '').replace("'", "")
+        query_text_updated = query_text.lower().replace('"', '').replace("'", "")
+
+        if resp_text != query_text_updated:
+            action_result.set_status(phantom.APP_ERROR, "Please provide a valid parsed question accepted by Tanium server")
+            return
+
+        if response["data"][0].get("parameter_values"):
+            self.save_progress("Making a parameterized query")
+            data = self._make_parameterized_query(response.get("data")[0], action_result)
+            if not data:
+                # Something failed
+                return
+        else:
+            self.save_progress("Making a non-parameterized query")
+            data.update(response.get("data")[0])
+
+        return data
+
+    def _ask_question(self, data, action_result, timeout_seconds=None):
+        # Post prepared data to questions endpoint and poll for results
+        config = self.get_config()
+        if timeout_seconds:
+            data['expire_seconds'] = timeout_seconds
+        ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/questions", verify=self._verify, params=None, headers=None, json=data, method="post")
+        self.save_progress("Data Posted to /questions:\n" + json.dumps(data))
+        self.save_progress("Response from /questions:\n" + json.dumps(response))
+
+        if (phantom.is_fail(ret_val)):
+            action_result.set_status(phantom.APP_ERROR, "Question post failed")
+            return
+
+        question_id = response.get("data", {}).get("id")
+
+        # Get results of Question
+        endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
+
+        results_percentage = config.get('results_percentage', 99)
+        response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
+
+        if response is None:
+            action_result.set_status(phantom.APP_ERROR, "Failed to get results")
+        else:
+            action_result.set_status(phantom.APP_SUCCESS)
+        return response
 
     def handle_action(self, param):
 
@@ -684,6 +763,9 @@ class TaniumRestConnector(BaseConnector):
 
         elif action_id == 'parse_question':
             ret_val = self._handle_parse_question(param)
+
+        elif action_id == 'action_on_endpoint':
+            ret_val = self._handle_action_on_endpoint(param)
 
         return ret_val
 
