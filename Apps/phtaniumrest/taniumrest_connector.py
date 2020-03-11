@@ -764,9 +764,6 @@ class TaniumRestConnector(BaseConnector):
         elif action_id == 'parse_question':
             ret_val = self._handle_parse_question(param)
 
-        elif action_id == 'action_on_endpoint':
-            ret_val = self._handle_action_on_endpoint(param)
-
         return ret_val
 
     def initialize(self):
