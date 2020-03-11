@@ -1,8 +1,8 @@
 # File: phishtank_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-# Embedded file name: ./phishtank_consts.py
+
 PHISHTANK_DOMAIN = 'http://www.phishtank.com'
 PHISHTANK_API_DOMAIN = 'https://checkurl.phishtank.com/checkurl/'
 PHISHTANK_APP_KEY = 'app_key'

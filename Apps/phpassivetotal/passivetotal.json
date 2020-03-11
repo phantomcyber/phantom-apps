@@ -3,18 +3,22 @@
     "name": "PassiveTotal",
     "description": "This app implements investigative actions by integrating with the PassiveTotal cloud reputation service",
     "type": "reputation",
-    "main_module": "passivetotal_connector.pyc",
-    "app_version": "1.2.36",
+    "main_module": "passivetotal_connector.py",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-02-05T00:26:42.000000Z",
     "product_vendor": "PassiveTotal",
     "product_name": "PassiveTotal",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.6.19142",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud v2 tested 2-21-2020"
+    ],
     "publisher": "Phantom",
     "package_name": "phantom_passivetotal",
     "logo": "logo_passivetotal.svg",
     "logo_dark": "logo_passivetotal_dark.svg",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "configuration": {
         "key": {
             "data_type": "string",
@@ -42,7 +46,7 @@
         },
         {
             "action": "domain reputation",
-            "description": "Get domain info/reputation ",
+            "description": "Get domain info/reputation",
             "verbose": "Passive information about a domain could get very large, because of which the calls could timeout. Use the <b>from</b> and <b>to</b> parameters to limit the passive data to query between a time range. If <b>from</b> parameter is not specified, the action gets data for the past 30 days.",
             "type": "investigate",
             "identifier": "lookup_domain",
@@ -75,12 +79,6 @@
                     "order": 3,
                     "required": false
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Domain Reputation",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -429,6 +427,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -466,12 +470,6 @@
                     "order": 3,
                     "required": false
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Ip Reputation",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -930,6 +928,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Ip Reputation",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -950,12 +954,6 @@
                     "primary": true,
                     "required": true
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Whois IP",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -1362,6 +1360,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Whois IP",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1382,12 +1386,6 @@
                     "primary": true,
                     "required": true
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Whois Domain",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -1790,6 +1788,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         }
     ]

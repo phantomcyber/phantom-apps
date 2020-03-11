@@ -1,0 +1,41 @@
+<!-- Exported using version "7_3_314_3424" on Monday, February 03, 2020 2:45:00 PM -->
+<content>
+    <content_set_role>
+        <name>Phantom-Run-Actions</name>
+        <description>Role used by phantom app to interact with Tanium API</description>
+        <reserved_name></reserved_name>
+        <deny_flag>0</deny_flag>
+        <all_content_sets_flag>1</all_content_sets_flag>
+        <category>advanced</category>
+        <meta_data/>
+        <content_set_role_privileges>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>read action</name>
+                    <reserved_name>read action</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>read package</name>
+                    <reserved_name>read package</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+            <content_set_role_privilege>
+                <content_set_privilege>
+                    <name>write action</name>
+                    <reserved_name>write action</reserved_name>
+                    <privilege_type></privilege_type>
+                    <privilege_module></privilege_module>
+                    <meta_data/>
+                </content_set_privilege>
+            </content_set_role_privilege>
+        </content_set_role_privileges>
+    </content_set_role>
+</content>
