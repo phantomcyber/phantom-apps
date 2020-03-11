@@ -186,6 +186,8 @@ class RadarConnector(BaseConnector):
 
         # get incident channel information
         phantom_base_url = self._get_system_settings()["company_info_settings"]["fqdn"]
+        if not phantom_base_url:
+            return action_result.set_status(phantom.APP_ERROR, "Base URL for phantom appliance must be configured")
         container_path = ""
         container_id = self.get_container_id()
         if container_id is not None:
