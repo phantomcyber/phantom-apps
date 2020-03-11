@@ -4,18 +4,18 @@
     "description": "This app integrates with Tanium Detect to perform several investigate, generic, and ingest type of actions",
     "type": "network security",
     "product_vendor": "Tanium",
-    "logo": "logo_taniumdetect.svg",
-    "logo_dark": "logo_taniumdetect_dark.svg",
+    "logo": "logo_tanium.svg",
+    "logo_dark": "logo_tanium_dark.svg",
     "product_name": "Detect",
     "product_version_regex": ".*",
     "publisher": "Robert Drouin",
     "license": "Copyright (c) Splunk, 2020",
-    "app_version": "1.3.0",
+    "app_version": "1.5.0",
     "utctime_updated": "2019-11-11T14:20:14.00000Z",
     "package_name": "phantom_taniumdetect",
     "main_module": "taniumdetect_connector.pyc",
     "min_phantom_version": "4.6.19142",
-    "app_wizard_version": "1.3.0",
+    "app_wizard_version": "1.5.0",
     "configuration": {
         "base_url": {
             "description": "IP or Hostname of Tanium Server",
@@ -70,6 +70,10 @@
                     "description": "The ID of the suppression rule",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ],
                     "order": 0
                 }
             },
@@ -77,22 +81,62 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                    "column_name": "Name",
+                    "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.revision",
+                    "data_type": "numeric",
+                    "column_name": "Revision",
+                    "column_order": 4
+                    
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
@@ -140,8 +184,12 @@
                     "order": 2
                 },
                 "inteldocid": {
-                    "description": "The id of the intel doc to associate the rule to",
+                    "description": "The ID of the intel doc to associate the rule to",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "order": 3
                 }
             },
@@ -155,7 +203,7 @@
                 {
                     "data_path": "action_result.parameter.config",
                     "data_type": "string",
-                    "column_name": "Config",
+                    "column_name": "Configuration",
                     "column_order": 1
                 },
                 {
@@ -167,7 +215,10 @@
                 {
                     "data_path": "action_result.parameter.inteldocid",
                     "data_type": "numeric",
-                    "column_name": "Inteldoc ID",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
                     "column_order": 3
                 },
                 {
@@ -216,15 +267,14 @@
                 "limit": {
                     "description": "The maximum number of rules to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 0
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 7
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
@@ -238,18 +288,21 @@
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.*.intelDocId",
                     "data_type": "numeric",
-                    "column_name": "Intel Document ID",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
                     "column_order": 3
                 },
                 {
@@ -261,8 +314,11 @@
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ],
                     "column_name": "ID",
-                    "column_order": 2
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.*.createdAt",
@@ -301,14 +357,18 @@
         {
             "action": "delete suppression rule",
             "identifier": "delete_suppression_rule",
-            "description": "Delete one or more suppression rules",
+            "description": "Delete one suppression rule",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "The ID of the rule to delete; multiple occurrences are supported",
+                    "description": "The ID of the rule to delete",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ],
                     "order": 0
                 }
             },
@@ -316,6 +376,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect suppression rule id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
@@ -366,6 +429,10 @@
                     "description": "The ID of the source to show",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect source id"
+                    ],
                     "order": 0
                 }
             },
@@ -373,22 +440,74 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect source id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect source id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.enabled",
+                    "data_type": "string",
+                    "column_name": "Enabled",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Indicator Count",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.signalCount",
+                    "data_type": "numeric",
+                    "column_name": "Signal Count",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.message",
@@ -415,7 +534,7 @@
         {
             "action": "delete source",
             "identifier": "delete_source",
-            "description": "Delete an existing source",
+            "description": "Delete an existing source by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -423,6 +542,10 @@
                     "description": "The ID of the source to delete",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect source id"
+                    ],
                     "order": 0
                 }
             },
@@ -430,6 +553,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect source id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
@@ -479,15 +605,14 @@
                 "limit": {
                     "description": "The maximum number of sources to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 0
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 9
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
@@ -501,7 +626,7 @@
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.*.type",
@@ -513,7 +638,7 @@
                     "data_path": "action_result.data.*.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.*.enabled",
@@ -525,31 +650,34 @@
                     "data_path": "action_result.data.*.*.updatedAt",
                     "data_type": "string",
                     "column_name": "Updated At",
-                    "column_order": 6
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect source id"
+                    ],
                     "column_name": "ID",
-                    "column_order": 2
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.*.createdAt",
                     "data_type": "string",
                     "column_name": "Created At",
-                    "column_order": 5
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.*.indicatorCount",
                     "data_type": "numeric",
-                    "column_name": "Revision",
-                    "column_order": 7
+                    "column_name": "Indicator Count",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.*.signalCount",
                     "data_type": "numeric",
-                    "column_name": "Revision",
-                    "column_order": 8
+                    "column_name": "Signal Count",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
@@ -581,9 +709,13 @@
             "read_only": true,
             "parameters": {
                 "id": {
-                    "description": "The ID of the source type to show",
+                    "description": "The ID of the source type to get",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect sourcetype id"
+                    ],
                     "order": 0
                 }
             },
@@ -591,22 +723,44 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect sourcetype id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect sourcetype id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.canAutoQuickScan",
+                    "data_type": "boolean",
+                    "column_name": "Can Auto Quck Scan",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -650,31 +804,34 @@
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.*.type",
                     "data_type": "string",
                     "column_name": "Type",
-                    "column_order": 3
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect sourcetype id"
+                    ],
                     "column_name": "ID",
-                    "column_order": 2
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.*.canAutoQuickScan",
                     "data_type": "boolean",
-                    "column_name": "Revision",
-                    "column_order": 4
+                    "column_name": "Can Auto Quck Scan",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -708,51 +865,66 @@
                 "num_days": {
                     "description": "Past number of days to account for (Default: 30)",
                     "data_type": "numeric",
+                    "default": 30,
                     "order": 0
                 },
                 "inteldocid": {
                     "description": "Intel doc ID to filter by",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "order": 1
                 },
                 "scanconfigid": {
                     "description": "Scan config ID to filter by",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect scan config id"
+                    ],
                     "order": 2
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.num_days",
-                    "data_type": "numeric",
-                    "column_name": "Num Days",
-                    "column_order": 0
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.inteldocid",
                     "data_type": "numeric",
-                    "column_name": "Inteldoc ID",
-                    "column_order": 1
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.scanconfigid",
                     "data_type": "numeric",
-                    "column_name": "Scan Config ID",
-                    "column_order": 2
+                    "contains": [
+                        "tanium detect scan config id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.date",
+                    "data_type": "string",
+                    "column_name": "Date",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -787,6 +959,10 @@
                     "description": "The ID of the notification to show",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
                     "order": 0
                 }
             },
@@ -794,22 +970,92 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect notification id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.message",
@@ -836,14 +1082,18 @@
         {
             "action": "update notification",
             "identifier": "update_notification",
-            "description": "Update the state of one or more notifications",
+            "description": "Update the state of one notification by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "The ID of the notification to update, multiple occurrences are supported",
+                    "description": "The ID of the notification to update",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
                     "order": 0
                 },
                 "state": {
@@ -863,28 +1113,96 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect notification id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.state",
-                    "data_type": "string",
-                    "column_name": "State",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.message",
@@ -928,52 +1246,115 @@
                 "limit": {
                     "description": "The maximum number of notifications to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 2
                 },
                 "offset": {
                     "description": "The offset at which to begin listing notifications",
                     "data_type": "numeric",
+                    "default": 0,
                     "order": 3
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.type",
-                    "data_type": "string",
-                    "column_name": "Type",
-                    "column_order": 0
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.sort",
-                    "data_type": "string",
-                    "column_name": "Sort",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 2
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.offset",
-                    "data_type": "numeric",
-                    "column_name": "Offset",
-                    "column_order": 3
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 4,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.message",
@@ -1000,14 +1381,18 @@
         {
             "action": "delete notification",
             "identifier": "delete_notification",
-            "description": "Delete one or more notifications",
+            "description": "Delete one notification by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "The ID of the notification to delete, multiple occurrences are supported",
+                    "description": "The ID of the notification to delete",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
                     "order": 0
                 }
             },
@@ -1015,6 +1400,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect notification id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
@@ -1057,7 +1445,7 @@
         {
             "action": "modify label",
             "identifier": "modify_label",
-            "description": "Modify the properties of an existing label",
+            "description": "Modify the properties of an existing label by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1065,6 +1453,10 @@
                     "description": "The ID of the label to update",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect label id"
+                    ],
                     "order": 0
                 },
                 "name": {
@@ -1084,8 +1476,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect label id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.name",
@@ -1095,23 +1488,61 @@
                 },
                 {
                     "data_path": "action_result.parameter.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Indicator Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.signalCount",
+                    "data_type": "numeric",
+                    "column_name": "Signal Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
@@ -1146,6 +1577,10 @@
                     "description": "The ID of the label to get",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect label id"
+                    ],
                     "order": 0
                 }
             },
@@ -1153,22 +1588,62 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect label id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Indicator Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.signalCount",
+                    "data_type": "numeric",
+                    "column_name": "Signal Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
@@ -1195,7 +1670,7 @@
         {
             "action": "delete label",
             "identifier": "delete_label",
-            "description": "Delete an existing label. Will fail if the label is used in group configurations",
+            "description": "Delete an existing label by ID. Will fail if label is used in group configurations",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1203,6 +1678,10 @@
                     "description": "The ID of the label that will be deleted",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect label id"
+                    ],
                     "order": 0
                 }
             },
@@ -1210,6 +1689,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
@@ -1263,7 +1745,7 @@
                     "order": 0
                 },
                 "description": {
-                    "description": "Describe the label",
+                    "description": "Description for the label",
                     "data_type": "string",
                     "required": true,
                     "order": 1
@@ -1272,29 +1754,65 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 0
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorCount",
+                    "data_type": "numeric",
+                    "column_name": "Indicator Count",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.signalCount",
+                    "data_type": "numeric",
+                    "column_name": "Signal Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
@@ -1328,15 +1846,14 @@
                 "limit": {
                     "description": "The maximum number of labels to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 0
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 6
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
@@ -1414,6 +1931,10 @@
                 "id": {
                     "description": "The ID of the intel document to show",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "required": true,
                     "order": 0
                 }
@@ -1422,22 +1943,131 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.revisionId",
+                    "data_type": "numeric",
+                    "column_name": "Revision ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.typeVersion",
+                    "data_type": "string",
+                    "column_name": "Type Version",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.isSchemaValid",
+                    "data_type": "boolean",
+                    "column_name": "Is Schema Valid",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.intrinsicId",
+                    "data_type": "string",
+                    "column_name": "Intrinsic ID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "column_name": "Size (KB)",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric",
+                    "column_name": "Alert Count",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.complied",
+                    "data_type": "string",
+                    "column_name": "Complied",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.unresolvedAlertCount",
+                    "data_type": "numeric",
+                    "column_name": "Unresolved Alert Count",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.labelIds",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
+                    "column_name": "Label IDs",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.sourceId",
+                    "data_type": "numeric",
+                    "column_name": "Source ID",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.contents",
+                    "data_type": "string",
+                    "column_name": "Contents",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 17
                 },
                 {
                     "data_path": "action_result.message",
@@ -1464,7 +2094,7 @@
         {
             "action": "delete intel",
             "identifier": "delete_intel",
-            "description": "Delete the identified intel document",
+            "description": "Delete the identified intel document by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1472,6 +2102,10 @@
                     "description": "The ID of the intel document to delete",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "order": 0
                 }
             },
@@ -1479,6 +2113,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },
@@ -1548,61 +2185,53 @@
                 "limit": {
                     "description": "The maximum number of IntelDocs to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 4
                 },
                 "offset": {
                     "description": "The offset number to begin listing alerts",
                     "data_type": "numeric",
+                    "default": 0,
                     "order": 5
                 },
                 "nolimit": {
                     "description": "If TRUE will not limit the number of items returned",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 6
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 0
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.type",
-                    "data_type": "string",
-                    "column_name": "Type",
-                    "column_order": 2  
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "string",
-                    "column_name": "Sort",
-                    "column_order": 3
+                    "example_values": [
+                        "-alertedAt,+name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 4
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.offset",
-                    "data_type": "numeric",
-                    "column_name": "Offset",
-                    "column_order": 5
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.nolimit",
-                    "data_type": "boolean",
-                    "column_name": "No Limit",
-                    "column_order": 6
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.status",
@@ -1616,19 +2245,25 @@
                     "data_path": "action_result.data.*.*.unresolvedAlertCount",
                     "data_type": "numeric",
                     "column_name": "Unresolved Alert Count",
-                    "column_order": 7
+                    "column_order": 12
                 },
                 {
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
                     "column_name": "Name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.data.*.*.typeVersion",
                     "data_type": "string",
                     "column_name": "Type Version",
-                    "column_order": 9
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.*.sourceId",
@@ -1646,61 +2281,82 @@
                     "data_path": "action_result.data.*.*.revisionId",
                     "data_type": "numeric",
                     "column_name": "Updated At",
-                    "column_order": 12
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.*.intrinsicId",
                     "data_type": "string",
                     "column_name": "Intrinsic ID",
-                    "column_order": 13
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.*.isSchemaValid",
                     "data_type": "boolean",
                     "column_name": "Is Schema Valid",
-                    "column_order": 14
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.*.alertCount",
                     "data_type": "numeric",
                     "column_name": "Alert Count",
-                    "column_order": 15
+                    "column_order": 10
                 },
                 {
                     "data_path": "action_result.data.*.*.updatedAt",
                     "data_type": "numeric",
                     "column_name": "Updated At",
-                    "column_order": 16
+                    "column_order": 17
                 },
                 {
                     "data_path": "action_result.data.*.*.md5",
                     "data_type": "string",
                     "column_name": "MD5",
-                    "column_order": 17
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.*.type",
                     "data_type": "string",
                     "column_name": "Type",
-                    "column_order": 18
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "numeric",
                     "column_name": "ID",
-                    "column_order": 19
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.*.createdAt",
                     "data_type": "string",
                     "column_name": "Created At",
-                    "column_order": 20
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.*.labelIds",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium detect label id"
+                    ],
+                    "column_name": "Label IDs",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.*.sourceId",
+                    "data_type": "numeric",
+                    "column_name": "Source ID",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.*.contents",
+                    "data_type": "string",
+                    "column_name": "Contents",
+                    "column_order": 15
                 },
                 {
                     "data_path": "action_result.data.*.*.size",
                     "data_type": "numeric",
                     "column_name": "Size (KB)",
-                    "column_order": 21
+                    "column_order": 9
                 },
                 {
                     "data_path": "action_result.message",
@@ -1732,9 +2388,10 @@
             "read_only": true,
             "parameters": {
                 "groupby": {
-                    "description": "Group alerts by specified group name [Default: 'computerName', Alternate Values: ['intelId']]",
+                    "description": "Group alerts by specified group name [Default: 'computerName']",
                     "data_type": "string",
                     "required": true,
+                    "default": "computerName",
                     "order": 0
                 }
             },
@@ -1742,22 +2399,36 @@
                 {
                     "data_path": "action_result.parameter.groupby",
                     "data_type": "string",
-                    "column_name": "Groupby",
-                    "column_order": 0
+                    "example_values": [
+                        "computerName",
+                        "intelId"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.groupById",
+                    "data_type": "string",
+                    "column_name": "Group By ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.groupByValue",
+                    "data_type": "string",
+                    "column_name": "Group By Value",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -1791,51 +2462,66 @@
                 "num_days": {
                     "description": "Past number of days to account for (Default: 30)",
                     "data_type": "numeric",
+                    "default": 30,
                     "order": 0
                 },
                 "inteldocid": {
                     "description": "Filter by alerts with specified intel doc ID",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "order": 1
                 },
                 "scanconfigid": {
                     "description": "Filter by alerts with the specified scan config ID",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect scan config id"
+                    ],
                     "order": 2
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.num_days",
-                    "data_type": "numeric",
-                    "column_name": "Num Days",
-                    "column_order": 0
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.inteldocid",
                     "data_type": "numeric",
-                    "column_name": "Inteldoc ID",
-                    "column_order": 1
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.scanconfigid",
                     "data_type": "numeric",
-                    "column_name": "Scan Config ID",
-                    "column_order": 2
+                    "contains": [
+                        "tanium detect scan config id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.date",
+                    "data_type": "string",
+                    "column_name": "Date",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -1870,6 +2556,10 @@
                     "description": "The ID of the alert to show",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
                     "order": 0
                 }
             },
@@ -1877,22 +2567,122 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Intelligence Document Revision",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect scan config id"
+                    ],
+                    "column_name": "Scan Configuration ID",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Scan Configuration Revision",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 15
                 },
                 {
                     "data_path": "action_result.message",
@@ -1919,14 +2709,18 @@
         {
             "action": "update state",
             "identifier": "update_state",
-            "description": "Update the state of one or more alerts",
+            "description": "Update the state of an alert",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "The ID of the alert to update. Multiple occurrences are supported",
+                    "description": "The ID of the alert to update",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
                     "order": 0
                 },
                 "state": {
@@ -1946,28 +2740,126 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "contains": [
+                        "tanium detect alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.state",
-                    "data_type": "string",
-                    "column_name": "State",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Intelligence Document Revision",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect scan config id"
+                    ],
+                    "column_name": "Scan Configuration ID",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Scan Configuration Revision",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 15
                 },
                 {
                     "data_path": "action_result.message",
@@ -1994,14 +2886,20 @@
         {
             "action": "list alerts",
             "identifier": "list_alerts",
-            "description": "Lists all the alerts from the Tanium Detect server",
-            "verbose": "List alerts with optional filtering, sorting, and pagination.",
+            "description": "List alerts with optional filtering, sorting, and pagination",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "state": {
                     "description": "Filter alerts by the specified states",
                     "data_type": "string",
+                    "value_list": [
+                        "unresolved",
+                        "inprogress",
+                        "ignored",
+                        "resolved"
+                    ],
+                    "default": "unresolved",
                     "order": 0
                 },
                 "type": {
@@ -2022,11 +2920,19 @@
                 "inteldocid": {
                     "description": "Filter alerts by the specified intelDocIds",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
                     "order": 4
                 },
                 "scanconfigid": {
                     "description": "Filter alerts by the specified scanConfigIds",
                     "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "tanium detect scan config id"
+                    ],
                     "order": 5
                 },
                 "computername": {
@@ -2040,101 +2946,180 @@
                     "order": 7
                 },
                 "sort": {
-                    "description": "A comma-separated list of COLUMN:DIR pairs controlling sort ordering",
+                    "description": "Use to sort columns using \"+/-\", comma separate for multiples",
                     "data_type": "string",
                     "order": 8
                 },
                 "limit": {
                     "description": "The maximum number of alerts to return. [Default: 100]",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 9
                 },
                 "offset": {
                     "description": "The offset number to begin listing alerts",
                     "data_type": "numeric",
+                    "default": 0,
                     "order": 10
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.state",
-                    "data_type": "string",
-                    "column_name": "State",
-                    "column_order": 0
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.type",
-                    "data_type": "string",
-                    "column_name": "Type",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.priority",
-                    "data_type": "string",
-                    "column_name": "Priority",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.severity",
-                    "data_type": "string",
-                    "column_name": "Severity",
-                    "column_order": 3
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.inteldocid",
-                    "data_type": "numeric",
-                    "column_name": "Inteldoc ID",
-                    "column_order": 4
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.scanconfigid",
-                    "data_type": "numeric",
-                    "column_name": "Scan Config ID",
-                    "column_order": 5
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.computername",
-                    "data_type": "string",
-                    "column_name": "Computer Name",
-                    "column_order": 6
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.computeripaddress",
-                    "data_type": "string",
-                    "column_name": "Computer IPaddress",
-                    "column_order": 7
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "string",
-                    "column_name": "Sort",
-                    "column_order": 8
+                    "example_values": [
+                        "-alertedAt,+name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "column_name": "Limit",
-                    "column_order": 9
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.offset",
-                    "data_type": "numeric",
-                    "column_name": "Offset",
-                    "column_order": 10
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 11,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.guid",
+                    "data_type": "string",
+                    "column_name": "GUID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.severity",
+                    "data_type": "string",
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "tanium detect intel doc id"
+                    ],
+                    "column_name": "Intelligence Document ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.intelDocRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Intelligence Document Revision",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.scanConfigId",
+                    "data_type": "numeric",
+                    "column_name": "Scan Configuration ID",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.scanConfigRevisionId",
+                    "data_type": "numeric",
+                    "column_name": "Scan Configuration Revision",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.compurterIpAddress",
+                    "data_type": "string",
+                    "column_name": "Computer IP Address",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.*.details",
+                    "data_type": "string",
+                    "column_name": "Details",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.*.alertedAt",
+                    "data_type": "string",
+                    "column_name": "Alerted At",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 15
                 },
                 {
                     "data_path": "action_result.message",
@@ -2161,7 +3146,7 @@
         {
             "action": "delete alert",
             "identifier": "delete_alert",
-            "description": "Delete one or more alerts",
+            "description": "Delete an alert by ID",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -2169,6 +3154,10 @@
                     "description": "ID of the alerts to delete",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
                     "order": 0
                 }
             },
@@ -2176,6 +3165,9 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
+                    "contains": [
+                        "tanium detect alert id"
+                    ],
                     "column_name": "ID",
                     "column_order": 0
                 },

@@ -161,11 +161,11 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -195,9 +195,11 @@ class TaniumDetectConnector(BaseConnector):
             return action_result.set_status("Please provide a valid integer in [inteldocid] action parameter. Error: {}".format(str(ve)))
         except Exception as e:
             return action_result.set_status("Error: {}".format(str(e)))
+
+        name = UnicodeDammit(param['name']).unicode_markup.encode("utf-8")
         config = UnicodeDammit(config).unicode_markup.encode("utf-8")
         description = UnicodeDammit(description).unicode_markup.encode("utf-8")
-        data = json.dumps(config + description + str(inteldocid))
+        data = json.dumps(name + config + description + str(inteldocid))
         ret_val, response = self._make_rest_call(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, action_result, method='post', data=data, params=None)
 
         if phantom.is_fail(ret_val):
@@ -219,7 +221,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -238,7 +240,9 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, param)
+        id = param.get('id')
+
+        endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_SUPPRESSION_RULES, id)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
@@ -259,11 +263,11 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_SOURCES, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -282,7 +286,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_SOURCES, id)
 
@@ -307,7 +311,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_SOURCES, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -326,11 +330,11 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_SOURCE_TYPES, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -368,13 +372,20 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        num_days = param.get('num_days', '')
-        inteldocid = param.get('inteldocid', '')
-        scanconfigid = param.get('scanconfigid', '')
+        params = []
 
-        endpoint = ('{}/count?n={}&intelDocId={}&scanConfigId={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, num_days, inteldocid, scanconfigid)
+        if param.get('num_days'):
+            params['n'] = param.get('num_days')
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        if param.get('inteldocid'):
+            params['inteldocid'] = param.get('inteldocid')
+
+        if param.get('scanconfigid'):
+            params['scanconfigid'] = param.get('scanconfigid')
+
+        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS_COUNT, params)
+
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -395,7 +406,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_NOTIFICATIONS, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -414,7 +425,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
         state = param.get('state', '')
 
         endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, id)
@@ -442,7 +453,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_NOTIFICATIONS, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -461,7 +472,8 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_NOTIFICATIONS, param)
+        id = param.get('id')
+        endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_NOTIFICATIONS, id)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
@@ -482,9 +494,9 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        name = param['name']
-        description = param['description']
+        id = param.get('id')
+        name = param.get('name')
+        description = param.get('description')
 
         endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_LABELS, id)
 
@@ -509,11 +521,11 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_LABELS, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -532,7 +544,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
 
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_LABELS, id)
 
@@ -555,8 +567,8 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        name = param['name']
-        description = param['description']
+        name = param.get('name')
+        description = param.get('description')
 
         data = json.dumps(name + description)
 
@@ -581,7 +593,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_LABELS, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -600,10 +612,10 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_INTELS, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -622,7 +634,9 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_INTELS, param)
+        id = param.get('id')
+
+        endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_INTELS, id)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
@@ -645,7 +659,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_INTELS, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -664,9 +678,9 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS_COUNTS, param)
+        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS_COUNT, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -685,13 +699,17 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        num_days = param.get('num_days', '')
-        inteldocid = param.get('inteldocid', '')
-        scanconfigid = param.get('scanconfigid', '')
+        params = []
+        if param.get('num_days'):
+            params['n'] = param.get('num_days')
+        if param.get('inteldocid'):
+            params['inteldocid'] = param.get('inteldocid')
+        if param.get('scanconfigid'):
+            params['scanconfigid'] = param.get('scanconfigid')
 
-        endpoint = ('{}?n={}&intelDocId={}&scanConfigId={}').format(TANIUM_DETECT_API_PATH_ALERTS_COUNT, num_days, inteldocid, scanconfigid)
+        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS_COUNT, params)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -710,10 +728,10 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
         endpoint = ('{}/{}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -732,7 +750,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = param.get('id')
         state = param.get('state', '')
 
         endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
@@ -761,24 +779,25 @@ class TaniumDetectConnector(BaseConnector):
         max_limit = TANIUM_DETECT_MAX_LIMIT
         self.save_progress('Getting alerts data')
 
+        params = []
+
         # If the limit is greater than the max_limit set it to the max_limit
         # Tanium Responds with a 400 error when the limit is greater than 500
         if param.get('limit') and param.get('limit') > max_limit:
-            param['limit'] = max_limit
+            params['limit'] = max_limit
         elif param.get('limit') is None:
-            param['limit'] = TANIUM_DETECT_DEFAULT_LIMIT
+            params['limit'] = TANIUM_DETECT_DEFAULT_LIMIT
 
-        while True:
-            endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS, param)
+        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS, params)
 
-            ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
-            if phantom.is_fail(ret_val):
-                self.save_progress(action_result.get_message())
-                self.set_status(phantom.APP_ERROR, ('Failed to get alerts: {}').format(action_result.get_message()))
-                return action_result.get_status()
+        if phantom.is_fail(ret_val):
+            self.save_progress(action_result.get_message())
+            self.set_status(phantom.APP_ERROR, ('Failed to get alerts: {}').format(action_result.get_message()))
+            return action_result.get_status()
 
-            action_result.add_data(response)
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -812,7 +831,7 @@ class TaniumDetectConnector(BaseConnector):
 
         endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS, param)
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, method='get', params=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
@@ -840,7 +859,9 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = self._process_parameters(TANIUM_DETECT_API_PATH_ALERTS, param)
+        id = param.get('id')
+
+        endpoint = ('{}?id={}').format(TANIUM_DETECT_API_PATH_ALERTS, id)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, method='delete', params=None)
 
