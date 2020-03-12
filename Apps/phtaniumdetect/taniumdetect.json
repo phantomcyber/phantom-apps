@@ -265,7 +265,7 @@
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "description": "The maximum number of rules to return. [Default: 100]",
+                    "description": "The maximum number of rules to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 0
@@ -603,7 +603,7 @@
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "description": "The maximum number of sources to return. [Default: 100]",
+                    "description": "The maximum number of sources to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 0
@@ -1244,7 +1244,7 @@
                     "order": 1
                 },
                 "limit": {
-                    "description": "The maximum number of notifications to return. [Default: 100]",
+                    "description": "The maximum number of notifications to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 2
@@ -1844,7 +1844,7 @@
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "description": "The maximum number of labels to return. [Default: 100]",
+                    "description": "The maximum number of labels to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 0
@@ -2183,7 +2183,7 @@
                     "order": 3
                 },
                 "limit": {
-                    "description": "The maximum number of IntelDocs to return. [Default: 100]",
+                    "description": "The maximum number of IntelDocs to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 4
@@ -2388,7 +2388,7 @@
             "read_only": true,
             "parameters": {
                 "groupby": {
-                    "description": "Group alerts by specified group name [Default: 'computerName']",
+                    "description": "Group alerts by specified group name (Default: 'computerName')",
                     "data_type": "string",
                     "required": true,
                     "default": "computerName",
@@ -2951,7 +2951,7 @@
                     "order": 8
                 },
                 "limit": {
-                    "description": "The maximum number of alerts to return. [Default: 100]",
+                    "description": "The maximum number of alerts to return. (Default: 100)",
                     "data_type": "numeric",
                     "default": 100,
                     "order": 9
