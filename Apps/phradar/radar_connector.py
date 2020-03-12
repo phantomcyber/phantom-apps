@@ -175,8 +175,12 @@ class RadarConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-        name = param.get("name", "Default name")
-        description = param.get("description", "Default description")
+        name = param.get("name")
+        if not name:
+            self.debug_print(f"required name param not present in action: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "incident name not specified")
+
+        description = param.get("description", "Privacy incident created by Splunk Phantom")
 
         # use timezone set in asset configuration to set discovered date_time timezone
         config = self.get_config()
