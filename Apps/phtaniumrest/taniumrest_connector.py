@@ -681,7 +681,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("Parsed Question:\n" + json.dumps(response))
 
         if (phantom.is_fail(ret_val)):
-            action_result.set_status(phantom.APP_ERROR, "failed to parse question")
+            action_result.set_status(phantom.APP_ERROR, "Failed to parse question")
             return
 
         if len(response.get("data")) != 1:
