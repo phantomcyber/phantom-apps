@@ -336,10 +336,10 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
             # Create the data we are going to send to Akamai. We need to have all these values for the "Update a network list" API
             data = {
-                "name": response['name'],
-                "description": response['description'],
-                "type": response['type'],
-                "syncPoint": response['syncPoint'],
+                "name": response.get('name', ''),
+                "description": response.get('description', ''),
+                "type": response.get('type', ''),
+                "syncPoint": response.get('syncPoint', ''),
                 "list": networkList
             }
 
