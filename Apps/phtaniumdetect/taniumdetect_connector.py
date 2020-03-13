@@ -372,7 +372,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = []
+        params = {}
 
         if param.get('num_days'):
             params['n'] = param.get('num_days')
@@ -699,7 +699,7 @@ class TaniumDetectConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = []
+        params = {}
         if param.get('num_days'):
             params['n'] = param.get('num_days')
         if param.get('inteldocid'):
@@ -779,7 +779,7 @@ class TaniumDetectConnector(BaseConnector):
         max_limit = TANIUM_DETECT_MAX_LIMIT
         self.save_progress('Getting alerts data')
 
-        params = []
+        params = {}
 
         # If the limit is greater than the max_limit set it to the max_limit
         # Tanium Responds with a 400 error when the limit is greater than 500
@@ -891,7 +891,7 @@ class TaniumDetectConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Asset configuration timezone is not set.")
 
         # Always sort by id
-        # Use -id to sort desending
+        # Use -id to sort descending
         sort = "id"
 
         limit = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
