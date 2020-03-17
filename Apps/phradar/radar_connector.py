@@ -77,20 +77,11 @@ class RadarConnector(BaseConnector):
                 return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
             else:
                 self.debug_print(f"Parse JSON error during action: {self.get_action_identifier()}. Error:", ex)
-                return RetVal(
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        f"Unable to parse JSON response. Error: {str(ex)} === {resp_json}"
-                    ),
-                    None
-                )
 
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = f"JSON Response Status Code: {response.status_code}: {response.text.replace(u'{', '{{').replace(u'}', '}}')}"
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(response)), None)
 
     def _process_response(self, resp, action_result):
         self.save_progress(f"Process response")
@@ -113,14 +104,27 @@ class RadarConnector(BaseConnector):
         if "html" in resp.headers.get("Content-Type", ""):
             return self._process_html_response(resp, action_result)
 
-        # it's not content-type that is to be parsed, handle an empty response
+        # If content-type cannot be parsed handle an empty response
         if not resp.text:
             return self._process_empty_response(resp, action_result)
 
-        # everything else is actually an error at this point
-        message = f"Error from Radar API. Status Code: {resp.status_code} Data from server: {resp.text.replace('{', '{{').replace('}', '}}')}"
+        # handle remaining error
+        return RetVal(action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), None)
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+    def _process_response_error_message(self, error_resp):
+        message = f"Error response: Status code: {error_resp.status_code}"
+        if error_resp.status_code == 404:
+            return f"{message}. Message: not found. Please double check request parameters."
+        try:
+            resp_json = error_resp.json()
+            # if there are more than one field validation errors return the first one
+            if len(resp_json["errors"]) > 0:
+                return f"{message}. Parameter error: {resp_json['errors'][0]['fields'][0]}. Message: {resp_json['errors'][0]['message']}"
+            return f"{message}. Message: {resp_json['message']}"
+        except ValueError as ex:
+            self.debug_print(f"Could not process error response json. Error: ", ex)
+
+        return f"{message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         self.save_progress(f"Make rest call")
@@ -145,16 +149,10 @@ class RadarConnector(BaseConnector):
         try:
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
             return self._process_response(resp, action_result)
-
         except Exception as ex:
             self.debug_print(f"Make REST call during action: {self.get_action_identifier()}. Error:", ex)
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    f"Error Connecting to server. Details: {str(ex)}"
-                ),
-                resp_json
-            )
+                action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
 
     def _handle_test_connectivity(self, param):
         self.save_progress("Connect to Radar")
