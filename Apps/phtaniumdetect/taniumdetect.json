@@ -87,7 +87,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -124,7 +128,6 @@
                     "data_type": "numeric",
                     "column_name": "Revision",
                     "column_order": 4
-                    
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
@@ -1510,7 +1513,6 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "Name",
                     "column_order": 1
                 },
@@ -1780,7 +1782,6 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "Name",
                     "column_order": 1
                 },
