@@ -836,7 +836,7 @@ class TaniumDetectConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
             self.set_status(phantom.APP_ERROR, ('Failed to get alerts: {}').format(action_result.get_message()))
-            return action_result.get_status()
+            return action_result.get_status(), None
 
         return action_result.set_status(phantom.APP_SUCCESS), response
 
