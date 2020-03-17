@@ -8,14 +8,12 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-# from phantom.vault import Vault
 
 # Usage of the consts file is recommended
 from smime_consts import *
 import requests
 import json
 import os
-# import tempfile
 from M2Crypto import BIO, Rand, SMIME, X509
 
 
@@ -63,7 +61,7 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        message_body = param['message_body']
+        message_body = bytes(str(param['message_body']).encode("utf-8"))
 
         # Optional values should use the .get() function
         # vault_id = param.get('vault_id', '')
@@ -107,7 +105,7 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        message_body = param['message_body']
+        message_body = bytes(str(param['message_body']).encode("utf-8"))
 
         self.save_progress(SMIME_ENCRYPT_PROGRESS_MSG)
         try:
@@ -164,7 +162,8 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        encrypted_message = param['encrypted_message']
+        encrypted_message = bytes(
+            str(param['encrypted_message']).encode("utf-8"))
 
         self.save_progress(SMIME_DECRYPT_PROGRESS_MSG)
 
@@ -218,7 +217,7 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        signed_message = param['signed_message']
+        signed_message = bytes(str(param['signed_message']).encode("utf-8"))
 
         self.save_progress(SMIME_VERIFY_PROGRESS_MSG)
 
@@ -236,9 +235,6 @@ class SmimeConnector(BaseConnector):
         # Load the signer's CA cert. In this case, because the signer's
         # cert is self-signed, it is the signer's cert itself.
         st = X509.X509_Store()
-        # NOTE: Official code expects to have a file location, not the file content!
-        # Src: https://gitlab.com/m2crypto/m2crypto/blob/master/M2Crypto/X509.py
-        # st.load_info(self._keys['public'])
         st.add_x509(x509)
         s.set_x509_store(st)
 
