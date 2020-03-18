@@ -415,7 +415,7 @@
       "action": "create privacy incident",
       "identifier": "create_privacy_incident",
       "description": "Create Radar Privacy Incident",
-      "verbose": "<p>This action creates a privacy incident in Radar using the following phantom system and app configurations:</p>\n<h4>Company Settings</h4>\n<p><b>Base URL For Phantom Appliance</b> - used to link the created incident's 'intake method' to this instance of Phantom.</p>\n\n<h4>Asset Configuration</h4>\n<p>Asset configuration values are used as follows to create the incident:</p>\n<p><b>Incident Group ID</b> - must be specified in the asset configuration for authorization.</p>\n<p><b>Time Zone</b> - the current moment that this action is triggered is used to set the created incident's 'discovered' date and time. The asset <b>Time Zone</b> is used to specify the 'discovered' time zone offset.</p>\n\n\n<h4>Container Information</h4>\n<p>The container ID for the associated phantom event or case is use to specify the Radar incident channel ID. This is used to associate the created incident to the container</p>\n\n<h4>Action Parameters</h4>\n<p>The action parameters are used to set the Radar incident <b>name</b> and <b>description</b></p>\n",
+      "verbose": "This action creates a privacy incident in Radar using Phantom settings and asset configurations. The Base URL For Phantom Appliance configured on the Company Settings page is used to link the incident's \"intake method\" to this instance of Phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated Phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the Phantom container. Action parameters are used to set the Radar incident name and description.",
       "type": "generic",
       "read_only": false,
       "parameters": {
@@ -490,7 +490,7 @@
       "action": "add note",
       "identifier": "add_note",
       "description": "Add a Note to a Radar Privacy Incident",
-      "verbose": "<p>This action adds a note to a given Radar incident using the following configurations:</p>\n\n<h4>Action Parameters</h4>\n<p><b>Incident ID</b> - used to add a note to a given incident</p>\n<p><b>Content</b> - the content of the note</p>\n\n\n<h4>Note Category</h4>\n<p>The note category will always be set to 'Splunk Phantom'</p>",
+      "verbose": "This action adds a note to a given Radar incident using asset configurations and action parameters. The incident ID action parameter is used to add a note to a given incident. The content action parameter is used for the content of the note. The Radar note category will always be set to \"Splunk Phantom\".",
       "type": "generic",
       "read_only": false,
       "parameters": {
