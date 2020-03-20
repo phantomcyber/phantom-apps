@@ -5,6 +5,8 @@ on:
     types: [closed]
       branches:
         - master
+      branches-ignore:
+      - '**'
 
 jobs:
   deploy-lambda:
