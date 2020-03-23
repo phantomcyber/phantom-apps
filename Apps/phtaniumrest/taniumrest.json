@@ -38,14 +38,12 @@
         "verify_server_cert": {
             "description": "Verify Server Certificate",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 1
         },
         "results_percentage": {
             "description": "Consider question results complete at (% out of 100)",
             "data_type": "numeric",
-            "required": false,
             "default": 99,
             "order": 4
         }
@@ -65,7 +63,7 @@
             "action": "list processes",
             "identifier": "list_processes",
             "description": "List the running processes of the devices registered on the Tanium server",
-            "verbose": "This action requires specifying a sensor to be used to list processes.  A standard Tanium sensor, 'Process Details' is used by default but a different sensor can be specified instead.  Note that the 'Process Details' sensor may not be available on all Tanium deployments.  Note that at this time this action only supports limiting the query to specified computer groups, but a generic Run Query action can be constructed to query an in individual computer's processes.",
+            "verbose": "This action requires specifying a sensor to be used to list processes. A standard Tanium sensor, 'Process Details' is used by default but a different sensor can be specified instead. Note that the 'Process Details' sensor may not be available on all Tanium deployments. Note that at this time this action only supports limiting the query to specified computer groups, but a generic Run Query action can be constructed to query an in individual computer's processes.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -79,7 +77,6 @@
                 "group_name": {
                     "description": "Computer group name of which the processes will be listed",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "timeout_seconds": {
@@ -517,14 +514,13 @@
             "action": "list questions",
             "identifier": "list_questions",
             "description": "Retrieves either a history of the most recent questions or a list of saved questions",
-            "verbose": "If the 'list_saved_questions' parameter is true, this action will return a list of saved questions.  If the flag is not set, this action will return a history of recently asked questions",
+            "verbose": "If the <b>list_saved_questions</b> parameter is true, this action will return a list of saved questions. If the flag is not set, this action will return a history of recently asked questions.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "list_saved_questions": {
                     "description": "Retrieve Saved Questions",
                     "data_type": "boolean",
-                    "required": false,
                     "default": true,
                     "order": 0
                 }
@@ -768,9 +764,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.user.deleted_flag",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        0
+                        true,
+                        false
                     ]
                 },
                 {
@@ -849,25 +846,21 @@
                 "package_parameters": {
                     "description": "Package parameters of the corresponding package",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "group_name": {
                     "description": "Computer group name of which the process will be terminated",
                     "data_type": "string",
-                    "required": false,
                     "order": 4
                 },
                 "distribute_seconds": {
                     "description": "The number of seconds over which to deploy the action",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 5
                 },
                 "issue_seconds": {
                     "description": "The number of seconds to reissue an action from the saved action",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 6
                 },
                 "expire_seconds": {
@@ -1108,10 +1101,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.content_set.name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.creation_time",
@@ -1130,10 +1120,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.display_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.expire_seconds",
@@ -1159,10 +1146,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.last_modified_by",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.last_update",
@@ -1173,17 +1157,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.mod_user.display_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.mod_user.domain",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "domain"
                     ]
@@ -1197,10 +1175,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.mod_user.name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.package_spec.modification_time",
@@ -1411,25 +1386,21 @@
                 "package_parameters": {
                     "description": "Parameter inputs of the corresponding package. Provide JSON format (i.e. {\"$1\": \"Standard_Collection\", \"$2\": \"SCP\"})",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "group_name": {
                     "description": "The Tanium Computer Group name on which the action will be executed. If left blank, will execute on all registered IP addresses/hostnames in your Tanium instance",
                     "data_type": "string",
-                    "required": false,
                     "order": 4
                 },
                 "distribute_seconds": {
                     "description": "The number of seconds over which to deploy the action",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 5
                 },
                 "issue_seconds": {
                     "description": "The number of seconds to reissue an action from the saved action",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 6
                 },
                 "expire_seconds": {
@@ -1654,7 +1625,7 @@
                     "data_path": "action_result.data.*.package_spec.command",
                     "data_type": "string",
                     "example_values": [
-                        "cmd /c mkdir C:\\Users\\Administrator\\donkeykong123\\\"TestDirectory\""
+                        "cmd /c mkdir C:\\Users\\Administrator\\test123\\\"TestDirectory\""
                     ]
                 },
                 {
@@ -1970,19 +1941,16 @@
                 "group_name": {
                     "description": "The Tanium Computer Group name on which the query will be executed (manual query only)",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "is_saved_question": {
                     "description": "Check this box if the query text parameter refers to a 'Saved Question' on your Tanium",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 2
                 },
                 "timeout_seconds": {
                     "description": "The number of seconds before the question expires (manual query only)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 600,
                     "order": 3
                 }
@@ -1991,8 +1959,6 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
@@ -2008,8 +1974,6 @@
                 {
                     "data_path": "action_result.parameter.is_saved_question",
                     "data_type": "boolean",
-                    "column_name": "Is Parsed",
-                    "column_order": 2,
                     "example_values": [
                         false,
                         true

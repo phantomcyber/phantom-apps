@@ -14,6 +14,7 @@ import requests
 import json
 from time import sleep
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -146,8 +147,14 @@ class TaniumRestConnector(BaseConnector):
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "error while connecting to the server. Details: {0}"
-                                                   .format(str(e))), resp_json)
+            if e.message:
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            else:
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error while connecting to the server. Details: {0}".format(error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -285,7 +292,7 @@ class TaniumRestConnector(BaseConnector):
 
     def _execute_action_support(self, param, action_result):
         action_grp = param['action_group']
-        package_name = param['package_name']
+        package_name = UnicodeDammit(param['package_name']).unicode_markup.encode('utf-8')
         action_name = param['action_name']
         expire_seconds = param['expire_seconds']
         package_parameter = param.get('package_parameters', None)
@@ -456,7 +463,8 @@ class TaniumRestConnector(BaseConnector):
         config = self.get_config()
 
         sensor_name = param['sensor']
-        group_name = param.get('group_name')
+        if param.get('group_name'):
+            group_name = UnicodeDammit(param.get('group_name')).unicode_markup.encode('utf-8')
         timeout_seconds = param.get('timeout_seconds', 600)
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
@@ -553,8 +561,9 @@ class TaniumRestConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        query_text = param.get('query_text')
-        group_name = param.get('group_name')
+        query_text = UnicodeDammit(param.get('query_text')).unicode_markup.encode('utf-8')
+        if param.get('group_name'):
+            group_name = UnicodeDammit(param.get('group_name')).unicode_markup.encode('utf-8')
         timeout_seconds = param.get('timeout_seconds')
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
