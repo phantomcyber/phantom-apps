@@ -14,7 +14,7 @@
     "utctime_updated": "2019-11-11T14:20:14.00000Z",
     "package_name": "phantom_taniumdetect",
     "main_module": "taniumdetect_connector.pyc",
-    "min_phantom_version": "4.1.94",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.5.0",
     "configuration": {
         "base_url": {
@@ -833,7 +833,7 @@
                 {
                     "data_path": "action_result.data.*.*.canAutoQuickScan",
                     "data_type": "boolean",
-                    "column_name": "Can Auto Quck Scan",
+                    "column_name": "Can Auto Quick Scan",
                     "column_order": 3
                 },
                 {
@@ -2196,7 +2196,7 @@
                     "order": 5
                 },
                 "nolimit": {
-                    "description": "If TRUE will not limit the number of items returned",
+                    "description": "If TRUE, it will not limit the number of items returned",
                     "data_type": "boolean",
                     "default": false,
                     "order": 6
