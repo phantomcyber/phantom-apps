@@ -7,7 +7,8 @@ import json
 import os
 import requests
 from datetime import datetime
-from pytz import timezone
+import pytz
+from dateutil import parser
 from bs4 import BeautifulSoup
 from radar_consts import *
 
@@ -184,7 +185,7 @@ class RadarConnector(BaseConnector):
         config = self.get_config()
         incident_group = int(config.get("radar_incident_group"))
         time_zone = config.get("time_zone", "UTC")
-        date_time = datetime.now(timezone(time_zone)).strftime("%Y-%m-%dT%H:%M:%S")
+        discovered = datetime.now(pytz.timezone(time_zone)).strftime("%Y-%m-%dT%H:%M:%S")
 
         # get incident channel information
         phantom_base_url = self._get_system_settings()["company_info_settings"]["fqdn"]
@@ -209,7 +210,7 @@ class RadarConnector(BaseConnector):
             "name": name,
             "description": description,
             "discovered": {
-                "date_time": date_time,
+                "date_time": discovered,
                 "time_zone": time_zone
             }
         }
@@ -219,14 +220,50 @@ class RadarConnector(BaseConnector):
         if phantom.is_fail(radar_val):
             return action_result.get_status()
 
-        data["incident_id"] = data["id"]
-        data["name"] = name
-        data["description"] = description
-        data["group"] = incident_group
-        data["discovered"] = f"{date_time} / {time_zone}"
+        # construct incident output with fields we want to render
+        incident = dict()
+        incident["incident_id"] = data["id"]
+        incident["name"] = name
+        incident["description"] = description
+        incident["url"] = data["url"]
+        incident["discovered"] = self._format_timestr(discovered)
 
         self.save_progress("Add data to action result")
-        action_result.add_data(data)
+        action_result.add_data(incident)
+
+        # Return success, no need to set the message, only the status
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_privacy_incident(self, param):
+        self.save_progress(f"Run action {self.get_action_identifier()}")
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        incident_id = param.get("incident_id")
+        if not incident_id:
+            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
+
+        radar_val, data = self._make_rest_call(f"/incidents/{incident_id}", action_result, method="get")
+
+        if phantom.is_fail(radar_val):
+            return action_result.get_status()
+
+        # construct incident output with fields we want to render
+        incident = dict()
+        incident["incident_id"] = data["id"]
+        incident["name"] = data["name"]
+        incident["description"] = data["description"]
+        incident["url"] = data["url"]
+        incident["discovered_at"] = self._format_timestr(data["discovered"]["date_time"])
+        incident["created_at"] = self._localize_and_format_timestr(data["created_at"])
+        incident["updated_at"] = self._localize_and_format_timestr(data["updated_at"])
+        incident["updated_by"] = data["updated_by"]
+        incident["incident_status"] = data["status"]
+        incident["assignee"] = f"{data['assignee']['given_name']} {data['assignee']['surname']}"
+
+        self.save_progress("Add data to action result")
+        action_result.add_data(incident)
 
         # Return success, no need to set the message, only the status
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -242,6 +279,17 @@ class RadarConnector(BaseConnector):
             self.debug_print(f"Get system settings during action: {self.get_action_identifier()}. Error:", ex)
 
         return resp_json
+
+    def _localize_and_format_timestr(self, timestr):
+        time_zone = self.get_config().get("time_zone", "UTC")
+        parsed_datetime = parser.parse(timestr)
+        formatted_datetime = parsed_datetime.astimezone(pytz.timezone(time_zone)).strftime("%Y-%m-%d %H:%M:%S")
+        return f"{formatted_datetime} / {time_zone}"
+
+    def _format_timestr(self, timestr):
+        time_zone = self.get_config().get("time_zone", "UTC")
+        formatted_datetime = parser.parse(timestr).strftime("%Y-%m-%d %H:%M:%S")
+        return f"{formatted_datetime} / {time_zone}"
 
     def _handle_add_note(self, param):
         self.save_progress(f"Run action {self.get_action_identifier()}")
@@ -263,13 +311,15 @@ class RadarConnector(BaseConnector):
         if phantom.is_fail(radar_val):
             return action_result.get_status()
 
-        data["incident_id"] = incident_id
-        data["id"] = data["headers"]["Location"].split("/")[4]
-        data["content"] = content
-        data["category"] = category
+        # construct note output with fields we want to render
+        note = dict()
+        note["incident_id"] = incident_id
+        note["id"] = data["headers"]["Location"].split("/")[4]
+        note["content"] = content
+        note["category"] = category
 
         self.save_progress("Add data to action result")
-        action_result.add_data(data)
+        action_result.add_data(note)
 
         # Return success, no need to set the message, only the status
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -285,6 +335,9 @@ class RadarConnector(BaseConnector):
 
         elif action_id == "create_privacy_incident":
             ret_val = self._handle_create_privacy_incident(param)
+
+        elif action_id == "get_privacy_incident":
+            ret_val = self._handle_get_privacy_incident(param)
 
         elif action_id == "add_note":
             ret_val = self._handle_add_note(param)

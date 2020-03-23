@@ -18,9 +18,8 @@
   "min_phantom_version": "4.6.19142",
   "pip_dependencies": {
     "pypi": [
-      {
-        "module": "pytz"
-      }
+      {"module": "pytz"},
+      {"module": "python-dateutil"}
     ]
   },
   "configuration": {
@@ -436,7 +435,7 @@
         {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
-          "column_name": "incident id",
+          "column_name": "id",
           "column_order": 0,
           "contains": [
             "radar incident id"
@@ -445,48 +444,145 @@
         {
           "data_path": "action_result.data.*.name",
           "data_type": "string",
-          "column_name": "incident name",
+          "column_name": "name",
           "column_order": 1
         },
         {
           "data_path": "action_result.data.*.description",
           "data_type": "string",
-          "column_name": "incident description",
+          "column_name": "description",
           "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.incident_group",
-          "data_type": "numeric",
-          "column_name": "incident group id",
-          "column_order": 3
         },
         {
           "data_path": "action_result.data.*.discovered",
           "data_type": "string",
-          "column_name": "incident discovered date and time",
-          "column_order": 4
+          "column_name": "discovered at",
+          "column_order": 3
         },
         {
           "data_path": "action_result.data.*.url",
-          "data_type": "numeric",
-          "column_name": "incident url",
-          "column_order": 5
+          "data_type": "string",
+          "column_name": "url",
+          "column_order": 4
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
           "column_name": "status",
-          "column_order": 6
+          "column_order": 5
         },
         {
           "data_path": "action_result.message",
           "data_type": "string",
-          "column_order": 7
+          "column_order": 6
         }
       ],
       "render": {
         "type": "custom",
-        "view": "radar_view.display_privacy_incident",
+        "view": "radar_view.display_create_incident_results",
+        "title": "Privacy Incident",
+        "menu_name": "Radar Privacy Incident"
+      },
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "get privacy incident",
+      "identifier": "get_privacy_incident",
+      "description": "Get Radar Privacy Incident",
+      "verbose": "This action gets a Radar privacy incident using the incident ID supplied in the action parameters",
+      "type": "generic",
+      "read_only": false,
+      "parameters": {
+        "incident_id": {
+          "description": "Radar Incident ID",
+          "data_type": "numeric",
+          "required": true,
+          "order": 0,
+          "contains": [
+            "radar incident id"
+          ],
+          "primary": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.incident_id",
+          "data_type": "numeric",
+          "column_name": "id",
+          "column_order": 0,
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "column_name": "name",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "description",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.url",
+          "data_type": "string",
+          "column_name": "url",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.data.*.created_at",
+          "data_type": "string",
+          "column_name": "created at",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.discovered_at",
+          "data_type": "string",
+          "column_name": "discovered at",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.updated_at",
+          "data_type": "string",
+          "column_name": "updated at",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.data.*.updated_by",
+          "data_type": "string",
+          "column_name": "updated by",
+          "column_order": 7
+        },
+        {
+          "data_path": "action_result.data.*.incident_status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 8
+        },
+        {
+          "data_path": "action_result.data.*.assignee",
+          "data_type": "string",
+          "column_name": "assignee",
+          "column_order": 9
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 10
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "column_order": 11
+        }
+      ],
+      "render": {
+        "type": "custom",
+        "view": "radar_view.display_get_incident_results",
         "title": "Privacy Incident",
         "menu_name": "Radar Privacy Incident"
       },

@@ -64,80 +64,135 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             padding-right: 10px
         }
 
+        .td-row-start {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
     </style>
     <div class="display-container">
-        {% if incidents %}
+        {% if create_incident_results %}
+            {% for incident in create_incident_results %}
             <h3 class="wf-h3-style">Radar Privacy Incident</h3>
-            <table class="wf-table-horizontal">
-                <th>incident id</th>
-                <th>incident name</th>
-                <th>description</th>
-                <th>incident group id</th>
-                <th>discovered</th>
-                <th>radar incident url</th>
-                {% for incident in incidents %}
-                    <tr>
-                        <td>
-                            <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.id }}' }], 0, {{ container.id }}, null, false);">
-                                {{ incident.id }}
-                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                            </a>
-                        </td>
-                        <td>
-                            {{ incident.name }}
-                        </td>
-                        <td>
-                            {{ incident.description }}
-                        </td>
-                        <td>
-                            {{ incident.group }}
-                        </td>
-                        <td>
-                            {{ incident.discovered }}
-                        </td>
-                        <td>
-                            <a target="_blank" href="{{ incident.url }}">{{ incident.url }}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            <table class="wf-table-vertical">
+                <tr>
+                    <td class="td-row-start">id</td>
+                    <td>
+                        <a href="javascript:;"
+                           onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ incident.incident_id }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">name</td>
+                    <td>{{ incident.name }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">description</td>
+                    <td>{{ incident.description }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">discovered</td>
+                    <td>{{ incident.discovered }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">url</td>
+                    <td><a target="_blank" href="{{ incident.url }}">{{ incident.url }}</a></td>
+                </tr>
             </table>
-        {% else %}
-            <p> No incident</p>
+            {% endfor %}
+        {% endif %}
+
+        {% if get_incident_results %}
+            {% for incident in get_incident_results %}
+            <table class="wf-table-vertical">
+            <h3 class="wf-h3-style">Radar Privacy Incident</h3>
+                <tr>
+                    <td class="td-row-start">id</td>
+                    <td>
+                        <a href="javascript:;"
+                           onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ incident.incident_id }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">name</td>
+                    <td>{{ incident.name }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">description</td>
+                    <td>{{ incident.description }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">url</td>
+                    <td><a target="_blank" href="{{ incident.url }}">{{ incident.url }}</a></td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">created at</td>
+                    <td>{{ incident.created_at}}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">discovered at</td>
+                    <td>{{ incident.discovered_at }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">updated at</td>
+                    <td>{{ incident.updated_at}}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">updated by</td>
+                    <td>{{ incident.updated_by }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">status</td>
+                    <td>{{ incident.incident_status }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">assignee</td>
+                    <td>{{ incident.assignee }}</td>
+                </tr>
+            </table>
+            {% endfor %}
         {% endif %}
 
         {% if notes %}
+            {% for note in notes %}
             <h2 class="wf-h3-style">Radar Incident Note</h2>
-            <table class="wf-table-horizontal">
-                <th>incident id</th>
-                <th>note id</th>
-                <th>note category</th>
-                <th>note content</th>
-                {% for note in notes %}
-                    <tr>
-                        <td>
-                            <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
-                                {{ note.incident_id }}
-                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
-                                {{ note.id }}
-                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                            </a>
-                        </td>
-                        <td>
-                            {{ note.category }}
-                        </td>
-                        <td>
-                            {{ note.content }}
-                        </td>
-                    </tr>
-                {% endfor %}
+            <table class="wf-table-vertical">
+                <tr>
+                    <td class="td-row-start">incident id</td>
+                    <td>
+                        <a href="javascript:;"
+                           onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ note.incident_id }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">note id</td>
+                    <td>
+                        <a href="javascript:;"
+                           onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ note.id }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">note category</td>
+                    <td>{{ note.category }}</td>
+                </tr>
+                <tr>
+                    <td class="td-row-start">note content</td>
+                    <td>{{ note.content }}</td>
+                </tr>
             </table>
+            {% endfor %}
         {% endif %}
     </div>
 
