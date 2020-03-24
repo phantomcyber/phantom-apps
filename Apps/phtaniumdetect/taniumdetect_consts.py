@@ -1,3 +1,7 @@
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 TANIUM_DETECT_DEFAULT_LIMIT = 100
 TANIUM_DETECT_MAX_LIMIT = 500
 TANIUM_DETECT_API_BASE_URL = '/plugin/products/detect3/api/v1'
