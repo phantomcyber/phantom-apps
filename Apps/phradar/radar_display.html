@@ -52,7 +52,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             padding-left: 4px;
         }
 
-        .wf-h3-style {
+        .wf-h2-style {
             font-size: 20px
         }
 
@@ -73,7 +73,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
     <div class="display-container">
         {% if create_incident_results %}
             {% for incident in create_incident_results %}
-            <h3 class="wf-h3-style">Radar Privacy Incident</h3>
+            <h2 class="wf-h2-style">Radar Privacy Incident</h2>
             <table class="wf-table-vertical">
                 <tr>
                     <td class="td-row-start">id</td>
@@ -108,7 +108,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         {% if get_incident_results %}
             {% for incident in get_incident_results %}
             <table class="wf-table-vertical">
-            <h3 class="wf-h3-style">Radar Privacy Incident</h3>
+            <h2 class="wf-h2-style">Radar Privacy Incident</h2>
                 <tr>
                     <td class="td-row-start">id</td>
                     <td>
@@ -159,10 +159,14 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             {% endfor %}
         {% endif %}
 
-        {% if notes %}
-            {% for note in notes %}
-            <h2 class="wf-h3-style">Radar Incident Note</h2>
+        {% if add_note_results %}
+            {% for note in add_note_results %}
+            <h2 class="wf-h2-style">Radar Incident Note</h2>
             <table class="wf-table-vertical">
+                <tr>
+                    <td class="td-row-start">note id</td>
+                    <td>{{note.id}}</td>
+                </tr>
                 <tr>
                     <td class="td-row-start">incident id</td>
                     <td>
@@ -174,25 +178,60 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                     </td>
                 </tr>
                 <tr>
-                    <td class="td-row-start">note id</td>
-                    <td>
-                        <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['radar note id'], 'value': '{{ note.id }}' }], 0, {{ container.id }}, null, false);">
-                            {{ note.id }}
-                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td-row-start">note category</td>
-                    <td>{{ note.category }}</td>
-                </tr>
-                <tr>
-                    <td class="td-row-start">note content</td>
+                    <td class="td-row-start">content</td>
                     <td>{{ note.content }}</td>
                 </tr>
             </table>
             {% endfor %}
+        {% endif %}
+
+        {% if get_notes_results %}
+            {% for notes in get_notes_results %}
+            <h2 class="wf-h2-style">Notes for Radar Incident {{ notes.0.incident_id }}</h2>
+                {% for note in notes %}
+                <table class="wf-table-vertical">
+                    <tr>
+                        <td class="td-row-start">note id</td>
+                        <td>{{note.id}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">incident id</td>
+                        <td>
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ note.incident_id }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">content</td>
+                        <td>{{ note.content }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">created at</td>
+                        <td>{{ note.created_at }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">created by</td>
+                        <td>{{ note.created_by }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">updated at</td>
+                        <td>{{ note.updated_at }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-row-start">updated by</td>
+                        <td>{{ note.updated_by }}</td>
+                    </tr>
+                </table>
+                <br/>
+                <br/>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        {% if get_note_results_none %}
+        <h2 class="wf-h2-style">There are no notes added to this incident that were created by Phantom.</h2>
         {% endif %}
     </div>
 

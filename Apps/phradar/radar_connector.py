@@ -306,7 +306,7 @@ class RadarConnector(BaseConnector):
         }
 
         # make rest call
-        radar_val, data = self._make_rest_call(f"/incidents/{param.get('incident_id')}/notes", action_result, method="post", data=json.dumps(body))
+        radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="post", data=json.dumps(body))
 
         if phantom.is_fail(radar_val):
             return action_result.get_status()
@@ -316,10 +316,42 @@ class RadarConnector(BaseConnector):
         note["incident_id"] = incident_id
         note["id"] = data["headers"]["Location"].split("/")[4]
         note["content"] = content
-        note["category"] = category
 
         self.save_progress("Add data to action result")
         action_result.add_data(note)
+
+    def _handle_get_notes(self, param):
+        self.save_progress(f"Run action {self.get_action_identifier()}")
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        incident_id = param.get("incident_id")
+
+        # make rest call
+        radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")
+
+        if phantom.is_fail(radar_val):
+            return action_result.get_status()
+
+        notes = []
+
+        for note_data in data:
+            if note_data["category"] == "Splunk Phantom":
+                # construct note output with fields we want to render
+                notes.append({
+                    "incident_id": incident_id,
+                    "id": note_data["id"],
+                    "content": note_data["content"],
+                    "category": note_data["category"],
+                    "created_at": self._localize_and_format_timestr(note_data["created_at"]),
+                    "created_by": note_data["created_by"],
+                    "updated_at": self._localize_and_format_timestr(note_data["updated_at"]),
+                    "updated_by": note_data["updated_by"],
+                })
+
+        self.save_progress("Add data to action result")
+        action_result.add_data(notes)
 
         # Return success, no need to set the message, only the status
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -341,6 +373,9 @@ class RadarConnector(BaseConnector):
 
         elif action_id == "add_note":
             ret_val = self._handle_add_note(param)
+
+        elif action_id == "get_notes":
+            ret_val = self._handle_get_notes(param)
 
         return ret_val
 
@@ -381,17 +416,17 @@ if __name__ == "__main__":
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies["csrftoken"]
 
-            data = dict()
-            data["username"] = username
-            data["password"] = password
-            data["csrfmiddlewaretoken"] = csrftoken
+            auth_data = dict()
+            auth_data["username"] = username
+            auth_data["password"] = password
+            auth_data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
             headers["Cookie"] = "csrftoken=" + csrftoken
             headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=auth_data, headers=headers)
             session_id = r2.cookies["sessionid"]
 
         except Exception as e:
