@@ -230,6 +230,9 @@ class TaniumRestConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to fetch a session token from Tanium API!")
+            self._state['session_id'] = None
+            self._session_id = None
+            self.save_state(self._state)
             return action_result.get_status()
 
         self._state['session_id'] = resp_json.get('data', {}).get('session')
@@ -463,8 +466,9 @@ class TaniumRestConnector(BaseConnector):
         config = self.get_config()
 
         sensor_name = param['sensor']
-        if param.get('group_name'):
-            group_name = UnicodeDammit(param.get('group_name')).unicode_markup.encode('utf-8')
+        group_name = param.get('group_name')
+        if group_name:
+            group_name = UnicodeDammit(group_name).unicode_markup.encode('utf-8')
         timeout_seconds = param.get('timeout_seconds', 600)
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
@@ -499,8 +503,8 @@ class TaniumRestConnector(BaseConnector):
         question_id = response.get("data", {}).get("id")
         self.debug_print("Successfully queried Tanium for list_proccesses action, got question results id {0}".format(question_id))
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
-        results_percentage = config.get('results_percentage', 99)
-        response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
+
+        response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result)
 
         if response is None:
             self.debug_print("Warning! Tanium returned empty response for list_processes action")
@@ -562,8 +566,9 @@ class TaniumRestConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         query_text = UnicodeDammit(param.get('query_text')).unicode_markup.encode('utf-8')
-        if param.get('group_name'):
-            group_name = UnicodeDammit(param.get('group_name')).unicode_markup.encode('utf-8')
+        group_name = param.get('group_name')
+        if group_name:
+            group_name = UnicodeDammit(group_name).unicode_markup.encode('utf-8')
         timeout_seconds = param.get('timeout_seconds')
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
@@ -734,8 +739,7 @@ class TaniumRestConnector(BaseConnector):
         # Get results of Question
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
 
-        results_percentage = config.get('results_percentage', 99)
-        response = self._question_result(timeout_seconds, int(results_percentage), endpoint, action_result)
+        response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result)
 
         if response is None:
             action_result.set_status(phantom.APP_ERROR, "Failed to get results")
@@ -783,8 +787,15 @@ class TaniumRestConnector(BaseConnector):
         self._username = config['username']
         self._password = config['password']
         self._verify = config['verify_server_cert']
+        self._percentage = config.get('results_percentage', 99)
 
-        self._base_url = config['base_url'].encode('utf-8')
+        try:
+            if int(self._percentage) < 0 or int(self._percentage) > 100:
+                return self.set_status(phantom.APP_ERROR, "Please provide a valid integer in range of 0-100 in [Consider question results complete at] configuration parameter")
+        except:
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid integer in range of 0-100 in [Consider question results complete at] configuration parameter")
+
+        self._base_url = UnicodeDammit(config['base_url']).unicode_markup.encode('utf-8')
 
         if self._base_url[-1] == '/':
             self._base_url = self._base_url[:-1]
