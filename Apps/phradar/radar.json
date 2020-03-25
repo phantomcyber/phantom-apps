@@ -685,13 +685,13 @@
       },
       "output": [
         {
-          "data_path": "action_result.data.*.id",
+          "data_path": "action_result.data.*.*.id",
           "data_type": "numeric",
           "column_name": "note id",
           "column_order": 0
         },
         {
-          "data_path": "action_result.data.*.incident_id",
+          "data_path": "action_result.parameter.incident_id",
           "data_type": "numeric",
           "column_name": "incident id",
           "column_order": 1,
@@ -700,31 +700,31 @@
           ]
         },
         {
-          "data_path": "action_result.data.*.content",
+          "data_path": "action_result.data.*.*.content",
           "data_type": "string",
           "column_name": "note content",
           "column_order": 2
         },
         {
-          "data_path": "action_result.data.*.created_at",
+          "data_path": "action_result.data.*.*.created_at",
           "data_type": "string",
           "column_name": "created at",
           "column_order": 3
         },
         {
-          "data_path": "action_result.data.*.created_by",
+          "data_path": "action_result.data.*.*.created_by",
           "data_type": "string",
           "column_name": "created by",
           "column_order": 4
         },
         {
-          "data_path": "action_result.data.*.updated_at",
+          "data_path": "action_result.data.*.*.updated_at",
           "data_type": "string",
           "column_name": "updated at",
           "column_order": 5
         },
         {
-          "data_path": "action_result.data.*.updated_by",
+          "data_path": "action_result.data.*.*.updated_by",
           "data_type": "string",
           "column_name": "updated by",
           "column_order": 6
