@@ -474,7 +474,10 @@
         {
           "data_path": "action_result.message",
           "data_type": "string",
-          "column_order": 6
+          "column_order": 6,
+          "example_values": [
+            "Successfully created a privacy incident"
+          ]
         }
       ],
       "render": {
@@ -577,7 +580,10 @@
         {
           "data_path": "action_result.message",
           "data_type": "string",
-          "column_order": 11
+          "column_order": 11,
+          "example_values": [
+            "Successfully fetched privacy incident"
+          ]
         }
       ],
       "render": {
@@ -644,7 +650,10 @@
         {
           "data_path": "action_result.message",
           "data_type": "string",
-          "column_order": 4
+          "column_order": 4,
+          "example_values": [
+            "Successfully added note"
+          ]
         }
       ],
       "render": {
@@ -729,7 +738,10 @@
         {
           "data_path": "action_result.message",
           "data_type": "string",
-          "column_order": 8
+          "column_order": 8,
+          "example_values": [
+            "Successfully fetched notes"
+          ]
         }
       ],
       "render": {

@@ -231,8 +231,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
 
-        # Return success, no need to set the message, only the status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created a privacy incident")
 
     def _handle_get_privacy_incident(self, param):
         self.save_progress(f"Run action {self.get_action_identifier()}")
@@ -274,8 +273,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
 
-        # Return success, no need to set the message, only the status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched privacy incident")
 
     def _get_system_settings(self):
         self.save_progress("Get system settings")
@@ -324,6 +322,8 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(note)
 
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully added note")
+
     def _handle_get_notes(self, param):
         self.save_progress(f"Run action {self.get_action_identifier()}")
 
@@ -357,8 +357,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(notes)
 
-        # Return success, no need to set the message, only the status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched notes")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
