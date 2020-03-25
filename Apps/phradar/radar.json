@@ -482,7 +482,7 @@
       ],
       "render": {
         "type": "custom",
-        "view": "radar_view.display_create_incident_results",
+        "view": "radar_view.display_view",
         "title": "Privacy Incident",
         "menu_name": "Radar Privacy Incident"
       },
@@ -588,7 +588,7 @@
       ],
       "render": {
         "type": "custom",
-        "view": "radar_view.display_get_incident_results",
+        "view": "radar_view.display_view",
         "title": "Privacy Incident",
         "menu_name": "Radar Privacy Incident"
       },
@@ -658,7 +658,7 @@
       ],
       "render": {
         "type": "custom",
-        "view": "radar_view.display_add_note_results",
+        "view": "radar_view.display_view",
         "title": "Privacy Incident Note",
         "menu_name": "Radar Privacy Incident Note"
       },
@@ -746,7 +746,7 @@
       ],
       "render": {
         "type": "custom",
-        "view": "radar_view.display_get_notes_results",
+        "view": "radar_view.display_view",
         "title": "Privacy Incident Note",
         "menu_name": "Radar Privacy Incident Note"
       },
