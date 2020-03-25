@@ -39,6 +39,7 @@ class RadarConnector(BaseConnector):
         config = self.get_config()
         self._api_url = config.get("radar_api_url")
         self._verify_ssl = not os.getenv(ALLOW_SELF_SIGNED_CERTS)
+        self._time_zone = self.get_config().get("time_zone", "UTC")
 
         return phantom.APP_SUCCESS
 
@@ -184,8 +185,7 @@ class RadarConnector(BaseConnector):
         # use timezone set in asset configuration to set discovered date_time timezone
         config = self.get_config()
         incident_group = int(config.get("radar_incident_group"))
-        time_zone = config.get("time_zone", "UTC")
-        discovered = datetime.now(pytz.timezone(time_zone)).strftime("%Y-%m-%dT%H:%M:%S")
+        discovered = datetime.now(pytz.timezone(self._time_zone))
 
         # get incident channel information
         phantom_base_url = self._get_system_settings()["company_info_settings"]["fqdn"]
@@ -210,8 +210,8 @@ class RadarConnector(BaseConnector):
             "name": name,
             "description": description,
             "discovered": {
-                "date_time": discovered,
-                "time_zone": time_zone
+                "date_time": discovered.strftime("%Y-%m-%dT%H:%M:%S"),
+                "time_zone": self._time_zone
             }
         }
 
@@ -226,7 +226,7 @@ class RadarConnector(BaseConnector):
         incident["name"] = name
         incident["description"] = description
         incident["url"] = data["url"]
-        incident["discovered"] = self._format_timestr(discovered)
+        incident["discovered"] = self._format_display_time(discovered)
 
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
@@ -255,9 +255,18 @@ class RadarConnector(BaseConnector):
         incident["name"] = data["name"]
         incident["description"] = data["description"]
         incident["url"] = data["url"]
-        incident["discovered_at"] = self._format_timestr(data["discovered"]["date_time"])
-        incident["created_at"] = self._localize_and_format_timestr(data["created_at"])
-        incident["updated_at"] = self._localize_and_format_timestr(data["updated_at"])
+
+        # localize the discovered time according to the time zone specified in the payload before
+        # localizing according to the asset configuration.
+        discovered = pytz.timezone(data["discovered"]["time_zone"])\
+            .localize(parser.parse(data["discovered"]["date_time"]))\
+            .astimezone(pytz.timezone(self._time_zone))
+
+        # localize and format time strings
+        incident["discovered_at"] = self._format_display_time(discovered)
+        incident["created_at"] = self._format_display_time(self._localize_time(data["created_at"]))
+        incident["updated_at"] = self._format_display_time(self._localize_time(data["updated_at"]))
+
         incident["updated_by"] = data["updated_by"]
         incident["incident_status"] = data["status"]
         incident["assignee"] = f"{data['assignee']['given_name']} {data['assignee']['surname']}"
@@ -280,16 +289,11 @@ class RadarConnector(BaseConnector):
 
         return resp_json
 
-    def _localize_and_format_timestr(self, timestr):
-        time_zone = self.get_config().get("time_zone", "UTC")
-        parsed_datetime = parser.parse(timestr)
-        formatted_datetime = parsed_datetime.astimezone(pytz.timezone(time_zone)).strftime("%Y-%m-%d %H:%M:%S")
-        return f"{formatted_datetime} / {time_zone}"
+    def _localize_time(self, time: str) -> datetime:
+        return parser.parse(time).astimezone(pytz.timezone(self._time_zone))
 
-    def _format_timestr(self, timestr):
-        time_zone = self.get_config().get("time_zone", "UTC")
-        formatted_datetime = parser.parse(timestr).strftime("%Y-%m-%d %H:%M:%S")
-        return f"{formatted_datetime} / {time_zone}"
+    def _format_display_time(self, time: datetime) -> str:
+        return f"{time.strftime('%Y-%m-%d %H:%M:%S')} / {self._time_zone}"
 
     def _handle_add_note(self, param):
         self.save_progress(f"Run action {self.get_action_identifier()}")
@@ -344,9 +348,9 @@ class RadarConnector(BaseConnector):
                     "id": note_data["id"],
                     "content": note_data["content"],
                     "category": note_data["category"],
-                    "created_at": self._localize_and_format_timestr(note_data["created_at"]),
+                    "created_at": self._format_display_time(self._localize_time(note_data["created_at"])),
                     "created_by": note_data["created_by"],
-                    "updated_at": self._localize_and_format_timestr(note_data["updated_at"]),
+                    "updated_at": self._format_display_time(self._localize_time(note_data["updated_at"])),
                     "updated_by": note_data["updated_by"],
                 })
 
