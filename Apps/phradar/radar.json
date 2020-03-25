@@ -491,7 +491,7 @@
       "description": "Get a Radar privacy incident",
       "verbose": "This action gets a Radar privacy incident using the incident ID supplied in the action parameters",
       "type": "generic",
-      "read_only": false,
+      "read_only": true,
       "parameters": {
         "incident_id": {
           "description": "Radar Incident ID",
@@ -661,7 +661,7 @@
       "description": "Get all notes for a Radar privacy incident",
       "verbose": "This action gets all notes for a given Radar incident using the incident ID supplied in the action parameters. Only notes that were created with the 'create note' action will be fetched from Radar.",
       "type": "generic",
-      "read_only": false,
+      "read_only": true,
       "parameters": {
         "incident_id": {
           "description": "Radar Incident ID",
