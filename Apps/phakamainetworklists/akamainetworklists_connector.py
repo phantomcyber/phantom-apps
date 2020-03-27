@@ -334,7 +334,8 @@ class AkamaiNetworkListsConnector(BaseConnector):
                         networkList.pop(index)
                     index += 1
 
-            # Create the data we are going to send to Akamai. We need to have all these values for the "Update a network list" API
+            # Create the data we are going to update the list details with. 
+            # All fields here are required for the "Update a network list" API
             data = {
                 "name": response.get('name', ''),
                 "description": response.get('description', ''),
@@ -471,9 +472,17 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         data = {
-            "comments": param.get('comments'),
-            "notification": param.get('notification', '')
+            "comments": param.get('comments', '')
         }
+
+        # Notification parameter is used 
+        if param.get("notification"):
+            notificationEmails = []
+
+            for notificationEmail in param.get("notification").split(',')
+                notificationEmails.append(notificationEmail)
+
+            data['notification'] = notificationEmails
 
         endpoint = "{}/{}/environments/{}/activate".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'), param.get('environment'))
 

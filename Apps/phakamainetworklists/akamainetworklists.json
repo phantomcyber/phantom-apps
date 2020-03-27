@@ -939,13 +939,13 @@
                 "comments": {
                     "description": "Comments to add to the network.",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 2
                 },
                 "notification": {
                     "description": "Notification Recipients for the network list. Comma seperate list allowed.",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 3,
                     "allow_list": true
                 }
