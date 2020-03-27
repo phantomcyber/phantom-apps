@@ -463,7 +463,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-        config = self.get_config()
+        # config = self.get_config()
 
         sensor_name = param['sensor']
         group_name = param.get('group_name')
@@ -589,15 +589,18 @@ class TaniumRestConnector(BaseConnector):
 
             endpoint = TANIUMREST_GET_SAVED_QUESTION_RESULT.format(saved_question_id=saved_question_id)
 
-            ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
+            response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if response is None:
                 return action_result.get_status()
+
+            # ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
+
+            # if (phantom.is_fail(ret_val)):
+            #     return action_result.get_status()
 
             action_result.add_data(response)
         else:
-            if not timeout_seconds:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide timeout seconds")
 
             question_data = self._parse_manual_question(query_text, action_result, group_name=group_name or None)
             if not question_data:
@@ -723,7 +726,7 @@ class TaniumRestConnector(BaseConnector):
 
     def _ask_question(self, data, action_result, timeout_seconds=None):
         # Post prepared data to questions endpoint and poll for results
-        config = self.get_config()
+        # config = self.get_config()
         if timeout_seconds:
             data['expire_seconds'] = timeout_seconds
         ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/questions", verify=self._verify, params=None, headers=None, json=data, method="post")
