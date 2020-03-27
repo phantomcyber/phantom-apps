@@ -156,6 +156,11 @@ class RadarConnector(BaseConnector):
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
 
+    def _payload_err(self, ex, action_result, data):
+        msg = f"Response payload is missing necessary fields: {ex}"
+        self.debug_print((f"{msg}\nresponse data:", data))
+        return action_result.set_status(phantom.APP_ERROR, msg)
+
     def _handle_test_connectivity(self, param):
         self.save_progress("Connect to Radar")
 
@@ -222,10 +227,15 @@ class RadarConnector(BaseConnector):
 
         # construct incident output with fields we want to render
         incident = dict()
-        incident["incident_id"] = data["id"]
+        try:
+            incident["incident_id"] = data["id"]
+        # return errors for missing id, which should always be present
+        except KeyError as ex:
+            return self._payload_err(ex, action_result, data)
+
         incident["name"] = name
         incident["description"] = description
-        incident["url"] = data["url"]
+        incident["url"] = data.get("url", "No incident url present in response")
         incident["discovered"] = self._format_display_time(discovered)
 
         self.save_progress("Add data to action result")
@@ -250,25 +260,29 @@ class RadarConnector(BaseConnector):
 
         # construct incident output with fields we want to render
         incident = dict()
-        incident["incident_id"] = data["id"]
-        incident["name"] = data["name"]
-        incident["description"] = data["description"]
-        incident["url"] = data["url"]
+        try:
+            incident["incident_id"] = data["id"]
+            incident["name"] = data["name"]
+            incident["description"] = data["description"]
 
-        # localize the discovered time according to the time zone specified in the payload before
-        # localizing according to the asset configuration.
-        discovered = pytz.timezone(data["discovered"]["time_zone"])\
-            .localize(parser.parse(data["discovered"]["date_time"]))\
-            .astimezone(pytz.timezone(self._time_zone))
+            # localize the discovered time according to the time zone specified in the payload before
+            # localizing according to the asset configuration.
+            discovered = pytz.timezone(data["discovered"]["time_zone"]) \
+                .localize(parser.parse(data["discovered"]["date_time"])) \
+                .astimezone(pytz.timezone(self._time_zone))
 
-        # localize and format time strings
-        incident["discovered_at"] = self._format_display_time(discovered)
-        incident["created_at"] = self._format_display_time(self._localize_time(data["created_at"]))
-        incident["updated_at"] = self._format_display_time(self._localize_time(data["updated_at"]))
+            # localize and format time strings
+            incident["discovered_at"] = self._format_display_time(discovered)
+            incident["created_at"] = self._format_display_time(self._localize_time(data["created_at"]))
+            incident["updated_at"] = self._format_display_time(self._localize_time(data["updated_at"]))
+            incident["updated_by"] = data["updated_by"]
+            incident["incident_status"] = data["status"]
+            incident["assignee"] = f"{data['assignee']['given_name']} {data['assignee']['surname']}"
+        # return errors for missing fields that should always be present
+        except KeyError as ex:
+            return self._payload_err(ex, action_result, data)
 
-        incident["updated_by"] = data["updated_by"]
-        incident["incident_status"] = data["status"]
-        incident["assignee"] = f"{data['assignee']['given_name']} {data['assignee']['surname']}"
+        incident["url"] = data.get("url", "No incident url present in response")
 
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
@@ -298,16 +312,19 @@ class RadarConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-        content = param.get("content")
+        content = param.get("content", "")
         category = "Splunk Phantom"
+
         incident_id = param.get("incident_id")
+        if not incident_id:
+            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
 
         body = {
             "content": content,
             "category": category,
         }
 
-        # make rest call
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="post", data=json.dumps(body))
 
         if phantom.is_fail(radar_val):
@@ -315,8 +332,14 @@ class RadarConnector(BaseConnector):
 
         # construct note output with fields we want to render
         note = dict()
+        try:
+            note["id"] = data["headers"]["Location"].split("/")[4]
+        # return error for missing id from response headers
+        except Exception:
+            self.debug_print("could not parse id from response headers: ", data["headers"])
+            return action_result.set_status(phantom.APP_ERROR, "Response payload is missing necessary fields: 'id'")
+
         note["incident_id"] = incident_id
-        note["id"] = data["headers"]["Location"].split("/")[4]
         note["content"] = content
 
         self.save_progress("Add data to action result")
@@ -331,28 +354,33 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
+        if not incident_id:
+            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
 
-        # make rest call
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")
 
         if phantom.is_fail(radar_val):
             return action_result.get_status()
 
+        # construct note output with fields we want to render
         notes = []
-
         for note_data in data:
-            if note_data["category"] == "Splunk Phantom":
-                # construct note output with fields we want to render
-                notes.append({
-                    "incident_id": incident_id,
-                    "id": note_data["id"],
-                    "content": note_data["content"],
-                    "category": note_data["category"],
-                    "created_at": self._format_display_time(self._localize_time(note_data["created_at"])),
-                    "created_by": note_data["created_by"],
-                    "updated_at": self._format_display_time(self._localize_time(note_data["updated_at"])),
-                    "updated_by": note_data["updated_by"],
-                })
+            try:
+                if note_data["category"] == "Splunk Phantom":
+                    notes.append({
+                        "incident_id": incident_id,
+                        "id": note_data["id"],
+                        "content": note_data["content"],
+                        "category": note_data["category"],
+                        "created_at": self._format_display_time(self._localize_time(note_data["created_at"])),
+                        "created_by": note_data["created_by"],
+                        "updated_at": self._format_display_time(self._localize_time(note_data["updated_at"])),
+                        "updated_by": note_data["updated_by"],
+                    })
+            # return errors for missing fields that should always be present
+            except KeyError as ex:
+                return self._payload_err(ex, action_result, data)
 
         self.save_progress("Add data to action result")
         action_result.add_data(notes)
