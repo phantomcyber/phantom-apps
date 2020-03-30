@@ -114,19 +114,32 @@ class RadarConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), None)
 
     def _process_response_error_message(self, error_resp):
-        message = f"Error response: Status code: {error_resp.status_code}"
-        if error_resp.status_code == 404:
-            return f"{message}. Message: not found. Please double check request parameters."
+        status_code = error_resp.status_code
+        status_message = f"Error response: Status code: {status_code}"
+        if status_code == 404:
+            return f"{status_message}. Message: not found. Please double check request parameters."
+        if status_code == 403:
+            return f"{status_message}. Message: forbidden. " \
+                f"Please double check that your Radar API token, user, and permissions are configured correctly."
+        if status_code == 401:
+            return f"{status_message}. Message: unauthorized. " \
+                f"Please double check your Radar API token."
+
         try:
             resp_json = error_resp.json()
-            # if there are more than one field validation errors return the first one
-            if len(resp_json["errors"]) > 0:
-                return f"{message}. Parameter error: {resp_json['errors'][0]['fields'][0]}. Message: {resp_json['errors'][0]['message']}"
-            return f"{message}. Message: {resp_json['message']}"
-        except ValueError as ex:
+            # if there are field validation errors return the first one
+            resp_errors = resp_json.get("errors")
+            if len(resp_errors) > 0:
+                invalid_field = resp_errors[0].get("fields")
+                invalid_field_msg = resp_errors[0].get("message")
+                if invalid_field and invalid_field_msg:
+                    return f"{status_message}. Parameter error: {invalid_field[0]}. Message: {invalid_field_msg}"
+            # return standard error message
+            return f"{status_message}. Message: {resp_json['message']}"
+        except (ValueError, KeyError) as ex:
             self.debug_print(f"Could not process error response json. Error: ", ex)
 
-        return f"{message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
+        return f"{status_message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         self.save_progress(f"Make rest call")
