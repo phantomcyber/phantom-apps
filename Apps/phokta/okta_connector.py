@@ -691,6 +691,7 @@ class OktaConnector(BaseConnector):
             return action_result.get_status()
 
         # process factors
+        factor_link_verify_uri = None
         for factor in response_factor:
             factor_link_verify_href = factor.get('_links', {}).get('verify', {}).get('href', {})
             if factor_type in factor['factorType'] and len(factor_link_verify_href) > 0:
@@ -698,6 +699,7 @@ class OktaConnector(BaseConnector):
                 factor_link_verify_uri = factor_link_verify_href.split('v1')[1]
         if not factor_link_verify_uri:
             self.save_progress("[-] error retriving factor_type: " + factor_type)
+            return action_result.set_status(status_strings.APP_ERROR, OKTA_INVALID_FACTOR_LINK_MSG)
 
         # call verify
         ret_val, response_verify = self._make_rest_call(factor_link_verify_uri, action_result, method='post')
