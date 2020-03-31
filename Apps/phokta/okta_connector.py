@@ -537,7 +537,8 @@ class OktaConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['group_id'] = response.json().get('id')
+        resp_json = json.loads(response)
+        summary['group_id'] = resp_json.get('id')
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -675,7 +676,7 @@ class OktaConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         user_id = param['email']
-        factor_type = param.get('factortype', 'push')
+        factor_type = 'push'
 
         # get user
         ret_val, response_user = self._make_rest_call('/users/{}'.format(user_id), action_result, method='get')
