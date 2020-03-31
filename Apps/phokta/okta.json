@@ -61,18 +61,6 @@
                     ],
                     "primary": true,
                     "order": 0
-                },
-                "factortype": {
-                    "required": true,
-                    "description": "Okta Factor Type",
-                    "data_type": "string",
-                    "default": "push",
-                    "value_list": [
-                        "push",
-                        "sms",
-                        "token:software:totp"
-                    ],
-                    "order": 1
                 }
             },
             "versions": "EQ(*)",
