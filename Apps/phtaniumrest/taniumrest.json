@@ -9,11 +9,15 @@
     "product_name": "Tanium REST",
     "product_version_regex": ".*",
     "publisher": "Splunk",
+    "python_version": "3",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "1.0.4",
+    "latest_tested_versions": [
+        "Build (Windows): 7.3.314.4269 | Console: 1.3.3.0150"
+    ],
+    "app_version": "2.0.0",
     "utctime_updated": "2019-10-09T22:28:52.000000Z",
     "package_name": "phantom_taniumrest",
-    "main_module": "taniumrest_connector.pyc",
+    "main_module": "taniumrest_connector.py",
     "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "configuration": {
