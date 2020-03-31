@@ -1,0 +1,44 @@
+<!--
+File: readme.html
+Copyright (c) 2020 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+    <head></head>
+    <body>
+        <h2>About Radar Software for Privacy Incident Response Management:</h2>
+        <p>Radar performs a comprehensive privacy risk assessment and determines when the incident is notifiable under current data breach regulations.
+            Radar guides privacy analysts through the profiling and risk scoring of an incident, providing all necessary documentation to support an organization’s burden of proof obligation under federal, state, and international breach laws.</p>
+        <p>For more information visit: <a href="https://www.radarfirst.com/radar" target="_blank">https://www.radarfirst.com/radar</a></p>
+
+        <h2>Setup and Configuration</h2>
+        <p>To use the Radar Phantom App, a Radar admin should request documentation from the Radar integrations team.</p>
+        <p>To request this documentation:</p>
+            <ul>
+                <li>Log into Radar at <a target="_blank" href="https://app.radarfirst.com/login">https://app.radarfirst.com/login</a></li>
+                <li>Select "Admin" from the top navigation.</li>
+                <li>From the admin UI, select "Integrations" from the top navigation.</li>
+                <li>From the list of integrations, select "Learn more" where Splunk Phantom is listed.</li>
+                <li>Follow the directions for contacting the Radar integration team.</li>
+            </ul>
+
+
+        <h2>Asset Configuration</h2>
+        <p>Configuration that must be set are under the "Asset Settings" tab. Below lists some details for each configuration setting:</p>
+        <ul>
+            <li>Radar API Bearer Token - A valid Radar bearer token with privileges for reading and writing radar incidents and notes.</li>
+            <li>Radar API URL - defaults to the production URL, but can be set to a test or staging URL.</li>
+            <li>Incident Group ID - must be set to the incident group of the user associated with the bearer token.</li>
+            <li>Time Zone - should reflect the time that the phantom instance is running in. This configuration is used in a couple different ways:
+                <ul>
+                    <li>To specify a privacy incident’s ‘discovered’ timezone, when it is created by the “create privacy incident” action. This data is used during incident assessment and is critically important in determining regulatory timelines for incident notification to governmental agencies.</li>
+                    <li>Used when displaying certain action outputs, such as the “created at” and “updated at” outputs from the “get privacy incident” action. These timestamps are converted to the time zone specified in the asset configuration.</li>
+                </ul>
+            </li>
+        </ul>
+        <h4>Environment Variables</h4>
+        <p>Under the 'Advanced' section of the asset settings, set environment variables to configure the app settings:</p>
+        <p><b>ALLOW_SELF_SIGNED_CERTS</b> - Should be set to '1' to turn off verification of SSL Certificates during action requests.</p>
+    </body>
+</html>

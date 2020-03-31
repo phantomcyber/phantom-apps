@@ -1,0 +1,125 @@
+<!--
+File: radar_get_privacy_incident.html
+Copyright (c) 2020 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
+{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
+{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
+{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%;
+    background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+    <style>
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .wf-table-vertical td {
+            padding: 5px;
+            border: 1px solid rgb(234, 234, 234);
+        }
+
+        .wf-table-horizontal th {
+            text-align: center;
+            border: 1px solid rgb(234, 234, 234);
+            text-transform: uppercase;
+            font-weight: normal;
+            color: rgb(108, 129, 139);
+            padding: 5px;
+        }
+
+        .wf-table-horizontal td {
+            border: 1px solid rgb(234, 234, 234);
+            padding: 5px;
+            padding-left: 4px;
+        }
+
+        .wf-h2-style {
+            font-size: 20px
+        }
+
+        .display-container {
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+            padding-left: 10px;
+            padding-right: 10px
+        }
+
+        .td-row-start {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+    </style>
+    <div class="display-container">
+        {% for result in results %}
+            {% if result.data %}
+                {% with incident=result.data %}
+                    <table class="wf-table-vertical">
+                    <h2 class="wf-h2-style">Radar Privacy Incident</h2>
+                        <tr>
+                            <td class="td-row-start">id</td>
+                            <td>
+                                <a href="javascript:;"
+                                   onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ incident.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ incident.incident_id }}
+                                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">name</td>
+                            <td>{{ incident.name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">description</td>
+                            <td>{{ incident.description }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">url</td>
+                            <td><a target="_blank" href="{{ incident.url }}">{{ incident.url }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">created at</td>
+                            <td>{{ incident.created_at}}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">discovered at</td>
+                            <td>{{ incident.discovered_at }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">updated at</td>
+                            <td>{{ incident.updated_at}}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">updated by</td>
+                            <td>{{ incident.updated_by }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">status</td>
+                            <td>{{ incident.incident_status }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-row-start">assignee</td>
+                            <td>{{ incident.assignee }}</td>
+                        </tr>
+                    </table>
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
