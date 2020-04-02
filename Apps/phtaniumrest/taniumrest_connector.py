@@ -731,9 +731,9 @@ class TaniumRestConnector(BaseConnector):
         else:
             row_count = 0
 
-        summary['number_of_results'] = row_count
+        summary['number_of_rows'] = row_count
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Question asked successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _make_parameterized_query(self, parse_response, action_result):
         """ Create the data structure to issue a parameterized sensor question to Tanium """

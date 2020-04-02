@@ -2223,7 +2223,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.number_of_results",
+                    "data_path": "action_result.summary.number_of_rows",
                     "data_type": "numeric",
                     "example_values": [
                         3
@@ -2240,7 +2240,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Number of results: 3"
+                        "Number of rows: 3"
                     ]
                 },
                 {
