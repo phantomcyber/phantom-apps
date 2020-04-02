@@ -1,0 +1,102 @@
+
+<!-- File: readme.html
+  Copyright (c) 2016-2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+    <head></head>
+    <body>
+
+        <p><h2>Explanation of Asset Configuration Parameters</h2>
+            The asset configuration parameters affect [test connectivity] and all the other actions of the application. Below are the explanation and usage of all those parameters.
+            <ul>
+                <li>
+                    <b>Base URL - </b> It is the URL to connect to the Fortigate server.
+                </li>
+                <li>
+                    <b>Username - </b>  It is the username used for authentication.
+                </li>
+                <li>
+                    <b>Password - </b> It is the password used for authentication. 
+                </li>
+                <li>
+                    <b>Verify server certificate - </b> It will enable or disable verify SSL certificates for HTTPS requests. The default value is false.
+                </li>
+                <li>
+                    <b>Virtual domain (vdom) - </b> It will specify the virtual domain to be used. It is an optional parameter. If no virtual domain is provided, it will use the one provided in the action parameters. And, if the virtual domain is not provided in the asset or action parameters, it will consider the virtual domain as root. Here, the value of vdom is case sensitive.
+                </li>
+            </ul>
+        </p>
+
+        <p><h2>Explanation of Fortigate Actions&#39; Parameters</h2>
+            <ol>
+                <h3><li>Test Connectivity (Action Workflow Details)</li></h3>
+                    <ul>
+                        <li> This action will test the connectivity of the Phantom server to the Fortigate instance by making an initial API call using the provided asset configuration parameters.</li>
+                        <li> The action validates the provided asset configuration parameters. Based on the API call response, the appropriate success and failure message will be displayed when the action gets executed.</li>
+                    </ul>
+                <br>
+
+                <h3><li>Block IP </li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u> - IP</b>
+                            <ul>
+                                <li>This parameter specifies the IP which is to be blocked. It is a required parameter.</li>
+			                </ul>
+                        <br>
+                        <li><b><u>Action Parameter</u> - Policy</b>
+                            <ul>
+                                <li>This parameter specifies the IPv4 policy to be used. It is a required parameter. All the available policies can be listed using the list policy action. The policy value should be present in the list of available policies.</li>
+                           </ul>
+                        <br>
+                        <li><b><u>Action Parameter</u> - VDOM</b>
+                            <ul>
+                                <li>This parameter specifies the virtual domain to be used. It is an optional parameter. If no virtual domain is provided, it will use the one provided in the asset configuration parameters. And, if the virtual domain is not provided in the asset or action parameters, it will consider the virtual domain as root. Here, the value of vdom is case sensitive.</li>
+                            </ul>
+                        </li>
+                        <br>
+                    </ul>
+                <br>
+		
+		
+		        <h3><li>Unblock IP </li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u> - IP</b>
+                            <ul>
+                                <li>This parameter specifies the IP which is to be unblocked. It is a required parameter. The IP value should be present in the list of blocked IPs otherwise action returns 'already unblocked' success message.</li>
+			                </ul>
+                        <br>
+                        <li><b><u>Action Parameter</u> - Policy</b>
+                            <ul>
+                                <li>This parameter specifies the IPv4 policy to be used. It is a required parameter. All the available policies can be listed using the list policy action. The policy value should be present in the list of available policies.</li>
+                           </ul>
+                        <br>
+                        <li><b><u>Action Parameter</u> - VDOM</b>
+                            <ul>
+                                <li>This parameter specifies the virtual domain to be used. It is an optional parameter. If no virtual domain is provided, it will use the one provided in the asset configuration parameters. And, if the virtual domain is not provided in the asset or action parameters, it will consider the virtual domain as root. Here, the value of vdom is case sensitive.</li>
+                            </ul>
+                        </li>
+                        <br>
+                    </ul>
+                <br>
+
+                <h3><li>List Policies</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u> - VDOM</b>
+                            <ul>
+                                <li>This parameter specifies the virtual domain to be used. It is an optional parameter.  If no virtual domain is provided, it will use the one provided in the asset configuration parameters. And, if the virtual domain is not provided in the asset or action parameters, it will consider the virtual domain as root. Here, the value of vdom is case sensitive.</li>
+                            </ul>
+                        </li>
+                        <li><b><u>Action Parameter</u> - Limit</b>
+                            <ul>
+                                <li>This parameter is used to limit the number of policies results. The default value is 100. If the limit is not provided, it will fetch by default 100 policies results.</li>
+                            </ul>
+                        </li>
+                        <br>
+                    </ul>
+            </ol>
+        </p>
+    </body>
+</html>
+                        
