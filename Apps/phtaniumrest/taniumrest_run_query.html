@@ -64,6 +64,10 @@
         font-size : 16px
     }
 
+    .taniumrest li {
+        padding-left: inherit;
+    }
+
     .taniumrest .collapse.in {
         display: block !important;
     }
@@ -127,9 +131,11 @@
                         {% for row in result_set.rows %}
                             <tr>
                                 {% for item in row.data %}
+                                <td>
                                     {% for x in item %}
-                                        <td>{{ x.text }}</td>
+                                        <li>{{ x.text }}</li>
                                     {% endfor %}
+                                </td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
