@@ -996,7 +996,11 @@ class JiraConnector(BaseConnector):
 
     def _get_container_id(self, issue_key):
 
-        url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(self.get_phantom_base_url(), issue_key, self.get_asset_id())
+        url = ""
+        if hasattr(self, 'get_phantom_base_url'):
+            url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(self.get_phantom_base_url(), issue_key, self.get_asset_id())
+        else:
+            url = '{0}/notable?source_data_identifier={1}&ingest_asset={2}'.format(self.get_ims_base_url(), issue_key, self.get_asset_id())
 
         try:
             r = requests.get(url, verify=False)
@@ -1005,12 +1009,12 @@ class JiraConnector(BaseConnector):
             self.debug_print("Unable to query JIRA ticket container: ", e)
             return None
 
-        if (resp_json.get('count', 0) <= 0):
+        if (resp_json.get('total', 0) <= 0):
             self.debug_print("No container matched")
             return None
 
         try:
-            container_id = resp_json.get('data', [])[0]['id']
+            container_id = resp_json.get('items', [])[0]['id']
         except Exception as e:
             self.debug_print("Container results are not proper: ", e)
             return None
@@ -1019,8 +1023,13 @@ class JiraConnector(BaseConnector):
 
     def _get_artifact_id(self, sdi, container_id, issue_type="issue", full_artifact=False):
 
-        url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&_filter_label="{3}"&sort=id&order=desc'.format(
+        if hasattr(self, 'get_phantom_base_url'):
+            url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&_filter_label="{3}"&sort=id&order=desc'.format(
                         self.get_phantom_base_url(), sdi, container_id, issue_type.lower())
+        else:
+            url = '{0}/event?source_data_identifier={1}&notable_id={2}'.format(self.get_ims_base_url(),
+                                                                                                      sdi,
+                                                                                                      container_id)
 
         try:
             r = requests.get(url, verify=False)
@@ -1029,13 +1038,14 @@ class JiraConnector(BaseConnector):
             self.debug_print("Unable to query JIRA artifact: ", e)
             return None
 
-        if (resp_json.get('count', 0) <= 0):
+        if (resp_json.get('total', 0) <= 0):
             self.debug_print("No artifact matched")
             return None
 
         try:
             if full_artifact:
-                previous_artifacts_list = resp_json.get('data', [])
+                # previous_artifacts_list = resp_json.get('data', [])
+                previous_artifacts_list = resp_json.get('items', [])
                 return previous_artifacts_list[0]
             else:
                 return resp_json.get('data', [])[0]['id']
@@ -1518,11 +1528,17 @@ class JiraConnector(BaseConnector):
     def _update_container(self, issue, container_id, last_time, action_result):
 
         update_json = {}
-        update_json['data'] = issue.raw
+        update_json['name'] = issue.key
+        update_json['data'] = issue.raw # Removing, post failing
         update_json['description'] = issue.fields.summary
 
-        url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
+        # self.prepare_container(update_json)
 
+        if hasattr(self, 'get_phantom_base_url'):
+            url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
+        else:
+            url = '{0}/notable/{1}'.format(self.get_ims_base_url(),
+                                           container_id)
         try:
             r = requests.post(url, data=json.dumps(update_json), verify=False)
             resp_json = r.json()
@@ -1629,6 +1645,7 @@ class JiraConnector(BaseConnector):
         container_json['description'] = issue.fields.summary
         container_json['source_data_identifier'] = issue.key
         container_json['label'] = self.get_config().get('ingest', {}).get('container_label')
+        container_json['ingest_asset'] = self.get_asset_id()
 
         # Save the container
         ret_val, message, container_id = self.save_container(container_json)
