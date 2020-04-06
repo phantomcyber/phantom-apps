@@ -59,7 +59,7 @@ class FortiGateConnector(BaseConnector):
         """
 
         config = self.get_config()
-        self._api_username = config[FORTIGATE_JSON_USERNAME]
+        self._api_username = self._handle_py_ver_compat_for_input_str(self._python_version, config[FORTIGATE_JSON_USERNAME])
         self._api_password = config[FORTIGATE_JSON_PASSWORD]
         self._api_vdom = config.get(FORTIGATE_JSON_VDOM, '')
         self._verify_server_cert = config.get(FORTIGATE_JSON_VERIFY_SERVER_CERT, False)
@@ -119,17 +119,17 @@ class FortiGateConnector(BaseConnector):
                     error_msg = e.args[0]
             else:
                 error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
         except:
             error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(self._python_version, error_msg)
         except TypeError:
             error_msg = "Error occurred while connecting to the Fortigate server. Please check the asset configuration and|or the action parameters."
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
         return error_code, error_msg
 
@@ -153,12 +153,16 @@ class FortiGateConnector(BaseConnector):
 
     def _break_ip_addr(self, ip_addr):
 
+        self.debug_print("Action Identifier: {}, IP Address: {}".format(self.get_action_identifier(), ip_addr))
+
         ip = None
         net_size = None
         net_mask = None
 
         if ('/' in ip_addr):
             ip, net_size = ip_addr.split('/')
+            if not net_size:
+                net_size = "32"
             net_mask = self._get_net_mask(net_size)
         elif(' ' in ip_addr):
             ip, net_mask = ip_addr.split()
@@ -168,16 +172,20 @@ class FortiGateConnector(BaseConnector):
             net_size = "32"
             net_mask = "255.255.255.255"
 
+        self.debug_print("IP: {}, Net Size: {}, Net Mask: {}".format(ip, net_size, net_mask))
+
         return (ip, net_size, net_mask)
 
     # Function that checks given address and return True if address is valid ip address or (ip address and subnet)
     def _is_ip(self, ip_addr):
 
         try:
-            ip, net_size, net_mask = self._break_ip_addr(ip_addr)
+            ip_addr = self._handle_py_ver_compat_for_input_str(self._python_version, ip_addr)
+            ip, net_size, net_mask = self._break_ip_addr(ip_addr.strip())
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Validation for ip_addr failed. Error Code:{0}. Error Message:{1}".format(error_code, error_msg))
+            self.debug_print("Validation for ip_addr failed. Error Code:{0}. Error Message:{1}. For valid IP formats, please refer to the action's documentation.".format(
+                                error_code, error_msg))
             return False
 
         # Validate ip address
@@ -226,7 +234,7 @@ class FortiGateConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), total policies
         """
 
-        total_policies = list()
+        total_results = list()
         skip = 0
 
         # Define per page limit
@@ -252,24 +260,24 @@ class FortiGateConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG), None
 
             # Fetch data from response
-            policies = response.get("results")
-            if policies is None:
+            results = response.get("results")
+            if results is None:
                 return action_result.set_status(phantom.APP_ERROR, "Unknown error occurred. No data found"), None
 
-            total_policies.extend(policies)
+            total_results.extend(results)
 
-            if limit and len(total_policies) >= limit:
-                return phantom.APP_SUCCESS, total_policies[:limit]
+            if limit and len(total_results) >= limit:
+                return phantom.APP_SUCCESS, total_results[:limit]
 
             # Fetched all data and fetched policies list is empty and not None
-            if not policies:
-                self.debug_print("Fetched all data and fetched policies list is empty and not None")
+            if not results:
+                self.debug_print("Fetched all data and fetched results list is empty and not None")
                 break
 
             skip += FORTIGATE_PER_PAGE_DEFAULT_LIMIT
 
         # Return success with total reports
-        return phantom.APP_SUCCESS, total_policies
+        return phantom.APP_SUCCESS, total_results
 
     # Function that makes the REST call to the device,
     # generic function that can be called from various action handlers
@@ -353,7 +361,7 @@ class FortiGateConnector(BaseConnector):
 
         # fetch vdom
         vdom = self._handle_py_ver_compat_for_input_str(self._python_version, param.get(FORTIGATE_JSON_VDOM, ''))
-        if self._api_vdom and not vdom:
+        if not vdom and self._api_vdom:
             vdom = self._api_vdom
 
         # fetch limit
@@ -362,9 +370,9 @@ class FortiGateConnector(BaseConnector):
             # validation for integer value
             limit = int(limit)
             if limit <= 0:
-                return action_result.set_status(phantom.APP_ERROR, FORTIGATE_LIMIT_VALIDATION_ALLOW_ZERO_MSG)
+                return action_result.set_status(phantom.APP_ERROR, FORTIGATE_LIMIT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_LIMIT_VALIDATION_ALLOW_ZERO_MSG)
+            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_LIMIT_VALIDATION_MSG)
 
         # create summary object
         summary_data = action_result.update_summary({})
@@ -628,10 +636,12 @@ class FortiGateConnector(BaseConnector):
 
         vdom = self._handle_py_ver_compat_for_input_str(self._python_version, param.get(FORTIGATE_JSON_VDOM, ''))
 
-        if self._api_vdom and not vdom:
+        if not vdom and self._api_vdom:
             vdom = self._api_vdom
 
-        ip, net_size, net_mask = self._break_ip_addr(ip_addr)
+        # Here the handling of exception is not required because the custom validator method
+        # _is_ip already validates the IP action parameters for all the actions calling this method.
+        ip, net_size, net_mask = self._break_ip_addr(ip_addr.strip())
 
         ip_addr_obj_name = "Phantom Addr {0}_{1}".format(ip, net_size)
 
