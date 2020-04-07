@@ -59,16 +59,17 @@ class FortiGateConnector(BaseConnector):
         """
 
         config = self.get_config()
-        self._api_username = self._handle_py_ver_compat_for_input_str(self._python_version, config[FORTIGATE_JSON_USERNAME])
-        self._api_password = config[FORTIGATE_JSON_PASSWORD]
-        self._api_vdom = config.get(FORTIGATE_JSON_VDOM, '')
-        self._verify_server_cert = config.get(FORTIGATE_JSON_VERIFY_SERVER_CERT, False)
-        self.set_validator('ip', self._is_ip)
 
         try:
             self._python_version = int(sys.version_info[0])
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
+        self._api_username = self._handle_py_ver_compat_for_input_str(self._python_version, config[FORTIGATE_JSON_USERNAME])
+        self._api_password = config[FORTIGATE_JSON_PASSWORD]
+        self._api_vdom = config.get(FORTIGATE_JSON_VDOM, '')
+        self._verify_server_cert = config.get(FORTIGATE_JSON_VERIFY_SERVER_CERT, False)
+        self.set_validator('ip', self._is_ip)
 
         self._device = self._handle_py_ver_compat_for_input_str(self._python_version, config[FORTIGATE_JSON_URL])
 
