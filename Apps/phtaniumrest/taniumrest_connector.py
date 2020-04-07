@@ -272,6 +272,7 @@ class TaniumRestConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to fetch a session token from Tanium API!")
+            self.save_progress("Failed to fetch a session token from Tanium API!")
             self._state['session_id'] = None
             self._session_id = None
             self.save_state(self._state)
@@ -339,7 +340,7 @@ class TaniumRestConnector(BaseConnector):
 
         if isinstance(response_data, list):
             if len(response_data) != 1:
-                action_result.set_status(phantom.APP_ERROR, "Error occured while fetching the {}".format(tanium_content))
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the {}".format(tanium_content))
                 return None
             elif not isinstance(response_data[0], dict):
                 action_result.set_status(phantom.APP_ERROR, "Unexpected API response")
@@ -364,14 +365,35 @@ class TaniumRestConnector(BaseConnector):
         issue_seconds = param.get('issue_seconds', None)
         group_name = param.get('group_name')
 
-        if expire_seconds == 0 or (expire_seconds and (not str(expire_seconds).isdigit() or expire_seconds <= 0)):
-            return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="expire_seconds"))
+        if group_name:
+            group_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, group_name)
 
-        if distribute_seconds == 0 or (distribute_seconds and (not str(distribute_seconds).isdigit() or distribute_seconds <= 0)):
-            return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="distribute_seconds"))
+        if expire_seconds is not None:
+            try:
+                expire_seconds = int(expire_seconds)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="expire_seconds"))
 
-        if issue_seconds == 0 or (issue_seconds and (not str(issue_seconds).isdigit() or issue_seconds <= 0)):
-            return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="issue_seconds"))
+            if expire_seconds <= 0:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="expire_seconds"))
+
+        if distribute_seconds is not None:
+            try:
+                distribute_seconds = int(distribute_seconds)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="distribute_seconds"))
+
+            if distribute_seconds <= 0:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="distribute_seconds"))
+
+        if issue_seconds is not None:
+            try:
+                issue_seconds = int(issue_seconds)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="issue_seconds"))
+
+            if issue_seconds <= 0:
+                return action_result.set_status(phantom.APP_ERROR, TANIUMREST_ERR_INVALID_PARAM.format(param="issue_seconds"))
 
         # Get the package details
         endpoint = TANIUMREST_GET_PACKAGE.format(package=package_name)
@@ -392,15 +414,21 @@ class TaniumRestConnector(BaseConnector):
             return action_result.get_status()
 
         package_id = res_data.get("id")
+
+        self.debug_print("Fetching parameter definition of the package")
         parameter_definition = response.get("data", {}).get("parameter_definition")
 
+        if parameter_definition is not None:
+            self.debug_print("Parameter definition fetched successfully")
+
         try:
-            if not isinstance(parameter_definition, dict):
+            if parameter_definition and not isinstance(parameter_definition, dict):
                 parameter_definition = json.loads(parameter_definition)
         except Exception as e:
             action_result.set_status(phantom.APP_ERROR, "Error while fetching package details. Error: {0}".format(str(e)))
 
-        if len(parameter_definition.get("parameters")) != 0:
+        if parameter_definition and len(parameter_definition.get("parameters")) != 0:
+            self.debug_print("Provided package is a parameterized package")
             if package_parameter is None:
                 return action_result.set_status(phantom.APP_ERROR, 'Please provide the required package parameter in the following format\
                     :- [{"<parameter_label_1>": "<parameter_value_1>"}, {"<parameter_label_2>": "<parameter_value_2>"}]')
@@ -430,7 +458,7 @@ class TaniumRestConnector(BaseConnector):
         package_spec = {
             "source_id": package_id
         }
-        if package_parameter and len(parameter_definition.get("parameters")) != 0:
+        if package_parameter and parameter_definition and len(parameter_definition.get("parameters")) != 0:
             for parameter_key, parameter_value in list(package_parameter.items()):
                 package_param.update({"key": parameter_key, "value": parameter_value})
 
@@ -806,7 +834,7 @@ class TaniumRestConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
 
             if (phantom.is_fail(ret_val)):
-                action_result.set_status(phantom.APP_ERROR, "Failed to get group")
+                action_result.set_status(phantom.APP_ERROR, "Failed to get group. Please provide a valid group name")
                 return
 
             response_data = response.get("data")
