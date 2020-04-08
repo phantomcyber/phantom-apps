@@ -108,7 +108,7 @@ class TaniumRestConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, error_text))
 
-        message = message.decode('utf-8').replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         if len(message) > 500:
             message = " error while connecting to the server"
@@ -292,6 +292,7 @@ class TaniumRestConnector(BaseConnector):
         ret_val = self._get_token(action_result)
 
         if phantom.is_fail(ret_val):
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
         # make rest call
         ret_val, response = self._make_rest_call_helper(action_result, TANIUMREST_GET_SAVED_QUESTIONS, verify=self._verify, params=None, headers=None)
@@ -356,7 +357,7 @@ class TaniumRestConnector(BaseConnector):
             return None
 
     def _execute_action_support(self, param, action_result):
-        action_grp = param['action_group']
+        action_grp = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, param['action_group'])
         package_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, param['package_name'])
         action_name = param['action_name']
         expire_seconds = param['expire_seconds']
@@ -406,7 +407,7 @@ class TaniumRestConnector(BaseConnector):
 
         if not response_data:
             return action_result.set_status(phantom.APP_ERROR, "No package exists with name {}. \
-                    Also, please verify that your account have sufficient permissions to access the packages".format(package_name))
+                    Also, please verify that your account has sufficient permissions to access the packages".format(package_name))
 
         res_data = self._get_response_data(response_data, action_result, "package")
 
@@ -475,7 +476,7 @@ class TaniumRestConnector(BaseConnector):
 
             if not response_data:
                 return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                        Also, please verify that your account have sufficient permissions to access the groups".format(group_name))
+                        Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
             res_data = self._get_response_data(response_data, action_result, "group")
 
@@ -498,7 +499,7 @@ class TaniumRestConnector(BaseConnector):
 
         if not response_data:
             return action_result.set_status(phantom.APP_ERROR, "No action group exists with name {}. \
-                    Also, please verify that your account have sufficient permissions to access the action groups".format(action_grp))
+                    Also, please verify that your account has sufficient permissions to access the action groups".format(action_grp))
 
         res_data = self._get_response_data(response_data, action_result, "action group")
 
@@ -610,7 +611,7 @@ class TaniumRestConnector(BaseConnector):
 
             if not response_data:
                 return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                        Also, please verify that your account have sufficient permissions to access the groups".format(group_name))
+                        Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
             res_data = self._get_response_data(response_data, action_result, "group")
 
@@ -722,7 +723,7 @@ class TaniumRestConnector(BaseConnector):
 
             if not response_data:
                 return action_result.set_status(phantom.APP_ERROR, "No saved question exists with name {}. \
-                        Also, please verify that your account have sufficient permissions to access the saved questions".format(query_text))
+                        Also, please verify that your account has sufficient permissions to access the saved questions".format(query_text))
 
             res_data = self._get_response_data(response_data, action_result, "saved question")
 
@@ -783,7 +784,7 @@ class TaniumRestConnector(BaseConnector):
 
             if not response_data:
                 action_result.set_status(phantom.APP_ERROR, "No sensor exists with name {}. \
-                        Also, please verify that your account have sufficient permissions to access the sensors".format(sensor_name))
+                        Also, please verify that your account has sufficient permissions to access the sensors".format(sensor_name))
                 return
 
             res_data = self._get_response_data(response_data, action_result, "sensor")
@@ -841,7 +842,7 @@ class TaniumRestConnector(BaseConnector):
 
             if not response_data:
                 action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                        Also, please verify that your account have sufficient permissions to access the groups".format(group_name))
+                        Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
                 return
 
             res_data = self._get_response_data(response_data, action_result, "group")

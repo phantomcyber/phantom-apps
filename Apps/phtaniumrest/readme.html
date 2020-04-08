@@ -18,7 +18,7 @@
 <ul>
   <li>Computer Groups</li>
   <ul>
-    <li>A component of Tanium permissions is the “Computer Groups” which an account is able to operate on.
+    <li>A component of Tanium permissions is the “Computer Groups” which an account can operate on.
     Please ensure the account you used to configure the Tanium REST API app has access to any machines you run queries or actions on.</li>
   </ul>
   <br>
@@ -51,10 +51,19 @@
   </ul>
 </ul>
 
+<h2>Paginaiton</h2>
+  <ul>
+    <li>Pagination is not implemented in this release. So, the results for the below mentioned actions will be the results that are fetched in a single API call.</li>
+    <ul>
+      <li> List processes </li>
+      <li> List questions </li>
+      <li> Run query </li>
+    </ul>
+  </ul>
 
 <h2>How to use Run Query Action</h2>
   <ul>
-    <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions in order to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
+    <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
     <li>Two modes of operation are supported for the run query action:</li>
     <br>
     <ul>
@@ -62,7 +71,7 @@
       <ul>
         <li>Using Tanium question syntax, users can directly provide the question to be asked to the Tanium server in the <b>query_text</b> parameter.
             For more information on Tanium's question syntax, <a href="https://docs.tanium.com/interact/interact/questions.html">click here.</a></li>
-        <li>Make sure the <b>is_saved_question</b> box is unchecked, since you are providing a question from scratch.</li>
+        <li>Make sure the <b>is_saved_question</b> box is unchecked since you are providing a question from scratch.</li>
         <li>Use the <b>group name</b> parameter to run your query on a particular computer group in your Tanium instance. Users can create a computer group with specific IP addresses/hostnames on the Tanium UI under Administration>Computer Groups.
             For a guide on how to create/manage computer groups in Tanium, <a href="https://docs.tanium.com/platform_user/platform_user/console_computer_groups.html">click here.</a></li>
           <ul>
@@ -131,7 +140,7 @@
     <ul>
       <li>Create and save a package on the Tanium server with a meaningful package name and add a command to terminate the required process in the package's command section.</li>
       <li>To terminate the process of particular computers, users can create a computer group with the IP address/hostname of the target computers and can specify that group name in the <b>group_name</b> parameter.</li>
-      <li>If <b>group_name</b> parameter is not provided, then the terminate process action will be executed on all the registered IP addresses/hostnames.</li>
+      <li>If the <b>group_name</b> parameter is not provided, then the terminate process action will be executed on all the registered IP addresses/hostnames.</li>
     </ul>
   </ul>
   <br>
@@ -140,7 +149,7 @@
     <li>The &#39;Execute Action&#39; action will cause a specified Tanium Package to be executed on the specified group.</li>
     <ul>
       <li>Create and save a package on the Tanium server with a meaningful package name and add a command in the package's command section, or just use an existing package.</li>
-      <li>Any parameters required by the specified package must be supplied a valid JSON via the <b>package_parameters</b> parameter.  For example,
+      <li>Any parameters required by the specified package must be supplied with a valid JSON via the <b>package_parameters</b> parameter.  For example,
       <code>
       {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}
       </code></li>
