@@ -1363,6 +1363,58 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "jira project key"
+                    ],
+                    "column_name": "Project Key",
+                    "column_order": 0,
+                    "example_values": [
+                        "AUA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.retrieve_all",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "234"
+                    ],
+                    "column_name": "Container ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.extension_filter",
+                    "data_type": "string",
+                    "column_name": "Extension Filter",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved attachments from Jira ticket"
                     ]
                 }
             ],
@@ -3343,6 +3395,14 @@
                     ],
                     "column_name": "Key",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -8880,7 +8940,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.comment_visibility",
+                    "data_path": "action_result.parameter.comment_visibility_name",
                     "data_type": "string",
                     "example_values": [
                         "jira-users",

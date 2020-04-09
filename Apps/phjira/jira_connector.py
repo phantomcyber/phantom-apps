@@ -1533,7 +1533,21 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed the user from the watchers list of the issue ID: {0}".format(issue_id))
 
-    def _handle_get_attachments(self,param):
+    def _write_in_file(self, action_result, attachment, full_path, container_id):
+
+        try:
+            with open(full_path, 'wb') as f:
+                attachment_content = attachment.get()
+                f.write(attachment_content)
+            action_result.add_data(Vault.add_attachment(file_location=full_path, container_id=container_id))
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Unable to ingest attachments. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
+            return action_result.set_status(phantom.APP_ERROR, error_text)
+
+        return phantom.APP_SUCCESS
+
+    def _handle_get_attachments(self, param):
 
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
@@ -1557,7 +1571,9 @@ class JiraConnector(phantom.BaseConnector):
         try:
             jira_issue = self._jira.issue(ticket_key, expand="attachment")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Please enter a valid Jira Ticket ID. Please check the provided parameters.")
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Please enter a valid Jira Ticket ID. Please check the provided parameters. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
+            return action_result.set_status(phantom.APP_ERROR, error_text)
 
         if len(jira_issue.fields.attachment) > 0:
             temp_vault_path = Vault.get_vault_tmp_dir().rstrip('/')
@@ -1566,11 +1582,11 @@ class JiraConnector(phantom.BaseConnector):
                     jira_filename = "".join(self._handle_py_ver_compat_for_input_str(attachment.filename).split())
 
                     # jira_filename = "".join(str(attachment.filename).split())
-                    full_path = '{}/{}'.format(temp_vault_path,jira_filename)
-                    with open(full_path, 'wb') as f:
-                        attachment_content = attachment.get()
-                        f.write(attachment_content)
-                        action_result.add_data(Vault.add_attachment(file_location=full_path,container_id=container_id))
+                    full_path = '{}/{}'.format(temp_vault_path, jira_filename)
+
+                    ret_val = self._write_in_file(action_result, attachment, full_path, container_id)
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
 
             elif extension_filter:
                 extension_list = extension_filter.split(',')
@@ -1584,15 +1600,14 @@ class JiraConnector(phantom.BaseConnector):
                     file_extension = ".{}".format(jira_filename.rsplit('.')[-1])
 
                     if file_extension in extension_list:
-                        with open(full_path, 'wb') as f:
-                            attachment_content = attachment.get()
-                            f.write(attachment_content)
-                        action_result.add_data(Vault.add_attachment(file_location=full_path, container_id=container_id))
+                        ret_val = self._write_in_file(action_result, attachment, full_path, container_id)
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
 
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Please select retrieve all or pass in a list of extensions to look for. Please check the provided parameters.")
+                return action_result.set_status(phantom.APP_ERROR, "Please select retrieve all or pass in a list of extensions to look for. Please check the provided parameters")
 
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved attachments from Jira ticket.")
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved attachments from Jira ticket")
 
         else:
             return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters.")
