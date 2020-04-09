@@ -89,18 +89,18 @@ class FortiGateConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    @staticmethod
-    def _handle_py_ver_compat_for_input_str(python_version, input_str):
+    def _handle_py_ver_compat_for_input_str(self, python_version, input_str):
         """
         This method returns the encoded|original string based on the Python version.
-
         :param python_version: Information of the Python version
         :param input_str: Input string to be processed
         :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
         """
-
-        if python_version == 2:
-            input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        try:
+            if input_str and python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
         return input_str
 
