@@ -38,8 +38,7 @@ class TaniumRestConnector(BaseConnector):
         self._session_id = None
         self._percentage = None
 
-    @staticmethod
-    def _handle_py_ver_compat_for_input_str(python_version, input_str):
+    def _handle_py_ver_compat_for_input_str(self, python_version, input_str):
         """
         This method returns the encoded|original string based on the Python version.
 
@@ -48,8 +47,11 @@ class TaniumRestConnector(BaseConnector):
         :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
         """
 
-        if python_version == 2:
-            input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        try:
+            if input_str and python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
         return input_str
 
@@ -69,18 +71,17 @@ class TaniumRestConnector(BaseConnector):
                     error_msg = e.args[0]
             else:
                 error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
         except:
             error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
         try:
-            error_msg = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, error_msg)
+            error_msg = self._handle_py_ver_compat_for_input_str(self._python_version, error_msg)
         except TypeError:
             error_msg = "Error occurred while connecting to the Tanium server. Please check the asset configuration and|or the action parameters."
-
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
         return error_code, error_msg
 
@@ -98,6 +99,9 @@ class TaniumRestConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script and style from the HTML message
+            for element in soup(["script", "style"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -106,12 +110,12 @@ class TaniumRestConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, error_text))
+                self._handle_py_ver_compat_for_input_str(self._python_version, error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
         if len(message) > 500:
-            message = " error while connecting to the server"
+            message = "Error while connecting to the server"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -130,10 +134,11 @@ class TaniumRestConnector(BaseConnector):
         # You should process the error returned in the json
         try:
             if resp_json.get('text'):
-                message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, resp_json.get('text'))
+                message = "Error from server. Status Code: {0} Data from \
+                    server: {1}".format(r.status_code, self._handle_py_ver_compat_for_input_str(self._python_version, resp_json.get('text')))
             else:
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                        r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+                        r.status_code, self._handle_py_ver_compat_for_input_str(self._python_version, r.text.replace('{', '{{').replace('}', '}}')))
         except Exception:
             message = "Error from server. Status Code: {0}. Please provide valid input".format(r.status_code)
 
@@ -166,7 +171,7 @@ class TaniumRestConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(self._python_version, r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -357,8 +362,8 @@ class TaniumRestConnector(BaseConnector):
             return None
 
     def _execute_action_support(self, param, action_result):
-        action_grp = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, param['action_group'])
-        package_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, param['package_name'])
+        action_grp = self._handle_py_ver_compat_for_input_str(self._python_version, param['action_group'])
+        package_name = self._handle_py_ver_compat_for_input_str(self._python_version, param['package_name'])
         action_name = param['action_name']
         expire_seconds = param['expire_seconds']
         package_parameter = param.get('package_parameters', None)
@@ -367,7 +372,7 @@ class TaniumRestConnector(BaseConnector):
         group_name = param.get('group_name')
 
         if group_name:
-            group_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, group_name)
+            group_name = self._handle_py_ver_compat_for_input_str(self._python_version, group_name)
 
         if expire_seconds is not None:
             try:
@@ -591,7 +596,7 @@ class TaniumRestConnector(BaseConnector):
         sensor_name = param['sensor']
         group_name = param.get('group_name')
         if group_name:
-            group_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, group_name)
+            group_name = self._handle_py_ver_compat_for_input_str(self._python_version, group_name)
         timeout_seconds = param.get('timeout_seconds', 600)
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
@@ -699,10 +704,10 @@ class TaniumRestConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        query_text = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, param.get('query_text'))
+        query_text = self._handle_py_ver_compat_for_input_str(self._python_version, param.get('query_text'))
         group_name = param.get('group_name')
         if group_name:
-            group_name = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, group_name)
+            group_name = self._handle_py_ver_compat_for_input_str(self._python_version, group_name)
         timeout_seconds = param.get('timeout_seconds')
 
         if timeout_seconds == 0 or (timeout_seconds and (not str(timeout_seconds).isdigit() or timeout_seconds <= 0)):
@@ -958,7 +963,7 @@ class TaniumRestConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         config = self.get_config()
-        self._username = config['username']
+        self._username = self._handle_py_ver_compat_for_input_str(self._python_version, config['username'])
         self._password = config['password']
         self._verify = config['verify_server_cert']
         self._percentage = config.get('results_percentage', 99)
@@ -969,10 +974,19 @@ class TaniumRestConnector(BaseConnector):
         except:
             return self.set_status(phantom.APP_ERROR, "Please provide a valid integer in range of 0-100 in [Consider question results complete at] configuration parameter")
 
-        self._base_url = TaniumRestConnector._handle_py_ver_compat_for_input_str(self._python_version, config['base_url'])
+        self._base_url = self._handle_py_ver_compat_for_input_str(self._python_version, config['base_url'])
 
-        if self._base_url[-1] == '/':
-            self._base_url = self._base_url[:-1]
+        # removing single occurence of trailing back-slash or forward-slash
+        if self._base_url.endswith('/'):
+            self._base_url = self._base_url.strip('/').strip('\\')
+        elif self._base_url.endswith('\\'):
+            self._base_url = self._base_url.strip('\\').strip('/')
+
+        # removing single occurence of leading back-slash or forward-slash
+        if self._base_url.startswith('/'):
+            self._base_url = self._base_url.strip('/').strip('\\')
+        elif self._base_url.startswith('\\'):
+            self._base_url = self._base_url.strip('\\').strip('/')
 
         self._session_id = self._state.get('session_id', '')
 
