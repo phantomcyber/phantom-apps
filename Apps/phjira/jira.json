@@ -104,6 +104,13 @@
             "order": 8,
             "description": "Comma-separated string of custom fields (case-sensitive) to be ingested",
             "required": false
+        },
+        "timezone": {
+            "data_type": "timezone",
+            "order": 9,
+            "description": "Jira instance timezone (used for timezone conversions for querying in ingestion). Refer to README",
+            "default": "GMT",
+            "required": true
         }
     },
     "actions": [
@@ -1301,6 +1308,61 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get attachments",
+            "description": "Gets specific attachments from a Jira Ticket (issue)",
+            "verbose": "The function will store specific attachments from a given Jira ticket inside the vault",
+            "type": "generic",
+            "identifier": "get_attachments",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The key of the Jira issue",
+                    "contains": [
+                        "jira project key"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "retrieve_all": {
+                    "data_type": "boolean",
+                    "order": 1,
+                    "description": "If this is set to true all attachments will be retrieved from the issue",
+                    "required": true
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "order": 2,
+                    "description": "The Container ID to associate the file with.",
+                    "required": true
+                },
+                "extension_filter": {
+                    "data_type": "string",
+                    "order": 3,
+                    "description": "Comma-separated list of file extensions to be returned from the issue",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "get attachments",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 }
             ],
@@ -3235,6 +3297,12 @@
                     "description": "Comment to add",
                     "data_type": "string",
                     "order": 1,
+                    "required": true
+                },
+                "internal": {
+                    "description": "Whether comment should be internal only or not",
+                    "data_type": "boolean",
+                    "order": 2,
                     "required": true
                 }
             },
@@ -8785,7 +8853,7 @@
                     "description": "How to limit the comment visibility",
                     "required": false
                 },
-                "comment_visibility": {
+                "comment_visibility_name": {
                     "data_type": "string",
                     "order": 5,
                     "description": "Name of group/role able to see the comment",
