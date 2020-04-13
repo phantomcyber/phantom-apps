@@ -78,6 +78,62 @@
             <li>NOTE: If the <b>group_name</b> parameter is not provided, the query will be executed on all registered IP addresses/hostnames in your Tanium instance.</li>
           </ul>
           <br>
+        <li>Parameterized Query</li>
+        <ul>
+          <li>Users can provide the parameter(s) of a Parameterized query in square brackets([parameter-1, parameter-2, ..., parameter-n]).</li>
+          <ul>
+            <li>Example: Get Process Details["parameter-1","parameter-2"] from all machines with Computer Name contains localhost</li>
+          </ul>
+          <li>Users can ignore the parameter part in the query if they want the default value to be considered. Below are the 2 ways a user can achieve this:</li>
+          <ul>
+            <li>Query: Get Process Details from all machines with Computer Name contains localhost</li>
+            <li>Query: Get Process Details["",""] from all machines with Computer Name contains localhost</li>
+          </ul>
+          <li>If a user wants to add only one parameter out of two parameters, users can keep the parameter empty. Below are the examples:</li>
+          <ul>
+            <li>Example: Get Process Details["parameter-1",""] from all machines with Computer Name contains localhost</li>
+            <li>Example: Get Process Details["","parameter-2"] from all machines with Computer Name contains localhost</li>
+          </ul>
+          <li>For two or more sensors in a query, users can select one of the below:</li>
+            <ul>
+              <li>Provide value for all the parameters of all the sensors in the query</li>
+              <ul>
+                <li>Example: Get Child Processes["parameter-1"] and Process Details["parameter-2","parameter-3"] from all machines</li>
+              </ul>
+              <li>Do not provide value for any of the parameters of any of the sensors in the query</li>
+              <ul>
+                <li>Example: Get Child Processes and Process Details from all machines</li>
+              </ul>
+              <li>Provide value for the parameters you want to provide. The parameters for which you don't want to add value, please use double quotes("")</li>
+              <ul>
+                <li>Example: Get Child Processes[""] and Process Details["SHA1", ""] from all machines</li>
+                <li>Example: Get Child Processes["csrss.exe"] and Process Details["", ""] from all machines</li>
+              </ul>
+            </ul>
+          <br>
+          <li>Scenarios:</li>
+          <ol>
+            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides only 2 parameters instead of 3 then, action will fail with a proper error message.</li>
+            <ul>
+              <li>Example: Get Child Processes["parameter-1"] and Process Details["parameter-2"] from all machines</li>
+            </ul>
+            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides more than 3 parameters then, action will fail with a proper error message.</li>
+            <ul>
+              <li>Example: Get Child Processes["parameter-1", "parameter-2"] and Process Details["parameter-3", "parameter-4"] from all machines</li>
+            </ul>
+            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user does not provides any parameter in Child Processes sensor and 3 parameters in Process Details sensor then, the first parameter from Process Details will be considered as the only parameter of the Child Processes sensor and the action will fetch the results accordingly.</li>
+            <ul>
+              <li>Query provided: Get Child Processes and Process Details["parameter-1", "parameter-2", "parameter-3"] from all machines</li>
+              <li>Query that will be executed because of API limitations: Get Child Processes["parameter-1"] and Process Details["parameter-2", "parameter-3"] from all machines</li>
+            </ul>
+            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user provides 2 parameters in Child Processes sensor and 1 parameter in Process Details sensor then, the second parameter from Child Processes sensor will be considered as the first parameter of the Process Details sensor and the only parameter of the Process Details sensor will be considered as the second parameter of the same. The action will fetch the results accordingly.</li>
+            <ul>
+              <li>Query provided: Get Child Processes["parameter-1", "parameter-2"] and Process Details["parameter-3"] from all machines</li>
+              <li>Query that will be executed because of API limitations: Get Child Processes["parameter-1"] and Process Details["parameter-2", "parameter-3"] from all machines</li>
+            </ul>
+          </ol>
+
+        </ul>
         <li>Example Run 1 - Get Computer Name:</li>
           <ul>
             <code>

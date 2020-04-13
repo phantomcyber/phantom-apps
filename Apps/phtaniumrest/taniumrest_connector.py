@@ -776,6 +776,7 @@ class TaniumRestConnector(BaseConnector):
         param_index = 0
         param_list = parse_response["parameter_values"]
         sensor_data = []
+        total_sensor_parameter = 0
 
         for sensor in sensors:
             sensor_name = sensor["name"]
@@ -805,8 +806,16 @@ class TaniumRestConnector(BaseConnector):
                 parameter_keys = [parameter["key"] for parameter in parameter_definition["parameters"]]
                 self.save_progress("Parameter Keys:\n" + json.dumps(parameter_keys))
 
+                total_sensor_parameter += len(parameter_keys)
+
                 parameters = []
                 for parameter_key in parameter_keys:
+
+                    if param_index >= len(param_list):
+                        action_result.set_status(phantom.APP_ERROR, "The parameters for which you don't want to add value, please use double quotes(\"\").\
+                                    For more details refer the documentation")
+                        return
+
                     parameter = {
                         "key": "||%s||" % parameter_key,
                         "value": param_list[param_index] }
@@ -820,6 +829,10 @@ class TaniumRestConnector(BaseConnector):
             else:
                 # Regular Sensor, can use as-is
                 sensor_data.append({"sensor": sensor})
+
+        if total_sensor_parameter and len(total_sensor_parameter) != len(param_list):
+            action_result.set_status(phantom.APP_ERROR, "Please provide exactly the number of parameters that are expected by the sensor and not more")
+            return
 
         self.save_progress("Sensor Data:\n" + json.dumps(sensor_data))
         question_data = { "selects": sensor_data,
@@ -867,7 +880,7 @@ class TaniumRestConnector(BaseConnector):
         self.save_progress("Parsed Question:\n" + json.dumps(response))
 
         if (phantom.is_fail(ret_val)):
-            action_result.set_status(phantom.APP_ERROR, "Failed to parse question")
+            self.debug_print("Failed to parse question")
             return
 
         if len(response.get("data")) != 1:
@@ -883,10 +896,12 @@ class TaniumRestConnector(BaseConnector):
 
         if response["data"][0].get("parameter_values"):
             self.save_progress("Making a parameterized query")
-            data = self._make_parameterized_query(response.get("data")[0], action_result)
-            if not data:
+            parameterized_data = self._make_parameterized_query(response.get("data")[0], action_result)
+            if not parameterized_data:
                 # Something failed
                 return
+
+            data.update(parameterized_data)
         else:
             self.save_progress("Making a non-parameterized query")
             data.update(response.get("data")[0])
