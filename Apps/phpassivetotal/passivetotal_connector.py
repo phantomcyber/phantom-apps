@@ -83,7 +83,7 @@ class PassivetotalConnector(BaseConnector):
         params = dict(self._params)
         params.update(request_params)
 
-        # get config
+        # get the config
         config = self.get_config()
 
         # make the call

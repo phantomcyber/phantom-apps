@@ -334,7 +334,7 @@ class AwsLambdaConnector(BaseConnector):
         # that needs to be accessed across actions
         self._state = self.load_state()
 
-        # get the asset config
+        # gets the asset config
         config = self.get_config()
 
         if LAMBDA_JSON_ACCESS_KEY in config:

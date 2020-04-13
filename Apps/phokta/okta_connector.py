@@ -539,7 +539,7 @@ class OktaConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['group_id'] = response.get('id')
 
-        # Return success, no need to set the message, only the status
+        # Returns success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(status_strings.APP_SUCCESS, OKTA_ADDED_GROUP_SUCCESS_MSG)
 
