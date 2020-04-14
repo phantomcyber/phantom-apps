@@ -414,12 +414,12 @@ class TaniumRestConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "No package exists with name {}. \
                     Also, please verify that your account has sufficient permissions to access the packages".format(package_name))
 
-        res_data = self._get_response_data(response_data, action_result, "package")
+        resp_data = self._get_response_data(response_data, action_result, "package")
 
-        if res_data is None:
+        if resp_data is None:
             return action_result.get_status()
 
-        package_id = res_data.get("id")
+        package_id = resp_data.get("id")
 
         self.debug_print("Fetching parameter definition of the package")
         parameter_definition = response.get("data", {}).get("parameter_definition")
@@ -483,13 +483,13 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
                         Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
-            res_data = self._get_response_data(response_data, action_result, "group")
+            resp_data = self._get_response_data(response_data, action_result, "group")
 
-            if res_data is None:
+            if resp_data is None:
                 return action_result.get_status()
 
-            group_id = res_data.get("id")
-            group_name = res_data.get("name")
+            group_id = resp_data.get("id")
+            group_name = resp_data.get("name")
             data["target_group"] = {"source_id": group_id, "name": str(group_name)}
 
         # Get the action group details
@@ -506,12 +506,12 @@ class TaniumRestConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "No action group exists with name {}. \
                     Also, please verify that your account has sufficient permissions to access the action groups".format(action_grp))
 
-        res_data = self._get_response_data(response_data, action_result, "action group")
+        resp_data = self._get_response_data(response_data, action_result, "action group")
 
-        if res_data is None:
+        if resp_data is None:
             return action_result.get_status()
 
-        action_group_id = res_data.get("id")
+        action_group_id = resp_data.get("id")
 
         data["action_group"] = {
             "id": action_group_id
@@ -618,12 +618,12 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
                         Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
-            res_data = self._get_response_data(response_data, action_result, "group")
+            resp_data = self._get_response_data(response_data, action_result, "group")
 
-            if res_data is None:
+            if resp_data is None:
                 return action_result.get_status()
 
-            group_id = res_data.get("id")
+            group_id = resp_data.get("id")
             data["context_group"] = {"id": group_id}
 
         select_list = list()
@@ -730,12 +730,12 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "No saved question exists with name {}. \
                         Also, please verify that your account has sufficient permissions to access the saved questions".format(query_text))
 
-            res_data = self._get_response_data(response_data, action_result, "saved question")
+            resp_data = self._get_response_data(response_data, action_result, "saved question")
 
-            if res_data is None:
+            if resp_data is None:
                 return action_result.get_status()
 
-            saved_question_id = res_data.get("id")
+            saved_question_id = resp_data.get("id")
 
             endpoint = TANIUMREST_GET_SAVED_QUESTION_RESULT.format(saved_question_id=saved_question_id)
 
@@ -769,14 +769,15 @@ class TaniumRestConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _make_parameterized_query(self, parse_response, action_result):
-        """ Create the data structure to issue a parameterized sensor question to Tanium """
-        sensors = [select["sensor"] for select in parse_response["selects"]]
+    def _parameterize_query(self, query, action_result):
+        """ Creates a data structure to send a parameterized sensor query to Tanium """
+        sensors = [select["sensor"] for select in query["selects"]]
         self.save_progress("Sensors:\n" + json.dumps(sensors))
-        param_index = 0
-        param_list = parse_response["parameter_values"]
+        # Set param index counter
+        param_idx = 0
+        total_params = 0
+        param_list = query["parameter_values"]
         sensor_data = []
-        total_sensor_parameter = 0
 
         for sensor in sensors:
             sensor_name = sensor["name"]
@@ -787,59 +788,55 @@ class TaniumRestConnector(BaseConnector):
                 return
 
             response_data = response.get("data")
-
             if not response_data:
                 action_result.set_status(phantom.APP_ERROR, "No sensor exists with name {}. \
-                        Also, please verify that your account has sufficient permissions to access the sensors".format(sensor_name))
+                        Please verify that your account has sufficient permissions to access the sensors".format(sensor_name))
                 return
 
-            res_data = self._get_response_data(response_data, action_result, "sensor")
-
-            if res_data is None:
+            resp_data = self._get_response_data(response_data, action_result, "sensor")
+            if resp_data is None:
                 return
 
-            self.save_progress("Parameter Definition:\n" + res_data.get("parameter_definition", ""))
-            parameter_definition = json.loads(res_data.get("parameter_definition", ""))
+            self.save_progress("Parameter Definition:\n" + resp_data.get("parameter_definition", ""))
+            parameter_definition = json.loads(resp_data.get("parameter_definition", ""))
 
             if parameter_definition:
                 # Parameterized Sensor
                 parameter_keys = [parameter["key"] for parameter in parameter_definition["parameters"]]
                 self.save_progress("Parameter Keys:\n" + json.dumps(parameter_keys))
-
-                total_sensor_parameter += len(parameter_keys)
-
+                total_params += len(parameter_keys)
                 parameters = []
-                for parameter_key in parameter_keys:
 
-                    if param_index >= len(param_list):
-                        action_result.set_status(phantom.APP_ERROR, "The parameters for which you don't want to add value, please use double quotes(\"\").\
-                                    For more details refer the documentation")
+                for key in parameter_keys:
+                    if param_idx >= len(param_list):
+                        action_result.set_status(phantom.APP_ERROR, "For parameters which you do not want to add value, please use double quotes(\"\").\
+                                    For more details refer to the documentation")
                         return
 
                     parameter = {
-                        "key": "||%s||" % parameter_key,
-                        "value": param_list[param_index] }
+                        "key": "||%s||" % key,
+                        "value": param_list[param_idx] }
                     parameters.append(parameter)
-                    param_index += 1
+                    param_idx += 1
 
-                formatted_sensor = {
+                sensor_dict = {
                     "source_hash": sensor["hash"],
                     "parameters": parameters }
-                sensor_data.append({"sensor": formatted_sensor})
+                sensor_data.append({"sensor": sensor_dict})
             else:
                 # Regular Sensor, can use as-is
                 sensor_data.append({"sensor": sensor})
 
-        if total_sensor_parameter and total_sensor_parameter != len(param_list):
-            action_result.set_status(phantom.APP_ERROR, "Please provide exactly the number of parameters that are expected by the sensor and not more")
+        if total_params and total_params != len(param_list):
+            action_result.set_status(phantom.APP_ERROR, "Please provide the exact number of parameters expected by the sensor")
             return
 
         self.save_progress("Sensor Data:\n" + json.dumps(sensor_data))
         question_data = { "selects": sensor_data,
-                          "question_text": parse_response["question_text"]}
-        if "group" in parse_response:
+                          "question_text": query["question_text"]}
+        if "group" in query:
             # Add in filters
-            question_data["group"] = parse_response["group"]
+            question_data["group"] = query["group"]
 
         return question_data
 
@@ -863,12 +860,12 @@ class TaniumRestConnector(BaseConnector):
                         Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
                 return
 
-            res_data = self._get_response_data(response_data, action_result, "group")
+            resp_data = self._get_response_data(response_data, action_result, "group")
 
-            if res_data is None:
+            if resp_data is None:
                 return
 
-            group_id = res_data.get("id")
+            group_id = resp_data.get("id")
             data["context_group"] = {"id": group_id}
 
         # Before executing the query, run the query text against the /parse_question
@@ -896,7 +893,7 @@ class TaniumRestConnector(BaseConnector):
 
         if response["data"][0].get("parameter_values"):
             self.save_progress("Making a parameterized query")
-            parameterized_data = self._make_parameterized_query(response.get("data")[0], action_result)
+            parameterized_data = self._parameterize_query(response.get("data")[0], action_result)
             if not parameterized_data:
                 # Something failed
                 return
