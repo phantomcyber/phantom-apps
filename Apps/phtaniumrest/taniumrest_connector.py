@@ -830,7 +830,7 @@ class TaniumRestConnector(BaseConnector):
                 # Regular Sensor, can use as-is
                 sensor_data.append({"sensor": sensor})
 
-        if total_sensor_parameter and len(total_sensor_parameter) != len(param_list):
+        if total_sensor_parameter and total_sensor_parameter != len(param_list):
             action_result.set_status(phantom.APP_ERROR, "Please provide exactly the number of parameters that are expected by the sensor and not more")
             return
 

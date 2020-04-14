@@ -51,9 +51,9 @@
   </ul>
 </ul>
 
-<h2>Paginaiton</h2>
+<h2>Pagination</h2>
   <ul>
-    <li>Pagination is not implemented in this release. So, the results for the below mentioned actions will be the results that are fetched in a single API call.</li>
+    <li>Pagination is not implemented in this release. So, the results for the below-mentioned actions will be the results that are fetched in a single API call.</li>
     <ul>
       <li> List processes </li>
       <li> List questions </li>
@@ -113,20 +113,20 @@
           <br>
           <li>Scenarios:</li>
           <ol>
-            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides only 2 parameters instead of 3 then, action will fail with a proper error message.</li>
+            <li>If the Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides only 2 parameters instead of 3 then, action will fail with a proper error message.</li>
             <ul>
               <li>Example: Get Child Processes["parameter-1"] and Process Details["parameter-2"] from all machines</li>
             </ul>
-            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides more than 3 parameters then, action will fail with a proper error message.</li>
+            <li>If the Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But the user provides more than 3 parameters then, action will fail with a proper error message.</li>
             <ul>
               <li>Example: Get Child Processes["parameter-1", "parameter-2"] and Process Details["parameter-3", "parameter-4"] from all machines</li>
             </ul>
-            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user does not provides any parameter in Child Processes sensor and 3 parameters in Process Details sensor then, the first parameter from Process Details will be considered as the only parameter of the Child Processes sensor and the action will fetch the results accordingly.</li>
+            <li>If the Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user does not provide any parameter in the Child Processes sensor and 3 parameters in Process Details sensor then, the first parameter from Process Details will be considered as the only parameter of the Child Processes sensor and the action will fetch the results accordingly.</li>
             <ul>
               <li>Query provided: Get Child Processes and Process Details["parameter-1", "parameter-2", "parameter-3"] from all machines</li>
               <li>Query that will be executed because of API limitations: Get Child Processes["parameter-1"] and Process Details["parameter-2", "parameter-3"] from all machines</li>
             </ul>
-            <li>If Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user provides 2 parameters in Child Processes sensor and 1 parameter in Process Details sensor then, the second parameter from Child Processes sensor will be considered as the first parameter of the Process Details sensor and the only parameter of the Process Details sensor will be considered as the second parameter of the same. The action will fetch the results accordingly.</li>
+            <li>If the Child Processes sensor expects 1 parameter and Process Details expects 2 parameters. But if the user provides 2 parameters in Child Processes sensor and 1 parameter in Process Details sensor then, the second parameter from Child Processes sensor will be considered as the first parameter of the Process Details sensor and the only parameter of the Process Details sensor will be considered as the second parameter of the same. The action will fetch the results accordingly.</li>
             <ul>
               <li>Query provided: Get Child Processes["parameter-1", "parameter-2"] and Process Details["parameter-3"] from all machines</li>
               <li>Query that will be executed because of API limitations: Get Child Processes["parameter-1"] and Process Details["parameter-2", "parameter-3"] from all machines</li>
@@ -215,7 +215,7 @@
         <ul>
           <code>
           <li><b>action name</b>: Splunk Live Response Test</li>
-          <li><b>action group:</b>: Default</li>
+          <li><b>action group</b>: Default</li>
           <li><b>package name</b>: Live Response - Linux</li>
           <li><b>package parameters</b>: {&quot;$1&quot;:&quot;Standard_Collection&quot;, &quot;$2&quot;:&quot;SCP&quot;}</li>
           <li><b>group name</b>: centos-computers</li><br>
