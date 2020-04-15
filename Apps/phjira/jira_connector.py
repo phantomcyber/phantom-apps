@@ -33,7 +33,7 @@ import time
 import signal
 import requests
 import tempfile
-from datetime import *
+from datetime import datetime
 from jira.client import JIRA
 from bs4 import BeautifulSoup
 
@@ -1009,12 +1009,12 @@ class JiraConnector(BaseConnector):
             self.debug_print("Unable to query JIRA ticket container: ", e)
             return None
 
-        if (resp_json.get('total', 0) <= 0):
+        if (resp_json.get('count', resp_json.get('total', 0)) <= 0):
             self.debug_print("No container matched")
             return None
 
         try:
-            container_id = resp_json.get('items', [])[0]['id']
+            container_id = resp_json.get('data', resp_json.get('items', []))[0]['id']
         except Exception as e:
             self.debug_print("Container results are not proper: ", e)
             return None
@@ -1038,17 +1038,18 @@ class JiraConnector(BaseConnector):
             self.debug_print("Unable to query JIRA artifact: ", e)
             return None
 
-        if (resp_json.get('total', 0) <= 0):
+        if (resp_json.get('count', resp_json.get('total', 0)) <= 0):
             self.debug_print("No artifact matched")
             return None
 
         try:
             if full_artifact:
-                # previous_artifacts_list = resp_json.get('data', [])
-                previous_artifacts_list = resp_json.get('items', [])
+                previous_artifacts_list = resp_json.get('data',
+                                                        resp_json.get('items',
+                                                                      []))
                 return previous_artifacts_list[0]
             else:
-                return resp_json.get('data', [])[0]['id']
+                return resp_json.get('data', resp_json.get('items', []))[0]['id']
         except Exception as e:
             self.debug_print("Artifact results are not proper: ", e)
             return None
@@ -1246,7 +1247,11 @@ class JiraConnector(BaseConnector):
         artifact_cef['created'] = attachment.created
         artifact_cef['filename'] = attachment.filename
         artifact_cef['mimeType'] = attachment.mimeType
-        artifact_cef['author'] = attachment.author.name
+        try:
+            artifact_cef['author'] = attachment.author.name
+        except:
+            artifact_cef['author'] = attachment.author.displayName
+
         artifact_cef['vault_id'] = vault_ret[json_keys.APP_JSON_HASH]
 
         artifact_json['cef'] = artifact_cef
@@ -1260,7 +1265,11 @@ class JiraConnector(BaseConnector):
         try:
             artifact_json = {}
 
-            artifact_json['name'] = '{0} by {1}'.format(base_name, comment.author.name)
+            try:
+                artifact_json['name'] = '{0} by {1}'.format(base_name, comment.author.name)
+            except:
+                artifact_json['name'] = '{0} by {1}'.format(base_name,
+                                                            comment.author.displayName)
             artifact_json['label'] = 'comment'
             artifact_json['container_id'] = container_id
             artifact_json['source_data_identifier'] = comment.id
@@ -1270,9 +1279,15 @@ class JiraConnector(BaseConnector):
             artifact_cef['body'] = comment.body
             artifact_cef['created'] = comment.created
             artifact_cef['updated'] = comment.updated
-            artifact_cef['author'] = comment.author.name
-            artifact_cef['updateAuthor'] = comment.updateAuthor.name
+            try:
+                artifact_cef['author'] = comment.author.name
+            except:
+                artifact_json['author'] = comment.author.displayName
 
+            try:
+                artifact_cef['updateAuthor'] = comment.updateAuthor.name
+            except:
+                artifact_cef['updateAuthor'] = comment.updateAuthor.displayName
             artifact_json['cef'] = artifact_cef
 
             artifact_list.append(artifact_json)
@@ -1491,17 +1506,48 @@ class JiraConnector(BaseConnector):
             issue_details.append(None)
 
         artifact_details = []
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CONTAINER))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_SDI))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_LABEL))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PRIORITY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_RESOLUTTION))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_STATUS))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_REPORTER))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PROJECT_KEY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_SUMMARY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_DESCRIPTION))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_ISSUE_TYPE))
+        if not 'notable_id' in previous_full_artifact:
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CONTAINER))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_SDI))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_LABEL))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PRIORITY))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_RESOLUTTION))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_STATUS))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_REPORTER))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PROJECT_KEY))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_SUMMARY))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_DESCRIPTION))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_ISSUE_TYPE))
+        else:
+            artifact_details.append(previous_full_artifact.get('notable_id'))
+            artifact_details.append(previous_full_artifact.get(JIRA_JSON_SDI))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_ISSUE_TYPE,
+                                                                      {}).get('value').lower())
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_PRIORITY,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_RESOLUTTION,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_STATUS,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_REPORTER,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_PROJECT_KEY,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_SUMMARY,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_DESCRIPTION,
+                                                                      {}).get('value'))
+            artifact_details.append(previous_full_artifact.get('artifacts',
+                                                               {}).get(JIRA_JSON_ISSUE_TYPE,
+                                                                      {}).get('value'))
 
         config = self.get_config()
         custom_fields = config.get(JIRA_JSON_CUSTOM_FIELDS)
@@ -1518,7 +1564,12 @@ class JiraConnector(BaseConnector):
 
             for custom_field in custom_fields_list:
                 issue_details.append(custom_fields_by_name.get(custom_field))
-                artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(custom_field))
+                if not 'notable_id' in previous_full_artifact:
+                    artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(custom_field))
+                else:
+                    artifact_details.append(previous_full_artifact.get('artifacts',
+                                                                       {}).get(custom_field,
+                                                                              {}).get('value'))
 
         if issue_details == artifact_details:
             return False
@@ -1529,10 +1580,7 @@ class JiraConnector(BaseConnector):
 
         update_json = {}
         update_json['name'] = issue.key
-        update_json['data'] = issue.raw # Removing, post failing
         update_json['description'] = issue.fields.summary
-
-        # self.prepare_container(update_json)
 
         if hasattr(self, 'get_phantom_base_url'):
             url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
