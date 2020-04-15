@@ -110,7 +110,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # initially set the token for first time
+        # Initially set the token for first time
         ret_val = self._get_token(action_result)
 
         if (status_strings.is_fail(ret_val)):
