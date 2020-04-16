@@ -49,7 +49,7 @@ class ReversinglabsConnector(BaseConnector):
     def initialize(self):
 
         config = self.get_config()
-        # setup the auth
+        # Setup the auth
         self._auth = HTTPBasicAuth(utils.get_req_value(config, json_keys.APP_JSON_USERNAME),
                 utils.get_req_value(config, json_keys.APP_JSON_PASSWORD))
 
