@@ -40,7 +40,7 @@ class PhishtankConnector(BaseConnector):
         return result
 
     def test_asset_connectivity(self, param):
-	# Gets the config
+	# gets the config
         config = self.get_config()
         app_key = config.get('apikey', None)
         self.save_progress(phishtank_consts.PHISHTANK_MSG_CONNECTING)
