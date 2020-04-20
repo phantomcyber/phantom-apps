@@ -1,0 +1,44 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Tanium Threat Response Typical Usage Example</h1>
+        <p>
+            To get the information from Tanium Threat Response, you will need to follow a certain flow of actions
+            to get what you want. First, you will need to run a search to find the computer that Threat Response can interact
+            with. To get that you can run the <code>list computers</code> action to search through the computers that
+            are connected to Threat Response. You will get back the top 10 computers that match a search query, so being as
+            specific as possible would be better.
+        </p>
+        <p>
+            Once you find the computer that you want to collect information from, you need to create a connection using
+            the <code>create connection</code> action, where the name returned from the <code>list computers</code> is used.
+            Otherwise, the connection may take a while and fail. This action only sends the request to create the
+            connection and will not return the status of that connection.
+        </p>
+        <p>
+            You can then test to see if your connection was made by running <code>get connection</code>. It will list
+            the status of all the current connections. An <b>active</b> status means you can run the other actions to
+            get information that you may need. Live connections will timeout and need to be recreated in those cases.
+            Connections to snapshots will stay open and should be closed after everything is completed.
+        </p>
+        <p>
+            You can get the list of all the snapshots by running the <code>list snapshots</code> action. It will list all the
+            snapshots, i.e., the snapshot files that are uploaded manually and the snapshots that are captured through Tanium UI.
+            The <code>list local snapshots</code> action lists only those snapshots which are captured through Tanium UI. Also,
+            the endpoint used in the <code>list local snapshots</code> action will be deprecated in the future so we would suggest
+            you use the <code>list snapshots</code> action instead of the <code>list local snapshots</code> action.
+        </p>
+        <p>
+            To delete a snapshot, you can run the <code>delete snapshot</code> action by providing the <b>host</b> and the
+            <b>filename</b>. The <code>delete local snapshot</code> action does not work as per the expectation, as the status
+            of the deleted snapshot does not get reflected on the UI. Hence, we would suggest you use the <code>delete
+            snapshot</code> action instead of the <code>delete local snapshot</code> action.
+        </p>
+    </body>
+</html>
