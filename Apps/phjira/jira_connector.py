@@ -1000,7 +1000,8 @@ class JiraConnector(BaseConnector):
         if hasattr(self, 'get_phantom_base_url'):
             url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(self.get_phantom_base_url(), issue_key, self.get_asset_id())
         else:
-            url = '{0}/notable?source_data_identifier={1}&ingest_asset={2}'.format(self.get_ims_base_url(), issue_key, self.get_asset_id())
+            # Setting earliest to '0' to make sure we search all tickets
+            url = '{0}/notable?source_data_identifier={1}&ingest_asset={2}&earliest=0'.format(self.get_ims_base_url(), issue_key, self.get_asset_id())
 
         try:
             r = requests.get(url, verify=False)
@@ -1576,10 +1577,10 @@ class JiraConnector(BaseConnector):
         else:
             return True
 
-    def _update_container(self, issue, container_id, last_time, action_result):
+    def _update_container(self, issue, container_id, last_time, last_updated_time, action_result):
 
         update_json = {}
-        update_json['name'] = issue.key
+        update_json['data'] = issue.raw
         update_json['description'] = issue.fields.summary
 
         if hasattr(self, 'get_phantom_base_url'):
@@ -1629,7 +1630,8 @@ class JiraConnector(BaseConnector):
                 update_datetime = datetime.strptime(update_time, "%Y-%m-%dT%H:%M:%S.%f")
                 update_epoch = (update_datetime - datetime.utcfromtimestamp(0)).total_seconds()
 
-                if self.is_poll_now() or (update_epoch > last_time):
+                # if self.is_poll_now() or (update_epoch > last_time):
+                if self.is_poll_now() or (update_epoch > last_updated_time):
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if status.is_fail(ret_val):
@@ -1673,13 +1675,14 @@ class JiraConnector(BaseConnector):
 
         return status.APP_SUCCESS
 
-    def _save_issue(self, issue, last_time, action_result):
+    def _save_issue(self, issue, last_time, last_updated_time, action_result):
 
         container_id = self._get_container_id(issue.key)
 
         if container_id:
             # Ticket has already been ingested. Need to update its container.
-            ret_val = self._update_container(issue, container_id, last_time, action_result)
+            ret_val = self._update_container(issue, container_id, last_time,
+                                             last_updated_time, action_result)
 
             if status.is_fail(ret_val):
                 return status.APP_ERROR
@@ -1766,6 +1769,7 @@ class JiraConnector(BaseConnector):
 
         # Get time from last poll, save now as time for this poll
         last_time = state.get('last_time', 0)
+        last_updated_time = last_time
 
         if last_time:
             try:
@@ -1820,12 +1824,14 @@ class JiraConnector(BaseConnector):
         # Ingest the issues
         failed = 0
         for issue in issues:
-            if (not self._save_issue(self._jira.issue(issue.key), last_time, action_result)):
+            if (not self._save_issue(self._jira.issue(issue.key), last_time,
+                                     last_updated_time, action_result)):
                 failed += 1
 
         if not self.is_poll_now() and issues:
             last_fetched_issue = self._jira.issue(issues[-1].key)
-            last_fetched_issue_updated_timestamp = time.mktime(datetime.strptime(last_fetched_issue.fields.updated[:-5], "%Y-%m-%dT%H:%M:%S.%f").timetuple())
+            # last_fetched_issue_updated_timestamp = time.mktime(datetime.strptime(last_fetched_issue.fields.updated[:-5], "%Y-%m-%dT%H:%M:%S.%f").timetuple())
+            last_fetched_issue_updated_timestamp = (datetime.strptime(last_fetched_issue.fields.updated[:-5], "%Y-%m-%dT%H:%M:%S.%f") - datetime.utcfromtimestamp(0)).total_seconds()
             state['last_time'] = last_fetched_issue_updated_timestamp
 
         # Check for save_state API, use it if it is present
