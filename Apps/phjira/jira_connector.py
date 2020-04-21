@@ -1695,7 +1695,14 @@ class JiraConnector(BaseConnector):
         container_json['data'] = issue.raw
         container_json['description'] = issue.fields.summary
         container_json['source_data_identifier'] = issue.key
-        container_json['label'] = self.get_config().get('ingest', {}).get('container_label')
+        # container_json['label'] = self.get_config().get('ingest', {}).get('container_label', self.get_config().get('ingest', {}).get('notable_label', 'Unknown'))
+        config = self.get_config()
+
+        if 'ingest' in config:
+            container_json['label'] = config.get('container_label', config.get('notable_label', 'Unknown'))
+        else:
+            container_json['label'] = 'Unknown'
+
         container_json['ingest_asset'] = self.get_asset_id()
 
         # Save the container
