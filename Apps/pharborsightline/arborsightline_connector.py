@@ -13,6 +13,7 @@ from arborsightline_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 import datetime
 import urllib
 import urlparse
@@ -48,9 +49,11 @@ class ArborSightlineConnector(BaseConnector):
 
         # An html response, treat it like an error
         status_code = response.status_code
-
+        
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -58,10 +61,11 @@ class ArborSightlineConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                                                                      error_text)
+        error_text = UnicodeDammit(error_text).unicode_markup.encode('utf-8')
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = " Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -120,14 +124,13 @@ class ArborSightlineConnector(BaseConnector):
         config = self.get_config()
 
         resp_json = None
-
         try:
             request_func = getattr(requests, method)
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{0}{1}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -136,7 +139,25 @@ class ArborSightlineConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            try:
+                if e.args:
+                    if len(e.args) > 1:
+                        error_code = e.args[0]
+                        error_msg = e.args[1]
+                    elif len(e.args) == 1:
+                        error_code = "Error code unavailable"
+                        error_msg = e.args[0]
+                else:
+                    error_code = "Error code unavailable"
+                    error_msg = "Error occurred while connecting to the Arbor Sightline server. Please check the asset configuration and|or action parameters."
+                try:
+                    error_msg = UnicodeDammit(error_msg).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = error_msg
+            except:
+                error_code = "Error code unavailable"
+                error_msg = "Error occurred while connecting to the Arbor Sightline server. Please check the asset configuration and|or action parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server.Error code: {0} Error Message:{1}".format(error_code, error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -269,8 +290,8 @@ class ArborSightlineConnector(BaseConnector):
             "alerts_per_page": 50,
             "total_pages": None
         }
-
-        # Convert from epoch to ISO 8601 format
+        self.save_progress("start_time:{0}".format(param[phantom.APP_JSON_START_TIME]))
+        # Convert from epoch tIf an ingestion is already in progresso ISO 8601 format
         dt_start = datetime.datetime.utcfromtimestamp(
             param[phantom.APP_JSON_START_TIME] / 1000)
         dt_start_formatted = datetime.datetime.strftime(
@@ -297,19 +318,27 @@ class ArborSightlineConnector(BaseConnector):
 
         url = "{0}?{1}".format(
             ARBORSIGHTLINE_GET_ALERTS_ENDPOINT, "&".join(params))
+        self.save_progress("Url={0}".format(url))
 
         # Fetch alerts
         ret_val, response = self._get_alerts(action_result, url, paging_data)
         if (phantom.is_fail(ret_val)):
-            self.error_print(action_result.get_status_message())
-            self.save_progress(action_result.get_status_message())
+            try:
+                self.error_print(action_result.get_status_message())
+                self.save_progress(action_result.get_status_message())
+            except:
+                pass
+            self.save_progress("Get alerts fails")
             return action_result.get_status()
 
         # Parse returned alerts
         ret_val, total_alerts = self._parse_alerts(action_result, response)
         if (phantom.is_fail(ret_val)):
-            self.error_print(action_result.get_status_message())
-            self.save_progress(action_result.get_status_message())
+            try:
+                self.error_print(action_result.get_status_message())
+                self.save_progress(action_result.get_status_message())
+            except:
+                pass
             return action_result.get_status()
 
         # Handle case of no alerts found
@@ -344,8 +373,11 @@ class ArborSightlineConnector(BaseConnector):
                 ret_val, response = self._get_alerts(
                     action_result, url, paging_data)
                 if (phantom.is_fail(ret_val)):
-                    self.error_print(action_result.get_status_message())
-                    self.save_progress(action_result.get_status_message())
+                    try:
+                        self.error_print(action_result.get_status_message())
+                        self.save_progress(action_result.get_status_message())
+                    except:
+                        pass
                     return action_result.get_status()
 
                 # Eventually reduce amount of alerts to speed up processing
@@ -355,8 +387,11 @@ class ArborSightlineConnector(BaseConnector):
                 ret_val, page_alerts = self._parse_alerts(
                     action_result, response)
                 if (phantom.is_fail(ret_val)):
-                    self.error_print(action_result.get_status_message())
-                    self.save_progress(action_result.get_status_message())
+                    try:
+                        self.error_print(action_result.get_status_message())
+                        self.save_progress(action_result.get_status_message())
+                    except:
+                        pass
                     return action_result.get_status()
 
                 # Update counters
@@ -434,7 +469,7 @@ class ArborSightlineConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = config.get('base_url')
+        self._base_url = UnicodeDammit(config.get('base_url')).unicode_markup.encode('utf-8')
 
         if self._base_url.endswith('/'):
             self._base_url = self._base_url[:-1]
