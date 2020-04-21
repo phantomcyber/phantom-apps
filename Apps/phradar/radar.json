@@ -1,0 +1,756 @@
+{
+  "appid": "f8fbcb9f-fc58-438c-9e39-14f034279b29",
+  "name": "Radar",
+  "description": "This app integrates with the Radar Incident Response Platform",
+  "type": "privacy incident response",
+  "product_vendor": "RADAR, LLC",
+  "url": "https://www.radarfirst.com/radar",
+  "logo": "radar.png",
+  "logo_dark": "radar_dark.svg",
+  "product_name": "Radar",
+  "product_version_regex": ".*",
+  "publisher": "RADAR, LLC",
+  "license": "Copyright (c) 2020 Splunk Inc.",
+  "app_version": "1.0.0",
+  "python_version": "3",
+  "package_name": "phantom_radar",
+  "main_module": "radar_connector.py",
+  "min_phantom_version": "4.6.19142",
+  "pip_dependencies": {
+    "pypi": [
+      {"module": "pytz"},
+      {"module": "python-dateutil"}
+    ]
+  },
+  "configuration": {
+    "radar_api_token": {
+      "description": "Radar API Bearer Token",
+      "data_type": "password",
+      "required": true,
+      "order": 0
+    },
+    "radar_api_url": {
+      "description": "Radar API URL",
+      "data_type": "string",
+      "default": "https://api.radarfirst.com",
+      "required": true,
+      "order": 1
+    },
+    "radar_incident_group": {
+      "description": "Incident Group ID",
+      "data_type": "numeric",
+      "required": true,
+      "order": 2
+    },
+    "time_zone": {
+      "description": "Time Zone",
+      "data_type": "string",
+      "value_list": [
+        "Africa/Abidjan",
+        "Africa/Accra",
+        "Africa/Algiers",
+        "Africa/Bissau",
+        "Africa/Cairo",
+        "Africa/Casablanca",
+        "Africa/Ceuta",
+        "Africa/El_Aaiun",
+        "Africa/Johannesburg",
+        "Africa/Juba",
+        "Africa/Khartoum",
+        "Africa/Lagos",
+        "Africa/Maputo",
+        "Africa/Monrovia",
+        "Africa/Nairobi",
+        "Africa/Ndjamena",
+        "Africa/Sao_Tome",
+        "Africa/Tripoli",
+        "Africa/Tunis",
+        "Africa/Windhoek",
+        "America/Adak",
+        "America/Anchorage",
+        "America/Araguaina",
+        "America/Argentina/Buenos_Aires",
+        "America/Argentina/Catamarca",
+        "America/Argentina/Cordoba",
+        "America/Argentina/Jujuy",
+        "America/Argentina/La_Rioja",
+        "America/Argentina/Mendoza",
+        "America/Argentina/Rio_Gallegos",
+        "America/Argentina/Salta",
+        "America/Argentina/San_Juan",
+        "America/Argentina/San_Luis",
+        "America/Argentina/Tucuman",
+        "America/Argentina/Ushuaia",
+        "America/Asuncion",
+        "America/Atikokan",
+        "America/Bahia",
+        "America/Bahia_Banderas",
+        "America/Barbados",
+        "America/Belem",
+        "America/Belize",
+        "America/Blanc-Sablon",
+        "America/Boa_Vista",
+        "America/Bogota",
+        "America/Boise",
+        "America/Cambridge_Bay",
+        "America/Campo_Grande",
+        "America/Cancun",
+        "America/Caracas",
+        "America/Cayenne",
+        "America/Chicago",
+        "America/Chihuahua",
+        "America/Costa_Rica",
+        "America/Creston",
+        "America/Cuiaba",
+        "America/Curacao",
+        "America/Danmarkshavn",
+        "America/Dawson",
+        "America/Dawson_Creek",
+        "America/Denver",
+        "America/Detroit",
+        "America/Edmonton",
+        "America/Eirunepe",
+        "America/El_Salvador",
+        "America/Fortaleza",
+        "America/Fort_Nelson",
+        "America/Glace_Bay",
+        "America/Godthab",
+        "America/Goose_Bay",
+        "America/Grand_Turk",
+        "America/Guatemala",
+        "America/Guayaquil",
+        "America/Guyana",
+        "America/Halifax",
+        "America/Havana",
+        "America/Hermosillo",
+        "America/Indiana/Indianapolis",
+        "America/Indiana/Knox",
+        "America/Indiana/Marengo",
+        "America/Indiana/Petersburg",
+        "America/Indiana/Tell_City",
+        "America/Indiana/Vevay",
+        "America/Indiana/Vincennes",
+        "America/Indiana/Winamac",
+        "America/Inuvik",
+        "America/Iqaluit",
+        "America/Jamaica",
+        "America/Juneau",
+        "America/Kentucky/Louisville",
+        "America/Kentucky/Monticello",
+        "America/La_Paz",
+        "America/Lima",
+        "America/Los_Angeles",
+        "America/Maceio",
+        "America/Managua",
+        "America/Manaus",
+        "America/Martinique",
+        "America/Matamoros",
+        "America/Mazatlan",
+        "America/Menominee",
+        "America/Merida",
+        "America/Metlakatla",
+        "America/Mexico_City",
+        "America/Miquelon",
+        "America/Moncton",
+        "America/Monterrey",
+        "America/Montevideo",
+        "America/Nassau",
+        "America/New_York",
+        "America/Nipigon",
+        "America/Nome",
+        "America/Noronha",
+        "America/North_Dakota/Beulah",
+        "America/North_Dakota/Center",
+        "America/North_Dakota/New_Salem",
+        "America/Ojinaga",
+        "America/Panama",
+        "America/Pangnirtung",
+        "America/Paramaribo",
+        "America/Phoenix",
+        "America/Port-au-Prince",
+        "America/Port_of_Spain",
+        "America/Porto_Velho",
+        "America/Puerto_Rico",
+        "America/Punta_Arenas",
+        "America/Rainy_River",
+        "America/Rankin_Inlet",
+        "America/Recife",
+        "America/Regina",
+        "America/Resolute",
+        "America/Rio_Branco",
+        "America/Santarem",
+        "America/Santiago",
+        "America/Santo_Domingo",
+        "America/Sao_Paulo",
+        "America/Scoresbysund",
+        "America/Sitka",
+        "America/St_Johns",
+        "America/Swift_Current",
+        "America/Tegucigalpa",
+        "America/Thule",
+        "America/Thunder_Bay",
+        "America/Tijuana",
+        "America/Toronto",
+        "America/Vancouver",
+        "America/Whitehorse",
+        "America/Winnipeg",
+        "America/Yakutat",
+        "America/Yellowknife",
+        "Antarctica/Casey",
+        "Antarctica/Davis",
+        "Antarctica/DumontDUrville",
+        "Antarctica/Macquarie",
+        "Antarctica/Mawson",
+        "Antarctica/Palmer",
+        "Antarctica/Rothera",
+        "Antarctica/Syowa",
+        "Antarctica/Troll",
+        "Antarctica/Vostok",
+        "Asia/Almaty",
+        "Asia/Amman",
+        "Asia/Anadyr",
+        "Asia/Aqtau",
+        "Asia/Aqtobe",
+        "Asia/Ashgabat",
+        "Asia/Atyrau",
+        "Asia/Baghdad",
+        "Asia/Baku",
+        "Asia/Bangkok",
+        "Asia/Barnaul",
+        "Asia/Beirut",
+        "Asia/Bishkek",
+        "Asia/Brunei",
+        "Asia/Chita",
+        "Asia/Choibalsan",
+        "Asia/Colombo",
+        "Asia/Damascus",
+        "Asia/Dhaka",
+        "Asia/Dili",
+        "Asia/Dubai",
+        "Asia/Dushanbe",
+        "Asia/Famagusta",
+        "Asia/Gaza",
+        "Asia/Hebron",
+        "Asia/Ho_Chi_Minh",
+        "Asia/Hong_Kong",
+        "Asia/Hovd",
+        "Asia/Irkutsk",
+        "Asia/Jakarta",
+        "Asia/Jayapura",
+        "Asia/Jerusalem",
+        "Asia/Kabul",
+        "Asia/Kamchatka",
+        "Asia/Karachi",
+        "Asia/Kathmandu",
+        "Asia/Khandyga",
+        "Asia/Kolkata",
+        "Asia/Krasnoyarsk",
+        "Asia/Kuala_Lumpur",
+        "Asia/Kuching",
+        "Asia/Macau",
+        "Asia/Magadan",
+        "Asia/Makassar",
+        "Asia/Manila",
+        "Asia/Nicosia",
+        "Asia/Novokuznetsk",
+        "Asia/Novosibirsk",
+        "Asia/Omsk",
+        "Asia/Oral",
+        "Asia/Pontianak",
+        "Asia/Pyongyang",
+        "Asia/Qatar",
+        "Asia/Qyzylorda",
+        "Asia/Riyadh",
+        "Asia/Sakhalin",
+        "Asia/Samarkand",
+        "Asia/Seoul",
+        "Asia/Shanghai",
+        "Asia/Singapore",
+        "Asia/Srednekolymsk",
+        "Asia/Taipei",
+        "Asia/Tashkent",
+        "Asia/Tbilisi",
+        "Asia/Tehran",
+        "Asia/Thimphu",
+        "Asia/Tokyo",
+        "Asia/Tomsk",
+        "Asia/Ulaanbaatar",
+        "Asia/Urumqi",
+        "Asia/Ust-Nera",
+        "Asia/Vladivostok",
+        "Asia/Yakutsk",
+        "Asia/Yangon",
+        "Asia/Yekaterinburg",
+        "Asia/Yerevan",
+        "Atlantic/Azores",
+        "Atlantic/Bermuda",
+        "Atlantic/Canary",
+        "Atlantic/Cape_Verde",
+        "Atlantic/Faroe",
+        "Atlantic/Madeira",
+        "Atlantic/Reykjavik",
+        "Atlantic/South_Georgia",
+        "Atlantic/Stanley",
+        "Australia/Adelaide",
+        "Australia/Brisbane",
+        "Australia/Broken_Hill",
+        "Australia/Currie",
+        "Australia/Darwin",
+        "Australia/Eucla",
+        "Australia/Hobart",
+        "Australia/Lindeman",
+        "Australia/Lord_Howe",
+        "Australia/Melbourne",
+        "Australia/Perth",
+        "Australia/Sydney",
+        "Europe/Amsterdam",
+        "Europe/Andorra",
+        "Europe/Astrakhan",
+        "Europe/Athens",
+        "Europe/Belgrade",
+        "Europe/Berlin",
+        "Europe/Brussels",
+        "Europe/Bucharest",
+        "Europe/Budapest",
+        "Europe/Chisinau",
+        "Europe/Copenhagen",
+        "Europe/Dublin",
+        "Europe/Gibraltar",
+        "Europe/Helsinki",
+        "Europe/Istanbul",
+        "Europe/Kaliningrad",
+        "Europe/Kiev",
+        "Europe/Kirov",
+        "Europe/Lisbon",
+        "Europe/London",
+        "Europe/Luxembourg",
+        "Europe/Madrid",
+        "Europe/Malta",
+        "Europe/Minsk",
+        "Europe/Monaco",
+        "Europe/Moscow",
+        "Europe/Oslo",
+        "Europe/Paris",
+        "Europe/Prague",
+        "Europe/Riga",
+        "Europe/Rome",
+        "Europe/Samara",
+        "Europe/Saratov",
+        "Europe/Simferopol",
+        "Europe/Sofia",
+        "Europe/Stockholm",
+        "Europe/Tallinn",
+        "Europe/Tirane",
+        "Europe/Ulyanovsk",
+        "Europe/Uzhgorod",
+        "Europe/Vienna",
+        "Europe/Vilnius",
+        "Europe/Volgograd",
+        "Europe/Warsaw",
+        "Europe/Zaporozhye",
+        "Europe/Zurich",
+        "Indian/Chagos",
+        "Indian/Christmas",
+        "Indian/Cocos",
+        "Indian/Kerguelen",
+        "Indian/Mahe",
+        "Indian/Maldives",
+        "Indian/Mauritius",
+        "Indian/Reunion",
+        "Pacific/Apia",
+        "Pacific/Auckland",
+        "Pacific/Bougainville",
+        "Pacific/Chatham",
+        "Pacific/Chuuk",
+        "Pacific/Easter",
+        "Pacific/Efate",
+        "Pacific/Enderbury",
+        "Pacific/Fakaofo",
+        "Pacific/Fiji",
+        "Pacific/Funafuti",
+        "Pacific/Galapagos",
+        "Pacific/Gambier",
+        "Pacific/Guadalcanal",
+        "Pacific/Guam",
+        "Pacific/Honolulu",
+        "Pacific/Kiritimati",
+        "Pacific/Kosrae",
+        "Pacific/Kwajalein",
+        "Pacific/Majuro",
+        "Pacific/Marquesas",
+        "Pacific/Nauru",
+        "Pacific/Niue",
+        "Pacific/Norfolk",
+        "Pacific/Noumea",
+        "Pacific/Pago_Pago",
+        "Pacific/Palau",
+        "Pacific/Pitcairn",
+        "Pacific/Pohnpei",
+        "Pacific/Port_Moresby",
+        "Pacific/Rarotonga",
+        "Pacific/Tahiti",
+        "Pacific/Tarawa",
+        "Pacific/Tongatapu",
+        "Pacific/Wake",
+        "Pacific/Wallis",
+        "UTC"
+      ],
+      "order": 3
+    }
+  },
+  "actions": [
+    {
+      "action": "test connectivity",
+      "identifier": "test_connectivity",
+      "description": "Validate Radar asset configuration for connectivity using supplied configuration",
+      "verbose": "",
+      "type": "test",
+      "read_only": true,
+      "parameters": {},
+      "output": [],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "create privacy incident",
+      "identifier": "create_privacy_incident",
+      "description": "Create Radar Privacy Incident",
+      "verbose": "This action creates a privacy incident in Radar using Phantom settings and asset configurations. The Base URL For Phantom Appliance configured on the Company Settings page is used to link the incident's \"intake method\" to this instance of Phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated Phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the Phantom container. Action parameters are used to set the Radar incident name and description.",
+      "type": "generic",
+      "read_only": false,
+      "parameters": {
+        "name": {
+          "description": "A name summarizing the privacy incident",
+          "data_type": "string",
+          "required": true,
+          "default": "",
+          "order": 0
+        },
+        "description": {
+          "description": "A description of the privacy incident",
+          "data_type": "string",
+          "order": 1
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.incident_id",
+          "data_type": "numeric",
+          "column_name": "id",
+          "column_order": 0,
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "column_name": "name",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "description",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.discovered",
+          "data_type": "string",
+          "column_name": "discovered at",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.data.*.url",
+          "data_type": "string",
+          "column_name": "url",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "column_order": 6,
+          "example_values": [
+            "Successfully created a privacy incident"
+          ]
+        }
+      ],
+      "render": {
+        "type": "custom",
+        "view": "radar_view.display_view",
+        "title": "Privacy Incident",
+        "menu_name": "Radar Privacy Incident"
+      },
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "get privacy incident",
+      "identifier": "get_privacy_incident",
+      "description": "Get a Radar privacy incident",
+      "verbose": "This action gets a Radar privacy incident using the incident ID supplied in the action parameters",
+      "type": "generic",
+      "read_only": true,
+      "parameters": {
+        "incident_id": {
+          "description": "Radar Incident ID",
+          "data_type": "numeric",
+          "required": true,
+          "order": 0,
+          "contains": [
+            "radar incident id"
+          ],
+          "primary": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.incident_id",
+          "data_type": "numeric",
+          "column_name": "id",
+          "column_order": 0,
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "column_name": "name",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "description",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.url",
+          "data_type": "string",
+          "column_name": "url",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.data.*.created_at",
+          "data_type": "string",
+          "column_name": "created at",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.discovered_at",
+          "data_type": "string",
+          "column_name": "discovered at",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.updated_at",
+          "data_type": "string",
+          "column_name": "updated at",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.data.*.updated_by",
+          "data_type": "string",
+          "column_name": "updated by",
+          "column_order": 7
+        },
+        {
+          "data_path": "action_result.data.*.incident_status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 8
+        },
+        {
+          "data_path": "action_result.data.*.assignee",
+          "data_type": "string",
+          "column_name": "assignee",
+          "column_order": 9
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 10
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "column_order": 11,
+          "example_values": [
+            "Successfully fetched privacy incident"
+          ]
+        }
+      ],
+      "render": {
+        "type": "custom",
+        "view": "radar_view.display_view",
+        "title": "Privacy Incident",
+        "menu_name": "Radar Privacy Incident"
+      },
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "add note",
+      "identifier": "add_note",
+      "description": "Add a Note to a Radar Privacy Incident",
+      "verbose": "This action adds a note to a given Radar incident using asset configurations and action parameters. The incident ID action parameter is used to add a note to a given incident. The content action parameter is used for the content of the note.",
+      "type": "generic",
+      "read_only": false,
+      "parameters": {
+        "incident_id": {
+          "description": "Radar Incident ID",
+          "data_type": "numeric",
+          "required": true,
+          "order": 0,
+          "contains": [
+            "radar incident id"
+          ],
+          "primary": true
+        },
+        "content": {
+          "description": "Note content",
+          "data_type": "string",
+          "required": true,
+          "order": 1
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "column_name": "note id",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.incident_id",
+          "data_type": "numeric",
+          "column_name": "incident id",
+          "column_order": 1,
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.content",
+          "data_type": "string",
+          "column_name": "note content",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "column_order": 4,
+          "example_values": [
+            "Successfully added note"
+          ]
+        }
+      ],
+      "render": {
+        "type": "custom",
+        "view": "radar_view.display_view",
+        "title": "Privacy Incident Note",
+        "menu_name": "Radar Privacy Incident Note"
+      },
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "get notes",
+      "identifier": "get_notes",
+      "description": "Get all notes for a Radar privacy incident",
+      "verbose": "This action gets all notes for a given Radar incident using the incident ID supplied in the action parameters. Only notes that were created with the 'create note' action will be fetched from Radar.",
+      "type": "generic",
+      "read_only": true,
+      "parameters": {
+        "incident_id": {
+          "description": "Radar Incident ID",
+          "data_type": "numeric",
+          "required": true,
+          "order": 0,
+          "contains": [
+            "radar incident id"
+          ],
+          "primary": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.data.*.*.id",
+          "data_type": "numeric",
+          "column_name": "note id",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.parameter.incident_id",
+          "data_type": "numeric",
+          "column_name": "incident id",
+          "column_order": 1,
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.*.content",
+          "data_type": "string",
+          "column_name": "note content",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.*.created_at",
+          "data_type": "string",
+          "column_name": "created at",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.data.*.*.created_by",
+          "data_type": "string",
+          "column_name": "created by",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.*.updated_at",
+          "data_type": "string",
+          "column_name": "updated at",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.*.updated_by",
+          "data_type": "string",
+          "column_name": "updated by",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "column_name": "status",
+          "column_order": 7
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "column_order": 8,
+          "example_values": [
+            "Successfully fetched notes"
+          ]
+        }
+      ],
+      "render": {
+        "type": "custom",
+        "view": "radar_view.display_view",
+        "title": "Privacy Incident Note",
+        "menu_name": "Radar Privacy Incident Note"
+      },
+      "versions": "EQ(*)"
+    }
+  ]
+}

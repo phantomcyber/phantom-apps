@@ -1,0 +1,496 @@
+{
+    "appid": "00a4cb00-19a1-46f6-9923-f502a3dd346b",
+    "name": "GitLab",
+    "description": "This app integrates with a GitLab instance to perform various lookups and execute CI/CD pipelines",
+    "type": "devops",
+    "product_vendor": "GitLab",
+    "logo": "logo_gitlab.svg",
+    "logo_dark": "logo_gitlab_dark.svg",
+    "product_name": "GitLab",
+    "product_version_regex": ".*",
+    "publisher": "Peter Bertel",
+    "license": "Copyright (c) Peter Bertel, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-08-26T01:28:27.791651Z",
+    "package_name": "phantom_gitlab",
+    "main_module": "gitlab_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "gitlab_location": {
+            "description": "The Hostname or IP address of the GitLab instance",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "personal_access_token": {
+            "description": "Access token for a GitLab user",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "identifier": "list_users",
+            "description": "List all the users in the GitLab instance",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.can_create_project",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list projects",
+            "identifier": "list_projects",
+            "description": "List all the projects in the GitLab instance",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "project-name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "path-to/project-name"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list branches",
+            "identifier": "list_branches",
+            "description": "List the branches of a GitLab project",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "project_id": {
+                    "description": "The ID of the GitLab project",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.project_id",
+                    "data_type": "numeric",
+                    "column_name": "Project ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "master"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create trigger",
+            "identifier": "create_trigger",
+            "description": "Create a new pipeline trigger for a GitLab project",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "project_id": {
+                    "description": "The ID of the GitLab project",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
+                    "order": 0
+                },
+                "trigger_name": {
+                    "description": "The name of the new trigger",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab trigger"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.project_id",
+                    "data_type": "string",
+                    "column_name": "Project ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.trigger_name",
+                    "data_type": "string",
+                    "column_name": "Trigger Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.trigger_token",
+                    "data_type": "string",
+                    "column_name": "Trigger Token",
+                    "example_values": [
+                        "100fadfa454da4b3e1d4d3b9243d78"
+                    ],
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list triggers",
+            "identifier": "list_triggers",
+            "description": "List the pipeline triggers of a GitLab project",
+            "verbose": "List the triggers of a GitLab project.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "project_id": {
+                    "description": "The ID of the GitLab project",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.project_id",
+                    "data_type": "numeric",
+                    "column_name": "Project ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sample trigger description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.token",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "example_values": [
+                        "123456abcdef"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run pipeline",
+            "identifier": "run_pipeline",
+            "description": "Execute a pipeline on a particular branch of a project",
+            "verbose": "Execute a pipeline on a particular branch of a project. GitLab CI/CD must be configured on the project for this action to succeed.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "project_id": {
+                    "description": "The ID of the GitLab project",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab project id"
+                    ],
+                    "order": 0
+                },
+                "trigger_token": {
+                    "description": "The trigger token required for executing a pipeline",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "gitlab trigger"
+                    ],
+                    "order": 1
+                },
+                "branch": {
+                    "description": "The branch containing the .gitlab-ci.yml file to run. Defaults to 'master'",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                      "branch name"
+                    ],
+                    "default": "master",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.project_id",
+                    "data_type": "numeric",
+                    "column_name": "Project ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.trigger_token",
+                    "data_type": "string",
+                    "column_name": "Trigger Token",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.branch",
+                    "data_type": "string",
+                    "column_name": "Branch",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.pipeline_id",
+                    "data_type": "string",
+                    "column_name": "Pipeline ID",
+                    "example_values": [
+                        "21"
+                    ],
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.pipeline_web_url",
+                    "data_type": "string",
+                    "column_name": "Pipeline Web URL",
+                    "example_values": [
+                        "https://gitlab.domain.com/test-group/test-project/pipelines/21"
+                    ],
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 5,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
