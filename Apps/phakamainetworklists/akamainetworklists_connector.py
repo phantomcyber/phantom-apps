@@ -184,7 +184,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         params = {}
 
         if param.get("includeelements"):
-            params['includeelements'] = param.get("includeelements")
+            params['includeElements'] = param.get("includeelements")
         if param.get("extended"):
             params['extended'] = param.get("extended")
         if param.get("search"):
@@ -219,7 +219,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         params = {}
 
         if param.get("includeelements"):
-            params['includeelements'] = param.get("includeelements")
+            params['includeElements'] = param.get("includeelements")
         if param.get("extended"):
             params['extended'] = param.get("extended")
         if param.get('networklistid'):
