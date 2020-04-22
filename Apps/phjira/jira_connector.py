@@ -1699,7 +1699,7 @@ class JiraConnector(BaseConnector):
         config = self.get_config()
 
         if 'ingest' in config:
-            container_json['label'] = config.get('container_label', config.get('notable_label', 'Unknown'))
+            container_json['label'] = config['ingest'].get('container_label', config['ingest'].get('notable_label', 'Unknown'))
         else:
             container_json['label'] = 'Unknown'
 
