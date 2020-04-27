@@ -51,7 +51,7 @@ class ArborSightlineConnector(BaseConnector):
 
         # An html response, treat it like an error
         status_code = response.status_code
-        
+
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             for element in soup(["script", "style", "footer", "nav"]):
@@ -149,7 +149,8 @@ class ArborSightlineConnector(BaseConnector):
             except:
                 error_msg = ARBORSIGHTLINE_GENERIC_ERROR_MSG
 
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while connecting to the Arbor Sightline server. Error Message:{0}".format(error_msg)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while connecting to the Arbor Sightline server. Error Message:{0}".format(
+                error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
