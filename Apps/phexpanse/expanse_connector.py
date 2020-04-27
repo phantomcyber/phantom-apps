@@ -16,7 +16,7 @@ from expanse_consts import STATUS_CODE_200, EXPANSE_USER_AGENT, \
 
 import base64
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from bs4 import BeautifulSoup
 
@@ -374,6 +374,40 @@ class ExpanseConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_lookup_behavior(self, param):
+        config = self.get_config()
+        jwt = self._fetch_jwt(config)
+
+        self.save_progress(
+            "In action handler for: {0}".format(self.get_action_identifier())
+        )
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ip = param['ip']
+
+        start_date = datetime.strftime(datetime.today() - timedelta(days=30),
+                                       "%Y-%m-%d")
+
+        ret_val, response = self._make_rest_call(
+            '/api/v1/behavior/risky-flows',
+            action_result,
+            params={"filter[created-after]": start_date + "T00:00:00.000Z",
+                    "filter[internal-ip-range]": ip,
+                    "page[limit]": 30},
+            headers=self._get_headers(jwt)
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        summary = action_result.update_summary({})
+        summary['data'] = response['data']
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -392,6 +426,9 @@ class ExpanseConnector(BaseConnector):
 
         elif action_id == 'lookup_certificate':
             ret_val = self._handle_lookup_certificate(param)
+
+        elif action_id == 'lookup_behavior':
+            ret_val = self._handle_lookup_behavior(param)
 
         return ret_val
 

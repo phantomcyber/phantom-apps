@@ -29,7 +29,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using supplied configuration.",
             "verbose": "",
             "type": "test",
             "read_only": true,
@@ -40,7 +40,7 @@
         {
             "action": "lookup ip",
             "identifier": "lookup_ip",
-            "description": "Check for the presence of an IP within a known IP Range in Expanse",
+            "description": "Check for the presence of an IP within a known IP Range in Expanse.",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -172,7 +172,7 @@
         {
             "action": "lookup domain",
             "identifier": "lookup_domain",
-            "description": "Check for the presence of a known domain in Expanse",
+            "description": "Check for the presence of a known domain in Expanse.",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -288,7 +288,7 @@
         {
             "action": "lookup certificate",
             "identifier": "lookup_certificate",
-            "description": "Returns certificates from Expanse for a full or partial common name",
+            "description": "Returns certificates from Expanse for a full or partial common name.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -411,6 +411,117 @@
                     "contains": [],
                     "column_name": "Certificate Advertisement Status",
                     "column_order": 14
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup behavior",
+            "identifier": "lookup_behavior",
+            "description": "Returns Expanse Behavior data for an ip. Limited to 30 flows within the last 30 days.",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "ip": {
+                    "description": "Internal IP address to search for",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Searched Term",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Internal IP Address",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalPort",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "Internal Port Number",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalCountryCode",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Internal Country Code",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "External IP Address",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalPort",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "External Port Number",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalCountryCode",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "External Country Code",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.protocol",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Transport Protocol",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.observationTimestamp",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Observation Timestamp",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.flowDirection",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Flow Direction",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.riskRule.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Violated Risk Rule",
+                    "column_order": 10
                 }
             ],
             "render": {
