@@ -10,13 +10,15 @@ from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
 from arborsightline_consts import *
+
 import requests
 import json
-from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
 import datetime
 import urllib
 import urlparse
+
+from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -83,7 +85,7 @@ class ArborSightlineConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+            r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('UTF-8') if r.text else r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -114,7 +116,7 @@ class ArborSightlineConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('UTF-8') if r.text else r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -139,25 +141,8 @@ class ArborSightlineConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
         except Exception as e:
-            try:
-                if e.args:
-                    if len(e.args) > 1:
-                        error_code = e.args[0]
-                        error_msg = e.args[1]
-                    elif len(e.args) == 1:
-                        error_code = "Error code unavailable"
-                        error_msg = e.args[0]
-                else:
-                    error_code = "Error code unavailable"
-                    error_msg = "Error occurred while connecting to the Arbor Sightline server. Please check the asset configuration and|or action parameters."
-                try:
-                    error_msg = UnicodeDammit(error_msg).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = error_msg
-            except:
-                error_code = "Error code unavailable"
-                error_msg = "Error occurred while connecting to the Arbor Sightline server. Please check the asset configuration and|or action parameters."
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server.Error code: {0} Error Message:{1}".format(error_code, error_msg)), resp_json)
+            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else ARBORSIGHTLINE_GENERIC_ERROR_MSG
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while connecting to the Arbor Sightline server. Error Message:{0}".format(error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -187,7 +172,7 @@ class ArborSightlineConnector(BaseConnector):
             return action_result.get_status()
 
         self.save_progress("API {0} v.{1}".format(
-            response["meta"]["api"], response["meta"]["api_version"]))
+            response.get("meta", {}).get("api"), response.get("meta", {}).get("api_version")))
 
         # Return success
         self.save_progress("Test Connectivity Passed")
@@ -196,65 +181,72 @@ class ArborSightlineConnector(BaseConnector):
     def _parse_alerts(self, action_result, alerts):
         """ Parse alerts to create containers and artifacts """
         alerts_cnt = 0
+
         # What happens if you do not have alerts returned?
         # data = [] --> returns alerts_cnt = 0
+        if alerts.get('data') is None:
+            action_result.set_status(phantom.APP_ERROR, ARBORSIGHTLINE_ALERTS_DATA_KEY_UNAVAILABLE_MSG)
+            return action_result.get_status(), None
 
-        for data in alerts['data']:
-            alert_id = data['id']
-            target_address = data['attributes']['subobject']['host_address']
-            impact_bps = data['attributes']['subobject']['impact_bps']
-            impact_pps = data['attributes']['subobject']['impact_pps']
-            victim_router = data['attributes']['subobject']['impact_boundary']
-            classification = data['attributes']['classification']
-            description = ""
+        try:
+            for data in alerts['data']:
+                alert_id = data['id']
+                target_address = data['attributes']['subobject']['host_address']
+                impact_bps = data['attributes']['subobject']['impact_bps']
+                impact_pps = data['attributes']['subobject']['impact_pps']
+                victim_router = data['attributes']['subobject']['impact_boundary']
+                classification = data['attributes']['classification']
+                description = ""
 
-            for include in alerts['included']:
-                if include['relationships']['parent']['data']['type'] == 'alert' and include['relationships']['parent']['data']['id'] == alert_id:
-                    description = include['attributes']['text']
-                    break
+                for include in alerts['included']:
+                    if include['relationships']['parent']['data']['type'] == 'alert' and include['relationships']['parent']['data']['id'] == alert_id:
+                        description = include['attributes']['text']
+                        break
 
-            # Creating container
-            c = {
-                'data': {},
-                'description': 'Ingested from Arbor Sightline',
-                'source_data_identifier': alert_id,
-                'name': '{0} {1}'.format(classification, target_address)
-            }
+                # Creating container
+                c = {
+                    'data': {},
+                    'description': 'Ingested from Arbor Sightline',
+                    'source_data_identifier': alert_id,
+                    'name': '{0} {1}'.format(classification, target_address)
+                }
 
-            # self.send_progress('Saving container for alert id {0}...'.format(alert_id))
-            status, msg, id_ = self.save_container(c)
-            # self.save_progress("Container id : {}, {}, {}".format(id_, status, msg))
-            if status == phantom.APP_ERROR:
-                action_result.set_status(
-                    phantom.APP_ERROR, ARBORSIGHTLINE_CREATE_CONTAINER_FAILED_MSG.format(msg))
-                return action_result.get_status(), None
+                # self.send_progress('Saving container for alert id {0}...'.format(alert_id))
+                status, msg, id_ = self.save_container(c)
+                # self.save_progress("Container id : {}, {}, {}".format(id_, status, msg))
+                if status == phantom.APP_ERROR:
+                    action_result.set_status(phantom.APP_ERROR, ARBORSIGHTLINE_CREATE_CONTAINER_FAILED_MSG.format(msg))
+                    return action_result.get_status(), None
 
-            # Creating artifacts
-            cef = {
-                'targetAddress': target_address,
-                'impactBps': impact_bps,
-                'impactPps': impact_pps,
-                'victimRouter': victim_router,
-                'classification': classification,
-                'description': description
-            }
-            art = {
-                'container_id': id_,
-                'name': 'Event Artifact',
-                'label': 'event',
-                'source_data_identifier': c['source_data_identifier'],
-                'cef': cef,
-                'run_automation': True
-            }
+                # Creating artifacts
+                cef = {
+                    'targetAddress': target_address,
+                    'impactBps': impact_bps,
+                    'impactPps': impact_pps,
+                    'victimRouter': victim_router,
+                    'classification': classification,
+                    'description': description
+                }
+                art = {
+                    'container_id': id_,
+                    'name': 'Event Artifact',
+                    'label': 'event',
+                    'source_data_identifier': c['source_data_identifier'],
+                    'cef': cef,
+                    'run_automation': True
+                }
 
-            # self.send_progress('Saving artifact...')
-            status, msg, id_ = self.save_artifact(art)
-            if status == phantom.APP_ERROR:
-                action_result.set_status(
-                    phantom.APP_ERROR, ARBORSIGHTLINE_CREATE_ARTIFACT_FAILED_MSG.format(msg))
-                return action_result.get_status(), None
+                # self.send_progress('Saving artifact...')
+                status, msg, id_ = self.save_artifact(art)
+                if status == phantom.APP_ERROR:
+                    action_result.set_status(phantom.APP_ERROR, ARBORSIGHTLINE_CREATE_ARTIFACT_FAILED_MSG.format(msg))
+                    return action_result.get_status(), None
 
-            alerts_cnt += 1
+                alerts_cnt += 1
+        except Exception as e:
+            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else "Error message unavailable"
+            action_result.set_status(phantom.APP_ERROR, '{}. Error message: {}'.format(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG, error_msg))
+            return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, alerts_cnt
 
@@ -327,8 +319,8 @@ class ArborSightlineConnector(BaseConnector):
                 self.error_print(action_result.get_status_message())
                 self.save_progress(action_result.get_status_message())
             except:
-                pass
-            self.save_progress("Get alerts fails")
+                self.error_print(ARBORSIGHTLINE_GET_ALERTS_FAILED_MSG)
+                self.save_progress(ARBORSIGHTLINE_GET_ALERTS_FAILED_MSG)
             return action_result.get_status()
 
         # Parse returned alerts
@@ -338,7 +330,8 @@ class ArborSightlineConnector(BaseConnector):
                 self.error_print(action_result.get_status_message())
                 self.save_progress(action_result.get_status_message())
             except:
-                pass
+                self.error_print(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG)
+                self.save_progress(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG)
             return action_result.get_status()
 
         # Handle case of no alerts found
@@ -349,54 +342,60 @@ class ArborSightlineConnector(BaseConnector):
             return action_result.get_status()
 
         # Handle paging to fetch next alerts
-        if not single_page:
-            last_page_link = urllib.unquote(
-                response['links']['last']).replace("&amp;", "&")
-            paging_data['total_pages'] = int(urlparse.parse_qs(
-                urlparse.urlparse(last_page_link).query)['page'][0])
-            paging_data['page_cnt'] += 1
-
-            while paging_data['page_cnt'] <= paging_data['total_pages']:
-                # Exit strategy with max containers
-                if not disable_max_containers:
-                    remaining_alerts = max_containers - total_alerts
-                    if remaining_alerts <= 0:
-                        self.save_progress(
-                            "Maximum amount of containers reached: leaving..")
-                        break
-
-                page_param = "page={0}".format(paging_data['page_cnt'])
-                params = [filter_param, other_param, page_param]
-                url = "{0}?{1}".format(
-                    ARBORSIGHTLINE_GET_ALERTS_ENDPOINT, "&".join(params))
-
-                ret_val, response = self._get_alerts(
-                    action_result, url, paging_data)
-                if (phantom.is_fail(ret_val)):
-                    try:
-                        self.error_print(action_result.get_status_message())
-                        self.save_progress(action_result.get_status_message())
-                    except:
-                        pass
-                    return action_result.get_status()
-
-                # Eventually reduce amount of alerts to speed up processing
-                if not disable_max_containers and remaining_alerts < paging_data['alerts_per_page']:
-                    response['data'] = response['data'][:remaining_alerts]
-
-                ret_val, page_alerts = self._parse_alerts(
-                    action_result, response)
-                if (phantom.is_fail(ret_val)):
-                    try:
-                        self.error_print(action_result.get_status_message())
-                        self.save_progress(action_result.get_status_message())
-                    except:
-                        pass
-                    return action_result.get_status()
-
-                # Update counters
+        try:
+            if not single_page:
+                last_page_link = urllib.unquote(
+                    response['links']['last']).replace("&amp;", "&")
+                paging_data['total_pages'] = int(urlparse.parse_qs(
+                    urlparse.urlparse(last_page_link).query)['page'][0])
                 paging_data['page_cnt'] += 1
-                total_alerts += page_alerts
+
+                while paging_data['page_cnt'] <= paging_data['total_pages']:
+                    # Exit strategy with max containers
+                    if not disable_max_containers:
+                        remaining_alerts = max_containers - total_alerts
+                        if remaining_alerts <= 0:
+                            self.save_progress(
+                                "Maximum amount of containers reached: leaving..")
+                            break
+
+                    page_param = "page={0}".format(paging_data['page_cnt'])
+                    params = [filter_param, other_param, page_param]
+                    url = "{0}?{1}".format(
+                        ARBORSIGHTLINE_GET_ALERTS_ENDPOINT, "&".join(params))
+
+                    ret_val, response = self._get_alerts(
+                        action_result, url, paging_data)
+                    if (phantom.is_fail(ret_val)):
+                        try:
+                            self.error_print(action_result.get_status_message())
+                            self.save_progress(action_result.get_status_message())
+                        except:
+                            self.error_print(ARBORSIGHTLINE_GET_ALERTS_FAILED_MSG)
+                            self.save_progress(ARBORSIGHTLINE_GET_ALERTS_FAILED_MSG)
+                        return action_result.get_status()
+
+                    # Eventually reduce amount of alerts to speed up processing
+                    if not disable_max_containers and remaining_alerts < paging_data['alerts_per_page']:
+                        response['data'] = response['data'][:remaining_alerts]
+
+                    ret_val, page_alerts = self._parse_alerts(
+                        action_result, response)
+                    if (phantom.is_fail(ret_val)):
+                        try:
+                            self.error_print(action_result.get_status_message())
+                            self.save_progress(action_result.get_status_message())
+                        except:
+                            self.error_print(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG)
+                            self.save_progress(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG)
+                        return action_result.get_status()
+
+                    # Update counters
+                    paging_data['page_cnt'] += 1
+                    total_alerts += page_alerts
+        except Exception as e:
+            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else "Error message unavailable"
+            return action_result.set_status(phantom.APP_ERROR, '{}. Error message: {}'.format(ARBORSIGHTLINE_GET_ALERTS_PAGINATION_FAILED_MSG, error_msg))
 
         # if single-page closure
 
@@ -411,8 +410,7 @@ class ArborSightlineConnector(BaseConnector):
 
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))

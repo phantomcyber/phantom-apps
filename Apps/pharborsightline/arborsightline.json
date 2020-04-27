@@ -1,7 +1,7 @@
 {
     "appid": "feca6617-c895-4465-926a-fc5d9c4e3bdc",
     "name": "Arbor Sightline",
-    "description": "This app integrates with Arbor Sightline to retrieve alerts details",
+    "description": "This app implements ingest action to integrate with Arbor Sightline for retrieving alerts details",
     "type": "network security",
     "product_vendor": "Arbor Networks",
     "logo": "logo_arborsightline.svg",
@@ -24,7 +24,7 @@
             "order": 0
         },
         "verify_server_cert": {
-            "description": "Verify server certificate",
+            "description": "Verify Server Certificate",
             "data_type": "boolean",
             "default": false,
             "order": 1
@@ -36,7 +36,7 @@
             "order": 2
         },
         "max_containers": {
-            "description": "Disable Maximum Containers for polling now",
+            "description": "Disable Maximum Containers for Polling Now",
             "data_type": "boolean",
             "default": true,
             "order": 3

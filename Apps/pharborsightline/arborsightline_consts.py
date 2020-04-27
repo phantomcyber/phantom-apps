@@ -8,6 +8,10 @@ ARBORSIGHTLINE_GET_ALERTS_PROGRESS_MSG = 'Fetching next {alerts_no} alerts from 
 ARBORSIGHTLINE_GET_ALERTS_OK = 'Fetched {total} alerts'
 ARBORSIGHTLINE_GET_ALERTS_EMPTY_MSG = 'No alerts found'
 ARBORSIGHTLINE_CREATE_CONTAINER_FAILED_MSG = 'Container creation failed: {msg}'
+ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG = 'An error occurred while parsing alerts data'
+ARBORSIGHTLINE_GET_ALERTS_PAGINATION_FAILED_MSG = 'An error occurred while fetching alerts using pagination'
+ARBORSIGHTLINE_GENERIC_ERROR_MSG = 'Please check the asset configuration and|or action parameters.'
+ARBORSIGHTLINE_ALERTS_DATA_KEY_UNAVAILABLE_MSG = 'The key "data" is unavailable in the alerts API response.'
 ARBORSIGHTLINE_CREATE_ARTIFACT_FAILED_MSG = 'Artifact creation failed: {msg}'
 
 ARBORSIGHTLINE_API_URL = '/api/sp/'
