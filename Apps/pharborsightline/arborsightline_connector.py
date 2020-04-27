@@ -141,7 +141,14 @@ class ArborSightlineConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
         except Exception as e:
-            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else ARBORSIGHTLINE_GENERIC_ERROR_MSG
+            try:
+                if e.message:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    error_msg = ARBORSIGHTLINE_GENERIC_ERROR_MSG
+            except:
+                error_msg = ARBORSIGHTLINE_GENERIC_ERROR_MSG
+
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while connecting to the Arbor Sightline server. Error Message:{0}".format(error_msg)), resp_json)
 
         return self._process_response(r, action_result)
@@ -244,7 +251,14 @@ class ArborSightlineConnector(BaseConnector):
 
                 alerts_cnt += 1
         except Exception as e:
-            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else "Error message unavailable"
+            try:
+                if e.message:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    error_msg = "Error message unavailable"
+            except:
+                error_msg = "Unable to parse error message"
+
             action_result.set_status(phantom.APP_ERROR, '{}. Error message: {}'.format(ARBORSIGHTLINE_PARSE_ALERTS_FAILED_MSG, error_msg))
             return action_result.get_status(), None
 
@@ -394,7 +408,14 @@ class ArborSightlineConnector(BaseConnector):
                     paging_data['page_cnt'] += 1
                     total_alerts += page_alerts
         except Exception as e:
-            error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8') if e.message else "Error message unavailable"
+            try:
+                if e.message:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
+                else:
+                    error_msg = "Error message unavailable"
+            except:
+                error_msg = "Unable to parse error message"
+
             return action_result.set_status(phantom.APP_ERROR, '{}. Error message: {}'.format(ARBORSIGHTLINE_GET_ALERTS_PAGINATION_FAILED_MSG, error_msg))
 
         # if single-page closure
