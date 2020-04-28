@@ -1,0 +1,26 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+  <head></head>
+  <body>
+    <h3 id="poll-now">Poll Now</h3>
+      <p>It should be used to get a sense of the containers and artifacts that are created by the app.
+      It makes use of asset configuration parameter <code>max_containers</code>, that can be:</p>
+      <ul>
+        <li><p><strong>enabled</strong></p>
+            <p>Window <em>Poll Now</em> allows the user to set the <em>Maximum containers</em> that should be ingested at this instance. Since a single container is created for each alert, this value equates to the maximum alerts that are ingested by the app. All remaining alerts would be ignored.</p>
+        </li>
+        <li><p><strong>disabled</strong></p>
+            <p> Any <em>Maximum containers</em> value set in window <em>Poll Now</em> will be ignored. The system will ingest all alerts found with <code>start_time</code> greater than 5 days ago.</p>
+        </li>
+      </ul>                                       
+
+    <h3 id="scheduled-polling">Scheduled Polling</h3>
+      <p>This mode is used to schedule a polling action on the asset at regular intervals, configured via asset tab <em>Ingest Settings</em>.</p>
+      <p>In the case of Scheduled Polling, on every poll, the app remembers the last time of successful ingestion and will pickup filtering alerts based on <code>start_time</code> greater than this value in the next scheduled poll.</p>
+
+  </body>
+</html>
