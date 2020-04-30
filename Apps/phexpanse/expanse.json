@@ -1,7 +1,7 @@
 {
     "appid": "f3605b22-3771-41d5-a393-47f9ca79e25b",
     "name": "Expanse",
-    "description": "Expanse allows you to perform enrichment using Expanse's Internet Asset data, including ip, domain, certificates, and more.",
+    "description": "Expanse allows you to perform enrichment using Expanse's Internet Asset data, including ip, domain, certificates, and more",
     "type": "information",
     "product_vendor": "Expanse",
     "logo": "expanse.png",
@@ -15,7 +15,7 @@
     "utctime_updated": "2020-04-08T16:11:16.683577Z",
     "package_name": "phantom_expanse",
     "main_module": "expanse_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "Token": {
@@ -29,8 +29,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration.",
-            "verbose": "",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -40,8 +39,7 @@
         {
             "action": "lookup ip",
             "identifier": "lookup_ip",
-            "description": "Check for the presence of an IP within a known IP Range in Expanse.",
-            "verbose": "",
+            "description": "Check for the presence of an IP within a known IP Range in Expanse",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -53,8 +51,6 @@
                     "contains": [
                         "ip"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -172,8 +168,7 @@
         {
             "action": "lookup domain",
             "identifier": "lookup_domain",
-            "description": "Check for the presence of a known domain in Expanse.",
-            "verbose": "",
+            "description": "Check for the presence of a known domain in Expanse",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -186,8 +181,6 @@
                         "domain",
                         "url"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -288,19 +281,15 @@
         {
             "action": "lookup certificate",
             "identifier": "lookup_certificate",
-            "description": "Returns certificates from Expanse for a full or partial common name.",
-            "verbose": "",
+            "description": "Returns certificates from Expanse for a full or partial common name",
             "type": "investigate",
             "read_only": false,
             "parameters": {
                 "common_name": {
-                    "description": "Search for given certificate value via a domain substring match.",
+                    "description": "Search for given certificate value via a domain substring match",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "primary": false,
                     "order": 0
                 }
             },
@@ -421,8 +410,7 @@
         {
             "action": "lookup behavior",
             "identifier": "lookup_behavior",
-            "description": "Returns Expanse Behavior data for an ip. Limited to 30 flows within the last 30 days.",
-            "verbose": "",
+            "description": "Returns Expanse Behavior data for an ip. Limited to 30 flows within the last 30 days",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -432,8 +420,6 @@
                     "required": true,
                     "primary": true,
                     "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
