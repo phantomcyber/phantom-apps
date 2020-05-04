@@ -1,15 +1,27 @@
-# Embedded file name: ./netskope_connector.py
-# Compiled at: 2019-08-19 09:46:48
-import uuid, json, sys, time, hashlib, os
+# File: netskope_connector.py
+# Copyright (c) 2018-2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+import uuid
+import json
+import sys
+import time
+import hashlib
+import os
 from datetime import datetime
 from urlparse import urlparse
 from bs4 import BeautifulSoup
-import requests, phantom.app, phantom.rules as phantom_rules
+from bs4 import UnicodeDammit
+import requests
+import phantom.app as phantom
+import phantom.rules as phantom_rules
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
 from netskope_consts import *
 from utilities import KennyLoggins, logging
+
 
 class RetVal(tuple):
 
@@ -33,6 +45,22 @@ class NetskopeConnector(BaseConnector):
         self._log = kl.get_logger(app_name='phnetskope', file_name='connector', log_level=logging.DEBUG, version='1.0.5')
         self._log.info('initialize_client=complete')
         return
+
+    def _unicode_string_handler(self, input_str):
+        """helper method for handling unicode strings
+
+        Arguments:
+            input_str  -- Input string that needs to be processed
+
+        Returns:
+             -- Processed input string based on input_str
+        """
+        try:
+            if input_str:
+                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error ocurred while converting the string")
+        return input_str
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -65,7 +93,7 @@ class NetskopeConnector(BaseConnector):
         except:
             error_text = 'Cannot parse error details'
 
-        message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code, error_text.encode('utf-8'))
+        message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code, UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
         message = message.replace('{', '{{').replace('}', '}}')
         if len(message) > 500:
             message = NETSKOPE_ERROR_CONNECTING_SERVER
@@ -119,7 +147,7 @@ class NetskopeConnector(BaseConnector):
             if not response.text:
                 self._log.info('action=process_empty_response')
                 return self._process_empty_response(response, action_result)
-            message = ("Can't process response from server. Status Code: {0} Data from server: {1}").format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
             self._log.error(('{}').format(message))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
         except Exception as e:
@@ -147,7 +175,7 @@ class NetskopeConnector(BaseConnector):
             config = self.get_config()
             self._log.info(('config={} params={} timeout={}').format(config, params, timeout))
             try:
-                self._scim['url'] = config[NETSKOPE_CONFIG_SCIM_URL].strip('/').encode('utf-8')
+                self._scim['url'] = self._unicode_string_handler(config.get(NETSKOPE_CONFIG_SCIM_URL)).strip('/')
                 self._scim['token'] = config[NETSKOPE_CONFIG_SCIM_KEY]
             except Exception as e:
                 self.debug_print('Error while encoding server URL')
@@ -171,17 +199,21 @@ class NetskopeConnector(BaseConnector):
                 else:
                     requests_response = request_func(url, headers=headers, data=json.dumps(params), timeout=timeout)
             except Exception as e:
-                self._log.error(('action=failed exception={}').format(e))
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
-                try:
-                    message = ('Error connecting to server. Details: {0}').format(str(e))
-                except Exception as e:
+                if e.message:
                     self._log.error(('action=failed exception={}').format(e))
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
+                    try:
+                        error_msg = self._unicode_string_handler(e)
+                        message = ('Error connecting to server. Details: {0}').format(error_msg)
+                    except Exception as e:
+                        self._log.error(('action=failed exception={}').format(self._unicode_string_handler(e)))
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
 
-                if 'token=' in str(e):
-                    message = 'Error while connecting to the server'
+                    if 'token=' in str(e):
+                        message = 'Error while connecting to the server'
+                else:
+                    message = "Error message unavailable. Please check the asset configuration and|or action parameters."
                 self._log.info(('action=failed response={}').format(resp_json))
                 return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
 
@@ -209,10 +241,10 @@ class NetskopeConnector(BaseConnector):
             params = {}
         config = self.get_config()
         try:
-            self._server_url = config[NETSKOPE_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+            self._server_url = self._unicode_string_handler(config[NETSKOPE_CONFIG_SERVER_URL]).strip('/')
             self._tenant = self._server_url.split('//')[1]
             self._api_key = config[NETSKOPE_CONFIG_API_KEY]
-            self._list_name = config[NETSKOPE_LIST_NAME]
+            self._list_name = self._unicode_string_handler(config[NETSKOPE_LIST_NAME])
             self._log.info(('tenant={}').format(self._tenant))
         except:
             self.debug_print('Error while encoding server URL')
@@ -236,20 +268,26 @@ class NetskopeConnector(BaseConnector):
                             for chunk in requests_response.iter_content(chunk_size=1024):
                                 if chunk:
                                     temp_file.write(chunk)
-
                         return RetVal(phantom.APP_SUCCESS, resp_json)
             else:
                 requests_response = request_func(url, params=params, timeout=timeout)
+        except requests.exceptions.ConnectionError:
+            message = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         except Exception as e:
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
-            try:
-                message = ('Error connecting to server. Details: {0}').format(str(e))
-            except:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
+            if e.message:
+                try:
+                    error_msg = self._unicode_string_handler(e)
+                    message = ('Error connecting to server. Details: {0}').format(error_msg)
+                except:
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
 
-            if 'token=' in str(e):
-                message = 'Error while connecting to the server'
+                if 'token=' in error_msg:
+                    message = 'Error while connecting to the server'
+            else:
+                message = "Error message unavailable. Please check the asset configuration and|or action parameters."
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
 
         return self._process_response(requests_response, action_result)
@@ -283,8 +321,8 @@ class NetskopeConnector(BaseConnector):
         details_status, file_id, file_name, profile_id = self._get_file_and_profile_details(action_result=action_result, file_param=file_param, profile_param=profile_param)
         if phantom.is_fail(details_status):
             return action_result.get_status()
-        request_param = {'op': 'download-url', 
-           'file_id': file_id, 
+        request_param = {'op': 'download-url',
+           'file_id': file_id,
            'quarantine_profile_id': profile_id}
         self.save_progress('Downloading file')
         ret_val, _ = self._make_rest_call(endpoint=NETSKOPE_QUARANTINE_ENDPOINT, action_result=action_result, params=request_param)
@@ -303,7 +341,7 @@ class NetskopeConnector(BaseConnector):
             vault_add_file_dict = Vault.add_attachment(file_location=temp_file_path, container_id=self.get_container_id(), file_name=file_name)
             vault_id = vault_add_file_dict['vault_id']
 
-        action_result.add_data({'vault_id': vault_id, 
+        action_result.add_data({'vault_id': vault_id,
            'file_name': file_name})
         summary = action_result.update_summary({})
         summary['vault_id'] = vault_id
@@ -373,7 +411,7 @@ class NetskopeConnector(BaseConnector):
         for quarantine_profile in request_response['data']['quarantined']:
             file_list = quarantine_profile.get('files', [])
             for file_info in file_list:
-                file_info.update({'quarantine_profile_id': quarantine_profile['quarantine_profile_id'], 
+                file_info.update({'quarantine_profile_id': quarantine_profile['quarantine_profile_id'],
                    'quarantine_profile_name': quarantine_profile['quarantine_profile_name']})
                 action_result.add_data(file_info)
 
@@ -433,13 +471,13 @@ class NetskopeConnector(BaseConnector):
             start_time = end_time - NETSKOPE_24_HOUR_GAP
         start_time = int(start_time)
         skip_value = NETSKOPE_INITIAL_SKIP_VALUE
-        params = {'query': NETSKOPE_QUERY_PARAM.format(srcip=ip, dstip=ip), 
-           'type': 'page', 
+        params = {'query': NETSKOPE_QUERY_PARAM.format(srcip=ip, dstip=ip),
+           'type': 'page',
            'skip': str(skip_value)}
         time_status, time_response = self._verify_time(start_time, end_time)
         if phantom.is_fail(time_status):
             return action_result.set_status(phantom.APP_ERROR, time_response)
-        params.update({'starttime': start_time, 
+        params.update({'starttime': start_time,
            'endtime': end_time})
         page_event_list = []
         application_event_list = []
@@ -461,7 +499,7 @@ class NetskopeConnector(BaseConnector):
         if page_event_list:
             event_details['page'] = page_event_list
         skip_value = NETSKOPE_INITIAL_SKIP_VALUE
-        params.update({'type': 'application', 
+        params.update({'type': 'application',
            'skip': str(skip_value)})
         while True:
             request_status_application, request_response_application = self._make_rest_call(endpoint=NETSKOPE_EVENTS_ENDPOINT, action_result=action_result, params=params)
@@ -514,7 +552,8 @@ class NetskopeConnector(BaseConnector):
                 continue
             artifacts_creation_status, artifacts_creation_msg = self._create_artifacts(alert=alert, container_id=container_id)
             if phantom.is_fail(artifacts_creation_status):
-                self.debug_print(('Error while creating artifacts for container with ID {container_id}. {error_msg}').format(container_id=container_id, error_msg=artifacts_creation_msg))
+                self.debug_print(('Error while creating artifacts for container with ID {container_id}. {error_msg}').format(
+                    container_id=container_id, error_msg=artifacts_creation_msg))
 
         self._state['first_run'] = False
         self._state['last_ingestion_time'] = end_time
@@ -537,9 +576,9 @@ class NetskopeConnector(BaseConnector):
                 limit = default_limit
             else:
                 limit = max_limit
-            request_params = {'limit': limit, 
-               'skip': skip, 
-               'starttime': start_time, 
+            request_params = {'limit': limit,
+               'skip': skip,
+               'starttime': start_time,
                'endtime': end_time}
             request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_ON_POLL_ENDPOINT, action_result=action_result, params=request_params)
             if phantom.is_fail(request_status):
@@ -564,18 +603,20 @@ class NetskopeConnector(BaseConnector):
         """
         container_dict = dict()
         self._log.info(('alert={}').format(json.dumps(alert)))
-        container_dict['name'] = ('{alert_name}-{id}-{type}').format(alert_name=alert['alert_name'], id=alert.get('_id', ('unk-{}').format(uuid.uuid4())), type=alert.get('alert_type', 'unknown'))
+        container_dict['name'] = ('{alert_name}-{id}-{type}').format(
+            alert_name=alert['alert_name'], id=alert.get('_id', ('unk-{}').format(uuid.uuid4())), type=alert.get('alert_type', 'unknown'))
         container_dict['source_data_identifier'] = container_dict['name']
         container_dict['start_time'] = ('{time}Z').format(time=datetime.utcfromtimestamp(alert['timestamp']).isoformat())
-        possible_tags = {'alert_type': alert.get('alert_type'), 'category': alert.get('category'), 
-           'activity': alert.get('activity'), 
+        possible_tags = {'alert_type': alert.get('alert_type'), 'category': alert.get('category'),
+           'activity': alert.get('activity'),
            'type': alert.get('type')}
-        container_dict['tags'] = [ ('{}={}').format(x, possible_tags[x]) for x in possible_tags if possible_tags[x] is not None
-                                 ]
+        container_dict['tags'] = [('{}={}').format(x, possible_tags[x]) for x in possible_tags if possible_tags[x] is not None
+                                  ]
         container_creation_status, container_creation_msg, container_id = self.save_container(container=container_dict)
         if phantom.is_fail(container_creation_status):
             self.debug_print(container_creation_msg)
-            self.save_progress(('Error while creating container for alert {alert_name}. {error_message}').format(alert_name=alert['alert_name'], error_message=container_creation_msg))
+            self.save_progress(('Error while creating container for alert {alert_name}. {error_message}').format(
+                alert_name=alert['alert_name'], error_message=container_creation_msg))
             return
         else:
             return container_id
@@ -590,965 +631,965 @@ class NetskopeConnector(BaseConnector):
         artifacts_list = []
         self._log.info(('action=create_artifacts tenant={} artifact={}').format(self._tenant, json.dumps(alert)))
         artifacts_mapping = {'IP Artifact': {'managementID': (
-                                          'managementID', []), 
+                                          'managementID', []),
                            'nsdeviceuid': (
-                                         'nsdeviceuid', []), 
+                                         'nsdeviceuid', []),
                            'Source IP': (
-                                       'srcip', ['ip']), 
+                                       'srcip', ['ip']),
                            'Destination IP': (
-                                            'dstip', ['ip'])}, 
+                                            'dstip', ['ip'])},
            'Email Artifact': {'managementID': (
-                                             'managementID', []), 
+                                             'managementID', []),
                               'nsdeviceuid': (
-                                            'nsdeviceuid', []), 
+                                            'nsdeviceuid', []),
                               'Email': (
-                                      'user', ['email']), 
+                                      'user', ['email']),
                               'Source Email': (
-                                             'from_user', ['email'])}, 
+                                             'from_user', ['email'])},
            'URL Artifact': {'managementID': (
-                                           'managementID', []), 
+                                           'managementID', []),
                             'nsdeviceuid': (
-                                          'nsdeviceuid', []), 
+                                          'nsdeviceuid', []),
                             'url': (
-                                  'url', ['url'])}, 
+                                  'url', ['url'])},
            'User Artifact': {'managementID': (
-                                            'managementID', []), 
+                                            'managementID', []),
                              'nsdeviceuid': (
-                                           'nsdeviceuid', []), 
+                                           'nsdeviceuid', []),
                              'userkey': (
-                                       'userkey', ['user name']), 
+                                       'userkey', ['user name']),
                              'user': (
-                                    'user', ['user name']), 
+                                    'user', ['user name']),
                              'from_user': (
                                          'from_user', ['user name'])}}
         specific_alert_mapping = {'malsite': {'managementID': (
-                                      'managementID', []), 
+                                      'managementID', []),
                        'nsdeviceuid': (
-                                     'nsdeviceuid', []), 
+                                     'nsdeviceuid', []),
                        'alert_type': (
-                                    'alert_type', []), 
+                                    'alert_type', []),
                        'dstip': (
-                               'dstip', ['ip', 'ipv4']), 
+                               'dstip', ['ip', 'ipv4']),
                        'severity_level': (
-                                        'severity_level', []), 
+                                        'severity_level', []),
                        'browser_session_id': (
-                                            'browser_session_id', []), 
+                                            'browser_session_id', []),
                        'app': (
-                             'app', []), 
+                             'app', []),
                        'object_type': (
-                                     'object_type', []), 
+                                     'object_type', []),
                        'site': (
-                              'site', []), 
+                              'site', []),
                        'malsite_id': (
-                                    'malsite_id', []), 
+                                    'malsite_id', []),
                        'src_location': (
-                                      'src_location', []), 
+                                      'src_location', []),
                        'browser_version': (
-                                         'browser_version', []), 
+                                         'browser_version', []),
                        'access_method': (
-                                       'access_method', []), 
+                                       'access_method', []),
                        'app_session_id': (
-                                        'app_session_id', []), 
+                                        'app_session_id', []),
                        'dst_location': (
-                                      'dst_location', []), 
+                                      'dst_location', []),
                        'category': (
-                                  'category', ['category']), 
+                                  'category', ['category']),
                        'page_site': (
-                                   'page_site', []), 
+                                   'page_site', []),
                        'severity': (
-                                  'severity', []), 
+                                  'severity', []),
                        'os_version': (
-                                    'os_version', []), 
+                                    'os_version', []),
                        'ds_region': (
-                                   'ds_region', []), 
+                                   'ds_region', []),
                        'malicious': (
-                                   'malicious', []), 
+                                   'malicious', []),
                        'userkey': (
-                                 'userkey', ['user name']), 
+                                 'userkey', ['user name']),
                        'managed_app': (
-                                     'managed_app', []), 
+                                     'managed_app', []),
                        'dst_country': (
-                                     'dst_country', []), 
+                                     'dst_country', []),
                        'ccl': (
-                             'ccl', []), 
+                             'ccl', []),
                        'traffic_type': (
-                                      'traffic_type', []), 
+                                      'traffic_type', []),
                        'type': (
-                              'type', []), 
+                              'type', []),
                        'transaction_id': (
-                                        'transaction_id', []), 
+                                        'transaction_id', []),
                        'malsite_region': (
-                                        'malsite_region', []), 
+                                        'malsite_region', []),
                        'malsite_country': (
-                                         'malsite_country', []), 
+                                         'malsite_country', []),
                        'timestamp': (
-                                   'timestamp', []), 
+                                   'timestamp', []),
                        'severity_level_id': (
-                                           'severity_level_id', []), 
+                                           'severity_level_id', []),
                        'src_region': (
-                                    'src_region', []), 
+                                    'src_region', []),
                        'acked': (
-                               'acked', []), 
+                               'acked', []),
                        'alert': (
-                               'alert', []), 
+                               'alert', []),
                        'userip': (
-                                'userip', ['ip', 'ipv4']), 
+                                'userip', ['ip', 'ipv4']),
                        'timer_metric_value': (
-                                            'timer_metric_value', []), 
+                                            'timer_metric_value', []),
                        'telemetry_app': (
-                                       'telemetry_app', []), 
+                                       'telemetry_app', []),
                        'user': (
-                              'user', ['user name']), 
+                              'user', ['user name']),
                        'from_user': (
-                                   'from_user', ['user name']), 
+                                   'from_user', ['user name']),
                        'device': (
-                                'device', []), 
+                                'device', []),
                        'src_country': (
-                                     'src_country', []), 
+                                     'src_country', []),
                        'count': (
-                               'count', []), 
+                               'count', []),
                        '_insertion_epoc_timestamp': (
-                                                   '_insertion_epoc_timestamp', []), 
+                                                   '_insertion_epoc_timestamp', []),
                        'srcip': (
-                               'srcip', ['ip', 'ipv4']), 
+                               'srcip', ['ip', 'ipv4']),
                        'page_id': (
-                                 'page_id', []), 
+                                 'page_id', []),
                        'malsite_ip_host': (
-                                         'malsite_ip_host', ['ip', 'ipv4']), 
+                                         'malsite_ip_host', ['ip', 'ipv4']),
                        'malsite_category': (
-                                          'malsite_category', ['category']), 
+                                          'malsite_category', ['category']),
                        'page': (
-                              'page', []), 
+                              'page', []),
                        'instance_id': (
-                                     'instance_id', []), 
+                                     'instance_id', []),
                        'url': (
-                             'url', ['url']), 
+                             'url', ['url']),
                        'alert_name': (
-                                    'alert_name', []), 
+                                    'alert_name', []),
                        'cci': (
-                             'cci', []), 
+                             'cci', []),
                        'thread_source_id': (
-                                          'thread_source_id', []), 
+                                          'thread_source_id', []),
                        'os': (
-                            'os', []), 
+                            'os', []),
                        'thread_match_filed': (
-                                            'thread_match_filed', []), 
+                                            'thread_match_filed', []),
                        'browser': (
-                                 'browser', []), 
+                                 'browser', []),
                        'appcategory': (
-                                     'appcategory', ['category'])}, 
+                                     'appcategory', ['category'])},
            'malware': {'managementID': (
-                                      'managementID', []), 
+                                      'managementID', []),
                        'nsdeviceuid': (
-                                     'nsdeviceuid', []), 
+                                     'nsdeviceuid', []),
                        'alert_type': (
-                                    'alert_type', []), 
+                                    'alert_type', []),
                        'dstip': (
-                               'dstip', ['ip', 'ipv4']), 
+                               'dstip', ['ip', 'ipv4']),
                        'malware_type': (
-                                      'malware_type', []), 
+                                      'malware_type', []),
                        'app_name': (
-                                  'app_name', []), 
+                                  'app_name', []),
                        'object': (
-                                'object', []), 
+                                'object', []),
                        'file_type': (
-                                   'file_type', []), 
+                                   'file_type', []),
                        'file_size': (
-                                   'file_size', []), 
+                                   'file_size', []),
                        'app': (
-                             'app', []), 
+                             'app', []),
                        '_insertion_epoc_timestamp': (
-                                                   '_insertion_epoc_timestamp', []), 
+                                                   '_insertion_epoc_timestamp', []),
                        'local_sha256': (
-                                      'local_sha256', ['hash', 'sha256']), 
+                                      'local_sha256', ['hash', 'sha256']),
                        'srcip': (
-                               'srcip', []), 
+                               'srcip', []),
                        'detection_type': (
-                                        'detection_type', []), 
+                                        'detection_type', []),
                        'os_version': (
-                                    'os_version', []), 
+                                    'os_version', []),
                        'device_classification': (
-                                               'device_classification', []), 
+                                               'device_classification', []),
                        'object_type': (
-                                     'object_type', []), 
+                                     'object_type', []),
                        'local_md5': (
-                                   'local_md5', ['hash', 'md5']), 
+                                   'local_md5', ['hash', 'md5']),
                        'user': (
-                              'user', ['user name']), 
+                              'user', ['user name']),
                        'action': (
-                                'action', []), 
+                                'action', []),
                        'app_session_id': (
-                                        'app_session_id', []), 
+                                        'app_session_id', []),
                        'browser_session_id': (
-                                            'browser_session_id', []), 
+                                            'browser_session_id', []),
                        'category': (
-                                  'category', []), 
+                                  'category', []),
                        'tss_mode': (
-                                  'tss_mode', []), 
+                                  'tss_mode', []),
                        'page_site': (
-                                   'page_site', []), 
+                                   'page_site', []),
                        'severity': (
-                                  'severity', ['severity']), 
+                                  'severity', ['severity']),
                        'dst_country': (
-                                     'dst_country', []), 
+                                     'dst_country', []),
                        'ns_detection_name': (
-                                           'ns_detection_name', []), 
+                                           'ns_detection_name', []),
                        'dst_region': (
-                                    'dst_region', []), 
+                                    'dst_region', []),
                        'hostname': (
-                                  'hostname', ['dvc']), 
+                                  'hostname', ['dvc']),
                        'managed_app': (
-                                     'managed_app', []), 
+                                     'managed_app', []),
                        'parent_id': (
-                                   'parent_id', []), 
+                                   'parent_id', []),
                        'device': (
-                                'device', []), 
+                                'device', []),
                        'access_method': (
-                                       'access_method', []), 
+                                       'access_method', []),
                        'traffic_type': (
-                                      'traffic_type', []), 
+                                      'traffic_type', []),
                        'type': (
-                              'type', []), 
+                              'type', []),
                        'transaction_id': (
-                                        'transaction_id', []), 
+                                        'transaction_id', []),
                        'count': (
-                               'count', []), 
+                               'count', []),
                        'detection_engine': (
-                                          'detection_engine', []), 
+                                          'detection_engine', []),
                        'malware_id': (
-                                    'malware_id', []), 
+                                    'malware_id', []),
                        'timestamp': (
-                                   'timestamp', []), 
+                                   'timestamp', []),
                        'src_region': (
-                                    'src_region', []), 
+                                    'src_region', []),
                        'severity_id': (
-                                     'severity_id', []), 
+                                     'severity_id', []),
                        'acked': (
-                               'acked', []), 
+                               'acked', []),
                        'site': (
-                              'site', []), 
+                              'site', []),
                        'referer': (
-                                 'referer', []), 
+                                 'referer', []),
                        'file_id': (
-                                 'file_id', []), 
+                                 'file_id', []),
                        'from_user': (
-                                   'from_user', ['user name']), 
+                                   'from_user', ['user name']),
                        'malware_profile': (
-                                         'malware_profile', []), 
+                                         'malware_profile', []),
                        'user_id': (
-                                 'user_id', ['user name']), 
+                                 'user_id', ['user name']),
                        'src_country': (
-                                     'src_country', []), 
+                                     'src_country', []),
                        'alert': (
-                               'alert', []), 
+                               'alert', []),
                        'malware_name': (
-                                      'malware_name', []), 
+                                      'malware_name', []),
                        'src_location': (
-                                      'src_location', []), 
+                                      'src_location', []),
                        'dst_location': (
-                                      'dst_location', []), 
+                                      'dst_location', []),
                        'url': (
-                             'url', ['url']), 
+                             'url', ['url']),
                        'page_id': (
-                                 'page_id', []), 
+                                 'page_id', []),
                        'instance': (
-                                  'instance', []), 
+                                  'instance', []),
                        'instance_id': (
-                                     'instance_id', []), 
+                                     'instance_id', []),
                        'ccl': (
-                             'ccl', []), 
+                             'ccl', []),
                        'cci': (
-                             'cci', []), 
+                             'cci', []),
                        'browser_version': (
-                                         'browser_version', []), 
+                                         'browser_version', []),
                        'activity': (
-                                  'activity', []), 
+                                  'activity', []),
                        'userip': (
-                                'userip', []), 
+                                'userip', []),
                        'userkey': (
-                                 'userkey', ['user name']), 
+                                 'userkey', ['user name']),
                        'browser': (
-                                 'browser', []), 
+                                 'browser', []),
                        'os': (
-                            'os', []), 
+                            'os', []),
                        'appcategory': (
-                                     'appcategory', ['category'])}, 
+                                     'appcategory', ['category'])},
            'dlp': {'managementID': (
-                                  'managementID', []), 
+                                  'managementID', []),
                    'nsdeviceuid': (
-                                 'nsdeviceuid', []), 
+                                 'nsdeviceuid', []),
                    'alert_type': (
-                                'alert_type', []), 
+                                'alert_type', []),
                    'dlp_incident_id': (
-                                     'dlp_incident_id', []), 
+                                     'dlp_incident_id', []),
                    'dstip': (
-                           'dstip', []), 
+                           'dstip', []),
                    'dst_location': (
-                                  'dst_location', []), 
+                                  'dst_location', []),
                    'dlp_file': (
-                              'dlp_file', []), 
+                              'dlp_file', []),
                    'file_type': (
-                               'file_type', ['file']), 
+                               'file_type', ['file']),
                    'app': (
-                         'app', []), 
+                         'app', []),
                    '_insertion_epoc_timestamp': (
-                                               '_insertion_epoc_timestamp', []), 
+                                               '_insertion_epoc_timestamp', []),
                    'site': (
-                          'site', []), 
+                          'site', []),
                    'src_location': (
-                                  'src_location', []), 
+                                  'src_location', []),
                    'file_size': (
-                               'file_size', []), 
+                               'file_size', []),
                    'owner': (
-                           'owner', ['user name']), 
+                           'owner', ['user name']),
                    'activity': (
-                              'activity', []), 
+                              'activity', []),
                    'app_session_id': (
-                                    'app_session_id', []), 
+                                    'app_session_id', []),
                    'category': (
-                              'category', ['category']), 
+                              'category', ['category']),
                    'instance_id': (
-                                 'instance_id', []), 
+                                 'instance_id', []),
                    'os_version': (
-                                'os_version', []), 
+                                'os_version', []),
                    'file_lang': (
-                               'file_lang', []), 
+                               'file_lang', []),
                    'dst_region': (
-                                'dst_region', []), 
+                                'dst_region', []),
                    'dst_zipcode': (
-                                 'dst_zipcode', []), 
+                                 'dst_zipcode', []),
                    'object_id': (
-                               'object_id', []), 
+                               'object_id', []),
                    'dlp_rule_count': (
-                                    'dlp_rule_count', []), 
+                                    'dlp_rule_count', []),
                    'managed_app': (
-                                 'managed_app', []), 
+                                 'managed_app', []),
                    'dst_country': (
-                                 'dst_country', []), 
+                                 'dst_country', []),
                    'access_method': (
-                                   'access_method', []), 
+                                   'access_method', []),
                    'policy': (
-                            'policy', []), 
+                            'policy', []),
                    'shared': (
-                            'shared', []), 
+                            'shared', []),
                    'traffic_type': (
-                                  'traffic_type', []), 
+                                  'traffic_type', []),
                    'type': (
-                          'type', []), 
+                          'type', []),
                    'file_path': (
-                               'file_path', []), 
+                               'file_path', []),
                    'mime_type': (
-                               'mime_type', []), 
+                               'mime_type', []),
                    'object_type': (
-                                 'object_type', []), 
+                                 'object_type', []),
                    'userkey': (
-                             'userkey', ['user name']), 
+                             'userkey', ['user name']),
                    'timestamp': (
-                               'timestamp', []), 
+                               'timestamp', []),
                    'dlp_parent_id': (
-                                   'dlp_parent_id', []), 
+                                   'dlp_parent_id', []),
                    'acked': (
-                           'acked', []), 
+                           'acked', []),
                    'scan_type': (
-                               'scan_type', []), 
+                               'scan_type', []),
                    'user': (
-                          'user', ['user name']), 
+                          'user', ['user name']),
                    'app_activity': (
-                                  'app_activity', []), 
+                                  'app_activity', []),
                    'device': (
-                            'device', []), 
+                            'device', []),
                    'dlp_profile': (
-                                 'dlp_profile', []), 
+                                 'dlp_profile', []),
                    'alert': (
-                           'alert', []), 
+                           'alert', []),
                    'md5': (
-                         'md5', []), 
+                         'md5', []),
                    'count': (
-                           'count', []), 
+                           'count', []),
                    'dlp_rule': (
-                              'dlp_rule', []), 
+                              'dlp_rule', []),
                    'url': (
-                         'url', ['url']), 
+                         'url', ['url']),
                    'modified': (
-                              'modified', []), 
+                              'modified', []),
                    'object': (
-                            'object', ['hash', 'md5']), 
+                            'object', ['hash', 'md5']),
                    'dlp_rule_severity': (
-                                       'dlp_rule_severity', []), 
+                                       'dlp_rule_severity', []),
                    'ccl': (
-                         'ccl', []), 
+                         'ccl', []),
                    'alert_name': (
-                                'alert_name', []), 
+                                'alert_name', []),
                    'cci': (
-                         'cci', []), 
+                         'cci', []),
                    'transaction_id': (
-                                    'transaction_id', []), 
+                                    'transaction_id', []),
                    'action': (
-                            'action', []), 
+                            'action', []),
                    'os': (
-                        'os', []), 
+                        'os', []),
                    'browser': (
-                             'browser', []), 
+                             'browser', []),
                    'appcategory': (
-                                 'appcategory', ['category'])}, 
+                                 'appcategory', ['category'])},
            'anomaly': {'managementID': (
-                                      'managementID', []), 
+                                      'managementID', []),
                        'nsdeviceuid': (
-                                     'nsdeviceuid', []), 
+                                     'nsdeviceuid', []),
                        'alert_type': (
-                                    'alert_type', []), 
+                                    'alert_type', []),
                        'event_type': (
-                                    'event_type', []), 
+                                    'event_type', []),
                        '_insertion_epoc_timestamp': (
-                                                   '_insertion_epoc_timestamp', []), 
+                                                   '_insertion_epoc_timestamp', []),
                        'site': (
-                              'site', []), 
+                              'site', []),
                        'tenantid': (
-                                  'tenantid', []), 
+                                  'tenantid', []),
                        'category': (
-                                  'category', ['category']), 
+                                  'category', ['category']),
                        'risk_level': (
-                                    'risk_level', ['risk']), 
+                                    'risk_level', ['risk']),
                        'alert_name': (
-                                    'alert_name', []), 
+                                    'alert_name', []),
                        'object_id': (
-                                   'object_id', []), 
+                                   'object_id', []),
                        'access_method': (
-                                       'access_method', []), 
+                                       'access_method', []),
                        'traffic_type': (
-                                      'traffic_type', []), 
+                                      'traffic_type', []),
                        'type': (
-                              'type', ['anomaly type']), 
+                              'type', ['anomaly type']),
                        'audit_type': (
-                                    'audit_type', []), 
+                                    'audit_type', []),
                        'timestamp': (
-                                   'timestamp', []), 
+                                   'timestamp', []),
                        'acked': (
-                               'acked', []), 
+                               'acked', []),
                        'alert': (
-                               'alert', []), 
+                               'alert', []),
                        'user': (
-                              'user', ['user']), 
+                              'user', ['user']),
                        'device': (
-                                'device', []), 
+                                'device', []),
                        'object_type': (
-                                     'object_type', []), 
+                                     'object_type', []),
                        'count': (
-                               'count', []), 
+                               'count', []),
                        'risk_level_id': (
-                                       'risk_level_id', []), 
+                                       'risk_level_id', []),
                        'ccl': (
-                             'ccl', []), 
+                             'ccl', []),
                        'cci': (
-                             'cci', []), 
+                             'cci', []),
                        'audit_category': (
-                                        'audit_category', []), 
+                                        'audit_category', []),
                        'os': (
-                            'os', []), 
+                            'os', []),
                        'browser': (
-                                 'browser', []), 
+                                 'browser', []),
                        'appcategory': (
-                                     'appcategory', [])}, 
+                                     'appcategory', [])},
            'compromised credential': {'managementID': (
-                                                     'managementID', []), 
+                                                     'managementID', []),
                                       'nsdeviceuid': (
-                                                    'nsdeviceuid', []), 
+                                                    'nsdeviceuid', []),
                                       'alert_type': (
-                                                   'alert_type', []), 
+                                                   'alert_type', []),
                                       'breach_id': (
-                                                  'breach_id', ['hash', 'md5']), 
+                                                  'breach_id', ['hash', 'md5']),
                                       'email_source': (
-                                                     'email_source', []), 
+                                                     'email_source', []),
                                       '_insertion_epoc_timestamp': (
-                                                                  '_insertion_epoc_timestamp', []), 
+                                                                  '_insertion_epoc_timestamp', []),
                                       'breach_score': (
-                                                     'breach_score', ['score']), 
+                                                     'breach_score', ['score']),
                                       'breach_date': (
-                                                    'breach_date', []), 
+                                                    'breach_date', []),
                                       'matched_username': (
-                                                         'matched_username', ['user']), 
+                                                         'matched_username', ['user']),
                                       'type': (
-                                             'type', []), 
+                                             'type', []),
                                       'timestamp': (
-                                                  'timestamp', []), 
+                                                  'timestamp', []),
                                       'acked': (
-                                              'acked', []), 
+                                              'acked', []),
                                       'alert': (
-                                              'alert', []), 
+                                              'alert', []),
                                       'user': (
-                                             'user', ['user']), 
+                                             'user', ['user']),
                                       'count': (
-                                              'count', []), 
+                                              'count', []),
                                       'alert_name': (
-                                                   'alert_name', [])}, 
+                                                   'alert_name', [])},
            'legal hold': {'managementID': (
-                                         'managementID', []), 
+                                         'managementID', []),
                           'nsdeviceuid': (
-                                        'nsdeviceuid', []), 
+                                        'nsdeviceuid', []),
                           'alert_type': (
-                                       'alert_type', []), 
+                                       'alert_type', []),
                           'suppression_key': (
-                                            'suppression_key', []), 
+                                            'suppression_key', []),
                           'lh_version': (
-                                       'lh_version', []), 
+                                       'lh_version', []),
                           'lh_custodian_email': (
-                                               'lh_custodian_email', ['user name']), 
+                                               'lh_custodian_email', ['user name']),
                           'file_type': (
-                                      'file_type', []), 
+                                      'file_type', []),
                           'app': (
-                                'app', ['category']), 
+                                'app', ['category']),
                           'app_activity': (
-                                         'app_activity', []), 
+                                         'app_activity', []),
                           'site': (
-                                 'site', []), 
+                                 'site', []),
                           'lh_dest_app': (
-                                        'lh_dest_app', []), 
+                                        'lh_dest_app', []),
                           'access_method': (
-                                          'access_method', []), 
+                                          'access_method', []),
                           'lh_shared': (
-                                      'lh_shared', []), 
+                                      'lh_shared', []),
                           'profile_emails': (
-                                           'profile_emails', ['user name']), 
+                                           'profile_emails', ['user name']),
                           'owner': (
-                                  'owner', ['user name']), 
+                                  'owner', ['user name']),
                           'category': (
-                                     'category', ['category']), 
+                                     'category', ['category']),
                           'user_id': (
-                                    'user_id', []), 
+                                    'user_id', []),
                           'act_user': (
-                                     'act_user', []), 
+                                     'act_user', []),
                           'alert_name': (
-                                       'alert_name', []), 
+                                       'alert_name', []),
                           'objec_id': (
-                                     'objec_id', []), 
+                                     'objec_id', []),
                           'instance': (
-                                     'instance', []), 
+                                     'instance', []),
                           'lh_fileid': (
-                                      'lh_fileid', []), 
+                                      'lh_fileid', []),
                           'policy': (
-                                   'policy', []), 
+                                   'policy', []),
                           'traffic_type': (
-                                         'traffic_type', []), 
+                                         'traffic_type', []),
                           'md5': (
-                                'md5', []), 
+                                'md5', []),
                           'type': (
-                                 'type', []), 
+                                 'type', []),
                           'file_path': (
-                                      'file_path', []), 
+                                      'file_path', []),
                           'mime_type': (
-                                      'mime_type', []), 
+                                      'mime_type', []),
                           'ld_dest_instance': (
-                                             'ld_dest_instance', []), 
+                                             'ld_dest_instance', []),
                           'ns_activity': (
-                                        'ns_activity', []), 
+                                        'ns_activity', []),
                           '_insertion_epoch_timestamp': (
-                                                       '_insertion_epoch_timestamp', []), 
+                                                       '_insertion_epoch_timestamp', []),
                           'lh_custodian_name': (
-                                              'lh_custodian_name', []), 
+                                              'lh_custodian_name', []),
                           'timestamp': (
-                                      'timestamp', []), 
+                                      'timestamp', []),
                           'acked': (
-                                  'acked', []), 
+                                  'acked', []),
                           'lh_original_filename': (
-                                                 'lh_original_filename', []), 
+                                                 'lh_original_filename', []),
                           'scan_type': (
-                                      'scan_type', []), 
+                                      'scan_type', []),
                           'action': (
-                                   'action', []), 
+                                   'action', []),
                           'file_size': (
-                                      'file_size', []), 
+                                      'file_size', []),
                           'user': (
-                                 'user', ['user name']), 
+                                 'user', ['user name']),
                           'lh_filename': (
-                                        'lh_filename', ['file']), 
+                                        'lh_filename', ['file']),
                           'device': (
-                                   'device', []), 
+                                   'device', []),
                           'dlp_profile': (
-                                        'dlp_profile', []), 
+                                        'dlp_profile', []),
                           'shared_with': (
-                                        'shared_with', []), 
+                                        'shared_with', []),
                           'lh_filepath': (
-                                        'lh_filepath', []), 
+                                        'lh_filepath', []),
                           'exposure': (
-                                     'exposure', []), 
+                                     'exposure', []),
                           'count': (
-                                  'count', []), 
+                                  'count', []),
                           'url': (
-                                'url', []), 
+                                'url', []),
                           'legal_hold_profile_name': (
-                                                    'legal_hold_profile_name', []), 
+                                                    'legal_hold_profile_name', []),
                           'modified': (
-                                     'modified', []), 
+                                     'modified', []),
                           'object': (
-                                   'object', []), 
+                                   'object', []),
                           'instance_id': (
-                                        'instance_id', []), 
+                                        'instance_id', []),
                           'ccl': (
-                                'ccl', []), 
+                                'ccl', []),
                           'from_user': (
-                                      'from_user', ['user name']), 
+                                      'from_user', ['user name']),
                           'cci': (
-                                'cci', []), 
+                                'cci', []),
                           'alert': (
-                                  'alert', []), 
+                                  'alert', []),
                           'activity': (
-                                     'activity', []), 
+                                     'activity', []),
                           'object_type': (
-                                        'object_type', []), 
+                                        'object_type', []),
                           'userkey': (
-                                    'userkey', ['user name']), 
+                                    'userkey', ['user name']),
                           'os': (
-                               'os', []), 
+                               'os', []),
                           'browser': (
-                                    'browser', []), 
+                                    'browser', []),
                           'appcategory': (
-                                        'appcategory', ['category'])}, 
+                                        'appcategory', ['category'])},
            'policy': {'managementID': (
-                                     'managementID', []), 
+                                     'managementID', []),
                       'nsdeviceuid': (
-                                    'nsdeviceuid', []), 
+                                    'nsdeviceuid', []),
                       'alert_type': (
-                                   'alert_type', []), 
+                                   'alert_type', []),
                       'dst_location': (
-                                     'dst_location', []), 
+                                     'dst_location', []),
                       'app': (
-                            'app', []), 
+                            'app', []),
                       'src_location': (
-                                     'src_location', []), 
+                                     'src_location', []),
                       'dstip': (
-                              'dstip', ['ip', 'ipv4']), 
+                              'dstip', ['ip', 'ipv4']),
                       'file_size': (
-                                  'file_size', []), 
+                                  'file_size', []),
                       'object_type': (
-                                    'object_type', []), 
+                                    'object_type', []),
                       'activty': (
-                                'activty', []), 
+                                'activty', []),
                       'app_session_id': (
-                                       'app_session_id', []), 
+                                       'app_session_id', []),
                       'category': (
-                                 'category', ['category']), 
+                                 'category', ['category']),
                       'dst_country': (
-                                    'dst_country', []), 
+                                    'dst_country', []),
                       'dst_region': (
-                                   'dst_region', []), 
+                                   'dst_region', []),
                       'object_id': (
-                                  'object_id', []), 
+                                  'object_id', []),
                       'managed_app': (
-                                    'managed_app', []), 
+                                    'managed_app', []),
                       'os_version': (
-                                   'os_version', []), 
+                                   'os_version', []),
                       'access_method': (
-                                      'access_method', []), 
+                                      'access_method', []),
                       'traffic_type': (
-                                     'traffic_type', []), 
+                                     'traffic_type', []),
                       'encrypt_failure': (
-                                        'encrypt_failure', []), 
+                                        'encrypt_failure', []),
                       'type': (
-                             'type', []), 
+                             'type', []),
                       'transaction_id': (
-                                       'transaction_id', []), 
+                                       'transaction_id', []),
                       'srcip': (
-                              'srcip', ['ip', 'ipv4']), 
+                              'srcip', ['ip', 'ipv4']),
                       'timestamp': (
-                                  'timestamp', []), 
+                                  'timestamp', []),
                       'src_region': (
-                                   'src_region', []), 
+                                   'src_region', []),
                       'acked': (
-                              'acked', []), 
+                              'acked', []),
                       'alert': (
-                              'alert', []), 
+                              'alert', []),
                       'userip': (
-                               'userip', ['ip', 'ipv4']), 
+                               'userip', ['ip', 'ipv4']),
                       'user': (
-                             'user', ['user name']), 
+                             'user', ['user name']),
                       'device': (
-                               'device', []), 
+                               'device', []),
                       'src_country': (
-                                    'src_country', []), 
+                                    'src_country', []),
                       'md5': (
-                            'md5', []), 
+                            'md5', []),
                       'count': (
-                              'count', []), 
+                              'count', []),
                       'url': (
-                            'url', ['url']), 
+                            'url', ['url']),
                       'page_id': (
-                                'page_id', []), 
+                                'page_id', []),
                       'sv': (
-                           'sv', []), 
+                           'sv', []),
                       'object': (
-                               'object', []), 
+                               'object', []),
                       'ccl': (
-                            'ccl', []), 
+                            'ccl', []),
                       'cci': (
-                            'cci', []), 
+                            'cci', []),
                       'action': (
-                               'action', []), 
+                               'action', []),
                       'os': (
-                           'os', []), 
+                           'os', []),
                       'browser': (
-                                'browser', []), 
+                                'browser', []),
                       'appcategory': (
-                                    'appcategory', ['category'])}, 
+                                    'appcategory', ['category'])},
            'quarantine': {'managementID': (
-                                         'managementID', []), 
+                                         'managementID', []),
                           'nsdeviceuid': (
-                                        'nsdeviceuid', []), 
+                                        'nsdeviceuid', []),
                           'alert_type': (
-                                       'alert_type', []), 
+                                       'alert_type', []),
                           'dstip': (
-                                  'dstip', ['ip', 'ipv4']), 
+                                  'dstip', ['ip', 'ipv4']),
                           'file_type': (
-                                      'file_type', []), 
+                                      'file_type', []),
                           'app': (
-                                'app', []), 
+                                'app', []),
                           'src_location': (
-                                         'src_location', []), 
+                                         'src_location', []),
                           'browser_version': (
-                                            'browser_version', []), 
+                                            'browser_version', []),
                           'device_classification': (
-                                                  'device_classification', []), 
+                                                  'device_classification', []),
                           'file_size': (
-                                      'file_size', []), 
+                                      'file_size', []),
                           'object_type': (
-                                        'object_type', []), 
+                                        'object_type', []),
                           'activity': (
-                                     'activity', []), 
+                                     'activity', []),
                           'app_session_id': (
-                                           'app_session_id', []), 
+                                           'app_session_id', []),
                           'browser_session_id': (
-                                               'browser_session_id', []), 
+                                               'browser_session_id', []),
                           'category': (
-                                     'category', ['category']), 
+                                     'category', ['category']),
                           'instance_name': (
-                                          'instance_name', []), 
+                                          'instance_name', []),
                           'page_site': (
-                                      'page_site', []), 
+                                      'page_site', []),
                           'os_version': (
-                                       'os_version', []), 
+                                       'os_version', []),
                           'quarantine_encrypt': (
-                                               'quarantine_encrypt', []), 
+                                               'quarantine_encrypt', []),
                           'dst_region': (
-                                       'dst_region', []), 
+                                       'dst_region', []),
                           'hostname': (
-                                     'hostname', []), 
+                                     'hostname', []),
                           'alert_name': (
-                                       'alert_name', []), 
+                                       'alert_name', []),
                           'managed_app': (
-                                        'managed_app', []), 
+                                        'managed_app', []),
                           'dst_country': (
-                                        'dst_country', []), 
+                                        'dst_country', []),
                           'parent_id': (
-                                      'parent_id', []), 
+                                      'parent_id', []),
                           'access_method': (
-                                          'access_method', []), 
+                                          'access_method', []),
                           'policy': (
-                                   'policy', []), 
+                                   'policy', []),
                           'traffic_type': (
-                                         'traffic_type', []), 
+                                         'traffic_type', []),
                           'type': (
-                                 'type', []), 
+                                 'type', []),
                           'transaction_id': (
-                                           'transaction_id', []), 
+                                           'transaction_id', []),
                           'srcip': (
-                                  'srcip', ['ip', 'ipv4']), 
+                                  'srcip', ['ip', 'ipv4']),
                           'instance_id': (
-                                        'instance_id', []), 
+                                        'instance_id', []),
                           'timestamp': (
-                                      'timestamp', []), 
+                                      'timestamp', []),
                           'src_region': (
-                                       'src_region', []), 
+                                       'src_region', []),
                           'alert': (
-                                  'alert', []), 
+                                  'alert', []),
                           'page_id': (
-                                    'page_id', []), 
+                                    'page_id', []),
                           'quarantine_app': (
-                                           'quarantine_app', []), 
+                                           'quarantine_app', []),
                           'referer': (
-                                    'referer', []), 
+                                    'referer', []),
                           'user': (
-                                 'user', ['user name']), 
+                                 'user', ['user name']),
                           'userkey': (
-                                    'userkey', ['user name']), 
+                                    'userkey', ['user name']),
                           'device': (
-                                   'device', []), 
+                                   'device', []),
                           'dlp_profile': (
-                                        'dlp_profile', []), 
+                                        'dlp_profile', []),
                           'src_country': (
-                                        'src_country', []), 
+                                        'src_country', []),
                           'md5': (
-                                'md5', []), 
+                                'md5', []),
                           'count': (
-                                  'count', []), 
+                                  'count', []),
                           'acked': (
-                                  'acked', []), 
+                                  'acked', []),
                           'url': (
-                                'url', ['url']), 
+                                'url', ['url']),
                           'sv': (
-                               'sv', []), 
+                               'sv', []),
                           'ojbect': (
-                                   'ojbect', []), 
+                                   'ojbect', []),
                           'tss_mode': (
-                                     'tss_mode', []), 
+                                     'tss_mode', []),
                           'ccl': (
-                                'ccl', []), 
+                                'ccl', []),
                           'from_user': (
-                                      'from_user', ['user name']), 
+                                      'from_user', ['user name']),
                           'cci': (
-                                'cci', []), 
+                                'cci', []),
                           'quarantine_profile_id': (
-                                                  'quarantine_profile_id', []), 
+                                                  'quarantine_profile_id', []),
                           'userip': (
-                                   'userip', ['ip', 'ipv4']), 
+                                   'userip', ['ip', 'ipv4']),
                           'quarantine_file_id': (
-                                               'quarantine_file_id', []), 
+                                               'quarantine_file_id', []),
                           'os': (
-                               'os', []), 
+                               'os', []),
                           'page': (
-                                 'page', []), 
+                                 'page', []),
                           'browser': (
-                                    'browser', []), 
+                                    'browser', []),
                           'appcategory': (
-                                        'appcategory', ['category'])}, 
+                                        'appcategory', ['category'])},
            'security assessment': {'managementID': (
-                                                  'managementID', []), 
+                                                  'managementID', []),
                                    'nsdeviceuid': (
-                                                 'nsdeviceuid', []), 
+                                                 'nsdeviceuid', []),
                                    'alert_type': (
-                                                'alert_type', []), 
+                                                'alert_type', []),
                                    'region_id': (
-                                               'region_id', []), 
+                                               'region_id', []),
                                    'sa_profile_name': (
-                                                     'sa_profile_name', []), 
+                                                     'sa_profile_name', []),
                                    'app': (
-                                         'app', []), 
+                                         'app', []),
                                    'site': (
-                                          'site', []), 
+                                          'site', []),
                                    'access_method': (
-                                                   'access_method', []), 
+                                                   'access_method', []),
                                    'browser': (
-                                             'browser', []), 
+                                             'browser', []),
                                    'account_name': (
-                                                  'account_name', []), 
+                                                  'account_name', []),
                                    'category': (
-                                              'category', ['category']), 
+                                              'category', ['category']),
                                    'sa_profile_id': (
-                                                   'sa_profile_id', []), 
+                                                   'sa_profile_id', []),
                                    'sa_rule_id': (
-                                                'sa_rule_id', []), 
+                                                'sa_rule_id', []),
                                    'sa_rule_severity': (
-                                                      'sa_rule_severity', []), 
+                                                      'sa_rule_severity', []),
                                    'policy': (
-                                            'policy', []), 
+                                            'policy', []),
                                    'sa_rule_name': (
-                                                  'sa_rule_name', []), 
+                                                  'sa_rule_name', []),
                                    'traffic_type': (
-                                                  'traffic_type', []), 
+                                                  'traffic_type', []),
                                    'type': (
-                                          'type', []), 
+                                          'type', []),
                                    'account_id': (
-                                                'account_id', []), 
+                                                'account_id', []),
                                    'timestamp': (
-                                               'timestamp', []), 
+                                               'timestamp', []),
                                    '_insertion_epoc_timestamp': (
-                                                               '_insertion_epoc_timestamp', []), 
+                                                               '_insertion_epoc_timestamp', []),
                                    'object': (
-                                            'object', []), 
+                                            'object', []),
                                    'acked': (
-                                           'acked', []), 
+                                           'acked', []),
                                    'user': (
-                                          'user', ['user name']), 
+                                          'user', ['user name']),
                                    'userkey': (
-                                             'userkey', ['user name']), 
+                                             'userkey', ['user name']),
                                    'device': (
-                                            'device', []), 
+                                            'device', []),
                                    'count': (
-                                           'count', []), 
+                                           'count', []),
                                    'instance_id': (
-                                                 'instance_id', []), 
+                                                 'instance_id', []),
                                    'ccl': (
-                                         'ccl', []), 
+                                         'ccl', []),
                                    'alert_name': (
-                                                'alert_name', []), 
+                                                'alert_name', []),
                                    'cci': (
-                                         'cci', []), 
+                                         'cci', []),
                                    'activity': (
-                                              'activity', []), 
+                                              'activity', []),
                                    'action': (
-                                            'action', []), 
+                                            'action', []),
                                    'resource_category': (
-                                                       'resource_category', ['category']), 
+                                                       'resource_category', ['category']),
                                    'policy_id': (
-                                               'policy_id', []), 
+                                               'policy_id', []),
                                    'appcategory': (
-                                                 'appcategory', ['category']), 
+                                                 'appcategory', ['category']),
                                    'sa_rule_mediation': (
-                                                       'sa_rule_mediation', [])}, 
+                                                       'sa_rule_mediation', [])},
            'watchlist': {'managementID': (
-                                        'managementID', []), 
+                                        'managementID', []),
                          'nsdeviceuid': (
-                                       'nsdeviceuid', []), 
+                                       'nsdeviceuid', []),
                          'alert_type': (
-                                      'alert_type', []), 
+                                      'alert_type', []),
                          'app': (
-                               'app', []), 
+                               'app', []),
                          'object_id': (
-                                     'object_id', []), 
+                                     'object_id', []),
                          'user_category': (
-                                         'user_category', ['category']), 
+                                         'user_category', ['category']),
                          'access_method': (
-                                         'access_method', []), 
+                                         'access_method', []),
                          'traffic_type': (
-                                        'traffic_type', []), 
+                                        'traffic_type', []),
                          'app_activity': (
-                                        'app_activity', []), 
+                                        'app_activity', []),
                          'type': (
-                                'type', []), 
+                                'type', []),
                          'ns_activity': (
-                                       'ns_activity', []), 
+                                       'ns_activity', []),
                          'count': (
-                                 'count', []), 
+                                 'count', []),
                          '_insertion_epoc_timestamp': (
-                                                     '_insertion_epoc_timestamp', []), 
+                                                     '_insertion_epoc_timestamp', []),
                          'timestamp': (
-                                     'timestamp', []), 
+                                     'timestamp', []),
                          'src_region': (
-                                      'src_region', []), 
+                                      'src_region', []),
                          'user_role': (
-                                     'user_role', []), 
+                                     'user_role', []),
                          'alert': (
-                                 'alert', []), 
+                                 'alert', []),
                          'user': (
-                                'user', ['user name']), 
+                                'user', ['user name']),
                          'device': (
-                                  'device', []), 
+                                  'device', []),
                          'src_country': (
-                                       'src_country', []), 
+                                       'src_country', []),
                          'src_location': (
-                                        'src_location', []), 
+                                        'src_location', []),
                          'acked': (
-                                 'acked', []), 
+                                 'acked', []),
                          'user_name': (
-                                     'user_name', ['user name']), 
+                                     'user_name', ['user name']),
                          'object': (
-                                  'object', []), 
+                                  'object', []),
                          'instance_id': (
-                                       'instance_id', []), 
+                                       'instance_id', []),
                          'ccl': (
-                               'ccl', []), 
+                               'ccl', []),
                          'alert_name': (
-                                      'alert_name', []), 
+                                      'alert_name', []),
                          'cci': (
-                               'cci', []), 
+                               'cci', []),
                          'activity': (
-                                    'activity', []), 
+                                    'activity', []),
                          'userip': (
-                                  'userip', ['ip', 'ipv4']), 
+                                  'userip', ['ip', 'ipv4']),
                          'userkey': (
-                                   'userkey', ['user name']), 
+                                   'userkey', ['user name']),
                          'os': (
-                              'os', []), 
+                              'os', []),
                          'browser': (
-                                   'browser', []), 
+                                   'browser', []),
                          'appcategory': (
                                        'appcategory', [])}}
         for artifact_name, artifact_keys in artifacts_mapping.iteritems():
@@ -1643,6 +1684,13 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._update_url_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _update_url_helper(self, action_result):
+        """ Helper function for updating URL."""
         try:
             exists, message, content = self.get_url_list()
             params = {'list': (',').join(content), 'name': self._list_name}
@@ -1668,17 +1716,23 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self._log.info(('param={}').format(json.dumps(param)))
-        status, msg, matches = phantom_rules.check_list(list_name=self._url_list, value=param['url'])
+        status, msg, matches = phantom_rules.check_list(
+            list_name=self._url_list,
+            value=self._unicode_string_handler(param['url'])
+        )
         self._log.info(('action=checking_for_matches status={} msg={} matches={}').format(status, msg, matches))
         if status:
-            return action_result.set_status(phantom.APP_SUCCESS, ('{} already exists in list').format(param['url']))
+            return action_result.set_status(phantom.APP_SUCCESS, ('{} already exists in list').format(
+                self._unicode_string_handler(param['url'])))
         status, msg, list_items = self.get_url_list()
-        list_items.append(param['url'])
+        list_items.append(self._unicode_string_handler(param['url']))
         url_list = list(set(list_items))
         self._log.debug(('unique_list={}').format(url_list))
         status, set_msg = phantom_rules.set_list(list_name=self._url_list, values=[ [x] for x in url_list ])
         self._log.info(('action=set_list status={} msg={}').format(status, set_msg))
-        self._handle_update_url_list(param)
+        ret_val = self._update_url_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         summary = action_result.update_summary({'set_list': set_msg})
         summary['total_urls'] = len(url_list)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1693,16 +1747,23 @@ class NetskopeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self._log.info(('param={}').format(json.dumps(param)))
         status, msg, list_items = self.get_url_list()
-        found_rows = [ True for idx, v in enumerate(list_items) if v == param['url'] ]
+        found_rows = [ True for idx, v in enumerate(list_items) if v == self._unicode_string_handler(param['url']) ]
         self._log.info(('action=checking_for_matches status={} msg={} matches={}').format(status, msg, found_rows))
         if not any(found_rows):
-            return action_result.set_status(phantom.APP_SUCCESS, ('{} does not exist in list').format(param['url']))
-        status, remove_msg = phantom_rules.delete_from_list(list_name=self._url_list, value=param['url'], remove_all=True, remove_row=True)
+            return action_result.set_status(phantom.APP_SUCCESS, ('{} does not exist in list').format(
+                self._unicode_string_handler(param['url'])))
+        status, remove_msg = phantom_rules.delete_from_list(
+            list_name=self._url_list,
+            value=self._unicode_string_handler(param['url']),
+            remove_all=True,
+            remove_row=True)
         if any(found_rows) and len(list_items) == 1:
             status, set_msg = phantom_rules.set_list(list_name=self._url_list, values=[[]])
             remove_msg = 'Deleted Single Row'
         self._log.info(('action=delete_from_list status={} msg={}').format(status, remove_msg))
-        self._handle_update_url_list(param)
+        ret_val = self._update_url_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         status, msg, list_items = self.get_url_list()
         summary = action_result.update_summary({'remove_msg': remove_msg})
         summary['total_urls'] = len(list_items)
@@ -1714,7 +1775,7 @@ class NetskopeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if 'group' in param:
-                param['filter'] = ('displayName eq "{}"').format(param.get('group'))
+                param['filter'] = ('displayName eq "{}"').format(self._unicode_string_handler(param.get('group')))
             self._log.debug(('action=make_scim_rest_call params={}').format(param))
             request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=param)
             if phantom.is_fail(request_status):
@@ -1735,7 +1796,7 @@ class NetskopeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if 'user' in param:
-                param['filter'] = ('userName eq "{}"').format(param.get('user'))
+                param['filter'] = ('userName eq "{}"').format(self._unicode_string_handler(param.get('user')))
             self._log.debug(('action=make_scim_rest_call params={}').format(param))
             request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=param)
             if phantom.is_fail(request_status):
@@ -1755,10 +1816,16 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            data = {'Operations': [{'op': param.get('action', 'add'), 'path': 'members', 'value': [{'value': param['user']}]}], 'schemas': [
-                         'urn:ietf:params:scim:api:messages:2.0:PatchOp']}
+            data = {
+                'Operations': [{
+                    'op': self._unicode_string_handler(param.get('action', 'add')),
+                    'path': 'members',
+                    'value': [{'value': self._unicode_string_handler(param['user'])}]}],
+                'schemas': ['urn:ietf:params:scim:api:messages:2.0:PatchOp']
+            }
             self._log.info(('action=make_scim_rest_call params={}').format(data))
-            request_status, request_response = self._make_scim_rest_call(endpoint=('{}/{}').format(NETSKOPE_SCIM_GROUPS_ENDPOINT, param['group']), action_result=action_result, params=data, method='patch')
+            request_status, request_response = self._make_scim_rest_call(endpoint=('{}/{}').format(
+                NETSKOPE_SCIM_GROUPS_ENDPOINT, self._unicode_string_handler(param['group'])), action_result=action_result, params=data, method='patch')
             if phantom.is_fail(request_status):
                 self._log.error(('action=failed status={} response={}').format(request_status, request_response))
                 return action_result.get_status()
@@ -1777,7 +1844,7 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            data = {'displayName': param['group'], 'schemas': ['urn:ietf:params:scim:schemas:core:2.0:Group']}
+            data = {'displayName': self._unicode_string_handler(param['group']), 'schemas': ['urn:ietf:params:scim:schemas:core:2.0:Group']}
             self._log.info(('action=make_scim_rest_call params={}').format(data))
             request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=data, method='post')
             if phantom.is_fail(request_status):
@@ -1796,9 +1863,13 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            data = {'userName': param['user'], 'name': {'familyName': param['familyName'], 'givenName': param['givenName']}, 'active': True, 
-               'emails': [{'value': param['email'], 'primary': True}], 'schemas': [
-                         'urn:ietf:params:scim:schemas:core:2.0:User']}
+            data = {
+                'userName': self._unicode_string_handler(param['user']),
+                'name': {'familyName': self._unicode_string_handler(param.get('familyName')),
+                'givenName': self._unicode_string_handler(param.get('givenName'))},
+                'active': True,
+                'emails': [{'value': self._unicode_string_handler(param['email']), 'primary': True}], 'schemas': [
+                            'urn:ietf:params:scim:schemas:core:2.0:User']}
             self._log.info(('action=make_scim_rest_call params={}').format(data))
             request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=data, method='post')
             if phantom.is_fail(request_status):
@@ -1820,6 +1891,13 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._update_file_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _update_file_helper(self, action_result):
+        """ Helper function for updating file list. """
         try:
             exists, message, content = self.get_file_list()
             params = {'list': (',').join(content), 'name': self._list_name}
@@ -1855,7 +1933,9 @@ class NetskopeConnector(BaseConnector):
         self._log.debug(('unique_list={}').format(file_list))
         status, set_msg = phantom_rules.set_list(list_name=self._file_list, values=[ [x] for x in file_list ])
         self._log.info(('action=set_list status={} msg={}').format(status, set_msg))
-        self._handle_update_file_list(param)
+        ret_val = self._update_file_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         summary = action_result.update_summary({'set_list': set_msg})
         summary['total_hashes'] = len(file_list)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1879,7 +1959,9 @@ class NetskopeConnector(BaseConnector):
             status, set_msg = phantom_rules.set_list(list_name=self._file_list, values=[[]])
             remove_msg = 'Deleted Single Row'
         self._log.info(('action=delete_from_list status={} msg={}').format(status, remove_msg))
-        self._handle_update_file_list(param)
+        ret_val = self._update_file_helper(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         status, msg, list_items = self.get_file_list()
         self._log.info(('action=after_delete_from_list status={} msg={} list_length={}').format(status, msg, len(list_items)))
         summary = action_result.update_summary({'remove_msg': remove_msg})
@@ -1894,28 +1976,34 @@ class NetskopeConnector(BaseConnector):
         """
         self.debug_print('action_id', self.get_action_identifier())
         self._log.info(('action_id={}').format(self.get_action_identifier()))
-        action_mapping = {'test_connectivity': self._handle_test_connectivity, 
-           'get_file': self._handle_get_file, 
-           'list_files': self._handle_list_files, 
-           'run_query': self._handle_run_query, 
-           'on_poll': self._handle_on_poll, 
-           'add_url_list': self._handle_add_url_list, 
-           'remove_url_list': self._handle_remove_url_list, 
-           'update_url_list': self._handle_update_url_list, 
-           'add_file_list': self._handle_add_file_list, 
-           'remove_file_list': self._handle_remove_file_list, 
-           'update_file_list': self._handle_update_file_list, 
-           'get_scim_users': self._handle_scim_get_users, 
-           'get_scim_groups': self._handle_scim_get_groups, 
-           'create_scim_group': self._handle_scim_create_group, 
-           'create_scim_user': self._handle_scim_create_user, 
-           'scim_user_to_group': self._handle_scim_user_to_group}
+
+        action_mapping = {
+           'test_connectivity': self._handle_test_connectivity,
+           'get_file': self._handle_get_file,
+           'list_files': self._handle_list_files,
+           'run_query': self._handle_run_query,
+           'on_poll': self._handle_on_poll,
+           'add_url_list': self._handle_add_url_list,
+           'remove_url_list': self._handle_remove_url_list,
+           'update_url_list': self._handle_update_url_list,
+           'add_file_list': self._handle_add_file_list,
+           'remove_file_list': self._handle_remove_file_list,
+           'update_file_list': self._handle_update_file_list,
+           'get_scim_users': self._handle_scim_get_users,
+           'get_scim_groups': self._handle_scim_get_groups,
+           'create_scim_group': self._handle_scim_create_group,
+           'create_scim_user': self._handle_scim_create_user,
+           'scim_user_to_group': self._handle_scim_user_to_group
+        }
+
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
+
         if action in action_mapping.keys():
             action_function = action_mapping[action]
             self._log.info(('execute={} params={}').format(action, param))
             action_execution_status = action_function(param)
+
         return action_execution_status
 
     def get_url_list(self):
@@ -1947,9 +2035,9 @@ class NetskopeConnector(BaseConnector):
         self._state = self.load_state()
         self._log.info(('action=initialize state={}').format(self._state))
         config = self.get_config()
-        self._file_list = ('{}_{}').format(config.get(NETSKOPE_LIST_NAME, ''), NETSKOPE_FILE_LIST)
-        self._url_list = ('{}_{}').format(config.get(NETSKOPE_LIST_NAME, ''), NETSKOPE_URL_LIST)
-        self._scim['url'] = config.get('scim_url', '')
+        self._file_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_FILE_LIST)
+        self._url_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_URL_LIST)
+        self._scim['url'] = self._unicode_string_handler(config.get('scim_url', ''))
         self._scim['token'] = config.get('scim_key', '')
         list_status, message, list_contents = self.get_url_list()
         self._log.info(('action=get_url_list status={} message={} contents_length={}').format(list_status, message, len(list_contents)))
@@ -1974,7 +2062,8 @@ class NetskopeConnector(BaseConnector):
 
 
 if __name__ == '__main__':
-    import pudb, argparse
+    import pudb
+    import argparse
     pudb.set_trace()
     argparser = argparse.ArgumentParser()
     argparser.add_argument('input_test_json', help='Input Test JSON file')

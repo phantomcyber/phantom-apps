@@ -9,12 +9,12 @@
   "product_name": "Netskope",
   "product_version_regex": ".*",
   "publisher": "Netskope",
-  "license": "Copyright (c) 2019 Netskope",
-  "app_version": "1.0.5",
+  "license": "Copyright (c) 2018-2020 Splunk Inc.",
+  "app_version": "2.0.0",
   "utctime_updated": "2019-01-11T00:54:10.000000Z",
   "package_name": "phantom_netskope",
   "main_module": "netskope_connector.pyc",
-  "min_phantom_version": "4.0.1068",
+  "min_phantom_version": "4.6.19142",
   "app_wizard_version": "1.0.0",
   "configuration": {
     "server_url": {
@@ -32,19 +32,16 @@
     "scim_url": {
       "description": "SCIM Server URL",
       "data_type": "string",
-      "required": false,
       "order": 2
     },
     "scim_key": {
       "description": "SCIM Token",
       "data_type": "password",
-      "required": false,
       "order": 3
     },
     "list_name": {
       "description": "Netskope List Name (both Url and File Hash)",
       "data_type": "string",
-      "required": false,
       "order": 4,
       "default": "phantom_list"
     }
@@ -65,7 +62,7 @@
       "identifier": "get_file",
       "description": "Download a quarantined file and upload it to the vault",
       "type": "generic",
-      "read_only": true,
+      "read_only": false,
       "parameters": {
         "file": {
           "description": "ID or quarantined name of the file to download",
@@ -109,7 +106,7 @@
             "netskope file id",
             "file name"
           ],
-          "column_name": "file",
+          "column_name": "File",
           "column_order": 0
         },
         {
@@ -122,7 +119,7 @@
             "netskope profile id",
             "netskope profile name"
           ],
-          "column_name": "profile",
+          "column_name": "Profile",
           "column_order": 1
         },
         {
@@ -189,21 +186,19 @@
     {
       "action": "get scim users",
       "identifier": "get_scim_users",
-      "description": "Get current SCIM user(s). If no parameter sent, will retrieve all userss",
+      "description": "Get current SCIM user(s). If no parameter is sent, it will retrieve all users",
       "type": "investigate",
       "read_only": true,
       "parameters": {
         "user": {
-          "description": "Username or email to  find.",
+          "description": "Username or email to find",
           "data_type": "string",
-          "required": false,
           "primary": true,
           "contains": [
             "user",
             "email",
             "user name"
           ],
-          "default": "",
           "order": 0
         }
       },
@@ -241,7 +236,7 @@
             "user name",
             "email"
           ],
-          "column_name": "user Name",
+          "column_name": "User Name",
           "column_order": 0
         },
         {
@@ -277,19 +272,17 @@
     {
       "action": "get scim groups",
       "identifier": "get_scim_groups",
-      "description": "Get current SCIM group(s). If no parameter sent, will retrieve all groups.",
+      "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all users",
       "type": "investigate",
       "read_only": true,
       "parameters": {
         "group": {
           "description": "Group Display Name to find",
           "data_type": "string",
-          "required": false,
           "primary": true,
           "contains": [
             "group name"
           ],
-          "default": "",
           "order": 0
         }
       },
@@ -323,7 +316,7 @@
           "contains": [
             "group name"
           ],
-          "column_name": "group Name",
+          "column_name": "Group Name",
           "column_order": 0
         },
         {
@@ -353,9 +346,9 @@
     {
       "action": "create scim group",
       "identifier": "create_scim_group",
-      "description": "Create SCIM group.",
+      "description": "Create SCIM group",
       "type": "generic",
-      "read_only": true,
+      "read_only": false,
       "parameters": {
         "group": {
           "description": "Group Name",
@@ -365,7 +358,6 @@
           "contains": [
             "group name"
           ],
-          "default": "",
           "order": 0
         }
       },
@@ -396,13 +388,13 @@
         {
           "data_path": "action_result.data.*.displayName",
           "data_type": "string",
-          "column_name": "displayName",
+          "column_name": "Display Name",
           "column_order": 0
         },
         {
           "data_path": "action_result.data.*.id",
           "data_type": "string",
-          "column_name": "id",
+          "column_name": "ID",
           "column_order": 1,
           "contains": [
             "scim group id"
@@ -417,9 +409,9 @@
     {
       "action": "create scim user",
       "identifier": "create_scim_user",
-      "description": "Create SCIM user.",
+      "description": "Create SCIM user",
       "type": "generic",
-      "read_only": true,
+      "read_only": false,
       "parameters": {
         "user": {
           "description": "User Name",
@@ -429,23 +421,16 @@
           "contains": [
             "user"
           ],
-          "default": "",
           "order": 0
         },
         "familyName": {
           "description": "Family Name",
           "data_type": "string",
-          "required": false,
-          "primary": true,
-          "default": "",
           "order": 1
         },
         "givenName": {
           "description": "Given Name",
           "data_type": "string",
-          "required": false,
-          "primary": true,
-          "default": "",
           "order": 2
         },
         "email": {
@@ -456,7 +441,6 @@
           "contains": [
             "user"
           ],
-          "default": "",
           "order": 3
         }
       },
@@ -495,18 +479,20 @@
         {
           "data_path": "action_result.parameter.email",
           "data_type": "string",
-          "contains": ["user"]
+          "contains": [
+            "user"
+          ]
         },
         {
           "data_path": "action_result.data.*.userName",
           "data_type": "string",
-          "column_name": "userName",
+          "column_name": "Username",
           "column_order": 0
         },
         {
           "data_path": "action_result.data.*.id",
           "data_type": "string",
-          "column_name": "id",
+          "column_name": "ID",
           "column_order": 1,
           "contains": [
             "scim user id"
@@ -533,7 +519,6 @@
           "contains": [
             "scim group id"
           ],
-          "default": "",
           "order": 0
         },
         "user": {
@@ -544,20 +529,18 @@
           "contains": [
             "scim user id"
           ],
-          "default": "",
           "order": 1
         },
         "action": {
           "description": "Action to perform",
           "data_type": "string",
           "required": true,
-          "primary": true,
           "default": "add",
           "example_values": [
             "add",
             "delete"
           ],
-          "order": 1
+          "order": 2
         }
       },
       "output": [
@@ -601,7 +584,7 @@
           "contains": [
             "group name"
           ],
-          "column_name": "group Name",
+          "column_name": "Group Name",
           "column_order": 0
         }
       ],
@@ -613,7 +596,7 @@
     {
       "action": "list files",
       "identifier": "list_files",
-      "description": "List all quarantined files ",
+      "description": "List all quarantined files",
       "type": "investigate",
       "read_only": true,
       "parameters": {},
@@ -647,7 +630,7 @@
           "contains": [
             "file name"
           ],
-          "column_name": "Original filename",
+          "column_name": "Original Filename",
           "column_order": 2
         },
         {
@@ -668,7 +651,7 @@
           "contains": [
             "netskope profile id"
           ],
-          "column_name": "Quarantine profile ID",
+          "column_name": "Quarantine Profile ID",
           "column_order": 4
         },
         {
@@ -680,7 +663,7 @@
           "contains": [
             "netskope profile name"
           ],
-          "column_name": "Quarantine profile name",
+          "column_name": "Quarantine Profile Name",
           "column_order": 5
         },
         {
@@ -692,7 +675,7 @@
           "contains": [
             "file name"
           ],
-          "column_name": "Quarantined filename",
+          "column_name": "Quarantined Filename",
           "column_order": 3
         },
         {
@@ -762,13 +745,11 @@
         "start_time": {
           "description": "Start time epoch",
           "data_type": "numeric",
-          "required": false,
           "order": 1
         },
         "end_time": {
           "description": "End time epoch",
           "data_type": "numeric",
-          "required": false,
           "order": 2
         }
       },
@@ -1571,32 +1552,27 @@
         "container_count": {
           "description": "Maximum number of containers to ingest",
           "data_type": "numeric",
-          "order": 0,
-          "required": false
+          "order": 0
         },
         "container_id": {
           "description": "Parameter ignored in this app",
           "data_type": "string",
-          "order": 1,
-          "required": false
+          "order": 1
         },
         "start_time": {
           "description": "Parameter ignored in this app",
           "data_type": "numeric",
-          "order": 2,
-          "required": false
+          "order": 2
         },
         "end_time": {
           "description": "Parameter ignored in this app",
           "data_type": "numeric",
-          "order": 3,
-          "required": false
+          "order": 3
         },
         "artifact_count": {
           "description": "Parameter ignored in this app",
           "data_type": "numeric",
-          "order": 4,
-          "required": false
+          "order": 4
         }
       },
       "output": [],
@@ -1606,7 +1582,6 @@
       "action": "addto netskope urllist",
       "identifier": "add_url_list",
       "description": "Add an URL to the URL Blocklist",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1619,8 +1594,6 @@
             "url",
             "domain"
           ],
-          "value_list": [],
-          "default": null,
           "order": 0
         }
       },
@@ -1632,14 +1605,18 @@
             "url",
             "domain"
           ],
-          "column_name": "url",
+          "column_name": "URL",
           "column_order": 0
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 1,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -1663,7 +1640,6 @@
       "action": "removefrom netskope urllist",
       "identifier": "remove_url_list",
       "description": "Remove an URL to the URL Blocklist",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1676,8 +1652,6 @@
             "url",
             "domain"
           ],
-          "value_list": [],
-          "default": null,
           "order": 0
         }
       },
@@ -1689,14 +1663,18 @@
             "url",
             "domain"
           ],
-          "column_name": "url",
+          "column_name": "URL",
           "column_order": 0
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 1,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -1720,17 +1698,19 @@
       "action": "update netskope urllist",
       "identifier": "update_url_list",
       "description": "Send the url list to Netskope",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
-      "parameters": {
-      },
+      "parameters": {},
       "output": [
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 0,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -1754,7 +1734,6 @@
       "action": "addto netskope filehashlist",
       "identifier": "add_file_list",
       "description": "Add a file hash to the file hash list",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1767,8 +1746,6 @@
             "hash",
             "md5"
           ],
-          "value_list": [],
-          "default": null,
           "order": 0
         }
       },
@@ -1780,14 +1757,18 @@
             "hash",
             "md5"
           ],
-          "column_name": "file",
+          "column_name": "File",
           "column_order": 0
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 1,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -1811,7 +1792,6 @@
       "action": "removefrom netskope filehashlist",
       "identifier": "remove_file_list",
       "description": "Remove a hash from the file hash list",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1824,8 +1804,6 @@
             "hash",
             "md5"
           ],
-          "value_list": [],
-          "default": null,
           "order": 0
         }
       },
@@ -1837,14 +1815,18 @@
             "hash",
             "md5"
           ],
-          "column_name": "hash",
+          "column_name": "Hash",
           "column_order": 0
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 1,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
@@ -1868,17 +1850,19 @@
       "action": "update netskope filehashlist",
       "identifier": "update_file_list",
       "description": "Send the file hash list to Netskope",
-      "verbose": "",
       "type": "contain",
       "read_only": false,
-      "parameters": {
-      },
+      "parameters": {},
       "output": [
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 1
+          "column_name": "Status",
+          "column_order": 0,
+          "example_values": [
+              "success",
+              "failed"
+          ]
         },
         {
           "data_path": "action_result.message",

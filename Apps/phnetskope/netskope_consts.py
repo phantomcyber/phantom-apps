@@ -1,5 +1,8 @@
-# Embedded file name: ./netskope_consts.py
-# Compiled at: 2019-07-02 17:17:12
+# File: netskope_consts.py
+# Copyright (c) 2018-2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 NETSKOPE_CONFIG_SERVER_URL = 'server_url'
 NETSKOPE_CONFIG_SCIM_URL = 'scim_url'
 NETSKOPE_CONFIG_API_KEY = 'api_key'

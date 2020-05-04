@@ -1,6 +1,10 @@
-# Embedded file name: ./netskope_view.py
-# Compiled at: 2019-07-02 16:46:21
+# File: netskope_view.py
+# Copyright (c) 2018-2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 from datetime import datetime
+
 
 def get_ctx_result(provides, result):
     """ Function that parses data.

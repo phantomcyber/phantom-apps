@@ -1,7 +1,14 @@
-# Embedded file name: ./utilities.py
-# Compiled at: 2019-07-02 16:46:21
-import logging, os, re, sys
+# File: utilities.py
+# Copyright (c) 2018-2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+import logging
+import os
+import re
+import sys
 from logging import handlers
+
 
 class KennyLoggins:
     """ Base Class for Logging """
@@ -16,7 +23,9 @@ class KennyLoggins:
         _log = logging.getLogger(('{}/{}').format(app_name, file_name))
         _log.propogate = False
         _log.setLevel(log_level)
-        formatter = logging.Formatter(('%(asctime)s log_level=%(levelname)s pid=%(process)d tid=%(threadName)s              file="%(filename)s" function="%(funcName)s" line_number="%(lineno)d" version="{}" %(message)s').format(version))
+        formatter = logging.Formatter(
+            ('%(asctime)s log_level=%(levelname)s pid=%(process)d tid=%(threadName)s              file="%(filename)s \
+                " function="%(funcName)s" line_number="%(lineno)d" version="{}" %(message)s').format(version))
         try:
             try:
                 if not os.path.isdir(log_location):
