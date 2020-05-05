@@ -202,15 +202,15 @@ class NetskopeConnector(BaseConnector):
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
                 if e.message:
-                    self._log.error(('action=failed exception={}').format(e))
                     try:
                         error_msg = self._unicode_string_handler(e)
+                        self._log.error(('action=failed exception={}').format(error_msg))
                         message = ('Error connecting to server. Details: {0}').format(error_msg)
                     except Exception as e:
                         self._log.error(('action=failed exception={}').format(self._unicode_string_handler(e)))
                         return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
 
-                    if 'token=' in str(e):
+                    if 'token=' in error_msg:
                         message = 'Error while connecting to the server'
                 else:
                     message = "Error message unavailable. Please check the asset configuration and|or action parameters."

@@ -195,7 +195,7 @@
           "data_type": "string",
           "primary": true,
           "contains": [
-            "user",
+            "netskope user",
             "email",
             "user name"
           ],
@@ -223,7 +223,7 @@
           "data_path": "action_result.parameter.user",
           "data_type": "string",
           "contains": [
-            "user",
+            "netskope user",
             "email",
             "user name"
           ]
@@ -232,7 +232,7 @@
           "data_path": "action_result.data.*.userName",
           "data_type": "string",
           "contains": [
-            "user",
+            "netskope user",
             "user name",
             "email"
           ],
@@ -249,7 +249,7 @@
           "data_path": "action_result.data.*.id",
           "data_type": "string",
           "contains": [
-            "scim user id"
+            "netskope scim user id"
           ],
           "column_name": "SCIM ID",
           "column_order": 2
@@ -258,7 +258,7 @@
           "data_path": "action_result.data.*.externalId",
           "data_type": "string",
           "contains": [
-            "external id"
+            "netskope external id"
           ],
           "column_name": "External ID",
           "column_order": 3
@@ -281,7 +281,7 @@
           "data_type": "string",
           "primary": true,
           "contains": [
-            "group name"
+            "netskope group name"
           ],
           "order": 0
         }
@@ -307,14 +307,14 @@
           "data_path": "action_result.parameter.group",
           "data_type": "string",
           "contains": [
-            "group name"
+            "netskope group name"
           ]
         },
         {
           "data_path": "action_result.data.*.displayName",
           "data_type": "string",
           "contains": [
-            "group name"
+            "netskope group name"
           ],
           "column_name": "Group Name",
           "column_order": 0
@@ -323,7 +323,7 @@
           "data_path": "action_result.data.*.id",
           "data_type": "string",
           "contains": [
-            "scim group id"
+            "netskope scim group id"
           ],
           "column_name": "SCIM ID",
           "column_order": 1
@@ -332,7 +332,7 @@
           "data_path": "action_result.data.*.externalId",
           "data_type": "string",
           "contains": [
-            "external id"
+            "netskope external id"
           ],
           "column_name": "External ID",
           "column_order": 2
@@ -356,7 +356,7 @@
           "required": true,
           "primary": true,
           "contains": [
-            "group name"
+            "netskope group name"
           ],
           "order": 0
         }
@@ -382,7 +382,7 @@
           "data_path": "action_result.parameter.group",
           "data_type": "string",
           "contains": [
-            "group name"
+            "netskope group name"
           ]
         },
         {
@@ -397,7 +397,7 @@
           "column_name": "ID",
           "column_order": 1,
           "contains": [
-            "scim group id"
+            "netskope scim group id"
           ]
         }
       ],
@@ -419,7 +419,7 @@
           "required": true,
           "primary": true,
           "contains": [
-            "user"
+            "netskope user"
           ],
           "order": 0
         },
@@ -439,7 +439,8 @@
           "required": true,
           "primary": true,
           "contains": [
-            "user"
+            "netskope user",
+            "email"
           ],
           "order": 3
         }
@@ -465,7 +466,7 @@
           "data_path": "action_result.parameter.user",
           "data_type": "string",
           "contains": [
-            "user"
+            "netskope user"
           ]
         },
         {
@@ -480,7 +481,8 @@
           "data_path": "action_result.parameter.email",
           "data_type": "string",
           "contains": [
-            "user"
+            "netskope user",
+            "email"
           ]
         },
         {
@@ -495,7 +497,7 @@
           "column_name": "ID",
           "column_order": 1,
           "contains": [
-            "scim user id"
+            "netskope scim user id"
           ]
         }
       ],
@@ -517,7 +519,7 @@
           "required": true,
           "primary": true,
           "contains": [
-            "scim group id"
+            "netskope scim group id"
           ],
           "order": 0
         },
@@ -527,7 +529,7 @@
           "required": true,
           "primary": true,
           "contains": [
-            "scim user id"
+            "netskope scim user id"
           ],
           "order": 1
         },
@@ -564,7 +566,7 @@
           "data_path": "action_result.parameter.group",
           "data_type": "string",
           "contains": [
-            "scim group id"
+            "netskope scim group id"
           ]
         },
         {
@@ -575,14 +577,14 @@
           "data_path": "action_result.parameter.user",
           "data_type": "string",
           "contains": [
-            "scim user id"
+            "netskope scim user id"
           ]
         },
         {
           "data_path": "action_result.data.*.displayName",
           "data_type": "string",
           "contains": [
-            "group name"
+            "netskope group name"
           ],
           "column_name": "Group Name",
           "column_order": 0
