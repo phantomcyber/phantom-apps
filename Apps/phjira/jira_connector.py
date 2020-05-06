@@ -130,7 +130,7 @@ class JiraConnector(BaseConnector):
 
         # Try to parse the HTML content of the error in majority situations and if it fails to parse
         # the error response as HTML, then, return the raw error text to ensure that the error text
-        # is not getting dropped from this point
+        # is not getting dropped from this point.
         try:
             soup = BeautifulSoup(str(error_text), "html.parser")
             error_text = soup.text
