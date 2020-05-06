@@ -20,7 +20,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
 from netskope_consts import *
-from utilities import KennyLoggins, logging
+from netskope_utilities import KennyLoggins, logging
 
 
 class RetVal(tuple):
@@ -86,6 +86,9 @@ class NetskopeConnector(BaseConnector):
         status_code = response.status_code
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [ x.strip() for x in split_lines if x.strip() ]
@@ -134,7 +137,7 @@ class NetskopeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
         try:
-            if hasattr(action_result, 'add_debug_data') and (self.get_action_identifier() != 'get-file' or not 200 <= response.status_code < 399):
+            if hasattr(action_result, 'add_debug_data') and (self.get_action_identifier() != 'get_file' or not 200 <= response.status_code < 399):
                 action_result.add_debug_data({'r_status_code': response.status_code})
                 action_result.add_debug_data({'r_text': response.text})
                 action_result.add_debug_data({'r_headers': response.headers})
