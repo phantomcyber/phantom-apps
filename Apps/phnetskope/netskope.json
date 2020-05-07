@@ -1617,7 +1617,7 @@
       "action": "on poll",
       "identifier": "on_poll",
       "description": "Ingest data to Phantom",
-      "verbose": "For <b>manual run</b> and <b>first poll</b>, alerts of last 24 hours would be ingested. Subsequent polls will ingest new alerts.<br>Only alerts of type &quotMalware&quot will be ingested.",
+      "verbose": "For <b>manual run</b> and <b>first poll</b>, alerts of the last 24 hours would be ingested. Subsequent polls will ingest new alerts.<br>Only alerts of type &quotMalware&quot will be ingested.",
       "type": "ingest",
       "read_only": true,
       "parameters": {
