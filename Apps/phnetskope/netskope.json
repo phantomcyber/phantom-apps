@@ -1795,7 +1795,7 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "update netskope urllist",
+      "action": "update url",
       "identifier": "update_url_list",
       "description": "Send the url list to Netskope",
       "type": "contain",
@@ -1989,7 +1989,7 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "update netskope filehashlist",
+      "action": "update hash",
       "identifier": "update_file_list",
       "description": "Send the file hash list to Netskope",
       "type": "contain",
