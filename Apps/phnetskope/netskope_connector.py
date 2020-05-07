@@ -118,12 +118,14 @@ class NetskopeConnector(BaseConnector):
                 error_message = (' ').join(resp_json['errors'])
             elif resp_json.get('errors'):
                 error_message = resp_json['errors']
+            error_message = UnicodeDammit(error_message).unicode_markup.encode('utf-8') if error_message else error_message
             message = ('Error from server. Status Code: {0} Data from server: {1}').format(response.status_code, error_message)
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         else:
             if 200 <= response.status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
             error_message = response.text.replace('{', '{{').replace('}', '}}')
+            error_message = UnicodeDammit(error_message).unicode_markup.encode('utf-8') if error_message else error_message
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), None)
 
     def _process_response(self, response, action_result):
@@ -147,7 +149,9 @@ class NetskopeConnector(BaseConnector):
             if not response.text:
                 self._log.info('action=process_empty_response')
                 return self._process_empty_response(response, action_result)
-            message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            error_message = response.text.replace('{', '{{').replace('}', '}}')
+            error_message = UnicodeDammit(error_message).unicode_markup.encode('utf-8') if error_message else error_message
+            message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
             self._log.error(('{}').format(message))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
         except Exception as e:
@@ -247,8 +251,9 @@ class NetskopeConnector(BaseConnector):
             self._list_name = self._unicode_string_handler(config[NETSKOPE_LIST_NAME])
             self._log.info(('tenant={}').format(self._tenant))
         except:
-            self.debug_print('Error while encoding server URL')
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error while encoding server URL'), resp_json)
+            self.debug_print('Error while initializing server URL and basic connection parameters from the asset configuration')
+            return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                        'Error while initializing server URL and basic connection parameters from the asset configuration'), resp_json)
 
         params.update({'token': self._api_key})
         try:

@@ -1651,9 +1651,9 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "addto netskope urllist",
+      "action": "add url",
       "identifier": "add_url_list",
-      "description": "Add an URL to the URL Blocklist",
+      "description": "Add an URL to the Netskope URL Blocklist",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1723,9 +1723,9 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "removefrom netskope urllist",
+      "action": "remove url",
       "identifier": "remove_url_list",
-      "description": "Remove an URL to the URL Blocklist",
+      "description": "Remove an URL to the Netskope URL Blocklist",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1845,9 +1845,9 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "addto netskope filehashlist",
+      "action": "add hash",
       "identifier": "add_file_list",
-      "description": "Add a file hash to the file hash list",
+      "description": "Add a file hash to the Netskope file hash list",
       "type": "contain",
       "read_only": false,
       "parameters": {
@@ -1917,9 +1917,9 @@
       "versions": "EQ(*)"
     },
     {
-      "action": "removefrom netskope filehashlist",
+      "action": "remove hash",
       "identifier": "remove_file_list",
-      "description": "Remove a hash from the file hash list",
+      "description": "Remove a hash from the Netskope file hash list",
       "type": "contain",
       "read_only": false,
       "parameters": {
