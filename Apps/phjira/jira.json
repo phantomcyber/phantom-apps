@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "2.0.35",
+    "app_version": "3.0.0",
     "utctime_updated": "2019-11-20T22:52:13.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
@@ -13,7 +13,8 @@
     "product_version_regex": ".*",
     "min_phantom_version": "4.6.19142",
     "latest_tested_versions": [
-        "On prem v7.1.9"
+        "On prem v7.1.9",
+        "Cloud Copyright (c) 2002 - 2020 Atlassian Corporation Pty Ltd."
     ],
     "python_version": "3",
     "logo": "logo_atlassian.svg",
@@ -102,7 +103,7 @@
         "custom_fields": {
             "data_type": "string",
             "order": 8,
-            "description": "Comma-separated string of custom fields (case-sensitive) to be ingested",
+            "description": "JSON formatted list of names of custom fields (case-sensitive) to be ingested",
             "required": false
         },
         "timezone": {
@@ -210,7 +211,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.assignee",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.description",
@@ -221,7 +225,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.fields",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"priority\": {\"name\": \"Normal\"}}",
+                        "{\"fields\": {\"customfield_10105\": \"Test epic link name\"}}"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.issue_type",
@@ -236,7 +244,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.priority",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Normal"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.project_key",
@@ -311,7 +322,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Splunk Test",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -356,6 +367,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -380,7 +394,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -390,7 +404,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -400,7 +414,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -410,12 +424,18 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.displayName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name"
+                    ],
+                    "contains": [
+                        "jira user display name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.emailAddress",
@@ -427,7 +447,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.self",
@@ -436,7 +462,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -468,8 +494,7 @@
                     "data_path": "action_result.data.*.fields.created",
                     "data_type": "string",
                     "example_values": [
-                        "2018-09-25T06:31:58.854-0700",
-                        "2018-10-03T03:42:10.913-0700"
+                        "2018-09-25T06:31:58.854-0700"
                     ]
                 },
                 {
@@ -477,6 +502,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -501,7 +529,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -511,7 +539,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -521,7 +549,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -531,21 +559,24 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.displayName",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Admin"
+                        "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -563,6 +594,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -572,7 +606,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -661,8 +695,8 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/issuetypes/story.svg",
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype"
+                        "http://10.10.123.124:8080/images/icons/issuetypes/story.svg",
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype"
                     ]
                 },
                 {
@@ -691,8 +725,8 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/10101",
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/3"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/10101",
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/3"
                     ]
                 },
                 {
@@ -714,7 +748,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ]
                 },
                 {
@@ -738,7 +772,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ]
                 },
                 {
@@ -762,8 +796,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&avatarId=10403",
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=xsmall&avatarId=10403"
                     ]
                 },
                 {
@@ -773,8 +806,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&avatarId=10403",
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=small&avatarId=10403"
                     ]
                 },
                 {
@@ -784,8 +816,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&avatarId=10403",
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=medium&avatarId=10403"
                     ]
                 },
                 {
@@ -795,24 +826,24 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?avatarId=10403",
-                        "http://10.1.99.111:8080/secure/projectavatar?pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?avatarId=10403"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.id",
                     "data_type": "string",
                     "example_values": [
-                        "10100",
-                        "10000"
+                        "10100"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.key",
                     "data_type": "string",
                     "example_values": [
-                        "MAN",
-                        "PRJ"
+                        "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -864,15 +895,15 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/project/10100",
-                        "http://10.1.99.111:8080/rest/api/2/project/10000"
+                        "http://10.10.123.124:8080/rest/api/2/project/10100"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.simplified",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -897,7 +928,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -907,7 +938,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -917,7 +948,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -927,7 +958,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -935,13 +966,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.reporter.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -968,7 +1002,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -1010,7 +1044,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ]
                 },
                 {
@@ -1034,7 +1068,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10000"
+                        "http://10.10.123.124:8080/rest/api/2/status/10000"
                     ]
                 },
                 {
@@ -1072,7 +1106,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ]
                 },
                 {
@@ -1125,8 +1159,8 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-240/votes",
-                        "http://10.1.99.111:8080/rest/api/2/issue/PHANINCIDE-370/votes"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-240/votes",
+                        "http://10.10.123.124:8080/rest/api/2/issue/PHANINCIDE-370/votes"
                     ]
                 },
                 {
@@ -1151,8 +1185,8 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-240/watchers",
-                        "http://10.1.99.111:8080/rest/api/2/issue/PHANINCIDE-370/watchers"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-240/watchers",
+                        "http://10.10.123.124:8080/rest/api/2/issue/PHANINCIDE-370/watchers"
                     ]
                 },
                 {
@@ -1245,6 +1279,9 @@
                     "example_values": [
                         "MAN",
                         "PRJ"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -1317,16 +1354,16 @@
             "action": "get attachments",
             "description": "Gets specific attachments from a Jira Ticket (issue)",
             "verbose": "The function will store specific attachments from a given Jira ticket inside the vault",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_attachments",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "id": {
                     "data_type": "string",
                     "order": 0,
                     "description": "The key of the Jira issue",
                     "contains": [
-                        "jira project key"
+                        "jira ticket key"
                     ],
                     "required": true,
                     "primary": true
@@ -1334,20 +1371,18 @@
                 "retrieve_all": {
                     "data_type": "boolean",
                     "order": 1,
-                    "description": "If this is set to true all attachments will be retrieved from the issue",
-                    "required": true
+                    "description": "If this is set to true all attachments will be retrieved from the issue"
                 },
                 "container_id": {
                     "data_type": "string",
                     "order": 2,
-                    "description": "The Container ID to associate the file with.",
+                    "description": "The Container ID to associate the file with",
                     "required": true
                 },
                 "extension_filter": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "Comma-separated list of file extensions to be returned from the issue",
-                    "required": false
+                    "description": "Comma-separated list of file extensions to be returned from the issue"
                 }
             },
             "render": {
@@ -1365,16 +1400,14 @@
                         "failed"
                     ],
                     "column_name": "Status",
-                    "column_order": 3
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
-                        "jira project key"
+                        "jira ticket key"
                     ],
-                    "column_name": "Project Key",
-                    "column_order": 0,
                     "example_values": [
                         "AUA"
                     ]
@@ -1399,12 +1432,67 @@
                 {
                     "data_path": "action_result.parameter.extension_filter",
                     "data_type": "string",
-                    "column_name": "Extension Filter",
+                    "example_values": [
+                        "txt,png,exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "2446"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.succeeded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
+                    ],
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        501
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "231003"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1415,6 +1503,20 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully retrieved attachments from Jira ticket"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
@@ -1440,14 +1542,12 @@
                 "update_fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "vault_id": {
                     "description": "Vault ID of attachment",
                     "data_type": "string",
                     "order": 2,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "vault id"
@@ -1482,7 +1582,10 @@
                     "data_path": "action_result.parameter.update_fields",
                     "data_type": "string",
                     "example_values": [
-                        "{\"update\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}}"
+                        "{\"update\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}}",
+                        "{ \"priority\":{ \"name\": \"test/\\\"\"}}",
+                        "{\"fields\":{\"\u65e5\u672c\u6a19\u6e96\u6642\u26f0\u26f1\u26f2\u26f3\u26f5\u2714\ufe0f\u2764\ufe0f\ufb17\u256c\u238b\u231a\u214d\u214e\u20ac \u20ad\u2042\u1fa7\u0488\u20ae\u20af\u214f\u231b\u238e\u2606\u1e02\" : [\"\u6f22\u5b57\u00a9\u00ac\u0278\u0460\u058d\u06de\u0a0a\u0bf5\u0d6c\u0f03\u1024\u1128\u11d7\u1296\u13cc\u1520\u16ef\u1720\u17a6\u1864\u18bb\u1910\u19aa\u5e73\u4eee\u540d\"]}}",
+                        "{\"fields\":{\"test-label\" : [\"test\"]}}"
                     ]
                 },
                 {
@@ -1517,7 +1620,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Splunk Test",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -1577,6 +1680,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -1601,7 +1707,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -1611,7 +1717,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -1621,7 +1727,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -1631,24 +1737,45 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.displayName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "jira user display name"
+                    ],
+                    "example_values": [
+                        "Test Name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.emailAddress",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.key",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.self",
@@ -1657,7 +1784,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -1669,6 +1796,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -1690,7 +1820,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1700,7 +1830,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1710,7 +1840,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1720,7 +1850,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1731,13 +1861,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -1755,13 +1888,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -1778,7 +1914,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.content",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/attachment/10403/Add+Comment.png"
+                        "http://10.10.123.124:8080/secure/attachment/10403/Add+Comment.png"
                     ],
                     "contains": [
                         "url"
@@ -1816,7 +1952,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/attachment/10403"
+                        "http://10.10.123.124:8080/rest/api/2/attachment/10403"
                     ],
                     "contains": [
                         "url"
@@ -1833,7 +1969,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.thumbnail",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/thumbnail/10403/_thumb_10403.png"
+                        "http://10.10.123.124:8080/secure/thumbnail/10403/_thumb_10403.png"
                     ],
                     "contains": [
                         "url"
@@ -1851,7 +1987,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1861,7 +1997,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1871,7 +2007,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1881,7 +2017,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1892,13 +2028,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -1916,13 +2055,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -1960,7 +2102,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/10246/comment/10004"
+                        "http://10.10.123.124:8080/rest/api/2/issue/10246/comment/10004"
                     ],
                     "contains": [
                         "url"
@@ -1978,7 +2120,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1988,7 +2130,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -1998,7 +2140,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -2008,7 +2150,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -2019,13 +2161,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -2043,13 +2188,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -2124,7 +2272,7 @@
                     "data_path": "action_result.data.*.fields.components.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/component/10104"
+                        "http://10.10.123.124:8080/rest/api/2/component/10104"
                     ],
                     "contains": [
                         "url"
@@ -2142,6 +2290,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -2166,7 +2317,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2176,7 +2327,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2186,7 +2337,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2196,7 +2347,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2204,13 +2355,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -2228,6 +2382,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -2237,7 +2394,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -2344,7 +2501,7 @@
                     "data_path": "action_result.data.*.fields.fixVersions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -2375,7 +2532,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
+                        "http://10.10.123.124:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
                     ],
                     "contains": [
                         "url"
@@ -2399,7 +2556,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/10400"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/10400"
                     ],
                     "contains": [
                         "url"
@@ -2417,7 +2574,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/high.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/high.svg"
                     ],
                     "contains": [
                         "url"
@@ -2441,7 +2598,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/2"
+                        "http://10.10.123.124:8080/rest/api/2/priority/2"
                     ],
                     "contains": [
                         "url"
@@ -2458,7 +2615,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ],
                     "contains": [
                         "url"
@@ -2520,7 +2677,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.statusCategory.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ],
                     "contains": [
                         "url"
@@ -2545,13 +2702,16 @@
                     "data_type": "string",
                     "example_values": [
                         "ZEP-14"
+                    ],
+                    "contains": [
+                        "jira ticket key"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/11849"
+                        "http://10.10.123.124:8080/rest/api/2/issue/11849"
                     ],
                     "contains": [
                         "url"
@@ -2561,7 +2721,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLink/10615"
+                        "http://10.10.123.124:8080/rest/api/2/issueLink/10615"
                     ],
                     "contains": [
                         "url"
@@ -2599,7 +2759,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.type.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLinkType/10000"
+                        "http://10.10.123.124:8080/rest/api/2/issueLinkType/10000"
                     ],
                     "contains": [
                         "url"
@@ -2626,7 +2786,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
                     ]
                 },
                 {
@@ -2653,7 +2813,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/1"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/1"
                     ]
                 },
                 {
@@ -2685,7 +2845,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ]
                 },
                 {
@@ -2709,7 +2869,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ]
                 },
                 {
@@ -2733,7 +2893,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=xsmall&avatarId=10403"
                     ]
                 },
                 {
@@ -2743,7 +2903,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=small&avatarId=10403"
                     ]
                 },
                 {
@@ -2753,7 +2913,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=medium&avatarId=10403"
                     ]
                 },
                 {
@@ -2763,7 +2923,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?avatarId=10403"
                     ]
                 },
                 {
@@ -2778,6 +2938,9 @@
                     "data_type": "string",
                     "example_values": [
                         "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -2829,14 +2992,15 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/project/10100"
+                        "http://10.10.123.124:8080/rest/api/2/project/10100"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.simplified",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -2861,7 +3025,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2871,7 +3035,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2881,7 +3045,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2891,7 +3055,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -2899,13 +3063,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.reporter.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -2923,6 +3090,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -2932,7 +3102,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -2971,7 +3141,7 @@
                     "data_path": "action_result.data.*.fields.resolution.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/resolution/10000"
+                        "http://10.10.123.124:8080/rest/api/2/resolution/10000"
                     ],
                     "contains": [
                         "url"
@@ -3005,7 +3175,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/closed.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/closed.png"
                     ]
                 },
                 {
@@ -3029,7 +3199,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10001"
+                        "http://10.10.123.124:8080/rest/api/2/status/10001"
                     ]
                 },
                 {
@@ -3067,7 +3237,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/3"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/3"
                     ]
                 },
                 {
@@ -3146,7 +3316,7 @@
                     "data_path": "action_result.data.*.fields.versions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -3167,7 +3337,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/votes"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/votes"
                     ]
                 },
                 {
@@ -3192,7 +3362,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/watchers"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/watchers"
                     ]
                 },
                 {
@@ -3270,6 +3440,9 @@
                     "example_values": [
                         "MAN",
                         "TES"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -3354,8 +3527,7 @@
                 "internal": {
                     "description": "Whether comment should be internal only or not",
                     "data_type": "boolean",
-                    "order": 2,
-                    "required": true
+                    "order": 2
                 }
             },
             "render": {
@@ -3704,7 +3876,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Splunk Test",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -3745,6 +3917,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -3769,7 +3944,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3779,7 +3954,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3789,7 +3964,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3799,7 +3974,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3807,13 +3982,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -3831,6 +4009,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -3840,7 +4021,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -3855,6 +4036,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -3904,6 +4088,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -3928,7 +4115,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3938,7 +4125,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3948,7 +4135,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3958,7 +4145,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -3966,13 +4153,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -3990,6 +4180,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -3999,7 +4192,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -4062,7 +4255,7 @@
                     "data_path": "action_result.data.*.fields.customfield_10704.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/customFieldOption/10604"
+                        "http://10.10.123.124:8080/rest/api/2/customFieldOption/10604"
                     ],
                     "contains": [
                         "url"
@@ -4118,7 +4311,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
+                        "http://10.10.123.124:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
                     ],
                     "contains": [
                         "url"
@@ -4142,7 +4335,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/10400"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/10400"
                     ],
                     "contains": [
                         "url"
@@ -4160,7 +4353,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/high.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/high.svg"
                     ],
                     "contains": [
                         "url"
@@ -4184,7 +4377,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/2"
+                        "http://10.10.123.124:8080/rest/api/2/priority/2"
                     ],
                     "contains": [
                         "url"
@@ -4194,14 +4387,14 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        ""
+                        "This is sample fields status description"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ],
                     "contains": [
                         "url"
@@ -4263,7 +4456,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.statusCategory.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ],
                     "contains": [
                         "url"
@@ -4288,13 +4481,16 @@
                     "data_type": "string",
                     "example_values": [
                         "ZEP-14"
+                    ],
+                    "contains": [
+                        "jira ticket key"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/11849"
+                        "http://10.10.123.124:8080/rest/api/2/issue/11849"
                     ],
                     "contains": [
                         "url"
@@ -4304,7 +4500,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLink/10615"
+                        "http://10.10.123.124:8080/rest/api/2/issueLink/10615"
                     ],
                     "contains": [
                         "url"
@@ -4342,7 +4538,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.type.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLinkType/10000"
+                        "http://10.10.123.124:8080/rest/api/2/issueLinkType/10000"
                     ],
                     "contains": [
                         "url"
@@ -4369,7 +4565,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype"
                     ]
                 },
                 {
@@ -4396,7 +4592,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/5"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/5"
                     ]
                 },
                 {
@@ -4432,7 +4628,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.issuetype.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype"
                     ],
                     "contains": [
                         "url"
@@ -4459,7 +4655,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.issuetype.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/3"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/3"
                     ],
                     "contains": [
                         "url"
@@ -4477,7 +4673,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.priority.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ],
                     "contains": [
                         "url"
@@ -4501,7 +4697,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.priority.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ],
                     "contains": [
                         "url"
@@ -4518,7 +4714,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.status.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ],
                     "contains": [
                         "url"
@@ -4542,7 +4738,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.status.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10000"
+                        "http://10.10.123.124:8080/rest/api/2/status/10000"
                     ],
                     "contains": [
                         "url"
@@ -4580,7 +4776,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.status.statusCategory.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ],
                     "contains": [
                         "url"
@@ -4611,7 +4807,7 @@
                     "data_path": "action_result.data.*.fields.parent.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/11811"
+                        "http://10.10.123.124:8080/rest/api/2/issue/11811"
                     ],
                     "contains": [
                         "url"
@@ -4624,7 +4820,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ]
                 },
                 {
@@ -4648,7 +4844,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ]
                 },
                 {
@@ -4672,7 +4868,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=xsmall&pid=10000&avatarId=10011"
                     ]
                 },
                 {
@@ -4682,7 +4878,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=small&pid=10000&avatarId=10011"
                     ]
                 },
                 {
@@ -4692,7 +4888,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=medium&pid=10000&avatarId=10011"
                     ]
                 },
                 {
@@ -4702,7 +4898,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?pid=10000&avatarId=10011"
+                        "http://10.10.123.124:8080/secure/projectavatar?pid=10000&avatarId=10011"
                     ]
                 },
                 {
@@ -4717,13 +4913,16 @@
                     "data_type": "string",
                     "example_values": [
                         "PRJ"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.name",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Create Incidents"
+                        "Test Create Incidents"
                     ]
                 },
                 {
@@ -4768,14 +4967,15 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/project/10000"
+                        "http://10.10.123.124:8080/rest/api/2/project/10000"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.simplified",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -4800,7 +5000,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -4810,7 +5010,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -4820,7 +5020,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -4830,7 +5030,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -4838,13 +5038,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.reporter.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -4862,6 +5065,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -4871,7 +5077,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -4880,10 +5086,6 @@
                     "example_values": [
                         "UTC"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.resolution",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.fields.resolution",
@@ -4914,7 +5116,7 @@
                     "data_path": "action_result.data.*.fields.resolution.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/resolution/1"
+                        "http://10.10.123.124:8080/rest/api/2/resolution/1"
                     ],
                     "contains": [
                         "url"
@@ -4948,7 +5150,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ]
                 },
                 {
@@ -4972,7 +5174,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10000"
+                        "http://10.10.123.124:8080/rest/api/2/status/10000"
                     ]
                 },
                 {
@@ -5010,7 +5212,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ]
                 },
                 {
@@ -5038,7 +5240,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.issuetype.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype"
                     ],
                     "contains": [
                         "url"
@@ -5065,7 +5267,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.issuetype.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/5"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/5"
                     ],
                     "contains": [
                         "url"
@@ -5083,7 +5285,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.priority.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ],
                     "contains": [
                         "url"
@@ -5107,7 +5309,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.priority.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ],
                     "contains": [
                         "url"
@@ -5124,7 +5326,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.status.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ],
                     "contains": [
                         "url"
@@ -5148,7 +5350,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.status.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10000"
+                        "http://10.10.123.124:8080/rest/api/2/status/10000"
                     ],
                     "contains": [
                         "url"
@@ -5186,7 +5388,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.status.statusCategory.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ],
                     "contains": [
                         "url"
@@ -5217,7 +5419,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/11839"
+                        "http://10.10.123.124:8080/rest/api/2/issue/11839"
                     ],
                     "contains": [
                         "url"
@@ -5264,7 +5466,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/PHANINCIDE-317/votes"
+                        "http://10.10.123.124:8080/rest/api/2/issue/PHANINCIDE-317/votes"
                     ]
                 },
                 {
@@ -5289,7 +5491,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/PHANINCIDE-317/watchers"
+                        "http://10.10.123.124:8080/rest/api/2/issue/PHANINCIDE-317/watchers"
                     ]
                 },
                 {
@@ -5365,6 +5567,9 @@
                     "data_type": "string",
                     "example_values": [
                         "PRJ"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -5435,6 +5640,253 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "search users",
+            "description": "Get a list of user Resources that match the specified search string",
+            "type": "investigate",
+            "identifier": "search_users",
+            "read_only": true,
+            "verbose": "The default value for the parameter <b>'start_index'</b> is <b>0</b> and for <b>'max_results'</b> is <b>1000</b>. The maximum number of tickets as specified by the parameter <b>'max_results'</b> will be fetched starting from the index specified by the parameter <b>'start_index'</b>.For JIRA on-prem, you have to provide 'username' action parameter, and, for JIRA cloud, you have to provide 'diaplay name' action parameter. If both are not provided or provided it will throws an error.",
+            "parameters": {
+                "username": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "A string to match usernames, name or email against for JIRA on-prem",
+                    "contains": [
+                        "user name"
+                    ],
+                    "required": false,
+                    "primary": true
+                },
+                "display_name": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "A string to match display name for JIRA cloud",
+                    "contains": [
+                        "jira user display name"
+                    ],
+                    "required": false,
+                    "primary": true
+                },
+                "start_index": {
+                    "description": "Start index of the list",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "default": 0
+                },
+                "max_results": {
+                    "description": "Maximum number of users to return",
+                    "data_type": "numeric",
+                    "order": 3,
+                    "default": 1000
+                }
+            },
+            "render": {
+                "type": "custom",
+                "view": "jira_view.display_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_index",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name",
+                        "test3.test"
+                    ],
+                    "contains": [
+                        "jira user display name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.locale",
+                    "data_type": "string",
+                    "example_values": [
+                        "en_US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://10.1.16.180:8080/rest/api/2/user?username=test"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.24x24",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=24"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.16x16",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=16"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.48x48",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=48"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.32x32",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=32"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@domain.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timeZone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        4
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.accountType",
+                    "data_type": "string",
+                    "example_values": [
+                        "atlassian"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "5d2ef6aa6637260c19b78dfd"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name"
+                    ],
+                    "contains": [
+                        "jira user display name"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get ticket",
             "description": "Get ticket (issue) information",
             "type": "investigate",
@@ -5495,7 +5947,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Splunk Test",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -5543,6 +5995,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -5574,7 +6029,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -5584,7 +6039,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -5594,24 +6049,42 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.displayName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "jira user display name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.emailAddress",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.key",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "admin"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.self",
@@ -5620,7 +6093,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -5632,6 +6105,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -5653,7 +6129,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5663,7 +6139,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5673,7 +6149,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5683,7 +6159,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5694,13 +6170,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -5718,13 +6197,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -5741,7 +6223,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.content",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/attachment/10403/Add+Comment.png"
+                        "http://10.10.123.124:8080/secure/attachment/10403/Add+Comment.png"
                     ],
                     "contains": [
                         "url"
@@ -5779,7 +6261,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/attachment/10403"
+                        "http://10.10.123.124:8080/rest/api/2/attachment/10403"
                     ],
                     "contains": [
                         "url"
@@ -5796,7 +6278,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.thumbnail",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/thumbnail/10403/_thumb_10403.png"
+                        "http://10.10.123.124:8080/secure/thumbnail/10403/_thumb_10403.png"
                     ],
                     "contains": [
                         "url"
@@ -5814,7 +6296,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5824,7 +6306,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5834,7 +6316,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5844,7 +6326,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5855,13 +6337,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -5879,13 +6364,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -5923,7 +6411,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/10246/comment/10004"
+                        "http://10.10.123.124:8080/rest/api/2/issue/10246/comment/10004"
                     ],
                     "contains": [
                         "url"
@@ -5941,7 +6429,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5951,7 +6439,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5961,7 +6449,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5971,7 +6459,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -5982,13 +6470,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -6006,13 +6497,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -6087,7 +6581,7 @@
                     "data_path": "action_result.data.*.fields.components.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/component/10104"
+                        "http://10.10.123.124:8080/rest/api/2/component/10104"
                     ],
                     "contains": [
                         "url"
@@ -6105,6 +6599,9 @@
                     "data_type": "string",
                     "example_values": [
                         "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -6129,7 +6626,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6139,7 +6636,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6149,7 +6646,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6159,7 +6656,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6167,13 +6664,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -6191,6 +6691,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -6200,7 +6703,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -6304,7 +6807,7 @@
                     "data_path": "action_result.data.*.fields.fixVersions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -6335,7 +6838,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
+                        "http://10.10.123.124:8080/download/resources/com.thed.zephyr.je/images/icons/ico_zephyr_issuetype.png"
                     ],
                     "contains": [
                         "url"
@@ -6359,7 +6862,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.issuetype.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/10400"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/10400"
                     ],
                     "contains": [
                         "url"
@@ -6377,7 +6880,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/high.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/high.svg"
                     ],
                     "contains": [
                         "url"
@@ -6401,7 +6904,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.priority.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/2"
+                        "http://10.10.123.124:8080/rest/api/2/priority/2"
                     ],
                     "contains": [
                         "url"
@@ -6418,7 +6921,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.iconUrl",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/open.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/open.png"
                     ],
                     "contains": [
                         "url"
@@ -6480,7 +6983,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.statusCategory.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/2"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/2"
                     ],
                     "contains": [
                         "url"
@@ -6505,13 +7008,16 @@
                     "data_type": "string",
                     "example_values": [
                         "ZEP-14"
+                    ],
+                    "contains": [
+                        "jira ticket key"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/11849"
+                        "http://10.10.123.124:8080/rest/api/2/issue/11849"
                     ],
                     "contains": [
                         "url"
@@ -6521,7 +7027,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLink/10615"
+                        "http://10.10.123.124:8080/rest/api/2/issueLink/10615"
                     ],
                     "contains": [
                         "url"
@@ -6559,7 +7065,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.type.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issueLinkType/10000"
+                        "http://10.10.123.124:8080/rest/api/2/issueLinkType/10000"
                     ],
                     "contains": [
                         "url"
@@ -6586,7 +7092,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
                     ]
                 },
                 {
@@ -6613,7 +7119,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/1"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/1"
                     ]
                 },
                 {
@@ -6645,7 +7151,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ]
                 },
                 {
@@ -6669,7 +7175,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ]
                 },
                 {
@@ -6693,7 +7199,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=xsmall&avatarId=10403"
                     ]
                 },
                 {
@@ -6703,7 +7209,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=small&avatarId=10403"
                     ]
                 },
                 {
@@ -6713,7 +7219,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=medium&avatarId=10403"
                     ]
                 },
                 {
@@ -6723,7 +7229,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?avatarId=10403"
                     ]
                 },
                 {
@@ -6738,6 +7244,9 @@
                     "data_type": "string",
                     "example_values": [
                         "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -6789,14 +7298,15 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/project/10100"
+                        "http://10.10.123.124:8080/rest/api/2/project/10100"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.project.simplified",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -6821,7 +7331,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6831,7 +7341,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6841,7 +7351,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6851,7 +7361,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -6859,13 +7369,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.reporter.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -6883,6 +7396,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -6892,7 +7408,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -6931,7 +7447,7 @@
                     "data_path": "action_result.data.*.fields.resolution.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/resolution/10000"
+                        "http://10.10.123.124:8080/rest/api/2/resolution/10000"
                     ],
                     "contains": [
                         "url"
@@ -6965,7 +7481,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/closed.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/closed.png"
                     ]
                 },
                 {
@@ -6989,7 +7505,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10001"
+                        "http://10.10.123.124:8080/rest/api/2/status/10001"
                     ]
                 },
                 {
@@ -7027,7 +7543,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/3"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/3"
                     ]
                 },
                 {
@@ -7097,7 +7613,7 @@
                     "data_path": "action_result.data.*.fields.versions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -7118,7 +7634,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/votes"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/votes"
                     ]
                 },
                 {
@@ -7143,7 +7659,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/watchers"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/watchers"
                     ]
                 },
                 {
@@ -7220,6 +7736,9 @@
                     "data_type": "string",
                     "example_values": [
                         "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -7334,7 +7853,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a sample status change comment of the ticket"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -7348,7 +7870,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.resolution",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "In Progress"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.status",
@@ -7375,88 +7900,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
                     "data_path": "action_result.data.*.fields.Epic Link",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Splunk Test",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -7514,7 +7962,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -7524,7 +7972,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -7534,7 +7982,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -7544,24 +7992,45 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.displayName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "jira user display name"
+                    ],
+                    "example_values": [
+                        "Test Name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.emailAddress",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.key",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.assignee.self",
@@ -7570,7 +8039,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -7589,7 +8058,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7599,7 +8068,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7609,7 +8078,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7619,7 +8088,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7630,13 +8099,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -7654,13 +8126,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.attachment.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -7677,7 +8152,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.content",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/attachment/10403/Add+Comment.png"
+                        "http://10.10.123.124:8080/secure/attachment/10403/Add+Comment.png"
                     ],
                     "contains": [
                         "url"
@@ -7715,7 +8190,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/attachment/10403"
+                        "http://10.10.123.124:8080/rest/api/2/attachment/10403"
                     ],
                     "contains": [
                         "url"
@@ -7732,7 +8207,7 @@
                     "data_path": "action_result.data.*.fields.attachment.*.thumbnail",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/thumbnail/10403/_thumb_10403.png"
+                        "http://10.10.123.124:8080/secure/thumbnail/10403/_thumb_10403.png"
                     ],
                     "contains": [
                         "url"
@@ -7750,7 +8225,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7760,7 +8235,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7770,7 +8245,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7780,7 +8255,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7791,13 +8266,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -7815,13 +8293,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.author.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -7859,7 +8340,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/10246/comment/10004"
+                        "http://10.10.123.124:8080/rest/api/2/issue/10246/comment/10004"
                     ],
                     "contains": [
                         "url"
@@ -7877,7 +8358,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.16x16",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7887,7 +8368,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.24x24",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7897,7 +8378,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7907,7 +8388,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.avatarUrls.48x48",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ],
                     "contains": [
                         "url"
@@ -7918,13 +8399,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -7942,13 +8426,16 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.comment.comments.*.updateAuthor.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ],
                     "contains": [
                         "url"
@@ -8007,7 +8494,7 @@
                     "data_path": "action_result.data.*.fields.components.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/component/10104"
+                        "http://10.10.123.124:8080/rest/api/2/component/10104"
                     ],
                     "contains": [
                         "url"
@@ -8035,7 +8522,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8045,7 +8532,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8055,7 +8542,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8065,7 +8552,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8073,13 +8560,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.creator.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -8106,7 +8596,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -8210,7 +8700,7 @@
                     "data_path": "action_result.data.*.fields.fixVersions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -8237,7 +8727,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
+                        "http://10.10.123.124:8080/secure/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype"
                     ]
                 },
                 {
@@ -8264,7 +8754,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issuetype/1"
+                        "http://10.10.123.124:8080/rest/api/2/issuetype/1"
                     ]
                 },
                 {
@@ -8296,7 +8786,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/priorities/medium.svg"
+                        "http://10.10.123.124:8080/images/icons/priorities/medium.svg"
                     ]
                 },
                 {
@@ -8320,7 +8810,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/priority/3"
+                        "http://10.10.123.124:8080/rest/api/2/priority/3"
                     ]
                 },
                 {
@@ -8344,7 +8834,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=xsmall&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=xsmall&avatarId=10403"
                     ]
                 },
                 {
@@ -8354,7 +8844,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=small&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=small&avatarId=10403"
                     ]
                 },
                 {
@@ -8364,7 +8854,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?size=medium&avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?size=medium&avatarId=10403"
                     ]
                 },
                 {
@@ -8374,7 +8864,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/projectavatar?avatarId=10403"
+                        "http://10.10.123.124:8080/secure/projectavatar?avatarId=10403"
                     ]
                 },
                 {
@@ -8389,6 +8879,9 @@
                     "data_type": "string",
                     "example_values": [
                         "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -8405,7 +8898,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/project/10100"
+                        "http://10.10.123.124:8080/rest/api/2/project/10100"
                     ]
                 },
                 {
@@ -8423,7 +8916,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=xsmall&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8433,7 +8926,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=small&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8443,7 +8936,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?size=medium&ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8453,7 +8946,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/secure/useravatar?ownerId=admin&avatarId=10500"
+                        "http://10.10.123.124:8080/secure/useravatar?ownerId=admin&avatarId=10500"
                     ]
                 },
                 {
@@ -8461,13 +8954,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.reporter.emailAddress",
                     "data_type": "string",
                     "example_values": [
-                        "notifications@splunk.us"
+                        "notifications@domain.us"
                     ],
                     "contains": [
                         "email"
@@ -8485,6 +8981,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -8494,7 +8993,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/user?username=admin"
+                        "http://10.10.123.124:8080/rest/api/2/user?username=admin"
                     ]
                 },
                 {
@@ -8529,7 +9028,7 @@
                     "data_path": "action_result.data.*.fields.resolution.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/resolution/10000"
+                        "http://10.10.123.124:8080/rest/api/2/resolution/10000"
                     ],
                     "contains": [
                         "url"
@@ -8556,7 +9055,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/images/icons/statuses/closed.png"
+                        "http://10.10.123.124:8080/images/icons/statuses/closed.png"
                     ]
                 },
                 {
@@ -8580,7 +9079,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/status/10001"
+                        "http://10.10.123.124:8080/rest/api/2/status/10001"
                     ]
                 },
                 {
@@ -8618,7 +9117,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/statuscategory/3"
+                        "http://10.10.123.124:8080/rest/api/2/statuscategory/3"
                     ]
                 },
                 {
@@ -8681,7 +9180,7 @@
                     "data_path": "action_result.data.*.fields.versions.*.self",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/version/10000"
+                        "http://10.10.123.124:8080/rest/api/2/version/10000"
                     ],
                     "contains": [
                         "url"
@@ -8702,7 +9201,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/votes"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/votes"
                     ]
                 },
                 {
@@ -8727,7 +9226,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://10.1.99.111:8080/rest/api/2/issue/MAN-1/watchers"
+                        "http://10.10.123.124:8080/rest/api/2/issue/MAN-1/watchers"
                     ]
                 },
                 {
@@ -8804,6 +9303,9 @@
                     "data_type": "string",
                     "example_values": [
                         "MAN"
+                    ],
+                    "contains": [
+                        "jira project key"
                     ]
                 },
                 {
@@ -8937,7 +9439,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "This is sample comment for the link tickets"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.comment_visibility_name",
@@ -8979,7 +9484,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.link_type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Duplicate"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.to_id",
@@ -9047,13 +9555,23 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to add to the watchers list",
+                    "description": "Username of the user to add to the watchers list(Use it for Jira on-prem)",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "contains": [
                         "user name"
                     ],
                     "order": 1,
+                    "primary": true
+                },
+                "user_account_id": {
+                    "description": "Account ID of the user to add to the watchers list(Use it for Jira cloud)",
+                    "data_type": "string",
+                    "required": false,
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "order": 2,
                     "primary": true
                 }
             },
@@ -9066,7 +9584,7 @@
                         "failed"
                     ],
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -9091,6 +9609,18 @@
                     ],
                     "column_name": "Username",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.user_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "column_name": "Account ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
@@ -9149,13 +9679,23 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to remove from the watchers list",
+                    "description": "Username of the user to add to the watchers list(Use it for Jira on-prem)",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "contains": [
                         "user name"
                     ],
                     "order": 1,
+                    "primary": true
+                },
+                "user_account_id": {
+                    "description": "Account ID of the user to add to the watchers list(Use it for Jira cloud)",
+                    "data_type": "string",
+                    "required": false,
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "order": 2,
                     "primary": true
                 }
             },
@@ -9168,7 +9708,7 @@
                         "failed"
                     ],
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -9193,6 +9733,18 @@
                     ],
                     "column_name": "Username",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.user_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "column_name": "Account ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",

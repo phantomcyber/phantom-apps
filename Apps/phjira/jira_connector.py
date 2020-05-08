@@ -17,6 +17,7 @@ from jira.client import JIRA
 from datetime import *
 from dateutil.parser import parse
 
+from builtins import str
 import dateutil
 import requests
 import tempfile
@@ -52,6 +53,7 @@ class JiraConnector(phantom.BaseConnector):
     ACTION_ID_REMOVE_WATCHER = "remove_watcher"
     ACTION_ID_ON_POLL = "on_poll"
     ACTION_ID_GET_ATTACHMENTS = "get_attachments"
+    ACTION_ID_SEARCH_USERS = "search_users"
 
     def __init__(self):
 
@@ -75,7 +77,162 @@ class JiraConnector(phantom.BaseConnector):
         self._host = self._base_url[self._base_url.find('//') + 2:]
         self._timezone = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_TIMEZONE, JIRA_JSON_DEFAULT_TIMEZONE))
 
+        self._verify_cert = config[phantom.APP_JSON_VERIFY]
+        self._username = self._handle_py_ver_compat_for_input_str(config[phantom.APP_JSON_USERNAME])
+        self._password = config[phantom.APP_JSON_PASSWORD]
+        self._custom_fields = None
+        self._custom_fields_list = None
+
         return phantom.APP_SUCCESS
+
+    def _process_empty_response(self, response, action_result):
+        """ This function is used to process empty response.
+        :param response: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
+        if response.status_code == 200 or response.status_code == 204:
+            return phantom.APP_SUCCESS, {}
+
+        return action_result.set_status(phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)), None
+
+    def _process_html_response(self, response, action_result):
+        """ This function is used to process html response.
+        :param response: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
+        # An html response, treat it like an error
+        status_code = response.status_code
+
+        if 200 <= status_code < 399:
+            return phantom.APP_SUCCESS, response.text
+
+        try:
+            soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
+            split_lines = error_text.split('\n')
+            split_lines = [x.strip() for x in split_lines if x.strip()]
+            error_text = '\n'.join(split_lines)
+        except:
+            error_text = "Cannot parse error details"
+
+        error_text = self._handle_py_ver_compat_for_input_str(error_text)
+
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+
+        message = message.replace('{', '{{').replace('}', '}}')
+
+        return action_result.set_status(phantom.APP_ERROR, message), None
+
+    def _process_json_response(self, r, action_result):
+        """ This function is used to process json response.
+        :param r: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
+        # Try a json parse
+        try:
+            resp_json = r.json()
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), None
+
+        # Please specify the status codes here
+        if 200 <= r.status_code < 399:
+            return phantom.APP_SUCCESS, resp_json
+
+        message = None
+        # Error handling for different type of error responses from server
+        if resp_json.get('errorMessages'):
+            resp_message = self._handle_py_ver_compat_for_input_str(", ".join(resp_json.get('errorMessages', "Error message not found")))
+            message = "Error from server. Status code: {}. Data from server: {}".format(r.status_code, resp_message)
+
+        # You should process the error returned in the json if none of the above handling happens for error scenario
+        if not message:
+            resp_text = self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}') if r.text else "Response error text not found")
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, resp_text)
+
+        return action_result.set_status(phantom.APP_ERROR, message), None
+
+    def _process_response(self, r, action_result):
+        """ This function is used to process API response.
+        :param r: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
+        # Store the r_text in debug data, it will get dumped in the logs if the action fails
+        if hasattr(action_result, 'add_debug_data'):
+            action_result.add_debug_data({'r_status_code': r.status_code})
+            action_result.add_debug_data({'r_text': r.text})
+            action_result.add_debug_data({'r_headers': r.headers})
+
+        # Process each 'Content-Type' of response separately
+
+        # Process a json response
+        if 'json' in r.headers.get('Content-Type', ''):
+            if not r.text:
+                return self._process_empty_response(r, action_result)
+            return self._process_json_response(r, action_result)
+
+        # Process an HTML response, Do this no matter what the api talks.
+        # There is a high chance of a PROXY in between phantom and the rest of
+        # world, in case of errors, PROXY's return HTML, this function parses
+        # the error and adds it to the action_result.
+        if 'html' in r.headers.get('Content-Type', ''):
+            return self._process_html_response(r, action_result)
+
+        # it's not content-type that is to be parsed, handle an empty response
+        if not r.text:
+            return self._process_empty_response(r, action_result)
+
+        # everything else is actually an error at this point
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+                r.status_code, UnicodeDammit(r.text.replace(u'{', '{{').replace(u'}', '}}') if r.text else "Response error text not found").unicode_markup.encode('UTF-8'))
+
+        return action_result.set_status(phantom.APP_ERROR, message), None
+
+    def _make_rest_call(self, endpoint, action_result, method="get", params=None):
+        """ Function that makes the REST call to the app.
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param action_result: object of ActionResult class
+        :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
+        :param params: request parameters
+        :param data: request body
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        response obtained by making an API call
+        """
+        resp_json = None
+
+        try:
+            request_func = getattr(requests, method)
+        except AttributeError:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json
+
+        # Create headers information
+        headers = dict()
+
+        headers.update({'Content-Type': 'application/json'})
+
+        # Create a URL to connect to Flashpoint
+        url = "{}/rest/api/2/{}".format(self._base_url, endpoint)
+
+        self.debug_print("Making a REST call with provided request parameters")
+
+        try:
+            r = request_func(url, auth=(self._username, self._password), params=params, headers=headers)
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), resp_json
+
+        return self._process_response(r, action_result)
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -193,30 +350,27 @@ class JiraConnector(phantom.BaseConnector):
                 error_text = "Unable to parse the details of the error received in the output response"
 
         if "Epic Name is required" in error_text:
-            error_text = "{}. {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"custom_field\" : \"epic_name\" } ")
+            error_text = "{}. {}".format(error_text, "Please create a custom field for Epic Name and provide it in the fields parameter as { \"customfield_Id\" : \"epic_name\" }")
+
+        if error_text:
+            error_text = self._handle_py_ver_compat_for_input_str(error_text)
 
         return result_object.set_status(phantom.APP_ERROR, "{0}. Message: {1}".format(message, error_text))
 
     def _create_jira_object(self):
 
-        config = self.get_config()
-
-        verify_cert = config[phantom.APP_JSON_VERIFY]
-        username = self._handle_py_ver_compat_for_input_str(config[phantom.APP_JSON_USERNAME])
-        password = config[phantom.APP_JSON_PASSWORD]
-
-        if (not verify_cert):
+        if (not self._verify_cert):
             if ('REQUESTS_CA_BUNDLE' in os.environ):
                 del os.environ['REQUESTS_CA_BUNDLE']
 
         # create the options dictionary
-        options = {'server': self._base_url, 'verify': verify_cert}
+        options = {'server': self._base_url, 'verify': self._verify_cert}
 
         signal.signal(signal.SIGALRM, timeout_handler)
         signal.alarm(JIRA_START_TIMEOUT)
 
         try:
-            self._jira = JIRA(options=options, basic_auth=(username, password))
+            self._jira = JIRA(options=options, basic_auth=(self._username, self._password))
         except Timeout:
             return self.set_status(phantom.APP_ERROR, JIRA_ERR_API_TIMEOUT)
         except Exception as e:
@@ -448,7 +602,7 @@ class JiraConnector(phantom.BaseConnector):
         transitions = self._jira.transitions(issue_id)
 
         try:
-            transition_info = [x for x in transitions if x['name'] == status_to_set]
+            transition_info = [x for x in transitions if self._handle_py_ver_compat_for_input_str(x['name']) == status_to_set]
         except:
             return action_result.set_status(phantom.APP_ERROR, "Unable to parse response from server while trying to get information about status values.")
 
@@ -456,7 +610,8 @@ class JiraConnector(phantom.BaseConnector):
             message = JIRA_ERR_ISSUE_VALID_TRANSITIONS
             valid_transitions = self._get_list_string(transitions)
             if (valid_transitions):
-                message = "{0}. Valid status value(s): {1}".format(message, ', '.join(valid_transitions))
+                valid_transitions = self._handle_py_ver_compat_for_input_str(', '.join(valid_transitions))
+                message = "{0}. Valid status value(s): {1}".format(message, valid_transitions)
             return action_result.set_status(phantom.APP_ERROR, message)
 
         try:
@@ -474,7 +629,7 @@ class JiraConnector(phantom.BaseConnector):
             resolutions = self._jira.resolutions()
 
             try:
-                resolution_info = [x for x in resolutions if x.name == resolution_to_set]
+                resolution_info = [x for x in resolutions if self._handle_py_ver_compat_for_input_str(x.name) == resolution_to_set]
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Unable to parse response from server while trying to get resolution about status values")
 
@@ -482,7 +637,8 @@ class JiraConnector(phantom.BaseConnector):
                 message = JIRA_ERR_ISSUE_VALID_RESOLUTION
                 valid_resolutions = self._get_list_string(resolutions)
                 if (valid_resolutions):
-                    message = "{0} Valid resolution value(s): {1}".format(message, ', '.join(valid_resolutions))
+                    valid_resolutions = self._handle_py_ver_compat_for_input_str(', '.join(valid_resolutions))
+                    message = "{0} Valid resolution value(s): {1}".format(message, valid_resolutions)
                 return action_result.set_status(phantom.APP_ERROR, message)
 
             try:
@@ -607,9 +763,7 @@ class JiraConnector(phantom.BaseConnector):
         if (attachment_status):
 
             if (action_result.get_message()):
-                action_result.set_status(phantom.APP_ERROR)
-                action_result.append_to_message(attachment_status)
-
+                action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(action_result.get_message(), attachment_status))
             else:
                 action_result.set_status(phantom.APP_ERROR, attachment_status)
 
@@ -772,18 +926,19 @@ class JiraConnector(phantom.BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_CREATED.format(id=new_issue.id, key=new_issue.key))
+        status_message = JIRA_SUCC_TICKET_CREATED.format(id=new_issue.id, key=new_issue.key)
 
         result_data = action_result.get_data()[0]
 
         if (assignee_status):
-            action_result.append_to_message(assignee_status)
+            status_message = "{} {}".format(status_message, assignee_status)
             result_data['assign_error'] = assignee_status
 
         if (attachment_status):
-            action_result.append_to_message(attachment_status)
+            status_message = "{} {}".format(status_message, attachment_status)
             result_data['attach_error'] = attachment_status
 
+        action_result.set_status(phantom.APP_SUCCESS, status_message)
         return action_result.get_status()
 
     def _list_tickets(self, param):
@@ -811,7 +966,7 @@ class JiraConnector(phantom.BaseConnector):
         if start_index is None:
             return action_result.get_status()
 
-        limit = param.get(JIRA_JSON_MAX_RESULTS)
+        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_RESULTS)
         limit = self._validate_integers(action_result, limit, 'limit')
         if limit is None:
             return action_result.get_status()
@@ -837,6 +992,130 @@ class JiraConnector(phantom.BaseConnector):
 
         summary = action_result.update_summary({})
         summary[JIRA_TOTAL_ISSUES] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _username_paginator(self, username, action_result, start_index=0, limit=None):
+
+        users_list = list()
+
+        while True:
+            try:
+                users = self._jira.search_users(user=username, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS)
+            except Exception as e:
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
+
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users. Error: {0}".format(
+                            error_text))
+
+                return None
+
+            if users is None:
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination.')
+                return None
+
+            users_list.extend(users)
+
+            if limit and len(users_list) >= limit:
+                return users_list[:limit]
+
+            if len(users) < DEFAULT_MAX_RESULTS:
+                break
+
+            start_index = start_index + DEFAULT_MAX_RESULTS
+
+        return users_list
+
+    def _display_name_paginator(self, display_name, action_result, start_index=0, limit=None):
+
+        users_list = list()
+        param = dict()
+
+        param.update({
+            "includeActive": True,
+            "includeInactive": False,
+            "maxResults": DEFAULT_MAX_RESULTS,
+            "startAt": start_index,
+            "query": "displayName=\"{0}\"".format(display_name)
+        })
+        while True:
+            try:
+                ret_val, users = self._make_rest_call("user/search", action_result, params=param)
+            except Exception as e:
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users. Error: {0}".format(
+                            error_text))
+                return None
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            if users is None:
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination.')
+                return None
+
+            users_list.extend(users)
+
+            if limit and len(users_list) >= limit:
+                return users_list[:limit]
+
+            if len(users) < DEFAULT_MAX_RESULTS:
+                break
+
+            param.update({"startAt": start_index + DEFAULT_MAX_RESULTS})
+
+        return users_list
+
+    def _handle_search_users(self, param):
+
+        # Progress
+        self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
+
+        # Connectivity
+        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+
+        # Create the jira object
+        if (phantom.is_fail(self._create_jira_object())):
+            return self.get_status()
+
+        action_result = self.add_action_result(phantom.ActionResult(param))
+
+        # get all the params for the search issue
+        username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_USERNAME))
+        display_name = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_DISPLAY_NAME))
+
+        if (display_name and username) or (not display_name and not username):
+            return action_result.set_status(phantom.APP_ERROR, JIRA_SEARCH_USERS_ERROR)
+
+        start_index = param.get(JIRA_JSON_START_INDEX, DEFAULT_START_INDEX)
+        start_index = self._validate_integers(action_result, start_index, 'start_index', allow_zero=True)
+        if start_index is None:
+            return action_result.get_status()
+
+        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_RESULTS)
+        limit = self._validate_integers(action_result, limit, 'limit')
+        if limit is None:
+            return action_result.get_status()
+
+        if display_name:
+            users = self._display_name_paginator(display_name, action_result, start_index=start_index, limit=limit)
+        else:
+            users = self._username_paginator(username, action_result, start_index=start_index, limit=limit)
+
+        if users is None:
+            return action_result.get_status()
+
+        for user in users:
+            if display_name:
+                action_result.add_data(user)
+            else:
+                action_result.add_data(user.raw)
+
+        summary = action_result.update_summary({})
+        summary[JIRA_TOTAL_USERS] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -941,10 +1220,10 @@ class JiraConnector(phantom.BaseConnector):
 
         # Check for file in vault
         try:
-            meta = Vault.get_file_info(vault_id)  # Vault IDs are unique
+            meta = Vault.get_file_info(vault_id=vault_id)  # Vault IDs are unique
 
             if (not meta):
-                self.debug_print("Error while attaching")
+                self.debug_print("Error fetching meta information attachment")
                 return JIRA_ERR_FILE_NOT_IN_VAULT
 
         except:
@@ -952,11 +1231,35 @@ class JiraConnector(phantom.BaseConnector):
 
         meta = meta[0]
 
-        # Attach file to ticket
         try:
             path = Vault.get_file_path(vault_id)
-            with open(path, 'rb') as f:
-                self._jira.add_attachment(issue=issue, attachment=f, filename=meta['name'])
+            filename = meta["name"]
+
+            try:
+                self.debug_print("First attempt to add attachment to the given Jira ticket ID")
+                with open(path, 'rb') as f:
+                    self._jira.add_attachment(issue=issue, attachment=f, filename=filename)
+            except Exception as e:
+                self.debug_print("First attempt failed while adding attachment to the given Jira ticket ID")
+                try:
+                    # This faliure might be happened beacuse if we let pass the Unicode chars with filename into the add_attachment() method of Jira SDK,
+                    # it throws 500 Internal Server Error and it will fail to add attachment on the Jira ticket.
+                    self.debug_print("Try to remove non-ASCII Unicode chars from the filename")
+                    modified_filename = filename.encode('ascii', 'ignore').decode('ascii')
+                    modified_filename = modified_filename.replace("\r", " ").replace("\n", " ")
+                except:
+                    pass
+
+                # this condition will check that whether filename has Unicode chars or not, and if not it will re-thorw the same exception
+                if len(modified_filename) < len(filename):
+                    self.debug_print("Add prefix to filename after removing non-ASCII Unicode chars")
+                    filename = "FILENAME_ASCII_{}".format(modified_filename)
+                    with open(path, 'rb') as f:
+                        self._jira.add_attachment(issue=issue, attachment=f, filename=filename)
+                else:
+                    self.debug_print("Raise the same exception as filename doesn't have Unicode chars")
+                    raise e
+
         except Exception as e:
             self.debug_print("Error while attaching")
 
@@ -1094,10 +1397,10 @@ class JiraConnector(phantom.BaseConnector):
 
         return container_id
 
-    def _get_artifact_id(self, sdi, container_id, issue_type="issue", full_artifact=False):
+    def _get_artifact_id(self, sdi, container_id, full_artifact=False):
 
-        url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&_filter_label="{3}"&sort=id&order=desc'.format(
-                        self.get_phantom_base_url(), sdi, container_id, issue_type.lower())
+        url = '{0}rest/artifact?_filter_source_data_identifier="{1}"&_filter_container_id={2}&sort=id&order=desc'.format(
+                        self.get_phantom_base_url(), sdi, container_id)
 
         try:
             r = requests.get(url, verify=False)
@@ -1221,20 +1524,13 @@ class JiraConnector(phantom.BaseConnector):
         except:
             pass
 
-        config = self.get_config()
-        custom_fields = config.get(JIRA_JSON_CUSTOM_FIELDS)
-
-        if custom_fields:
-
-            custom_fields_list = [x.strip() for x in custom_fields.split(',')]
-            custom_fields_list = list(filter(None, custom_fields_list))
-
+        if self._custom_fields_list:
             custom_fields_by_name = self._fetch_fields_by_replacing_custom_fields_id_to_name(issue, action_result)
 
             if custom_fields_by_name is None:
                 return None
 
-            for custom_field in custom_fields_list:
+            for custom_field in self._custom_fields_list:
                 try:
                     artifact_cef[custom_field] = custom_fields_by_name[custom_field]
                 except:
@@ -1288,43 +1584,61 @@ class JiraConnector(phantom.BaseConnector):
 
     def _handle_attachment(self, attachment, container_id, artifact_list, action_result):
 
-        if hasattr(Vault, 'get_vault_tmp_dir'):
-            tmp = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
-        else:
-            tmp = tempfile.NamedTemporaryFile(dir='/opt/phantom/vault/tmp/', delete=False)
+        try:
+            if hasattr(Vault, 'get_vault_tmp_dir'):
+                tmp = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+            else:
+                tmp = tempfile.NamedTemporaryFile(dir='/opt/phantom/vault/tmp/', delete=False)
 
-        ret_val = self._download_file(attachment.content, tmp.name)
+            ret_val = self._download_file(attachment.content, tmp.name)
 
-        if (phantom.is_fail(ret_val)):
+            if (phantom.is_fail(ret_val)):
+                return phantom.APP_ERROR
+
+            filename = self._handle_py_ver_compat_for_input_str(attachment.filename)
+
+            vault_ret = Vault.add_attachment(tmp.name, container_id, filename)
+
+            if not vault_ret.get('succeeded'):
+                self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
+                return phantom.APP_ERROR
+
+            artifact_json = {}
+
+            artifact_json['name'] = 'attachment - {0}'.format(filename)
+            artifact_json['label'] = 'attachment'
+            artifact_json['container_id'] = container_id
+            artifact_json['source_data_identifier'] = attachment.id
+
+            artifact_cef = {}
+
+            artifact_cef['size'] = attachment.size
+            artifact_cef['created'] = attachment.created
+            artifact_cef['filename'] = filename
+            artifact_cef['mimeType'] = attachment.mimeType
+
+            try:
+                artifact_cef['author'] = attachment.author.name
+                artifact_cef['author_account_id'] = None
+                artifact_cef['is_on_prem'] = True
+            except:
+                self.debug_print("Exception occurred when server is Jira cloud. So try to fetch author display name and account ID")
+                artifact_cef['author_account_id'] = attachment.author.accountId
+                artifact_cef['author'] = attachment.author.displayName
+                artifact_cef['is_on_prem'] = False
+
+            artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
+
+            artifact_json['cef'] = artifact_cef
+
+            artifact_list.append(artifact_json)
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+
+            action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the attachment artifact. Error message: {0}".format(
+                        error_text))
             return phantom.APP_ERROR
-
-        filename = self._handle_py_ver_compat_for_input_str(attachment.filename)
-
-        vault_ret = Vault.add_attachment(tmp.name, container_id, filename)
-
-        if not vault_ret.get('succeeded'):
-            self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
-            return phantom.APP_ERROR
-
-        artifact_json = {}
-
-        artifact_json['name'] = 'attachment - {0}'.format(filename)
-        artifact_json['label'] = 'attachment'
-        artifact_json['container_id'] = container_id
-        artifact_json['source_data_identifier'] = attachment.id
-
-        artifact_cef = {}
-
-        artifact_cef['size'] = attachment.size
-        artifact_cef['created'] = attachment.created
-        artifact_cef['filename'] = filename
-        artifact_cef['mimeType'] = attachment.mimeType
-        artifact_cef['author'] = attachment.author.name
-        artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
-
-        artifact_json['cef'] = artifact_cef
-
-        artifact_list.append(artifact_json)
 
         return phantom.APP_SUCCESS
 
@@ -1333,7 +1647,21 @@ class JiraConnector(phantom.BaseConnector):
         try:
             artifact_json = {}
 
-            artifact_json['name'] = '{0} by {1}'.format(base_name, comment.author.name)
+            try:
+                author = comment.author.name
+                updateAuthor = comment.updateAuthor.name
+                author_account_id = None
+                updateAuthor_account_id = None
+                is_on_prem = True
+            except:
+                self.debug_print("Exception occurred when server is Jira cloud. So try to fetch author display name and account ID")
+                author = comment.author.displayName
+                updateAuthor = comment.updateAuthor.displayName
+                author_account_id = comment.author.accountId
+                updateAuthor_account_id = comment.updateAuthor.accountId
+                is_on_prem = False
+
+            artifact_json['name'] = '{0} by {1}'.format(base_name, author)
             artifact_json['label'] = 'comment'
             artifact_json['container_id'] = container_id
             artifact_json['source_data_identifier'] = comment.id
@@ -1343,8 +1671,11 @@ class JiraConnector(phantom.BaseConnector):
             artifact_cef['body'] = comment.body
             artifact_cef['created'] = comment.created
             artifact_cef['updated'] = comment.updated
-            artifact_cef['author'] = comment.author.name
-            artifact_cef['updateAuthor'] = comment.updateAuthor.name
+            artifact_cef['is_on_prem'] = is_on_prem
+            artifact_cef['author'] = author
+            artifact_cef['author_account_id'] = author_account_id
+            artifact_cef['updateAuthor'] = updateAuthor
+            artifact_cef['updateAuthor_account_id'] = updateAuthor_account_id
 
             artifact_json['cef'] = artifact_cef
 
@@ -1424,7 +1755,7 @@ class JiraConnector(phantom.BaseConnector):
         comment = None
 
         try:
-            link_type.encode('utf-8')
+            UnicodeDammit(link_type).unicode_markup.encode('utf-8')
         except:
             return action_result.set_status(phantom.APP_ERROR, "Parameter value failed validation. Enter a valid value.")
 
@@ -1459,28 +1790,35 @@ class JiraConnector(phantom.BaseConnector):
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ISSUE_ID])
-        username = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_WATCHER])
+        username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_WATCHER))
+        account_id = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_USER_ACCOUNT_ID))
 
-        ret_val, watchers = self.get_watchers_list(action_result, issue_id)
+        if (account_id and username) or (not account_id and not username):
+            return action_result.set_status(phantom.APP_ERROR, JIRA_WATCHERS_ERROR)
+
+        ret_val, watchers = self.get_watchers_list(action_result, issue_id, True if username else False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if username.lower() in watchers:
-            return action_result.set_status(phantom.APP_ERROR, "The given username already exists in the watchers list of the issue: {0}".format(issue_id))
+        if (username and username in watchers) or (account_id and account_id in watchers):
+            return action_result.set_status(phantom.APP_SUCCESS, "The given user already exists in the watchers list of the issue: {0}".format(issue_id))
+
+        user = username if username else account_id
 
         try:
-            self._jira.add_watcher(issue_id, username)
+            self._jira.add_watcher(issue_id, user)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
-            self.save_progress("Response from the server: {0}".format(error_text))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add the watcher. Please check the provided parameters.")
+            err = "Response from the server: {0}".format(error_text)
+            self.save_progress(err)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to add the watcher. Please check the provided parameters. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added the user to the watchers list of the issue ID: {0}".format(issue_id))
 
-    def get_watchers_list(self, action_result, issue_id):
+    def get_watchers_list(self, action_result, issue_id, flag=False):
 
         try:
             response = self._jira.watchers(issue_id)
@@ -1492,10 +1830,24 @@ class JiraConnector(phantom.BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, error_text), None
 
         watcher_list = list()
-        for watcher in response.watchers:
-            watcher_list.append(str(watcher.name))
+        watchers = response.raw.get('watchers', [])
 
-        return phantom.APP_SUCCESS, list(map(str.lower, watcher_list))
+        try:
+            for watcher in watchers:
+                if flag:
+                    watcher_list.append(watcher['name'])
+                else:
+                    watcher_list.append(watcher['accountId'])
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, JIRA_WATCHERS_ERROR), None
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Error occurred while fetching the watchers list. Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+
+            self.save_progress("Response from the server: {}".format(error_text))
+            return action_result.set_status(phantom.APP_ERROR, error_text), None
+
+        return phantom.APP_SUCCESS, watcher_list
 
     def _handle_remove_watcher(self, param):
 
@@ -1509,9 +1861,13 @@ class JiraConnector(phantom.BaseConnector):
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ISSUE_ID])
-        username = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_WATCHER])
+        username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_WATCHER))
+        account_id = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_USER_ACCOUNT_ID))
 
-        ret_val, watchers = self.get_watchers_list(action_result, issue_id)
+        if (account_id and username) or (not account_id and not username):
+            return action_result.set_status(phantom.APP_ERROR, JIRA_WATCHERS_ERROR)
+
+        ret_val, watchers = self.get_watchers_list(action_result, issue_id, True if username else False)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1519,17 +1875,24 @@ class JiraConnector(phantom.BaseConnector):
         if not watchers:
             return action_result.set_status(phantom.APP_ERROR, "No watchers found in the issue ID: {0}".format(issue_id))
 
-        if username.lower() not in watchers:
-            return action_result.set_status(phantom.APP_ERROR, "The given username is not found in the watchers list of the issue ID: {0}".format(issue_id))
+        if (username and username not in watchers) or (account_id and account_id not in watchers):
+            return action_result.set_status(phantom.APP_SUCCESS, "The given user is not found in the watchers list of the issue: {0}".format(issue_id))
 
         try:
-            self._jira.remove_watcher(issue_id, username)
+            if username:
+                self._jira.remove_watcher(issue_id, username)
+            else:
+                param = {'accountId': account_id}
+                ret_val, _ = self._make_rest_call("issue/{}/watchers".format(issue_id), action_result, params=param, method='delete')
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
-            self.save_progress("Response from the server: {0}".format(error_text))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to remove the watcher. Please check the provided parameters.")
+            err = "Response from the server: {0}".format(error_text)
+            self.save_progress(err)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to remove the watcher. Please check the provided parameters. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed the user from the watchers list of the issue ID: {0}".format(issue_id))
 
@@ -1539,7 +1902,16 @@ class JiraConnector(phantom.BaseConnector):
             with open(full_path, 'wb') as f:
                 attachment_content = attachment.get()
                 f.write(attachment_content)
-            action_result.add_data(Vault.add_attachment(file_location=full_path, container_id=container_id))
+
+            vault_ret = Vault.add_attachment(file_location=full_path, container_id=container_id)
+
+            action_result.add_data(vault_ret)
+
+            if not vault_ret.get('succeeded'):
+                err_msg = vault_ret.get('message', "Could not save file to vault")
+                return action_result.set_status(phantom.APP_ERROR, "Error saving file to vault: {}".format(
+                    self._handle_py_ver_compat_for_input_str(err_msg if err_msg else "Could not save file to vault")))
+
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
             error_text = "Unable to ingest attachments. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
@@ -1575,132 +1947,52 @@ class JiraConnector(phantom.BaseConnector):
             error_text = "Please enter a valid Jira Ticket ID. Please check the provided parameters. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
             return action_result.set_status(phantom.APP_ERROR, error_text)
 
-        if len(jira_issue.fields.attachment) > 0:
-            temp_vault_path = Vault.get_vault_tmp_dir().rstrip('/')
-            if get_all_attachments:
-                for attachment in jira_issue.fields.attachment:
-                    jira_filename = "".join(self._handle_py_ver_compat_for_input_str(attachment.filename).split())
+        try:
+            if len(jira_issue.fields.attachment) > 0:
+                ingest_file_count = 0
+                temp_vault_path = Vault.get_vault_tmp_dir().rstrip('/')
+                if get_all_attachments:
+                    for attachment in jira_issue.fields.attachment:
+                        jira_filename = "".join(self._handle_py_ver_compat_for_input_str(attachment.filename).split())
 
-                    # jira_filename = "".join(str(attachment.filename).split())
-                    full_path = '{}/{}'.format(temp_vault_path, jira_filename)
+                        full_path = '{}/{}'.format(temp_vault_path, jira_filename)
 
-                    ret_val = self._write_in_file(action_result, attachment, full_path, container_id)
-                    if phantom.is_fail(ret_val):
-                        return action_result.get_status()
-
-            elif extension_filter:
-                extension_list = extension_filter.split(',')
-                extension_list = [".{}".format(extension.lstrip('.')) for extension in extension_list]
-
-                for attachment in jira_issue.fields.attachment:
-                    jira_filename = "".join(self._handle_py_ver_compat_for_input_str(attachment.filename).split())
-
-                    # jira_filename = "".join(str(attachment.filename).split())
-                    full_path = '{}/{}'.format(temp_vault_path, jira_filename)
-                    file_extension = ".{}".format(jira_filename.rsplit('.')[-1])
-
-                    if file_extension in extension_list:
                         ret_val = self._write_in_file(action_result, attachment, full_path, container_id)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
 
+                    ingest_file_count = len(jira_issue.fields.attachment)
+
+                elif extension_filter:
+                    extension_list = extension_filter.split(',')
+                    extension_list = [".{}".format(extension.lstrip('.')) for extension in extension_list]
+
+                    for attachment in jira_issue.fields.attachment:
+                        jira_filename = "".join(self._handle_py_ver_compat_for_input_str(attachment.filename).split())
+
+                        full_path = '{}/{}'.format(temp_vault_path, jira_filename)
+                        file_extension = ".{}".format(jira_filename.rsplit('.')[-1])
+
+                        if file_extension in extension_list:
+                            ret_val = self._write_in_file(action_result, attachment, full_path, container_id)
+                            if phantom.is_fail(ret_val):
+                                return action_result.get_status()
+                            ingest_file_count += 1
+
+                else:
+                    err = "Please select retrieve all or pass in a list of extensions to look for. Please check the provided parameters"
+                    return action_result.set_status(phantom.APP_ERROR, err)
+
+                msg = "Successfully retrieved {0} attachments of {1} total attachments from Jira ticket- {2}".format(
+                    ingest_file_count, len(jira_issue.fields.attachment), ticket_key)
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
+
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Please select retrieve all or pass in a list of extensions to look for. Please check the provided parameters")
-
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved attachments from Jira ticket")
-
-        else:
-            return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters.")
-
-    def _check_to_create_updated_artifact(self, container_id, issue, previous_full_artifact, action_result):
-
-        issue_details = []
-        issue_details.append(container_id)
-
-        try:
-            issue_details.append(issue.key)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.issuetype.name.lower())
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.priority.name)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.resolution.name)
-        except:
-            issue_details.append(JIRA_JSON_UNRESOLVED)
-
-        try:
-            issue_details.append(issue.fields.status.name)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.reporter.displayName)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.project.key)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.summary)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.description)
-        except:
-            issue_details.append(None)
-
-        try:
-            issue_details.append(issue.fields.issuetype.name)
-        except:
-            issue_details.append(None)
-
-        artifact_details = []
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CONTAINER))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_SDI))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_LABEL))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PRIORITY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_RESOLUTTION))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_STATUS))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_REPORTER))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_PROJECT_KEY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_SUMMARY))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_DESCRIPTION))
-        artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(JIRA_JSON_ISSUE_TYPE))
-
-        config = self.get_config()
-        custom_fields = config.get(JIRA_JSON_CUSTOM_FIELDS)
-
-        if custom_fields:
-
-            custom_fields_list = [x.strip() for x in custom_fields.split(',')]
-            custom_fields_list = list(filter(None, custom_fields_list))
-
-            custom_fields_by_name = self._fetch_fields_by_replacing_custom_fields_id_to_name(issue, action_result)
-
-            if custom_fields_by_name is None:
-                return None
-
-            for custom_field in custom_fields_list:
-                issue_details.append(custom_fields_by_name.get(custom_field))
-                artifact_details.append(previous_full_artifact.get(JIRA_JSON_CEF, {}).get(custom_field))
-
-        if issue_details == artifact_details:
-            return False
-        else:
-            return True
+                return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters.")
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Unable to get attachments. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
+            return action_result.set_status(phantom.APP_ERROR, error_text)
 
     def _update_container(self, issue, container_id, last_time, action_result):
 
@@ -1731,10 +2023,12 @@ class JiraConnector(phantom.BaseConnector):
 
         try:
             for attachment in issue.fields.attachment:
-                if not self._get_artifact_id(attachment.id, container_id, issue_type="attachment"):
+                if not self._get_artifact_id(attachment.id, container_id):
                     ret_val = self._handle_attachment(attachment, container_id, artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
+                        self.debug_print("Issue key: {}. {}".format(issue.key, action_result.get_message()))
+                        self.save_progress("Issue key: {}. {}".format(issue.key, action_result.get_message()))
                         return phantom.APP_ERROR
         except:
             pass
@@ -1743,12 +2037,14 @@ class JiraConnector(phantom.BaseConnector):
 
             for comment in issue.fields.comment.comments:
 
-                full_artifact = self._get_artifact_id(comment.id, container_id, issue_type="comment", full_artifact=True)
+                full_artifact = self._get_artifact_id(comment.id, container_id, full_artifact=True)
 
                 if not full_artifact:
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
+                        self.debug_print("Issue key: {}. {}".format(issue.key, action_result.get_message()))
+                        self.save_progress("Issue key: {}. {}".format(issue.key, action_result.get_message()))
                         return phantom.APP_ERROR
 
                     continue
@@ -1777,37 +2073,21 @@ class JiraConnector(phantom.BaseConnector):
                     ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                     if phantom.is_fail(ret_val):
+                        self.debug_print("Issue key: {}. {}".format(issue.key, action_result.get_message()))
+                        self.save_progress("Issue key: {}. {}".format(issue.key, action_result.get_message()))
                         return phantom.APP_ERROR
 
         except:
             pass
 
-        try:
-            issue_type = issue.fields.issuetype.name
-        except:
-            issue_type = "issue"
+        artifact_json = self._build_fields_artifact(issue, container_id, action_result)
 
-        previous_full_artifact = self._get_artifact_id(issue.key, container_id, issue_type=issue_type, full_artifact=True)
-
-        if not previous_full_artifact:
-            self.save_progress(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
-            self.debug_print(JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER.format(issue_key=issue.key, container_id=container_id))
+        if artifact_json is None:
             return phantom.APP_ERROR
 
-        to_create_updated_artifact = self._check_to_create_updated_artifact(container_id, issue, previous_full_artifact, action_result)
+        artifact_json['name'] = '{0}_{1}'.format('ticket fields', issue.fields.updated)
 
-        if to_create_updated_artifact is None:
-            return phantom.APP_ERROR
-
-        if to_create_updated_artifact:
-            artifact_json = self._build_fields_artifact(issue, container_id, action_result)
-
-            if artifact_json is None:
-                return phantom.APP_ERROR
-
-            artifact_json['name'] = '{0}_{1}'.format('ticket fields', issue.fields.updated)
-
-            artifact_list.append(artifact_json)
+        artifact_list.append(artifact_json)
 
         if artifact_list:
             ret_val, message, resp = self.save_artifacts(artifact_list)
@@ -1854,6 +2134,8 @@ class JiraConnector(phantom.BaseConnector):
                 ret_val = self._handle_attachment(attachment, container_id, artifact_list, action_result)
 
                 if phantom.is_fail(ret_val):
+                    self.debug_print("Issue key: {}. {}".format(issue.key, action_result.get_message()))
+                    self.save_progress("Issue key: {}. {}".format(issue.key, action_result.get_message()))
                     return phantom.APP_ERROR
         except:
             pass
@@ -1864,6 +2146,8 @@ class JiraConnector(phantom.BaseConnector):
                 ret_val = self._handle_comment(comment, container_id, '{0}_{1}'.format('comment', comment.updated), artifact_list, action_result)
 
                 if phantom.is_fail(ret_val):
+                    self.debug_print("Issue key: {}. {}".format(issue.key, action_result.get_message()))
+                    self.save_progress("Issue key: {}. {}".format(issue.key, action_result.get_message()))
                     return phantom.APP_ERROR
         except:
             pass
@@ -1951,6 +2235,18 @@ class JiraConnector(phantom.BaseConnector):
 
         if project_key:
             query = "project={0}".format(project_key)
+
+        self._custom_fields = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_CUSTOM_FIELDS))
+
+        if self._custom_fields:
+            try:
+                self._custom_fields_list = json.loads(self._custom_fields)
+                if not isinstance(self._custom_fields_list, list):
+                    return action_result.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_NON_EMPTY_ERROR)
+            except Exception as e:
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+                return action_result.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_FORMAT_ERROR.format(error_text))
 
         action_query = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_QUERY, ""))
 
@@ -2061,7 +2357,8 @@ class JiraConnector(phantom.BaseConnector):
             self.ACTION_ID_ADD_WATCHER: self._handle_add_watcher,
             self.ACTION_ID_REMOVE_WATCHER: self._handle_remove_watcher,
             self.ACTION_ID_ON_POLL: self._on_poll,
-            self.ACTION_ID_GET_ATTACHMENTS: self._handle_get_attachments
+            self.ACTION_ID_GET_ATTACHMENTS: self._handle_get_attachments,
+            self.ACTION_ID_SEARCH_USERS: self._handle_search_users
         }
 
         if action in action_mapping.keys():

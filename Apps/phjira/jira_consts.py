@@ -26,6 +26,7 @@ JIRA_JSON_QUERY = "query"
 JIRA_JSON_START_INDEX = "start_index"
 JIRA_JSON_MAX_RESULTS = "max_results"
 JIRA_TOTAL_ISSUES = "total_issues"
+JIRA_TOTAL_USERS = "total_users"
 JIRA_TOTAL_PROJECTS = "total_projects"
 
 JIRA_JSON_ATTACHMENT = "vault_id"
@@ -49,7 +50,16 @@ JIRA_JSON_LABEL = 'label'
 JIRA_JSON_CEF = 'cef'
 JIRA_JSON_UNRESOLVED = 'Unresolved'
 JIRA_JSON_CUSTOM_FIELDS = 'custom_fields'
+JIRA_JSON_USERNAME = 'username'
+JIRA_JSON_DISPLAY_NAME = 'display_name'
+JIRA_JSON_USER_ACCOUNT_ID = 'user_account_id'
 
+JIRA_WATCHERS_ERROR = "Please provide either 'user_account_id' or 'username' action parameter. "
+JIRA_WATCHERS_ERROR += "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'user_account_id' action parameter"
+JIRA_SEARCH_USERS_ERROR = "Please provide either 'display_name' or 'username' action parameter. "
+JIRA_SEARCH_USERS_ERROR += "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'display_name' action parameter"
+JIRA_CUSTOM_FIELD_FORMAT_ERROR = "Could not load JSON formatted list from the custom_fields asset configuration parameter. {0}"
+JIRA_CUSTOM_FIELD_NON_EMPTY_ERROR = "Please provide custom_fields asset configuration parameter as a non-empty JSON formatted list"
 JIRA_INVALID_LIMIT = "Please provide non-zero positive integer in limit"
 JIRA_ERR_STATE_FILE_LOAD_ERROR = "Could not load the state file"
 JIRA_ERR_FETCH_CUSTOM_FIELDS = "Error occurred while fetching the custom fields metadata"

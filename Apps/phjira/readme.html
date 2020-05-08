@@ -11,6 +11,16 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 
 <p>Unfortunately, the JIRA API in most cases returns a generic error message with no valuable information to assist in debugging.</p>
 
+<p><b>Playbook Backward Compatibility</b>
+	<ul>
+		<li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+		<ul>
+			<li>Add Watcher - The new [user_account_id] parameter have been added for JIRA cloud to add watcher into a provided issue.</li>
+			<li>Remove Watcher - The new [user_account_id] parameter have been added for JIRA cloud to remove watcher from a provided issue.</li>
+		</ul>
+	</ul>
+</p>
+
 <p>
 	<b>Authentication steps for JIRA Cloud</b>
     <ul>
@@ -60,7 +70,7 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 						<li>For checking the system settings timezone, navigate to the JIRA instance; navigate to the option <b>Jira Settings --> System</b> in the settings page; the value of the <b>Default user time zone</b> parameter is the timezone that has to be provided in the Phantom asset configuration</li>
 					</ul>
 			</ol>
-			<li>Users can provide the comma-separated names of the custom fields (to be considered for the ingestion) in the asset configuration parameter <b>custom_fields</b> e.g. Test CF 1, test_cf_2. Please find the below points for getting exact names for the custom fields.</li>
+			<li>Users can provide the JSON formatted list of names of the custom fields (to be considered for the ingestion) in the asset configuration parameter <b>custom_fields</b> e.g. ["Test \"CF\" 1", "test_cf_2"]. It's a valid JSON formatted list of strings, so user should use escape sequences whenever needed. Please find the below points for getting exact names for the custom fields.</li>
 			<ol>
 				<li>On-premise JIRA</li>
 					<ul>
@@ -108,7 +118,12 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 <p><b>Some example caveats</b></p>
 	<ul>
 		<li>Attempting to set both Status and Resolution fails because the process set by the user doesn't require a resolution to be set by the user, such as if there is only one resolution for a particular status.</li>
+
 		<li>Attempting to add a comment while setting Status may return success, however, the comment isn't posted.  In this case, when the status change is made via the Jira UI, no dialogue appears to offer any additional input, therefore the API expects the same.</li>
+
 		<li>The "simple" format for the update ticket may not work to add a comment, while the "update" method does.</li>
+
 		<li>Test connectivity may fail due to invalid credentials, such as accidentally using the user's email address as the authentication login instead of the user's login name.</li>
+
+		<li>When updating the ticket with a vault ID(adding attachment to the Jira ticket) which contains Unicode characters in the filename getting failed with the 500 server error due to the used add_attachment method of JIRA SDK. The SDK behaves differently with the various Phantom platforms.As a result, we have decided a workflow which will ensure a minimal change in the filename and minimal/no data loss. In the workflow, the first time we try to add an attachment to the Jira ticket with the same name as the filename, if it may get successful, then it will add an attachment with the same name. But if it fails, then, we will check whether there are Unicode chars or not in the filename, if it has, there are highly possible chances that Jira SDK add_attachment() method might get throws an exception. And in such a case, we removed those non-ASCII Unicode chars from the name and add prefix FILENAME_ASCII to the filename. And, we again try to add an attachment with a newly created name to the Jira ticket. If it passes, then it's okay and if it doesn't, then, there might be some other genuine issue rather than the SDK Unicode issue and we fail the action.</li>
 	</ul>
