@@ -1,0 +1,136 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+--><html><head></head><body>
+
+<p>
+The asset settings page has several ingestion related settings.
+
+This app is currently written to support the ingestion of either the Cofense Triage Threat Indicators or the Cofense Triage Reports.
+
+This is set by the <b> ingestion_method </b> variable by a pull-down menu.
+
+If you wish to ingest both sets of data, it is suggested you setup a second Cofense Triage asset with the same credentials,
+but with the variable set to the other value.
+</p>
+
+<b><p>1. Remaining Settings</p></b>
+
+<table>
+  <colgroup>
+  <col style="width: 50px">
+  <col style="width: 200px">
+  </colgroup>
+  <tr>
+    <th>Setting</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>max_results</td>
+    <td>Maximum number of results retrieved during the ingestion run.</td>
+    <td>This is adjustable to any number. The practical limit is dictated by the number of API calls that your rate limit allows. Each API call will retrieve the maximum allowed of 50 results.</td>
+  </tr>
+  <tr>
+    <td>start_date</td>
+    <td>The initial start date and time of the ingestion. The default is six days ago.</td>
+    <td>This setting is used only if there weren't any prior successful ingestions and were ignored afterwards. If left blank, it will default to the product setting of six days ago. If one or more results are successfully ingested, the relevant date of the last ingested result is used to set the start date for the next ingestion run. It is important to set this setting to date within a range that contains data.<br></td>
+  </tr>
+  <tr>
+    <td>date_sort</td>
+    <td>Retrieve either the oldest results first or the latest results first.</td>
+    <td>This setting is used to set which pages of results to retrieve and how they are sorted. This setting makes the observed assumption that the result ID is ordered by ascending date. ie. ID=1 is an older result than ID=2.
+ If this setting is the <b>Oldest first</b> the results are retrieved and sorted with the lowest ID first. If the ingestion run of <b>max_results</b> does not completely exhaust this list of results, it will continue to retrieve the oldest entries until all the results are exhausted.
+ If this setting is the <b>latest first</b> the results are retrieved and sorted with the highest ID first. We will ingest the newest results first and then work our way down to older results until we hit <b>max_results</b> or your rate limit.
+<i>If older results remaining in the ingestion run, they will be ignored on the next ingestion run.</i>
+ This will always guarantee your latest results are ingested first at the risk of losing older results if it exceeds your <b>max_result</b> or rate limit.
+</td>
+  </tr>
+  <tr>
+    <td>cef_mapping</td>
+    <td>JSON dictionary is represented as a serialized JSON string. Only applicable if ingesting new artifacts</td>
+    <td>This parameter is a json dictionary represented as a serialized json string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {"website":"requestURL"} your artifact will have requestURL cef fields in place of website cef fields.</td>
+  </tr>
+  <tr>
+    <td>ingestion_method</td>
+    <td>Ingestion of either Threat Indicators or Reports</td>
+    <td>User can select whether to ingest Threat Indicators or Reports</td>
+  </tr>
+</table>
+
+<br>
+<b><p>2. Ingestion Settings for Ingesting Threat Indicators</p></b>
+<table>
+  <col style="width: 50px">
+  <col style="width: 200px">
+  <tr>
+    <th>Setting</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>threat_type</td>
+    <td>Filter results by threat indicator type, default retrieve All. Types are; Subject, Sender, Domain, URL, MD5, SHA256.</td>
+    <td>These are applied as filters in the api call to retrieved results.
+ You may retrieve all results or filter results by a single type. At the moment, if you wish to ingest two types, it is suggested you create a second asset.
+</td>
+  </tr>
+  <tr>
+    <td>threat_level</td>
+    <td>Filter results by threat indicator level, default retrieve All. Levels are; Malicious, Suspicious, Benign.</td>
+    <td>Similar to the threat_type setting, these will allow either all results or filtered to a single level.</td>
+  </tr>
+</table>
+
+<br>
+<b><p>3. Ingestion Settings for Ingesting Reports</p></b>
+
+<table>
+  <col style="width: 50px">
+  <col style="width: 200px">
+  <tr>
+    <th>Setting</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+  <tr>
+    <td>report_type</td>
+    <td>Type of reports to retrieve, default retrieve All.</td>
+    <td>Possible values are; All - All reports in Inbox, Recon, and Processed folders; Inbox - Uncategorized reports in the Inbox and Recon folders; Processed - Categorized reports in the Processed folder.
+Be aware that the reports in the Recon folder are ingested only if the option is All or Inbox but not Processed. Reports from the Inbox folder are unreviewed reports and therefore missing any evaluated information</td>
+  </tr>
+    <td>report_ingest_subfields</td>
+    <td>Only applicable if ingesting reports. This option will ingest the dictionary and list fields of the subject as additional artifacts.
+</td>
+    <td>If set to true, during ingestion of reports, in addition to the Report Artifact which contains the entire report as an artifact, it will extract various sub-elements and create individual artifacts for the following items; URLs, tags, rules, and attachments.
+  </tr>
+  <tr>
+    <td>report_match_priority</td>
+    <td>The highest match priority based on rule hits for the report.
+</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>report_category_id</td>
+    <td>Filter by category ID, default retrieve All.</td>
+<td>The category ID (1-5) for processed reports. Takes either string or number. Only valid when retrieving "All" or "Processed" reports. Category IDs correspond to category names as follows: 5 (lowest): Phishing Simulation; 1: Non-Malicious; 2: Spam; 3: Crimeware; 4 (highest): Advanced Threats.
+ You may retrieve all results or filter results by a single category. At the moment, if you wish to ingest two categories, it is suggested you create a second asset.
+</td>
+  </tr>
+<tr>
+    <td>report_tags</td>
+    <td>One or more tags of processed reports to filter on. Use commas to separate multiple tags.
+</td>
+    <td></td>
+  </tr>
+</table>
+<p>
+
+<b>NOTE</b>: The Triage devices fetch data according to its own rules. If you look carefully at the logs or the output of the poll-now,
+you may see the last result from the previous ingestion, reingested and marked as a duplicate container. This is to guarantee we do not miss any
+results since the last ingestion.
+</p>
+
+</body></html>
