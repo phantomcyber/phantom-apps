@@ -199,7 +199,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_ERROR, message), None
 
-    def _make_rest_call(self, endpoint, action_result, method="get", params=None):
+    def _make_rest_call(self, endpoint, action_result, method="get", params=None, data=None):
         """ Function that makes the REST call to the app.
         :param endpoint: REST endpoint that needs to appended to the service address
         :param action_result: object of ActionResult class
@@ -227,7 +227,7 @@ class JiraConnector(phantom.BaseConnector):
         self.debug_print("Making a REST call with provided request parameters")
 
         try:
-            r = request_func(url, auth=(self._username, self._password), params=params, headers=headers)
+            r = request_func(url, auth=(self._username, self._password), params=params, headers=headers, data=data)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), resp_json
@@ -842,9 +842,16 @@ class JiraConnector(phantom.BaseConnector):
         priority = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_ISSUE_PRIORITY, ''))
         attachment = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_ATTACHMENT, ''))
 
-        assignee = param.get(JIRA_JSON_ISSUE_ASSIGNEE)
-        if assignee:
-            assignee = self._handle_py_ver_compat_for_input_str(assignee)
+        assignee_username = param.get(JIRA_JSON_ISSUE_ASSIGNEE)
+        if assignee_username:
+            assignee_username = self._handle_py_ver_compat_for_input_str(assignee_username)
+
+        assignee_account_id = param.get(JIRA_JSON_ISSUE_ASSIGNEE_ACCOUNT_ID)
+        if assignee_account_id:
+            assignee_account_id = self._handle_py_ver_compat_for_input_str(assignee_account_id)
+
+        if assignee_username and assignee_account_id:
+            return action_result.set_status(phantom.APP_ERROR, JIRA_ASSIGNEE_ERROR)
 
         param_fields = param.get(JIRA_JSON_FIELDS)
         if param_fields:
@@ -898,24 +905,41 @@ class JiraConnector(phantom.BaseConnector):
         except Exception as e:
             return self._set_jira_error(action_result, JIRA_ERR_CREATE_TICKET_FAILED, e)
 
-        self.save_progress(JIRA_CREATED_TICKET)
+        self.debug_print(JIRA_CREATED_TICKET)
 
-        self.save_progress("Adding the attachment")
+        self.debug_print("Adding the attachment")
         attachment_status = self._add_attachment(new_issue, attachment)
 
         assignee_status = ""
         # now try to assign if required
-        if (assignee is not None):
-            self.save_progress("Assigning to user")
-            try:
-                self._jira.assign_issue(new_issue, assignee)
-            except Exception as e:
-                self.debug_print("Exception for assignee")
+        if (assignee_username is not None) or (assignee_account_id is not None):
+            if assignee_username:
+                self.debug_print("Assigning to user for Jira on-prem")
+                try:
+                    self._jira.assign_issue(new_issue, assignee_username)
+                except Exception as e:
+                    self.debug_print("Exception for assignee")
 
-                error_code, error_msg = self._get_error_message_from_exception(e)
-                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+                    error_code, error_msg = self._get_error_message_from_exception(e)
+                    error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
-                assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee, error_text)
+                    assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee_username, error_text)
+            else:
+                self.debug_print("Assigning to user for Jira cloud")
+                endpoint = 'issue/{0}/assignee'.format(str(new_issue))
+                payload = {
+                    "accountId": assignee_account_id
+                }
+                try:
+                    ret_val, _ = self._make_rest_call(endpoint, action_result, data=json.dumps(payload), method="put")
+                except Exception as e:
+                    error_code, error_msg = self._get_error_message_from_exception(e)
+                    error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
+
+                    assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee_account_id, error_text)
+
+                if phantom.is_fail(ret_val):
+                    assignee_status = JIRA_ERR_TICKET_ASSIGNMENT_FAILED.format(assignee_account_id, action_result.get_message())
 
         issue_id = new_issue.key
 

@@ -128,7 +128,7 @@
         {
             "action": "create ticket",
             "description": "Create a ticket (issue)",
-            "verbose": "The <b>fields</b> parameter is provided for an advanced use of the JIRA API. It is passed directly to the &quot;fields&quot; attribute in the JIRA API call. Values in the <b>fields</b> parameter will take precedence over the individual parameters such as <b>summary</b>, <b>description</b>, <b>project_key</b>, <b>issue_type</b> etc.<br><br>When using the <b>fields</b> parameter, you are required to know how a particular field is inputted. To give a few examples (might differ in your JIRA environment):<ul><li>The <b>description</b> of a ticket can be added as the first level key with a value like { \"description\": \"ticket description\" }</li><li><b>issuetype</b> needs to be set as a dictionary like { \"issuetype\": { \"name\": \"Task\" } }</li><li><b>priority</b> is set as { \"priority\": { \"name\": \"Medium\" } }</li><li>The <b>project</b> key is set like { \"project\": { \"key\": \"SPLUNK_APP\" } }</li></ul><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><b>Assignee</b> and attachments by <b>vault_id</b> are addressed in a separate call to JIRA made after ticket creation.<br><br>The <b>project_key</b> parameter is case sensitive.<h3>Default Values</h3>Previous versions of the app set default values for <b>priority</b> and <b>issue_type</b>. This caused issues in situations where the default values used by the app were incompatible with the configured values. The app does not set default values anymore. If an optional field below is required by the JIRA environment and it is not provided, JIRA will give an error causing the action to fail.<br><br>This action will pass if a ticket is successfully created, even if it fails to assign the ticket, add an attachment to the ticket, or fill out the custom fields. These failures will be indicated in the result message.<h3>Creating a subtask</h3>The following <b>fields</b> parameter value can be used to create a sub-task, the key is to use the correct <b>issuetype</b>.<pre>{\"fields\":{\"project\":{\"key\":\"AP\"},\"parent\":{\"key\":\"AP-231\"},\"summary\":\"Sub-taskofAP-231\",\"description\":\"Don'tforgettodothistoo.\",\"issuetype\":{\"name\":\"Sub-Task\"}}}</pre>",
+            "verbose": "The <b>fields</b> parameter is provided for an advanced use of the JIRA API. It is passed directly to the &quot;fields&quot; attribute in the JIRA API call. Values in the <b>fields</b> parameter will take precedence over the individual parameters such as <b>summary</b>, <b>description</b>, <b>project_key</b>, <b>issue_type</b> etc.<br><br>When using the <b>fields</b> parameter, you are required to know how a particular field is inputted. To give a few examples (might differ in your JIRA environment):<ul><li>The <b>description</b> of a ticket can be added as the first level key with a value like { \"description\": \"ticket description\" }</li><li><b>issuetype</b> needs to be set as a dictionary like { \"issuetype\": { \"name\": \"Task\" } }</li><li><b>priority</b> is set as { \"priority\": { \"name\": \"Medium\" } }</li><li>The <b>project</b> key is set like { \"project\": { \"key\": \"SPLUNK_APP\" } }</li></ul><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><b>Assignee</b> and attachments by <b>vault_id</b> are addressed in a separate call to JIRA made after ticket creation.<br><br>The <b>project_key</b> parameter is case sensitive.<h3>Default Values</h3>Previous versions of the app set default values for <b>priority</b> and <b>issue_type</b>. This caused issues in situations where the default values used by the app were incompatible with the configured values. The app does not set default values anymore. If an optional field below is required by the JIRA environment and it is not provided, JIRA will give an error causing the action to fail.<br><br>This action will pass if a ticket is successfully created, even if it fails to assign the ticket, add an attachment to the ticket, or fill out the custom fields. These failures will be indicated in the result message.<h3>Creating a subtask</h3>The following <b>fields</b> parameter value can be used to create a sub-task, the key is to use the correct <b>issuetype</b>.<pre>{\"fields\":{\"project\":{\"key\":\"AP\"},\"parent\":{\"key\":\"AP-231\"},\"summary\":\"Sub-taskofAP-231\",\"description\":\"Don'tforgettodothistoo.\",\"issuetype\":{\"name\":\"Sub-Task\"}}}</pre><h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's. Since is not possible to add assignee to the Jira ticket using username for Jira cloud, we will use user's account_id to add assignee. Use 'search users' action to find out user's account_id. You can use [assignee_account_id] action parameter to add assignne to the Jira ticket for Jira cloud, and, [assignee] action parameter will be use to add assignee to the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "create_ticket",
             "read_only": false,
@@ -172,21 +172,35 @@
                     "required": false
                 },
                 "assignee": {
-                    "description": "Assignee user (assign required permissions)",
+                    "description": "Assignee user name(Use it for Jira on-prem, assign required permissions)",
                     "data_type": "string",
                     "order": 5,
-                    "required": false
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                "assignee_account_id": {
+                    "description": "Assignee user account ID(Use it for Jira cloud, assign required permissions)",
+                    "data_type": "string",
+                    "order": 6,
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "jira user account id"
+                    ]
                 },
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
                     "required": false,
-                    "order": 6
+                    "order": 7
                 },
                 "vault_id": {
                     "description": "Vault ID of attachment",
                     "data_type": "string",
-                    "order": 7,
+                    "order": 8,
                     "required": false,
                     "primary": true,
                     "contains": [
@@ -214,6 +228,19 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Name"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.assignee_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
@@ -1554,7 +1581,7 @@
                     ]
                 }
             },
-            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/jiradev/jira-apis/jira-rest-apis/jira-rest-api-tutorials/updating-an-issue-via-the-jira-rest-apis\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.",
+            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/jiradev/jira-apis/jira-rest-apis/jira-rest-api-tutorials/updating-an-issue-via-the-jira-rest-apis\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's. Since is not possible to update fields related with user resources in the the Jira ticket using username for Jira cloud, we will use user's account_id to update fields related with user resources. Use 'search users' action to find out user's account_id. Use 'get ticket' action results to obtain the [update_fields] parameters. Please find out below mentioned examples for the [update_fields] parameter which related with user resources.<ul><li>Add assignee to the Jira ticket for Jira on-prem:<br>{\"fields\":{\"assignee\" : {\"name\": \"username\"}}}</li><li>Add assignee to the Jira ticket for Jira cloud:<br>{\"fields\":{\"assignee\" : {\"accountId\": \"6d1ef6xy52z7360c267f27bb\"}}}</li></ul>",
             "render": {
                 "type": "custom",
                 "view": "jira_view.display_view"
@@ -5641,11 +5668,11 @@
         },
         {
             "action": "search users",
-            "description": "Get a list of user Resources that match the specified search string",
+            "description": "Get a list of user resources that match the specified search string",
             "type": "investigate",
             "identifier": "search_users",
             "read_only": true,
-            "verbose": "The default value for the parameter <b>'start_index'</b> is <b>0</b> and for <b>'max_results'</b> is <b>1000</b>. The maximum number of tickets as specified by the parameter <b>'max_results'</b> will be fetched starting from the index specified by the parameter <b>'start_index'</b>.For JIRA on-prem, you have to provide 'username' action parameter, and, for JIRA cloud, you have to provide 'diaplay name' action parameter. If both are not provided or provided it will throws an error.",
+            "verbose": "This action will be used to fetch username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for the parameter <b>'start_index'</b> is <b>0</b> and for <b>'max_results'</b> is <b>1000</b>. The maximum number of tickets as specified by the parameter <b>'max_results'</b> will be fetched starting from the index specified by the parameter <b>'start_index'</b>.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's. Since is not possible to search users using username for Jira cloud, we will use user's display name to search users. You can use [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be use to search users for Jira on-prem.",
             "parameters": {
                 "username": {
                     "data_type": "string",
@@ -9539,6 +9566,7 @@
         {
             "action": "add watcher",
             "description": "Add a user to an issue's watchers list",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's. Since is not possible to add watcher using username for Jira cloud, we will use user's account_id to add watcher for Jira cloud. Use 'search users' action to find out user's account_id. You can use [user_account_id] action parameter to add watcher to the Jira ticket for Jira cloud, and, [username] action parameter will be use to add watcher to the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "add_watcher",
             "read_only": false,
@@ -9663,6 +9691,7 @@
         {
             "action": "remove watcher",
             "description": "Remove a user from an issue's watchers list",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's. Since is not possible to remove watcher using username for Jira cloud, we will use user's account_id to remove watcher for Jira cloud. Use 'search users' action to find out user's account_id. You can use [user_account_id] action parameter to remove watcher from the Jira ticket for Jira cloud, and, [username] action parameter will be use to remove watcher from the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "remove_watcher",
             "read_only": false,
