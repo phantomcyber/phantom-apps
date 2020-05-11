@@ -11,7 +11,7 @@
     "publisher": "Netskope",
     "license": "Copyright (c) 2018-2020 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2019-01-11T00:54:10.000000Z",
+    "utctime_updated": "2020-05-11T23:20:05.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.pyc",
     "min_phantom_version": "4.6.19142",
@@ -1655,7 +1655,7 @@
             "identifier": "add_url_list",
             "description": "Add an URL to the Netskope URL Blocklist",
             "type": "contain",
-            "undo": "remove url", 
+            "undo": "remove url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1728,7 +1728,7 @@
             "identifier": "remove_url_list",
             "description": "Remove an URL from the Netskope URL Blocklist",
             "type": "contain",
-            "undo": "add url", 
+            "undo": "add url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1851,7 +1851,7 @@
             "identifier": "add_file_list",
             "description": "Add a file hash to the Netskope file hash list",
             "type": "contain",
-            "undo": "remove hash", 
+            "undo": "remove hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -1924,7 +1924,7 @@
             "identifier": "remove_file_list",
             "description": "Remove a hash from the Netskope file hash list",
             "type": "contain",
-            "undo": "add hash", 
+            "undo": "add hash",
             "read_only": false,
             "parameters": {
                 "hash": {
