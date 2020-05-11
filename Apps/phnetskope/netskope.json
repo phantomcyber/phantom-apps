@@ -754,7 +754,7 @@
                     "data_path": "action_result.data.*.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "mario@netskope.com"
+                        "user@netskope.com"
                     ],
                     "contains": [
                         "email"
@@ -1655,6 +1655,7 @@
             "identifier": "add_url_list",
             "description": "Add an URL to the Netskope URL Blocklist",
             "type": "contain",
+            "undo": "remove url", 
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1725,8 +1726,9 @@
         {
             "action": "remove url",
             "identifier": "remove_url_list",
-            "description": "Remove an URL to the Netskope URL Blocklist",
+            "description": "Remove an URL from the Netskope URL Blocklist",
             "type": "contain",
+            "undo": "add url", 
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1849,6 +1851,7 @@
             "identifier": "add_file_list",
             "description": "Add a file hash to the Netskope file hash list",
             "type": "contain",
+            "undo": "remove hash", 
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -1921,6 +1924,7 @@
             "identifier": "remove_file_list",
             "description": "Remove a hash from the Netskope file hash list",
             "type": "contain",
+            "undo": "add hash", 
             "read_only": false,
             "parameters": {
                 "hash": {
