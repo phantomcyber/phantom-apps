@@ -8,13 +8,13 @@
     "logo_dark": "logo_netskope_dark.svg",
     "product_name": "Netskope",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
-    "app_version": "1.0.4",
+    "publisher": "Netskope",
+    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-01-11T00:54:10.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "server_url": {
@@ -28,6 +28,22 @@
             "data_type": "password",
             "required": true,
             "order": 1
+        },
+        "scim_url": {
+            "description": "SCIM Server URL",
+            "data_type": "string",
+            "order": 2
+        },
+        "scim_key": {
+            "description": "SCIM Token",
+            "data_type": "password",
+            "order": 3
+        },
+        "list_name": {
+            "description": "Netskope List Name (both Url and File Hash)",
+            "data_type": "string",
+            "order": 4,
+            "default": "phantom_list"
         }
     },
     "actions": [
@@ -46,7 +62,7 @@
             "identifier": "get_file",
             "description": "Download a quarantined file and upload it to the vault",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "file": {
                     "description": "ID or quarantined name of the file to download",
@@ -90,7 +106,7 @@
                         "netskope file id",
                         "file name"
                     ],
-                    "column_name": "file",
+                    "column_name": "File",
                     "column_order": 0
                 },
                 {
@@ -103,7 +119,7 @@
                         "netskope profile id",
                         "netskope profile name"
                     ],
-                    "column_name": "profile",
+                    "column_name": "Profile",
                     "column_order": 1
                 },
                 {
@@ -168,6 +184,488 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get scim users",
+            "identifier": "get_scim_users",
+            "description": "Get current SCIM user(s). If no parameter is sent, it will retrieve all users",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "user": {
+                    "description": "Username or email to find",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "netskope user",
+                        "email",
+                        "user name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope user",
+                        "email",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope user",
+                        "user name",
+                        "email"
+                    ],
+                    "column_name": "User Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "column_name": "Active",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope scim user id"
+                    ],
+                    "column_name": "SCIM ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope external id"
+                    ],
+                    "column_name": "External ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get scim groups",
+            "identifier": "get_scim_groups",
+            "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all users",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "group": {
+                    "description": "Group Display Name to find",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "netskope group name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.group",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope scim group id"
+                    ],
+                    "column_name": "SCIM ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope external id"
+                    ],
+                    "column_name": "External ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create scim group",
+            "identifier": "create_scim_group",
+            "description": "Create SCIM group",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "group": {
+                    "description": "Group Name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "netskope group name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.group",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "netskope scim group id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create scim user",
+            "identifier": "create_scim_user",
+            "description": "Create SCIM user",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "user": {
+                    "description": "User Name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "netskope user"
+                    ],
+                    "order": 0
+                },
+                "familyName": {
+                    "description": "Family Name",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "givenName": {
+                    "description": "Given Name",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "email": {
+                    "description": "Primary Email",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "netskope user",
+                        "email"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.givenName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope user",
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "netskope scim user id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "scim user group",
+            "identifier": "scim_user_to_group",
+            "description": "Add or Remove a user from a SCIM group",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "group": {
+                    "description": "Group ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "netskope scim group id"
+                    ],
+                    "order": 0
+                },
+                "user": {
+                    "description": "User ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "netskope scim user id"
+                    ],
+                    "order": 1
+                },
+                "action": {
+                    "description": "Action to perform",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "add",
+                    "example_values": [
+                        "add",
+                        "delete"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.group",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope scim group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope scim user id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "list files",
             "identifier": "list_files",
             "description": "List all quarantined files",
@@ -204,14 +702,14 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "Original filename",
+                    "column_name": "Original Filename",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.policy",
                     "data_type": "string",
                     "example_values": [
-                        "PCI Upload - ICAP Integration"
+                        "PCI Upload - ICAP Integration "
                     ],
                     "column_name": "Policy",
                     "column_order": 6
@@ -225,7 +723,7 @@
                     "contains": [
                         "netskope profile id"
                     ],
-                    "column_name": "Quarantine profile ID",
+                    "column_name": "Quarantine Profile ID",
                     "column_order": 4
                 },
                 {
@@ -237,7 +735,7 @@
                     "contains": [
                         "netskope profile name"
                     ],
-                    "column_name": "Quarantine profile name",
+                    "column_name": "Quarantine Profile Name",
                     "column_order": 5
                 },
                 {
@@ -249,14 +747,14 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "Quarantined filename",
+                    "column_name": "Quarantined Filename",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "mario@netskope.com"
+                        "user@netskope.com"
                     ],
                     "contains": [
                         "email"
@@ -319,13 +817,11 @@
                 "start_time": {
                     "description": "Start time epoch",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 1
                 },
                 "end_time": {
                     "description": "End time epoch",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 2
                 }
             },
@@ -1121,42 +1617,429 @@
             "action": "on poll",
             "identifier": "on_poll",
             "description": "Ingest data to Phantom",
-            "verbose": "For <b>manual run</b> and <b>first poll</b>, alerts of last 24 hours would be ingested. Subsequent polls will ingest new alerts.<br>Only alerts of type &quotMalware&quot will be ingested.",
+            "verbose": "For <b>manual run</b> and <b>first poll</b>, alerts of the last 24 hours would be ingested. Subsequent polls will ingest new alerts.<br>Only alerts of type &quotMalware&quot will be ingested.",
             "type": "ingest",
             "read_only": true,
             "parameters": {
                 "container_count": {
                     "description": "Maximum number of containers to ingest",
                     "data_type": "numeric",
-                    "order": 0,
-                    "required": false
+                    "order": 0
                 },
                 "container_id": {
                     "description": "Parameter ignored in this app",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "start_time": {
                     "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "order": 2,
-                    "required": false
+                    "order": 2
                 },
                 "end_time": {
                     "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "artifact_count": {
                     "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 }
             },
             "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add url",
+            "identifier": "add_url_list",
+            "description": "Add an URL to the Netskope URL Blocklist",
+            "type": "contain",
+            "undo": "remove url", 
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "URL to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove url",
+            "identifier": "remove_url_list",
+            "description": "Remove an URL from the Netskope URL Blocklist",
+            "type": "contain",
+            "undo": "add url", 
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "URL to remove",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update url",
+            "identifier": "update_url_list",
+            "description": "Send the url list to Netskope",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add hash",
+            "identifier": "add_file_list",
+            "description": "Add a file hash to the Netskope file hash list",
+            "type": "contain",
+            "undo": "remove hash", 
+            "read_only": false,
+            "parameters": {
+                "hash": {
+                    "description": "Hash to add",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "column_name": "File",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove hash",
+            "identifier": "remove_file_list",
+            "description": "Remove a hash from the Netskope file hash list",
+            "type": "contain",
+            "undo": "add hash", 
+            "read_only": false,
+            "parameters": {
+                "hash": {
+                    "description": "hash to remove",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update hash",
+            "identifier": "update_file_list",
+            "description": "Send the file hash list to Netskope",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]
