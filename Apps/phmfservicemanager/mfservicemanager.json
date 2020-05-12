@@ -1,0 +1,2708 @@
+{
+    "appid": "0cc9e7c6-58c4-4e90-ae25-ed657b90ca09",
+    "name": "Micro Focus Service Manager",
+    "description": "This app supports a variety of object management actions on Micro Focus Service Manager (formerly HPE Service Manager)",
+    "type": "ticketing",
+    "product_vendor": "MicroFocus",
+    "logo": "logo_microfocus.svg",
+    "logo_dark": "logo_microfocus_dark.svg",
+    "product_name": "Service Manager",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.3.0",
+    "utctime_updated": "2019-01-22T08:05:33.738804Z",
+    "package_name": "phantom_mfservicemanager",
+    "main_module": "mfservicemanager_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "URL for the API (e.g. https://api.itsm.com/)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "ph": {
+          "data_type": "ph",
+          "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password for user",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create incident",
+            "identifier": "create_incident",
+            "description": "Create a incident",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "title": {
+                    "description": "Title for the incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "description": {
+                    "description": "Description of the incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 2
+                },
+                "service": {
+                    "description": "Service associated with the incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 3
+                },
+                "area": {
+                    "description": "Area for the incident (e.g. Application)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 4
+                },
+                "subarea": {
+                    "description": "Subarea for the incident (e.g. Availability Issue)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 5
+                },
+                "assignment group": {
+                    "description": "Assignment Group for the incident",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 6
+                },
+                "fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignment group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incident",
+            "identifier": "get_incident",
+            "description": "Get incident details",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm incident id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update incident",
+            "identifier": "update_incident",
+            "description": "Update incident details",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm incident id"
+                    ],
+                    "order": 0
+                },
+                "Description": {
+                    "description": "Incident description",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "Assignee": {
+                    "description": "assignee",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "Assignment Group": {
+                    "description": "assignment group",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "Title": {
+                    "description": "Incident title",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 4
+                },
+                "Category": {
+                    "description": "Incident category",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 5
+                },
+                "Contact": {
+                    "description": "Contact",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 6
+                },
+                "Impact": {
+                    "description": "Impact of the incident (1-4)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 7
+                },
+                "Affected CI": {
+                    "description": "Affected CI",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 8
+                },
+                "Area": {
+                    "description": "Area",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 9
+                },
+                "Subarea": {
+                    "description": "Subarea",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 10
+                },
+                "Urgency": {
+                    "description": "Urgency of the incident (1-4)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 11
+                },
+                "Journal Updates": {
+                    "description": "Journal Updates (newline-separated)",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 12
+                },
+                "Service": {
+                    "description": "Service",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 13
+                },
+                "Ticket Source": {
+                    "description": "Ticket Source",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 14
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Affected CI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Assignment Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Contact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Impact",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.Journal Updates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Ticket Source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.Urgency",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "close incident",
+            "identifier": "close_incident",
+            "description": "Get incident details",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "assignee": {
+                    "description": "Assignee",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "closure code": {
+                    "description": "Closure code",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "solution": {
+                    "description": "Solution",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.closure code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.solution",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create change",
+            "identifier": "create_change",
+            "description": "Create a change",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "title": {
+                    "description": "Title for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "description": {
+                    "description": "Description of the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 2
+                },
+                "reason": {
+                    "description": "Reason for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 3
+                },
+                "impact": {
+                    "description": "Impact of the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 4
+                },
+                "service": {
+                    "description": "Service associated with the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 5
+                },
+                "category": {
+                    "description": "category for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 6
+                },
+                "subcategory": {
+                    "description": "Subcategory for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 7
+                },
+                "assignment group": {
+                    "description": "Assignment Group for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 8
+                },
+                "change coordinator": {
+                    "description": "Change Coordinator for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 9
+                },
+                "no implementation effect": {
+                    "description": "Effect of not implementing the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 10
+                },
+                "implementation start": {
+                    "description": "Scheduled implementation start for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 11
+                },
+                "implementation end": {
+                    "description": "Scheduled implementation end for the change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 12
+                },
+                "fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 13
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignment group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.change coordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.implementation end",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.implementation start",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.no implementation effect",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.title",
+                    "data_type": "string",
+                    "column_name": "title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.CustomerVisible",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EffectOfNotImplementing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description.structure.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ApprovalStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeCoordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeID",
+                    "data_type": "string",
+                    "column_name": "ChangeID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.header.DateEntered",
+                    "data_type": "string",
+                    "column_name": "Date Entered",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.header.InitiatedBy",
+                    "data_type": "string",
+                    "column_name": "Initiated By",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.header.Open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.header.Phase",
+                    "data_type": "string",
+                    "column_name": "Phase",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.RiskAssessment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get change",
+            "identifier": "get_change",
+            "description": "Get Change information",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Change ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CustomerVisible",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EffectOfNotImplementing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ImplementationEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ImplementationStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.ReviewResults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.close.ClosingComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.close.ClosureCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.description.structure.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description.structure.ImplementationComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ApprovalStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.AssignedTo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.BackoutDuration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeCoordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeModel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.CloseTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.DateEntered",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.InitiatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.header.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.RiskAssessment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "close change",
+            "identifier": "close_change",
+            "description": "Close out a Change",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Change ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "order": 0
+                },
+                "closure comments": {
+                    "description": "Closure comments for this change (newline-separated)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1
+                },
+                "closure code": {
+                    "description": "Closure code for this change",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 2
+                },
+                "review results": {
+                    "description": "Review results for this change",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.closure code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.closure comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.review results",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CustomerVisible",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EffectOfNotImplementing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ImplementationEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ImplementationStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.ReviewResults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.close.ClosingComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.close.ClosureCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.description.structure.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description.structure.ImplementationComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ApprovalStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.AssignedTo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.BackoutDuration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeCoordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.ChangeModel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.CloseTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.DateEntered",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.InitiatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.header.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.PlannedStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.RiskAssessment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.header.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create configitem",
+            "identifier": "create_configitem",
+            "description": "Create a configuration item",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "display name": {
+                    "description": "Display name for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 0
+                },
+                "CI type": {
+                    "description": "Type for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "CI subtype": {
+                    "description": "Subype for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 2
+                },
+                "assignment group": {
+                    "description": "Assignment Group for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 3
+                },
+                "owner individual": {
+                    "description": "Contact name for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 4
+                },
+                "department": {
+                    "description": "Department for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 5
+                },
+                "department owner": {
+                    "description": "Owner of the department for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 6
+                },
+                "status": {
+                    "description": "Status for the CI",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 7
+                },
+                "fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.CI subtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.CI type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignment group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.department owner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.display name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.owner individual",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ConfigurationItem",
+                    "data_type": "string",
+                    "column_name": "CI ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.ConfigurationItemSubType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ConfigurationItemType",
+                    "data_type": "string",
+                    "column_name": "CI Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Critical",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DepartmentOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayName",
+                    "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Environment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.LocationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Model",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.OS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.PrimaryService",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.PushGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.SystemDown",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get object",
+            "identifier": "get_object",
+            "description": "Get object information",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Object (Issue) ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "order": 0
+                },
+                "project_key": {
+                    "description": "Project Key to get the issue from",
+                    "data_type": "string",
+                    "default": "incidents",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.project_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "incidents",
+                        "changes",
+                        "devices",
+                        "contacts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Change.CustomerVisible",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Change.EffectOfNotImplementing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ImplementationEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ImplementationStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ReviewResults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.close.ClosingComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.close.ClosureCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.description.structure.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.description.structure.ImplementationComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ApprovalStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.AssignedTo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.BackoutDuration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeCoordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeModel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.CloseTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.DateEntered",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.InitiatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.PlannedEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.PlannedStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.RiskAssessment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.ContactName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CorpStructure",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CostCenter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CostCentre",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.DepartmentName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.EmployeeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.FirstName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.FullName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.LastName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.LocationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Manager",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.WorkPhone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItem",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItemSubType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Critical",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.DepartmentOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.DisplayName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Environment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.LocationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Model",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.OS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.PrimaryService",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.PushGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.SerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.SystemDown",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Device.TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update object",
+            "identifier": "update_object",
+            "description": "Update an object",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Object ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "order": 0
+                },
+                "update_fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "project_key": {
+                    "description": "Key for project to update the object",
+                    "data_type": "string",
+                    "default": "incidents",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.project_key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.update_fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "update_fields",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Change.CustomerVisible",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Change.EffectOfNotImplementing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ImplementationEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ImplementationStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.ReviewResults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.close.ClosingComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.close.ClosureCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.description.structure.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.description.structure.ImplementationComments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ApprovalStatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.AssignedTo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.BackoutDuration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeCoordinator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.ChangeModel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.CloseTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.DateEntered",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.InitiatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.PlannedEnd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.PlannedStart",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.RiskAssessment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Subcategory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Change.header.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.ContactName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CorpStructure",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CostCenter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.CostCentre",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.DepartmentName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.EmployeeID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.FirstName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.FullName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.LastName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.LocationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Manager",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.Title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Contact.WorkPhone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.AssignmentGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItem",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItemSubType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.ConfigurationItemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Critical",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.DepartmentOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.DisplayName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Environment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.LocationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Model",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.OS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.PrimaryService",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.PushGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.SerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.SystemDown",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Device.TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Device.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Area",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.AssignmentGroup",
+                    "data_type": "string",
+                    "column_name": "Assignment Group",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.IncidentID",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.JournalUpdates",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.OpenTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.OpenedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Phase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.ProblemType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Subarea",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Title",
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.UpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.UpdatedTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Incident.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ReturnCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "close object",
+            "identifier": "close_object",
+            "description": "Close an object",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Object ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "order": 0
+                },
+                "project_key": {
+                    "description": "Key for project to update the object",
+                    "data_type": "string",
+                    "default": "incidents",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.project_key",
+                    "data_type": "string",
+                    "column_name": "Project",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
