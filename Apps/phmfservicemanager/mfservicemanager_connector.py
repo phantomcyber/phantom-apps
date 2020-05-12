@@ -1,8 +1,8 @@
 # File: mfservicemanager_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2020 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
@@ -10,7 +10,7 @@ from phantom.action_result import ActionResult
 from mfservicemanager_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 
 
 class RetVal(tuple):
@@ -32,32 +32,47 @@ class MfServiceManagerConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _unicode_string_handler(self, input_str):
+        """helper method for handling unicode strings
+
+        Arguments:
+            input_str  -- Input string that needs to be processed
+
+        Returns:
+             -- Processed input string based on input_str
+        """
+        try:
+            if input_str:
+                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error ocurred while converting the string")
+        return input_str
+
     def _process_empty_reponse(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, u"Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
         # An html response, treat it like an error
         status_code = response.status_code
-
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = u'\n'.join(split_lines)
+            error_text = '\n'.join(split_lines)
         except:
-            error_text = u"Cannot parse error details"
+            error_text = "Cannot parse error details"
 
-        message = u"Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
-
-        message = message.replace(u'{', u'{{').replace(u'}', u'}}')
-
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
+                self._unicode_string_handler(error_text))
+        message = message.replace('{', '{{').replace('}', '}}')
+        if len(message) > 500:
+            message = 'Error while connecting to server'
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -66,15 +81,17 @@ class MfServiceManagerConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
-        message = u"Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', u'{{').replace(u'}', u'}}'))
+        error_message = r.text.replace('{', '{{').replace('}', '}}')
+        error_message = self._unicode_string_handler(error_message)
+        message = "Error from server. Status Code: {0} Data from server: {1}".format(
+                r.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -104,7 +121,7 @@ class MfServiceManagerConnector(BaseConnector):
             return self._process_empty_reponse(r, action_result)
 
         # everything else is actually an error at this point
-        message = u"Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -113,13 +130,11 @@ class MfServiceManagerConnector(BaseConnector):
         # **kwargs can be any additional parameters that requests.request accepts
 
         config = self.get_config()
-
         resp_json = None
-
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
         url = self._base_url + endpoint
@@ -130,9 +145,19 @@ class MfServiceManagerConnector(BaseConnector):
                             auth=(self._username, self._password),  # basic authentication
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
+        except requests.exceptions.ConnectionError:
+            message = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, u"Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-
+            if e.message:
+                try:
+                    error_msg = self._unicode_string_handler(e)
+                    message = ('Error connecting to server. Details: {0}').format(error_msg)
+                except:
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
+            else:
+                message = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -162,7 +187,7 @@ class MfServiceManagerConnector(BaseConnector):
         service = param.get('service', '')
         area = param.get('area', '')
         subarea = param.get('subarea', '')
-        assignment_group = param.get('assignment group', '')
+        assignment_group = param.get('assignment_group', '')
         fields = param.get('fields', '')
         try:
             if not len(fields):
@@ -209,7 +234,7 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = self._unicode_string_handler(param['id'])
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key='incidents')
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
@@ -229,56 +254,56 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = self._unicode_string_handler(param['id'])
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key='incidents')
         update_fields = {
-            'Assignee': param['Assignee']
+            'Assignee': param['assignee']
         }
 
-        if param.get('Description'):
-            update_fields['Description'] = param.get('Description')
+        if param.get('description'):
+            update_fields['Description'] = param.get('description')
 
-        if param.get('Assignment Group'):
-            update_fields['Assignment Group'] = param.get('Assignment Group')
+        if param.get('assignment_group'):
+            update_fields['AssignmentGroup'] = param.get('assignment_group')
 
-        if param.get('Title'):
-            update_fields['Title'] = param.get('Title')
+        if param.get('title'):
+            update_fields['Title'] = param.get('title')
 
-        if param.get('Category'):
-            update_fields['Category'] = param.get('Category')
+        if param.get('category'):
+            update_fields['Category'] = param.get('category')
 
-        if param.get('Contact'):
-            update_fields['Contact'] = param.get('Contact')
+        if param.get('contact'):
+            update_fields['Contact'] = param.get('contact')
 
-        if param.get('Impact'):
-            update_fields['Impact'] = str(param.get('Impact'))
+        if param.get('impact'):
+            update_fields['Impact'] = str(param.get('impact'))
 
-        if param.get('Urgency'):
-            update_fields['Urgency'] = str(param.get('Urgency'))
+        if param.get('urgency'):
+            update_fields['Urgency'] = str(param.get('urgency'))
 
-        if param.get('Affected CI'):
-            update_fields['AffectedCI'] = param.get('Affected CI')
+        if param.get('affected_ci'):
+            update_fields['AffectedCI'] = param.get('affected_ci')
 
-        if param.get('Area'):
-            update_fields['Area'] = param.get('Area')
+        if param.get('area'):
+            update_fields['Area'] = param.get('area')
 
-        if param.get('Subarea'):
-            update_fields['Subarea'] = param.get('Subarea')
+        if param.get('subarea'):
+            update_fields['Subarea'] = param.get('subarea')
 
         journal_updates = [
             journal_update.strip()
             for journal_update
-            in param.get('Journal Updates').splitlines()
+            in param.get('journal_updates').splitlines()
         ]
         journal_updates = filter(None, journal_updates)
 
         update_fields['JournalUpdates'] = journal_updates
 
-        if param.get('Service'):
-            update_fields['Service'] = param.get('Service')
+        if param.get('service'):
+            update_fields['Service'] = param.get('service')
 
-        if param.get('Ticket Source'):
-            update_fields['mmmTicketSource'] = param.get('Ticket Source')
+        if param.get('ticket_source'):
+            update_fields['mmmTicketSource'] = param.get('ticket_source')
 
         update_obj = {
             'Incident': update_fields
@@ -310,10 +335,10 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = self._unicode_string_handler(param['id'])
         assignee = param['assignee']
-        closure_code = param['closure code']
-        solution = [solution_line.strip() for solution_line in param['solution'].splitlines()]
+        closure_code = param['closure_code']
+        solution = [solution_line.strip() for solution_line in self._unicode_string_handler(param['solution']).splitlines()]
         solution = filter(None, solution)
         endpoint = HPSM_CLOSE_RESOURCE.format(id=id, project_key='incidents')
 
@@ -356,20 +381,20 @@ class MfServiceManagerConnector(BaseConnector):
         description = description.splitlines()
 
         # noeffect is stored as a list of lines
-        noeffect = param.get('no implementation effect', '')
+        noeffect = param.get('no_implementation_effect', '')
         noeffect = noeffect.splitlines()
 
         title = param.get('title', '')
         service = param.get('service', '')
         # risk_assessment = param.get('risk assessment', '')
-        change_coordinator = param.get('change coordinator', '')
+        change_coordinator = param.get('change_coordinator', '')
         category = param.get('category', '')
         subcategory = param.get('subcategory', '')
         impact = param.get('impact', '')
         reason = param.get('reason', '')
-        planned_end = param.get('implementation end', '')
-        planned_start = param.get('implementation start', '')
-        assignment_group = param.get('assignment group', '')
+        planned_end = param.get('implementation_end', '')
+        planned_start = param.get('implementation_start', '')
+        assignment_group = param.get('assignment_group', '')
         fields = param.get('fields', '')
         try:
             if not len(fields):
@@ -428,7 +453,7 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = self._unicode_string_handler(param['id'])
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key='changes')
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
@@ -448,13 +473,16 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        closure_code = int(param['closure code'])
+        id = self._unicode_string_handler(param['id'])
+        try:
+            closure_code = int(param['closure_code'])
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid numeric value in 'closure_code' action parameter")
 
-        closing_comments = [result_line.strip() for result_line in param['closure comments'].splitlines()]
+        closing_comments = [result_line.strip() for result_line in param['closure_comments'].splitlines()]
         closing_comments = filter(None, closing_comments)
 
-        review_results = [result_line.strip() for result_line in param['review results'].splitlines()]
+        review_results = [result_line.strip() for result_line in param['review_results'].splitlines()]
         review_results = filter(None, review_results)
 
         endpoint = HPSM_CLOSE_RESOURCE.format(id=id, project_key='changes')
@@ -500,20 +528,22 @@ class MfServiceManagerConnector(BaseConnector):
 
         fields = param.get('fields', '')
         try:
+            if not len(fields):
+                fields = '{}'
             fields = json.loads(fields)
         except:
             return action_result.set_status(phantom.APP_ERROR, "fields is not a valid JSON string. Please validate and try running the action again.")
 
         device = {
             "Device": {
-                "AssignmentGroup": param['Assignment Group'],
-                "ConfigurationItemType": param['CI Type'],
-                "ConfigurationItemSubType": param['CI Subtype'],
-                "ContactName": param['Owner Individual'],
-                "Department": param['Department'],
-                "DepartmentOwner": param['Department Owner'],
-                "DisplayName": param['Display Name'],
-                "Status": param['Status']
+                "AssignmentGroup": param['assignment_group'],
+                "ConfigurationItemType": param['ci_type'],
+                "ConfigurationItemSubType": param['ci_subtype'],
+                "ContactName": param['owner_individual'],
+                "Department": param['department'],
+                "DepartmentOwner": param['department_owner'],
+                "DisplayName": param['display_name'],
+                "Status": param['status']
             }
         }
 
@@ -544,8 +574,8 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        project_key = param.get('project_key', 'incidents').lower()
+        id = self._unicode_string_handler(param['id'])
+        project_key = self._unicode_string_handler(param.get('project_key', 'incidents')).lower()
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key=project_key)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
@@ -565,15 +595,17 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
+        id = self._unicode_string_handler(param['id'])
         update_fields = param.get('update_fields', '')
 
         try:
+            if not len(update_fields):
+                update_fields = '{}'
             update_fields = json.loads(update_fields)
         except:
             return action_result.set_status(phantom.APP_ERROR, "update_fields is not a valid JSON string. Please validate and try running the action again.")
 
-        project_key = param.get('project_key', 'incidents').lower()
+        project_key = self._unicode_string_handler(param.get('project_key', 'incidents')).lower()
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key=project_key)
 
         if not update_fields.get('JournalUpdates'):
@@ -609,8 +641,8 @@ class MfServiceManagerConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        id = param['id']
-        project_key = param.get('project_key', 'incidents').lower()
+        id = self._unicode_string_handler(param['id'])
+        project_key = self._unicode_string_handler(param.get('project_key', 'incidents')).lower()
 
         endpoint = HPSM_CLOSE_RESOURCE.format(id=id, project_key=project_key)
 
@@ -690,11 +722,11 @@ class MfServiceManagerConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config['base_url']
+        self._base_url = self._unicode_string_handler(config['base_url'])
         if self._base_url.endswith('/'):
             self._base_url = self._base_url[:-1]
 
-        self._username = config['username']
+        self._username = self._unicode_string_handler(config['username'])
         self._password = config['password']
 
         return phantom.APP_SUCCESS
@@ -734,7 +766,8 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            login_url = '{}/login'.format(BaseConnector.get_phantom_base_url())
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -744,10 +777,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))

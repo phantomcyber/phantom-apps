@@ -9,12 +9,12 @@
     "product_name": "Service Manager",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
+    "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.3.0",
     "utctime_updated": "2019-01-22T08:05:33.738804Z",
     "package_name": "phantom_mfservicemanager",
     "main_module": "mfservicemanager_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -45,7 +45,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -63,65 +62,61 @@
                     "description": "Title for the incident",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 1
+                    "order": 0
                 },
                 "description": {
                     "description": "Description of the incident",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 2
+                    "order": 1
                 },
                 "service": {
                     "description": "Service associated with the incident",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 3
+                    "order": 2
                 },
                 "area": {
                     "description": "Area for the incident (e.g. Application)",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 4
+                    "order": 3
                 },
                 "subarea": {
                     "description": "Subarea for the incident (e.g. Availability Issue)",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 5
+                    "order": 4
                 },
-                "assignment group": {
+                "assignment_group": {
                     "description": "Assignment Group for the incident",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 6
+                    "order": 5
                 },
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 7
+                    "order": 6
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 5
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.area",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.assignment group",
+                    "data_path": "action_result.parameter.assignment_group",
                     "data_type": "string"
                 },
                 {
@@ -248,7 +243,7 @@
             "action": "get incident",
             "identifier": "get_incident",
             "description": "Get incident details",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -265,7 +260,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -388,150 +387,142 @@
                     ],
                     "order": 0
                 },
-                "Description": {
+                "description": {
                     "description": "Incident description",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
-                "Assignee": {
+                "assignee": {
                     "description": "assignee",
                     "data_type": "string",
                     "required": true,
                     "order": 2
                 },
-                "Assignment Group": {
+                "assignment_group": {
                     "description": "assignment group",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
-                "Title": {
+                "title": {
                     "description": "Incident title",
                     "data_type": "string",
-                    "required": false,
                     "order": 4
                 },
-                "Category": {
+                "category": {
                     "description": "Incident category",
                     "data_type": "string",
-                    "required": false,
                     "order": 5
                 },
-                "Contact": {
+                "contact": {
                     "description": "Contact",
                     "data_type": "string",
-                    "required": false,
                     "order": 6
                 },
-                "Impact": {
+                "impact": {
                     "description": "Impact of the incident (1-4)",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 7
                 },
-                "Affected CI": {
+                "affected_ci": {
                     "description": "Affected CI",
                     "data_type": "string",
-                    "required": false,
                     "order": 8
                 },
-                "Area": {
+                "area": {
                     "description": "Area",
                     "data_type": "string",
-                    "required": false,
                     "order": 9
                 },
-                "Subarea": {
+                "subarea": {
                     "description": "Subarea",
                     "data_type": "string",
-                    "required": false,
                     "order": 10
                 },
-                "Urgency": {
+                "urgency": {
                     "description": "Urgency of the incident (1-4)",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 11
                 },
-                "Journal Updates": {
+                "journal_updates": {
                     "description": "Journal Updates (newline-separated)",
                     "data_type": "string",
                     "required": true,
                     "order": 12
                 },
-                "Service": {
+                "service": {
                     "description": "Service",
                     "data_type": "string",
-                    "required": false,
                     "order": 13
                 },
-                "Ticket Source": {
+                "ticket_source": {
                     "description": "Ticket Source",
                     "data_type": "string",
-                    "required": false,
                     "order": 14
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.affected_ci",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Affected CI",
+                    "data_path": "action_result.parameter.area",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Area",
+                    "data_path": "action_result.parameter.assignee",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Assignee",
+                    "data_path": "action_result.parameter.assignment_group",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Assignment Group",
+                    "data_path": "action_result.parameter.category",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Category",
+                    "data_path": "action_result.parameter.contact",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Contact",
+                    "data_path": "action_result.parameter.description",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.Impact",
+                    "data_path": "action_result.parameter.impact",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.Journal Updates",
+                    "data_path": "action_result.parameter.journal_updates",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Service",
+                    "data_path": "action_result.parameter.service",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Subarea",
+                    "data_path": "action_result.parameter.subarea",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Ticket Source",
+                    "data_path": "action_result.parameter.ticket_source",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Title",
+                    "data_path": "action_result.parameter.title",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.Urgency",
+                    "data_path": "action_result.parameter.urgency",
                     "data_type": "numeric"
                 },
                 {
@@ -641,9 +632,9 @@
         {
             "action": "close incident",
             "identifier": "close_incident",
-            "description": "Get incident details",
+            "description": "Close an incident",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "id": {
                     "description": "Incident ID",
@@ -657,7 +648,7 @@
                     "required": true,
                     "order": 1
                 },
-                "closure code": {
+                "closure_code": {
                     "description": "Closure code",
                     "data_type": "string",
                     "required": true,
@@ -673,14 +664,18 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.assignee",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.closure code",
+                    "data_path": "action_result.parameter.closure_code",
                     "data_type": "string"
                 },
                 {
@@ -802,101 +797,91 @@
                     "description": "Title for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 1
+                    "order": 0
                 },
                 "description": {
                     "description": "Description of the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 2
+                    "order": 1
                 },
                 "reason": {
                     "description": "Reason for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 3
+                    "order": 2
                 },
                 "impact": {
                     "description": "Impact of the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 4
+                    "order": 3
                 },
                 "service": {
                     "description": "Service associated with the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 5
+                    "order": 4
                 },
                 "category": {
                     "description": "category for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 6
+                    "order": 5
                 },
                 "subcategory": {
                     "description": "Subcategory for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 7
+                    "order": 6
                 },
-                "assignment group": {
+                "assignment_group": {
                     "description": "Assignment Group for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 8
+                    "order": 7
                 },
-                "change coordinator": {
+                "change_coordinator": {
                     "description": "Change Coordinator for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 9
+                    "order": 8
                 },
-                "no implementation effect": {
+                "no_implementation_effect": {
                     "description": "Effect of not implementing the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 10
+                    "order": 9
                 },
-                "implementation start": {
+                "implementation_start": {
                     "description": "Scheduled implementation start for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 11
+                    "order": 10
                 },
-                "implementation end": {
+                "implementation_end": {
                     "description": "Scheduled implementation end for the change",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "order": 12
+                    "order": 11
                 },
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "order": 13
+                    "order": 12
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.assignment group",
+                    "data_path": "action_result.parameter.assignment_group",
                     "data_type": "string"
                 },
                 {
@@ -904,7 +889,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.change coordinator",
+                    "data_path": "action_result.parameter.change_coordinator",
                     "data_type": "string"
                 },
                 {
@@ -920,15 +905,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.implementation end",
+                    "data_path": "action_result.parameter.implementation_end",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.implementation start",
+                    "data_path": "action_result.parameter.implementation_start",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.no implementation effect",
+                    "data_path": "action_result.parameter.no_implementation_effect",
                     "data_type": "string"
                 },
                 {
@@ -946,7 +931,7 @@
                 {
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
-                    "column_name": "title",
+                    "column_name": "Title",
                     "column_order": 1
                 },
                 {
@@ -1083,7 +1068,7 @@
             "action": "get change",
             "identifier": "get_change",
             "description": "Get Change information",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -1100,7 +1085,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -1285,39 +1274,40 @@
                     ],
                     "order": 0
                 },
-                "closure comments": {
+                "closure_comments": {
                     "description": "Closure comments for this change (newline-separated)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
                     "order": 1
                 },
-                "closure code": {
+                "closure_code": {
                     "description": "Closure code for this change",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": true,
                     "order": 2
                 },
-                "review results": {
+                "review_results": {
                     "description": "Review results for this change",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
                     "order": 3
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.closure_code",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.closure code",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.closure comments",
+                    "data_path": "action_result.parameter.closure_comments",
                     "data_type": "string"
                 },
                 {
@@ -1325,7 +1315,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.review results",
+                    "data_path": "action_result.parameter.review_results",
                     "data_type": "string"
                 },
                 {
@@ -1497,85 +1487,79 @@
             "type": "generic",
             "read_only": false,
             "parameters": {
-                "display name": {
+                "display_name": {
                     "description": "Display name for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 0
                 },
-                "CI type": {
+                "ci_type": {
                     "description": "Type for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
-                "CI subtype": {
+                "ci_subtype": {
                     "description": "Subype for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 },
-                "assignment group": {
+                "assignment_group": {
                     "description": "Assignment Group for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 3
                 },
-                "owner individual": {
+                "owner_individual": {
                     "description": "Contact name for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 4
                 },
                 "department": {
                     "description": "Department for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 5
                 },
-                "department owner": {
+                "department_owner": {
                     "description": "Owner of the department for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 6
                 },
                 "status": {
                     "description": "Status for the CI",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 7
                 },
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 8
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ci_subtype",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.CI subtype",
+                    "data_path": "action_result.parameter.ci_type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.CI type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.assignment group",
+                    "data_path": "action_result.parameter.assignment_group",
                     "data_type": "string"
                 },
                 {
@@ -1583,7 +1567,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.department owner",
+                    "data_path": "action_result.parameter.department_owner",
                     "data_type": "string"
                 },
                 {
@@ -1591,7 +1575,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.display name",
+                    "data_path": "action_result.parameter.display_name",
                     "data_type": "string"
                 },
                 {
@@ -1599,7 +1583,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.owner individual",
+                    "data_path": "action_result.parameter.owner_individual",
                     "data_type": "string"
                 },
                 {
@@ -1724,7 +1708,7 @@
             "action": "get object",
             "identifier": "get_object",
             "description": "Get object information",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -1741,15 +1725,17 @@
                     "description": "Project Key to get the issue from",
                     "data_type": "string",
                     "default": "incidents",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -2193,32 +2179,30 @@
                 "update_fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "project_key": {
                     "description": "Key for project to update the object",
                     "data_type": "string",
                     "default": "incidents",
-                    "required": false,
-                    "primary": false,
-                    "order": 1
+                    "order": 2
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0
                 },
                 {
@@ -2228,8 +2212,7 @@
                 {
                     "data_path": "action_result.parameter.update_fields",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "update_fields",
+                    "column_name": "Update Fields",
                     "column_order": 1
                 },
                 {
@@ -2548,7 +2531,7 @@
                     "data_path": "action_result.data.*.Incident.AssignmentGroup",
                     "data_type": "string",
                     "column_name": "Assignment Group",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.Incident.Category",
@@ -2565,8 +2548,8 @@
                 {
                     "data_path": "action_result.data.*.Incident.IncidentID",
                     "data_type": "string",
-                    "column_name": "ID",
-                    "column_order": 0
+                    "column_name": "IncidentID",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.Incident.JournalUpdates",
@@ -2604,7 +2587,7 @@
                     "data_path": "action_result.data.*.Incident.Title",
                     "data_type": "string",
                     "column_name": "Title",
-                    "column_order": 1
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.Incident.UpdatedBy",
@@ -2661,8 +2644,6 @@
                     "description": "Key for project to update the object",
                     "data_type": "string",
                     "default": "incidents",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -2670,14 +2651,17 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0
                 },
                 {
