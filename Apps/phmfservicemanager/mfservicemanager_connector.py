@@ -22,7 +22,7 @@ class MfServiceManagerConnector(BaseConnector):
 
     def __init__(self):
 
-        # Call the BaseConnectors init first
+        # Call the Base Connector's init first
         super(MfServiceManagerConnector, self).__init__()
 
         self._state = None
@@ -109,7 +109,7 @@ class MfServiceManagerConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the API talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -315,7 +315,7 @@ class MfServiceManagerConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        # grab relevant fields from return JSON
+        # grab relevant fields from the returned JSON response
         resource_data = response.get('Incident', {})
 
         action_result.add_data(resource_data)
@@ -621,7 +621,7 @@ class MfServiceManagerConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        # grab relevant fields from return JSON
+        # grab relevant fields from the returned JSON response
         resource_data = response.get(project_key.capitalize()[:-1], {})
 
         action_result.add_data(resource_data)
@@ -733,7 +733,7 @@ class MfServiceManagerConnector(BaseConnector):
 
     def finalize(self):
 
-        # Save the state, this data is saved accross actions and app upgrades
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 

@@ -54,7 +54,7 @@
         {
             "action": "create incident",
             "identifier": "create_incident",
-            "description": "Create a incident",
+            "description": "Create an incident",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -89,7 +89,7 @@
                     "order": 4
                 },
                 "assignment_group": {
-                    "description": "Assignment Group for the incident",
+                    "description": "Assignment group for the incident",
                     "data_type": "string",
                     "required": true,
                     "order": 5
@@ -393,13 +393,13 @@
                     "order": 1
                 },
                 "assignee": {
-                    "description": "assignee",
+                    "description": "Assignee",
                     "data_type": "string",
                     "required": true,
                     "order": 2
                 },
                 "assignment_group": {
-                    "description": "assignment group",
+                    "description": "Assignment group",
                     "data_type": "string",
                     "order": 3
                 },
@@ -444,7 +444,7 @@
                     "order": 11
                 },
                 "journal_updates": {
-                    "description": "Journal Updates (newline-separated)",
+                    "description": "Journal updates (newline-separated)",
                     "data_type": "string",
                     "required": true,
                     "order": 12
@@ -455,7 +455,7 @@
                     "order": 13
                 },
                 "ticket_source": {
-                    "description": "Ticket Source",
+                    "description": "Ticket source",
                     "data_type": "string",
                     "order": 14
                 }
@@ -824,7 +824,7 @@
                     "order": 4
                 },
                 "category": {
-                    "description": "category for the change",
+                    "description": "Category for the change",
                     "data_type": "string",
                     "required": true,
                     "order": 5
@@ -836,13 +836,13 @@
                     "order": 6
                 },
                 "assignment_group": {
-                    "description": "Assignment Group for the change",
+                    "description": "Assignment group for the change",
                     "data_type": "string",
                     "required": true,
                     "order": 7
                 },
                 "change_coordinator": {
-                    "description": "Change Coordinator for the change",
+                    "description": "Change coordinator for the change",
                     "data_type": "string",
                     "required": true,
                     "order": 8
@@ -1067,7 +1067,7 @@
         {
             "action": "get change",
             "identifier": "get_change",
-            "description": "Get Change information",
+            "description": "Get change information",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1260,7 +1260,7 @@
         {
             "action": "close change",
             "identifier": "close_change",
-            "description": "Close out a Change",
+            "description": "Close out a change",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1500,13 +1500,13 @@
                     "order": 1
                 },
                 "ci_subtype": {
-                    "description": "Subype for the CI",
+                    "description": "Subtype for the CI",
                     "data_type": "string",
                     "required": true,
                     "order": 2
                 },
                 "assignment_group": {
-                    "description": "Assignment Group for the CI",
+                    "description": "Assignment group for the CI",
                     "data_type": "string",
                     "required": true,
                     "order": 3
@@ -1722,7 +1722,7 @@
                     "order": 0
                 },
                 "project_key": {
-                    "description": "Project Key to get the issue from",
+                    "description": "Project key to get the issue from",
                     "data_type": "string",
                     "default": "incidents",
                     "order": 1
@@ -2182,7 +2182,7 @@
                     "order": 1
                 },
                 "project_key": {
-                    "description": "Key for project to update the object",
+                    "description": "Project key to update the object",
                     "data_type": "string",
                     "default": "incidents",
                     "order": 2
@@ -2641,7 +2641,7 @@
                     "order": 0
                 },
                 "project_key": {
-                    "description": "Key for project to update the object",
+                    "description": "Project key to close the object",
                     "data_type": "string",
                     "default": "incidents",
                     "order": 1
