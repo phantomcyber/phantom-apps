@@ -53,7 +53,7 @@ class MfServiceManagerConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -151,7 +151,7 @@ class MfServiceManagerConnector(BaseConnector):
         except Exception as e:
             if e.message:
                 try:
-                    error_msg = self._unicode_string_handler(e)
+                    error_msg = self._unicode_string_handler(e.message)
                     message = ('Error connecting to server. Details: {0}').format(error_msg)
                 except:
                     return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
@@ -168,7 +168,7 @@ class MfServiceManagerConnector(BaseConnector):
         ret_val, response = self._make_rest_call(HPSM_INCIDENTS_ENDPOINT, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
@@ -276,10 +276,20 @@ class MfServiceManagerConnector(BaseConnector):
             update_fields['Contact'] = param.get('contact')
 
         if param.get('impact'):
-            update_fields['Impact'] = str(param.get('impact'))
+            try:
+                impact = int(param.get('impact'))
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the 'impact' parameter")
+
+            update_fields['Impact'] = str(impact)
 
         if param.get('urgency'):
-            update_fields['Urgency'] = str(param.get('urgency'))
+            try:
+                urgency = int(param.get('impact'))
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the 'urgency' parameter")
+
+            update_fields['Urgency'] = str(urgency)
 
         if param.get('affected_ci'):
             update_fields['AffectedCI'] = param.get('affected_ci')

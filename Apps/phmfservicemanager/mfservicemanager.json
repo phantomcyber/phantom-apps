@@ -8,7 +8,7 @@
     "logo_dark": "logo_microfocus_dark.svg",
     "product_name": "Service Manager",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.3.0",
     "utctime_updated": "2019-01-22T08:05:33.738804Z",
@@ -165,7 +165,10 @@
                     "data_path": "action_result.data.*.IncidentID",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.JournalUpdates",
@@ -227,11 +230,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -268,7 +277,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Area",
@@ -296,7 +308,10 @@
                     "data_path": "action_result.data.*.IncidentID",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.JournalUpdates",
@@ -358,11 +373,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -527,7 +548,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Area",
@@ -555,7 +579,10 @@
                     "data_path": "action_result.data.*.IncidentID",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.JournalUpdates",
@@ -617,11 +644,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -640,6 +673,10 @@
                     "description": "Incident ID",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "itsm incident id"
+                    ],
                     "order": 0
                 },
                 "assignee": {
@@ -680,7 +717,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.solution",
@@ -712,7 +752,10 @@
                     "data_path": "action_result.data.*.IncidentID",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.JournalUpdates",
@@ -774,11 +817,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -930,9 +979,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.title",
-                    "data_type": "string",
-                    "column_name": "Title",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.CustomerVisible",
@@ -982,7 +1029,10 @@
                     "data_path": "action_result.data.*.header.ChangeID",
                     "data_type": "string",
                     "column_name": "ChangeID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.header.DateEntered",
@@ -1036,7 +1086,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.Title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary.success",
@@ -1052,11 +1104,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1093,7 +1151,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.CustomerVisible",
@@ -1177,7 +1238,12 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.ChangeID",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "column_name": "ChangeID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.header.ChangeModel",
@@ -1189,11 +1255,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.DateEntered",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Date Entered",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.header.InitiatedBy",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Initiated By",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.header.Open",
@@ -1205,7 +1275,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.Phase",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Phase",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.header.PlannedEnd",
@@ -1237,7 +1309,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.Title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -1245,11 +1319,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1312,7 +1392,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.review_results",
@@ -1400,7 +1483,12 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.ChangeID",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.header.ChangeModel",
@@ -1412,11 +1500,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.DateEntered",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Date Entered",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.header.InitiatedBy",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Initiated By",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.header.Open",
@@ -1428,7 +1520,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.Phase",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Phase",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.header.PlannedEnd",
@@ -1460,7 +1554,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.header.Title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -1468,11 +1564,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1692,11 +1794,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1739,7 +1847,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.project_key",
@@ -1829,7 +1940,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.Change.header.ChangeID",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Change.header.ChangeModel",
@@ -2085,7 +2199,10 @@
                     "data_path": "action_result.data.*.Incident.IncidentID",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Incident.JournalUpdates",
@@ -2147,11 +2264,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -2203,7 +2326,10 @@
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.project_key",
@@ -2293,7 +2419,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.Change.header.ChangeID",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Change.header.ChangeModel",
@@ -2549,7 +2678,10 @@
                     "data_path": "action_result.data.*.Incident.IncidentID",
                     "data_type": "string",
                     "column_name": "IncidentID",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "itsm incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Incident.JournalUpdates",
@@ -2611,11 +2743,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -2662,7 +2800,10 @@
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "itsm object id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.project_key",
@@ -2671,16 +2812,26 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
