@@ -57,7 +57,7 @@ def display_view(provides, all_app_runs, context):
         return_page = "jira_update_ticket.html"
     if provides == "list tickets":
         return_page = "jira_list_tickets.html"
-    if provides == 'search users':
+    if provides == 'lookup users':
         return_page = "jira_search_users.html"
 
     return return_page

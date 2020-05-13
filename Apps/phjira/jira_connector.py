@@ -80,8 +80,18 @@ class JiraConnector(phantom.BaseConnector):
         self._verify_cert = config[phantom.APP_JSON_VERIFY]
         self._username = self._handle_py_ver_compat_for_input_str(config[phantom.APP_JSON_USERNAME])
         self._password = config[phantom.APP_JSON_PASSWORD]
-        self._custom_fields = None
         self._custom_fields_list = None
+        self._custom_fields = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_CUSTOM_FIELDS))
+
+        if self._custom_fields:
+            try:
+                self._custom_fields_list = json.loads(self._custom_fields)
+                if not isinstance(self._custom_fields_list, list):
+                    return self.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_NON_EMPTY_ERROR)
+            except Exception as e:
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+                return self.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_FORMAT_ERROR.format(error_text))
 
         return phantom.APP_SUCCESS
 
@@ -106,9 +116,6 @@ class JiraConnector(phantom.BaseConnector):
 
         # An html response, treat it like an error
         status_code = response.status_code
-
-        if 200 <= status_code < 399:
-            return phantom.APP_SUCCESS, response.text
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
@@ -195,7 +202,7 @@ class JiraConnector(phantom.BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, UnicodeDammit(r.text.replace(u'{', '{{').replace(u'}', '}}') if r.text else "Response error text not found").unicode_markup.encode('UTF-8'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}') if r.text else "Response error text not found"))
 
         return action_result.set_status(phantom.APP_ERROR, message), None
 
@@ -357,7 +364,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return result_object.set_status(phantom.APP_ERROR, "{0}. Message: {1}".format(message, error_text))
 
-    def _create_jira_object(self):
+    def _create_jira_object(self, action_result):
 
         if (not self._verify_cert):
             if ('REQUESTS_CA_BUNDLE' in os.environ):
@@ -372,9 +379,9 @@ class JiraConnector(phantom.BaseConnector):
         try:
             self._jira = JIRA(options=options, basic_auth=(self._username, self._password))
         except Timeout:
-            return self.set_status(phantom.APP_ERROR, JIRA_ERR_API_TIMEOUT)
+            return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_API_TIMEOUT)
         except Exception as e:
-            return self._set_jira_error(self, JIRA_ERR_API_INITIALIZATION, e)
+            return self._set_jira_error(action_result, JIRA_ERR_API_INITIALIZATION, e)
         finally:
             signal.alarm(0)
 
@@ -382,6 +389,7 @@ class JiraConnector(phantom.BaseConnector):
 
     def _test_connectivity(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
         # Progress
         self.save_progress(JIRA_USING_BASE_URL.format(base_url=self._base_url))
 
@@ -389,20 +397,23 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            self.append_to_message(JIRA_ERR_CONNECTIVITY_TEST)
-            return self.get_status()
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            self.save_progress(JIRA_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
         try:
             self._jira.projects()
         except Exception as e:
-            self._set_jira_error(self, JIRA_ERR_PROJECTS_INFO, e)
-            self.append_to_message(JIRA_ERR_CONNECTIVITY_TEST)
-            return self.get_status()
+            self._set_jira_error(action_result, JIRA_ERR_PROJECTS_INFO, e)
+            self.save_progress(JIRA_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, JIRA_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(JIRA_SUCC_CONNECTIVITY_TEST)
+        return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_CONNECTIVITY_TEST)
 
     def _list_projects(self, param):
+
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
@@ -411,10 +422,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(param))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         projects = None
 
@@ -424,7 +433,7 @@ class JiraConnector(phantom.BaseConnector):
         except Exception as e:
             return self._set_jira_error(action_result, JIRA_ERR_PROJECTS_INFO, e)
 
-        action_result.set_summary({JIRA_TOTAL_PROJECTS: "0"})
+        action_result.set_summary({JIRA_TOTAL_PROJECTS: 0})
 
         if (not projects):
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -470,7 +479,7 @@ class JiraConnector(phantom.BaseConnector):
 
         try:
             # get all the custom keys present in the input_fields
-            custom_keys_present = set(input_fields.keys()).intersection(custom_id_to_name.keys())
+            custom_keys_present = set(input_fields.keys()).intersection(list(custom_id_to_name.keys()))
 
             for field in custom_keys_present:
                 # replace them
@@ -486,7 +495,7 @@ class JiraConnector(phantom.BaseConnector):
 
         try:
             # get all the custom keys present in the input_fields
-            custom_keys_present = set(input_fields.keys()).intersection(custom_name_to_id.keys())
+            custom_keys_present = set(input_fields.keys()).intersection(list(custom_name_to_id.keys()))
 
             for field in custom_keys_present:
                 # replace them
@@ -570,6 +579,7 @@ class JiraConnector(phantom.BaseConnector):
 
     def _set_ticket_status(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -577,10 +587,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         kwargs = {}
 
@@ -712,6 +720,8 @@ class JiraConnector(phantom.BaseConnector):
 
     def _update_ticket(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -719,10 +729,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ID])
 
@@ -761,7 +769,6 @@ class JiraConnector(phantom.BaseConnector):
         attachment_status = self._add_attachment(issue, attachment)
 
         if (attachment_status):
-
             if (action_result.get_message()):
                 action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(action_result.get_message(), attachment_status))
             else:
@@ -782,12 +789,18 @@ class JiraConnector(phantom.BaseConnector):
             error_message = ""
 
         if (not ret_val and JIRA_ERR_FETCH_CUSTOM_FIELDS not in error_message) or not attach_result or not update_result:
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while updating the ticket. Error message: {0}'.format(action_result.get_message()))
+            error_msg = "Error occurred while updating the ticket. "
+            if (attachment):
+                error_msg += "Attachment successfully added. " if (attach_result) else "Failed to add attachment. "
+            if (param_update_fields):
+                error_msg += "Fields successfully updated." if (update_result) else "Failed to update fields."
+            return action_result.set_status(phantom.APP_ERROR, '{0} Error message: {1}'.format(error_msg, action_result.get_message()))
 
         return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_UPDATED)
 
     def _delete_ticket(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -795,10 +808,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ID])
 
@@ -821,6 +832,8 @@ class JiraConnector(phantom.BaseConnector):
 
     def _create_ticket(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -828,10 +841,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(param))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         # get all the params for the issue
         project_key = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_PROJECT_KEY])
@@ -870,7 +881,7 @@ class JiraConnector(phantom.BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, error_text.replace('{', '(').replace('}', ')'))
 
             if ('fields' in fields):
-                if (len(fields.keys()) > 1):
+                if (len(list(fields.keys())) > 1):
                     return action_result.set_status(phantom.APP_ERROR, JIRA_ERR_INPUT_FIELDS_NOT_THE_ONLY_ONE)
                 fields = fields['fields']
 
@@ -967,6 +978,8 @@ class JiraConnector(phantom.BaseConnector):
 
     def _list_tickets(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -974,10 +987,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(param))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         # get all the params for the search issue
         project_key = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_PROJECT_KEY])
@@ -990,7 +1001,7 @@ class JiraConnector(phantom.BaseConnector):
         if start_index is None:
             return action_result.get_status()
 
-        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_RESULTS)
+        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_VALUE)
         limit = self._validate_integers(action_result, limit, 'limit')
         if limit is None:
             return action_result.get_status()
@@ -1025,18 +1036,18 @@ class JiraConnector(phantom.BaseConnector):
 
         while True:
             try:
-                users = self._jira.search_users(user=username, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS)
+                users = self._jira.search_users(user=username, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS_PER_PAGE)
             except Exception as e:
                 error_code, error_msg = self._get_error_message_from_exception(e)
                 error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users. Error: {0}".format(
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users for Jira on-prem. Error: {0}".format(
                             error_text))
 
                 return None
 
             if users is None:
-                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination.')
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira on-prem.')
                 return None
 
             users_list.extend(users)
@@ -1044,10 +1055,10 @@ class JiraConnector(phantom.BaseConnector):
             if limit and len(users_list) >= limit:
                 return users_list[:limit]
 
-            if len(users) < DEFAULT_MAX_RESULTS:
+            if len(users) < DEFAULT_MAX_RESULTS_PER_PAGE:
                 break
 
-            start_index = start_index + DEFAULT_MAX_RESULTS
+            start_index = start_index + DEFAULT_MAX_RESULTS_PER_PAGE
 
         return users_list
 
@@ -1059,7 +1070,7 @@ class JiraConnector(phantom.BaseConnector):
         param.update({
             "includeActive": True,
             "includeInactive": False,
-            "maxResults": DEFAULT_MAX_RESULTS,
+            "maxResults": DEFAULT_MAX_RESULTS_PER_PAGE,
             "startAt": start_index,
             "query": "displayName=\"{0}\"".format(display_name)
         })
@@ -1070,7 +1081,7 @@ class JiraConnector(phantom.BaseConnector):
                 error_code, error_msg = self._get_error_message_from_exception(e)
                 error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
 
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users. Error: {0}".format(
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users for Jira cloud. Error: {0}".format(
                             error_text))
                 return None
 
@@ -1078,7 +1089,7 @@ class JiraConnector(phantom.BaseConnector):
                 return None
 
             if users is None:
-                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination.')
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira cloud.')
                 return None
 
             users_list.extend(users)
@@ -1086,14 +1097,16 @@ class JiraConnector(phantom.BaseConnector):
             if limit and len(users_list) >= limit:
                 return users_list[:limit]
 
-            if len(users) < DEFAULT_MAX_RESULTS:
+            if len(users) < DEFAULT_MAX_RESULTS_PER_PAGE:
                 break
 
-            param.update({"startAt": start_index + DEFAULT_MAX_RESULTS})
+            param.update({"startAt": start_index + DEFAULT_MAX_RESULTS_PER_PAGE})
 
         return users_list
 
     def _handle_search_users(self, param):
+
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
@@ -1102,10 +1115,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(param))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         # get all the params for the search issue
         username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_USERNAME))
@@ -1114,12 +1125,9 @@ class JiraConnector(phantom.BaseConnector):
         if (display_name and username) or (not display_name and not username):
             return action_result.set_status(phantom.APP_ERROR, JIRA_SEARCH_USERS_ERROR)
 
-        start_index = param.get(JIRA_JSON_START_INDEX, DEFAULT_START_INDEX)
-        start_index = self._validate_integers(action_result, start_index, 'start_index', allow_zero=True)
-        if start_index is None:
-            return action_result.get_status()
+        start_index = 0
 
-        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_RESULTS)
+        limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_VALUE)
         limit = self._validate_integers(action_result, limit, 'limit')
         if limit is None:
             return action_result.get_status()
@@ -1132,11 +1140,18 @@ class JiraConnector(phantom.BaseConnector):
         if users is None:
             return action_result.get_status()
 
-        for user in users:
-            if display_name:
-                action_result.add_data(user)
-            else:
-                action_result.add_data(user.raw)
+        try:
+            for user in users:
+                if display_name:
+                    action_result.add_data(user)
+                else:
+                    action_result.add_data(user.raw)
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing fetched response. Error: {0}".format(
+                            error_text))
 
         summary = action_result.update_summary({})
         summary[JIRA_TOTAL_USERS] = action_result.get_data_size()
@@ -1153,8 +1168,8 @@ class JiraConnector(phantom.BaseConnector):
         :param action_result: action_result
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         '''
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         update_body = {"update": {"comment": [{"add": {}}]}}
         comment_body = update_body['update']['comment'][0]['add']
@@ -1176,6 +1191,8 @@ class JiraConnector(phantom.BaseConnector):
 
     def _add_comment(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -1183,10 +1200,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ID])
 
@@ -1244,20 +1259,36 @@ class JiraConnector(phantom.BaseConnector):
 
         # Check for file in vault
         try:
-            meta = Vault.get_file_info(vault_id=vault_id)  # Vault IDs are unique
+            vault_meta = Vault.get_file_info(vault_id=vault_id)  # Vault IDs are unique
 
-            if (not meta):
-                self.debug_print("Error fetching meta information attachment")
+            if (not vault_meta):
+                self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
                 return JIRA_ERR_FILE_NOT_IN_VAULT
 
         except:
             return JIRA_ERR_FILE_NOT_IN_VAULT
 
-        meta = meta[0]
+        file_meta = None
+        try:
+            for meta in vault_meta:
+                if meta.get("container_id") == self.get_container_id():
+                    file_meta = meta
+                    break
+            else:
+                self.debug_print("Unable to find a file for the vault ID: '{0}' in the container ID: '{1}'".format(vault_id, self.get_container_id()))
+        except:
+            self.debug_print("Error occurred while finding a file for the vault ID: '{0}' in the container ID: '{1}'".format(vault_id, self.get_container_id()))
+            self.debug_print("Considering the first file as the required file")
+            file_meta = vault_meta[0]
+
+        if not file_meta:
+            self.debug_print("Unable to find a file for the vault ID: '{0}' in the container ID: '{1}'".format(vault_id, self.get_container_id()))
+            self.debug_print("Considering the first file as the required file")
+            file_meta = vault_meta[0]
 
         try:
             path = Vault.get_file_path(vault_id)
-            filename = meta["name"]
+            filename = file_meta["name"]
 
             try:
                 self.debug_print("First attempt to add attachment to the given Jira ticket ID")
@@ -1272,6 +1303,8 @@ class JiraConnector(phantom.BaseConnector):
                     modified_filename = filename.encode('ascii', 'ignore').decode('ascii')
                     modified_filename = modified_filename.replace("\r", " ").replace("\n", " ")
                 except:
+                    self.debug_print("Failed to remove non-ASCII Unicode chars from the filename")
+                    modified_filename = filename
                     pass
 
                 # this condition will check that whether filename has Unicode chars or not, and if not it will re-thorw the same exception
@@ -1281,7 +1314,7 @@ class JiraConnector(phantom.BaseConnector):
                     with open(path, 'rb') as f:
                         self._jira.add_attachment(issue=issue, attachment=f, filename=filename)
                 else:
-                    self.debug_print("Raise the same exception as filename doesn't have Unicode chars")
+                    self.debug_print("Raise the same exception as filename doesn't have Unicode chars or unable to remove Unicode chars")
                     raise e
 
         except Exception as e:
@@ -1372,6 +1405,8 @@ class JiraConnector(phantom.BaseConnector):
 
     def _get_ticket(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -1379,24 +1414,29 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(param))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ID])
 
         ret_val = self._set_issue_data(issue_id, action_result)
 
+        error_msg = ""
         if (phantom.is_fail(ret_val)):
             error_message = action_result.get_message()
             if not error_message:
                 error_message = ""
 
-            if JIRA_ERR_FETCH_CUSTOM_FIELDS not in error_message:
+            if (JIRA_ERR_FETCH_CUSTOM_FIELDS not in error_message):
                 return action_result.get_status()
+            else:
+                error_msg = error_message
+        try:
+            message = "The ticket has been retrieved successfully{0}".format(". Error while fetching custom fields: {0}".format(error_msg) if error_msg else "")
+        except:
+            message = "The ticket has been retrieved successfully"
 
-        return action_result.set_status(phantom.APP_SUCCESS, "The ticket has been retrieved successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _get_container_id(self, issue_key):
 
@@ -1646,7 +1686,7 @@ class JiraConnector(phantom.BaseConnector):
                 artifact_cef['author_account_id'] = None
                 artifact_cef['is_on_prem'] = True
             except:
-                self.debug_print("Exception occurred when server is Jira cloud. So try to fetch author display name and account ID")
+                self.debug_print("Error occurred while fetching author name as server is Jira cloud. So try to fetch author display name and account ID")
                 artifact_cef['author_account_id'] = attachment.author.accountId
                 artifact_cef['author'] = attachment.author.displayName
                 artifact_cef['is_on_prem'] = False
@@ -1678,7 +1718,7 @@ class JiraConnector(phantom.BaseConnector):
                 updateAuthor_account_id = None
                 is_on_prem = True
             except:
-                self.debug_print("Exception occurred when server is Jira cloud. So try to fetch author display name and account ID")
+                self.debug_print("Error occurred while fetching author name as server is Jira cloud. So try to fetch author display name and account ID")
                 author = comment.author.displayName
                 updateAuthor = comment.updateAuthor.displayName
                 author_account_id = comment.author.accountId
@@ -1721,9 +1761,9 @@ class JiraConnector(phantom.BaseConnector):
         while True:
             try:
                 if fields:
-                    issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS, fields='updated')
+                    issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS_PER_PAGE, fields='updated')
                 else:
-                    issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS)
+                    issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS_PER_PAGE)
             except Exception as e:
                 error_code, error_msg = self._get_error_message_from_exception(e)
                 error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
@@ -1741,14 +1781,16 @@ class JiraConnector(phantom.BaseConnector):
             if limit and len(issues_list) >= limit:
                 return issues_list[:limit]
 
-            if len(issues) < DEFAULT_MAX_RESULTS:
+            if len(issues) < DEFAULT_MAX_RESULTS_PER_PAGE:
                 break
 
-            start_index = start_index + DEFAULT_MAX_RESULTS
+            start_index = start_index + DEFAULT_MAX_RESULTS_PER_PAGE
 
         return issues_list
 
     def _handle_link_tickets(self, param):
+
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
@@ -1757,10 +1799,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         from_issue = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_FROM_ID])
         to_issue = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_TO_ID])
@@ -1804,14 +1844,14 @@ class JiraConnector(phantom.BaseConnector):
 
     def _handle_add_watcher(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ISSUE_ID])
         username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_WATCHER))
@@ -1875,14 +1915,14 @@ class JiraConnector(phantom.BaseConnector):
 
     def _handle_remove_watcher(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         issue_id = self._handle_py_ver_compat_for_input_str(param[JIRA_JSON_ISSUE_ID])
         username = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_WATCHER))
@@ -1945,14 +1985,14 @@ class JiraConnector(phantom.BaseConnector):
 
     def _handle_get_attachments(self, param):
 
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
-
-        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         ticket_key = self._handle_py_ver_compat_for_input_str(param['id'])
         container_id = self._handle_py_ver_compat_for_input_str(param['container_id'])
@@ -2195,6 +2235,9 @@ class JiraConnector(phantom.BaseConnector):
 
     def _on_poll(self, param):
 
+        # Add action result
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
@@ -2202,8 +2245,8 @@ class JiraConnector(phantom.BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
-        if (phantom.is_fail(self._create_jira_object())):
-            return self.get_status()
+        if (phantom.is_fail(self._create_jira_object(action_result))):
+            return action_result.get_status()
 
         # Check for load_state API, use it if it is present
         if (hasattr(self, 'load_state')):
@@ -2213,9 +2256,6 @@ class JiraConnector(phantom.BaseConnector):
 
         # Get config
         config = self.get_config()
-
-        # Add action result
-        action_result = self.add_action_result(phantom.ActionResult(param))
 
         if not state:
             self.debug_print(JIRA_ERR_STATE_FILE_LOAD_ERROR)
@@ -2260,18 +2300,6 @@ class JiraConnector(phantom.BaseConnector):
         if project_key:
             query = "project={0}".format(project_key)
 
-        self._custom_fields = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_CUSTOM_FIELDS))
-
-        if self._custom_fields:
-            try:
-                self._custom_fields_list = json.loads(self._custom_fields)
-                if not isinstance(self._custom_fields_list, list):
-                    return action_result.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_NON_EMPTY_ERROR)
-            except Exception as e:
-                error_code, error_msg = self._get_error_message_from_exception(e)
-                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
-                return action_result.set_status(phantom.APP_ERROR, JIRA_CUSTOM_FIELD_FORMAT_ERROR.format(error_text))
-
         action_query = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_QUERY, ""))
 
         if (len(action_query) > 0):
@@ -2283,21 +2311,37 @@ class JiraConnector(phantom.BaseConnector):
 
         # If it's the first poll, don't filter based on update time
         elif (state.get('first_run', True)):
-            max_tickets = int(config.get('first_run_max_tickets', -1))
+            max_tickets = int(config.get('first_run_max_tickets', DEFAULT_SCHEDULED_INTERVAL_INGESTION_COUNT))
 
         # If it's scheduled polling add a filter for update time being greater than the last poll time
         else:
-            max_tickets = int(config.get('max_tickets', -1))
+            max_tickets = int(config.get('max_tickets', DEFAULT_SCHEDULED_INTERVAL_INGESTION_COUNT))
             query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', last_time_str)
 
         # Order by update time
         query = "{0} order by updated asc".format(query if query else '')
+
+        try:
+            self.debug_print("JQL Query: {0}".format(query))
+            self.save_progress("JQL Query: {0}".format(query))
+        except:
+            self.debug_print("Error occurred while logging the value of JQL query, continuing the on poll execution")
+            self.save_progress("Error occurred while logging the value of JQL query, continuing the on poll execution")
+            pass
 
         # Query for issues
         issues = self._paginator(query, action_result, limit=max_tickets, fields=True)
 
         if issues is None:
             return action_result.get_status()
+
+        try:
+            self.save_progress("Total issues fetched: {0}".format(len(issues)))
+            self.debug_print("Total issues fetched: {0}".format(len(issues)))
+        except:
+            self.debug_print("Error occurred while logging the value of total issues fetched, continuing the on poll execution")
+            self.save_progress("Error occurred while logging the value of total issues fetched, continuing the on poll execution")
+            pass
 
         # Ingest the issues
         failed = 0
@@ -2310,6 +2354,13 @@ class JiraConnector(phantom.BaseConnector):
             last_time_jira_server_tz_specific = parse(last_fetched_issue.fields.updated)
             last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(dateutil.tz.tzlocal())
             state['last_time'] = time.mktime(last_time_phantom_server_tz_specific.timetuple())
+
+            try:
+                self.debug_print("State File: {0}".format(str(state)))
+                self.debug_print("Last fetched Jira ticket: {0}".format(issues[-1].key))
+            except:
+                self.debug_print("Error occurred while logging the value of state file and last fetched Jira ticket, continuing the on poll execution")
+                pass
 
         # Mark the first_run as False once the scheduled or ingestion polling
         # first run or every run has been successfully completed
@@ -2385,7 +2436,7 @@ class JiraConnector(phantom.BaseConnector):
             self.ACTION_ID_SEARCH_USERS: self._handle_search_users
         }
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 

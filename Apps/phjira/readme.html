@@ -15,9 +15,10 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 	<ul>
 		<li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
 		<ul>
-			<li>Add Watcher - The new [user_account_id] parameter have been added for JIRA cloud to add watcher into a provided issue.</li>
-			<li>Remove Watcher - The new [user_account_id] parameter have been added for JIRA cloud to remove watcher from a provided issue.</li>
-			<li>Create Ticket - The new [assignee_account_id] parameter have been added for JIRA cloud to add assignee while creating a Jira ticket.</li>
+			<li>Add Watcher - The new [user_account_id] parameter has been added for the Jira cloud to add watcher into a provided issue.</li>
+			<li>Remove Watcher - The new [user_account_id] parameter has been added for the Jira cloud to remove watcher from a provided issue.</li>
+			<li>Create Ticket - The new [assignee_account_id] parameter has been added for the Jira cloud to add the assignee while creating a Jira ticket.</li>
+			<li>Lookup Users - Added a new action. This action will get a list of User resources that match the specified search string.</li>
 		</ul>
 	</ul>
 </p>
@@ -47,12 +48,12 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 </p>
 
 <p>
-	<b>Functioning of On Poll</b>
+	<b>The functioning of On Poll</b>
 		<ul>
 			<li><b>NOTE (Consider below points due to a minute's granularity (instead of a second or lesser) for querying tickets in the JIRA)</b></li>
 				<ul>
 					<li>It is highly recommended for configuring a significantly large value (larger than the number of existing tickets on the user's instance) in the <b></b> asset configuration parameter to bring the ingested tickets in the Phantom in sync entirely with the JIRA instance in the first run</li>
-					<li>It is highly recommended for configuring a significantly large value (larger than the possible number of tickets that can be updated in 1 minute or any value larger than the average number of tickets getting created every unit of time (based on frequency of scheduled or interval polling)) in the <b></b> asset configuration parameter to avoid the duplicate tickets ingestion</li>
+					<li>It is highly recommended for configuring a significantly large value (larger than the possible number of tickets that can be updated in 1 minute or any value larger than the average number of tickets getting created every unit of time (based on the frequency of scheduled or interval polling)) in the <b></b> asset configuration parameter to avoid the duplicate tickets ingestion</li>
 				</ul>
 			<br>
 			<li>The On Poll action works in 2 steps. In the first step, all the tickets (issues) in a defined time duration will be fetched. In the second step, all the components (e.g. fields, comments, and attachments) of the tickets (retrieved in the first step) will be fetched. A container will be created for each ticket and for each ticket all the components will be created as the respective artifacts.</li>
@@ -71,7 +72,7 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 						<li>For checking the system settings timezone, navigate to the JIRA instance; navigate to the option <b>Jira Settings --> System</b> in the settings page; the value of the <b>Default user time zone</b> parameter is the timezone that has to be provided in the Phantom asset configuration</li>
 					</ul>
 			</ol>
-			<li>Users can provide the JSON formatted list of names of the custom fields (to be considered for the ingestion) in the asset configuration parameter <b>custom_fields</b> e.g. ["Test \"CF\" 1", "test_cf_2"]. It's a valid JSON formatted list of strings, so user should use escape sequences whenever needed. Please find the below points for getting exact names for the custom fields.</li>
+			<li>Users can provide the JSON formatted list of names of the custom fields (to be considered for the ingestion) in the asset configuration parameter <b>custom_fields</b> e.g. ["Test \"CF\" 1", "test_cf_2"]. It's a valid JSON formatted list of strings, so the user should use escape sequences whenever needed. Please find the below points for getting exact names for the custom fields.</li>
 			<ol>
 				<li>On-premise JIRA</li>
 					<ul>
@@ -100,14 +101,14 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 							<li>Fetch all created or updated components (e.g. fields, comments, and attachments) for each ticket (retrieved in the previous step)</li>
 						</ul>
 						<li>Create containers for the tickets and artifacts for the fields, comments, and the attachments</li>
-						<li>It is recommended to provide a sufficiently large value in the <b>container_count</b> parameter for polling because manual polling does not remember the timestamp of last fetched ticket and it starts polling from the beginning every time. Hence, if user runs the manual polling with e.g. 10 as the container count (the tickets are ingested successfully), then, the user again runs the manual polling with the same value in the container count; the app will fetch the same 10 tickets from the beginning and it will display the message as 'duplicate artifacts found' because the same artifacts were already ingested in the earlier manual polling run.</li>
+						<li>It is recommended to provide a sufficiently large value in the <b>container_count</b> parameter for polling because manual polling does not remember the timestamp of last fetched ticket and it starts polling from the beginning every time. Hence, if the user runs the manual polling with e.g. 10 as the container count (the tickets are ingested successfully), then, the user again runs the manual polling with the same value in the container count; the app will fetch the same 10 tickets from the beginning and it will display the message as 'duplicate artifacts found' because the same artifacts were already ingested in the earlier manual polling run.</li>
 					</ul>
 					<br>
 					<li>Scheduled Polling</li>
 					<ul>
 						<li>Follows the same steps as manual polling with the below-mentioned points getting considered</li>
-						<li>The application will fetch the number of tickets governed by the <b>Maximum tickets (issues) for scheduled polling</b> parameter in the On Poll action, whose <b>updated</b> time is greater than or equal to one minute less than the time stored in the <b>last_time</b> variable in the state file. The reason for reducing one minute from the <b>last_time</b> is to ensure that no tickets created or updated on the same minute are not getting skipped due to the granularity of Jira being 1 minute for the time-based filtering of the tickets.</li>
-						<li>If the <b>last_time</b> variable is not present in the state file i.e. the On Poll is executing for the first time, the application will fetch the last <b>M</b> tickets (<b>M:</b> Value provided in the <b>Maximum tickets (issues) to poll first time</b> app configuration parameter) and then, from the next consecutive runs, it will fetch <b>N</b> tickets (<b>N:</b> Value provided in the <b>Maximum tickets (issues) for scheduled polling</b> app configuration parameter).</li>
+						<li>The application will fetch the number of tickets governed by the <b>Maximum tickets (issues) for scheduled polling</b> parameter (default: 100) in the On Poll action, whose <b>updated</b> time is greater than or equal to one minute less than the time stored in the <b>last_time</b> variable in the state file. The reason for reducing one minute from the <b>last_time</b> is to ensure that no tickets created or updated on the same minute are not getting skipped due to the granularity of Jira being 1 minute for the time-based filtering of the tickets.</li>
+						<li>If the <b>last_time</b> variable is not present in the state file i.e. the On Poll is executing for the first time, the application will fetch the last <b>M</b> tickets (<b>M:</b> Value provided in the <b>Maximum tickets (issues) to poll first time</b> app configuration parameter (default: 100)) and then, from the next consecutive runs, it will fetch <b>N</b> tickets (<b>N:</b> Value provided in the <b>Maximum tickets (issues) for scheduled polling</b> app configuration parameter (default: 100)).</li>
 						<li>The last_time will be updated by the <b>updated</b> time of the last ticket which was ingested</li>
 					</ul>
 				</ul>
@@ -126,5 +127,20 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 
 		<li>Test connectivity may fail due to invalid credentials, such as accidentally using the user's email address as the authentication login instead of the user's login name.</li>
 
-		<li>When updating the ticket with a vault ID(adding attachment to the Jira ticket) which contains Unicode characters in the filename getting failed with the 500 Internal Server Error which raised from the used add_attachment() method of JIRA SDK. The SDK behaves differently with the various Phantom platforms. As a result, we have decided a workflow which will ensure a minimal change in the filename and minimal/no data loss. In the workflow, the first time we try to add an attachment to the Jira ticket with the same name as the filename, if it may get successful, then it will add an attachment with the same name. But if it fails, then, we will check whether there are Unicode chars or not in the filename, if it has, there are highly possible chances that Jira SDK add_attachment() method might get throws an exception. And in such a case, we removed those non-ASCII Unicode chars from the name and add prefix FILENAME_ASCII to the filename. And, we again try to add an attachment with a newly created name to the Jira ticket. If it passes, then it's okay and if it doesn't, then, there might be some other genuine issue rather than the SDK Unicode issue and we fail the action.</li>
+		<li>While adding an attachment to the Jira ticket using 'Update ticket' action, if the filename contains Unicode characters, the action is getting failed with the 500 Internal Server Error because of the Jira SDK issue. Due to this, action behaves differently with the various Phantom platforms. As a result, we have deployed the below-mentioned workflow which will ensure a minimal change in the filename and minimal/no data loss.
+			<ol>
+				<li>
+					For the first time we try to add an attachment to the Jira ticket with the same name as the filename, if it may get successful, then it will add an attachment with the same name
+				</li>
+				<li>
+					But if it fails, then, we will check whether there are Unicode characters or not in the filename, if it has, there are highly possible chances that Jira SDK might get throws an exception due to this Unicode characters.
+				</li>
+				<li>
+					And in such a case, we removed those non-ASCII Unicode characters from the filename and add prefix FILENAME_ASCII to the filename. And, we again try to add an attachment with a newly created name to the Jira ticket.
+				</li>
+				<li>
+					If it passes, then it's okay and if it doesn't, then, there might be some other genuine issue rather than the SDK issue and we fail the action by rethrowing the same error.
+				</li>
+			</ol>
+		</li>
 	</ul>
