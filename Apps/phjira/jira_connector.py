@@ -1038,12 +1038,7 @@ class JiraConnector(phantom.BaseConnector):
             try:
                 users = self._jira.search_users(user=username, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS_PER_PAGE)
             except Exception as e:
-                error_code, error_msg = self._get_error_message_from_exception(e)
-                error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
-
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users for Jira on-prem. Error: {0}".format(
-                            error_text))
-
+                self._set_jira_error(action_result, "Error occurred while fetching the list of users for Jira on-prem", e)
                 return None
 
             if users is None:
