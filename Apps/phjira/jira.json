@@ -169,7 +169,11 @@
                     "description": "Priority of the issue",
                     "data_type": "string",
                     "order": 4,
-                    "required": false
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "jira ticket priority"
+                    ]
                 },
                 "assignee": {
                     "description": "Assignee user name(Use it for Jira on-prem, assign required permissions)",
@@ -274,6 +278,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Normal"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -790,6 +797,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -1020,6 +1030,9 @@
                     "data_type": "string",
                     "example_values": [
                         "admin"
+                    ],
+                    "contains": [
+                        "user name"
                     ]
                 },
                 {
@@ -1298,6 +1311,9 @@
                     "column_order": 6,
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -1318,6 +1334,9 @@
                     "column_order": 8,
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
@@ -1327,6 +1346,9 @@
                     "column_order": 7,
                     "example_values": [
                         "Unresolved"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -2887,6 +2909,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -3162,6 +3187,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -3459,6 +3487,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -3477,6 +3508,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
@@ -3484,6 +3518,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -4398,6 +4435,9 @@
                     "data_type": "string",
                     "example_values": [
                         "High"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -4718,6 +4758,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -4862,6 +4905,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -5137,6 +5183,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Fixed"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -5330,6 +5379,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -5587,6 +5639,9 @@
                     "column_order": 6,
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -5606,6 +5661,9 @@
                     "column_order": 8,
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
@@ -5615,6 +5673,9 @@
                     "column_order": 7,
                     "example_values": [
                         "Unresolved"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -6912,6 +6973,9 @@
                     "data_type": "string",
                     "example_values": [
                         "High"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -7180,6 +7244,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -7455,6 +7522,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -7743,6 +7813,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -7760,6 +7833,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
@@ -7767,6 +7843,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -7843,7 +7922,11 @@
                     "data_type": "string",
                     "order": 2,
                     "description": "Resolution to set",
-                    "required": false
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "jira ticket resolution"
+                    ]
                 },
                 "comment": {
                     "data_type": "string",
@@ -7887,6 +7970,9 @@
                     "data_type": "string",
                     "example_values": [
                         "In Progress"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -8815,6 +8901,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -9036,6 +9125,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
@@ -9310,6 +9402,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Medium"
+                    ],
+                    "contains": [
+                        "jira ticket priority"
                     ]
                 },
                 {
@@ -9327,6 +9422,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Test Admin"
+                    ],
+                    "contains": [
+                        "jira user display name"
                     ]
                 },
                 {
@@ -9334,6 +9432,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Done"
+                    ],
+                    "contains": [
+                        "jira ticket resolution"
                     ]
                 },
                 {
