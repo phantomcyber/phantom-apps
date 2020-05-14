@@ -703,9 +703,6 @@ class MfServiceManagerConnector(BaseConnector):
         elif action_id == 'get_change':
             ret_val = self._handle_get_change(param)
 
-        elif action_id == 'update_change':
-            ret_val = self._handle_update_change(param)
-
         elif action_id == 'close_change':
             ret_val = self._handle_close_change(param)
 
