@@ -285,7 +285,7 @@ class MfServiceManagerConnector(BaseConnector):
 
         if param.get('urgency'):
             try:
-                urgency = int(param.get('impact'))
+                urgency = int(param.get('urgency'))
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the 'urgency' parameter")
 
