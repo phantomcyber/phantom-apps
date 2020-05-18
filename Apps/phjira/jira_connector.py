@@ -904,7 +904,7 @@ class JiraConnector(phantom.BaseConnector):
             fields['priority'] = {}
             fields['priority']['name'] = priority
 
-        self.save_progress("Creating the ticket")
+        self.debug_print("Creating the ticket")
         # Create JIRA ticket
         try:
             new_issue = self._jira.create_issue(fields=fields)
@@ -1760,11 +1760,7 @@ class JiraConnector(phantom.BaseConnector):
                 else:
                     issues = self._jira.search_issues(jql_str=jql_query, startAt=start_index, maxResults=DEFAULT_MAX_RESULTS_PER_PAGE)
             except Exception as e:
-                error_code, error_msg = self._get_error_message_from_exception(e)
-                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
-
-                action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of tickets (issues). Error: {0}".format(
-                            error_text))
+                self._set_jira_error(action_result, "Error occurred while fetching the list of tickets (issues)", e)
                 return None
 
             if issues is None:
@@ -1882,11 +1878,10 @@ class JiraConnector(phantom.BaseConnector):
         try:
             response = self._jira.watchers(issue_id)
         except Exception as e:
-            error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error occurred while fetching the watchers list. Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            self._set_jira_error(action_result, "Error occurred while fetching the watchers list", e)
 
-            self.save_progress("Response from the server:{}".format(error_text))
-            return action_result.set_status(phantom.APP_ERROR, error_text), None
+            self.debug_print("Error occurred while fetching the watchers list")
+            return action_result.get_status(), None
 
         watcher_list = list()
         watchers = response.raw.get('watchers', [])
@@ -2002,9 +1997,7 @@ class JiraConnector(phantom.BaseConnector):
         try:
             jira_issue = self._jira.issue(ticket_key, expand="attachment")
         except Exception as e:
-            error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Please enter a valid Jira Ticket ID. Please check the provided parameters. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
-            return action_result.set_status(phantom.APP_ERROR, error_text)
+            return self._set_jira_error(action_result, "Please enter a valid Jira Ticket ID. Please check the provided parameters", e)
 
         try:
             if len(jira_issue.fields.attachment) > 0:
