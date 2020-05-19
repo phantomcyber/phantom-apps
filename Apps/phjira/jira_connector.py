@@ -1211,7 +1211,7 @@ class JiraConnector(phantom.BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists.")
 
         try:
-            self._jira.add_comment(issue_id, body, is_internal=param['internal'])
+            self._jira.add_comment(issue_id, body, is_internal=param.get('internal', False))
         except Exception as e:
             return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
@@ -1987,7 +1987,7 @@ class JiraConnector(phantom.BaseConnector):
         ticket_key = self._handle_py_ver_compat_for_input_str(param['id'])
         container_id = self._handle_py_ver_compat_for_input_str(param['container_id'])
         extension_filter = self._handle_py_ver_compat_for_input_str(param.get('extension_filter', ''))
-        get_all_attachments = param['retrieve_all']
+        get_all_attachments = param.get('retrieve_all', False)
 
         # removing extra comma from a extentsion filter string
         types = [x.strip() for x in extension_filter.split(",")]

@@ -1402,7 +1402,7 @@
         {
             "action": "get attachments",
             "description": "Gets specific attachments from a Jira Ticket (issue)",
-            "verbose": "The function will store specific attachments from a given Jira ticket inside the vault",
+            "verbose": "The function will store specific attachments from a given Jira ticket inside the vault.",
             "type": "investigate",
             "identifier": "get_attachments",
             "read_only": true,
@@ -1420,7 +1420,8 @@
                 "retrieve_all": {
                     "data_type": "boolean",
                     "order": 1,
-                    "description": "If this is set to true all attachments will be retrieved from the issue"
+                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is provided, it will internally treated as 'false')",
+                    "default": true
                 },
                 "container_id": {
                     "data_type": "string",
@@ -3589,9 +3590,10 @@
                     "required": true
                 },
                 "internal": {
-                    "description": "Whether comment should be internal only or not",
+                    "description": "Whether comment should be internal only or not in Jira Service Desk (if the value is provided, it will internally treated as 'false')",
                     "data_type": "boolean",
-                    "order": 2
+                    "order": 2,
+                    "default": true
                 }
             },
             "render": {
