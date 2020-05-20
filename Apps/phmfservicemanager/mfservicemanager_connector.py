@@ -7,9 +7,9 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-from mfservicemanager_consts import *
 import requests
 import json
+from mfservicemanager_consts import *
 from bs4 import BeautifulSoup, UnicodeDammit
 
 
@@ -45,7 +45,7 @@ class MfServiceManagerConnector(BaseConnector):
             if input_str:
                 return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print("Error ocurred while converting the string")
+            self.debug_print("Error ocurred while Unicode handling of the string")
         return input_str
 
     def _process_empty_reponse(self, response, action_result):
@@ -71,8 +71,6 @@ class MfServiceManagerConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 self._unicode_string_handler(error_text))
         message = message.replace('{', '{{').replace('}', '}}')
-        if len(message) > 500:
-            message = 'Error while connecting to server'
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -122,7 +120,7 @@ class MfServiceManagerConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._unicode_string_handler(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -154,7 +152,7 @@ class MfServiceManagerConnector(BaseConnector):
                     error_msg = self._unicode_string_handler(e.message)
                     message = ('Error connecting to server. Details: {0}').format(error_msg)
                 except:
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check for valid server URL'), resp_json)
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. Please check the asset configuration parameters.'), resp_json)
             else:
                 message = "Error message unavailable. Please check the asset configuration and|or action parameters."
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
@@ -194,7 +192,7 @@ class MfServiceManagerConnector(BaseConnector):
                 fields = '{}'
             fields = json.loads(fields)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "fields is not a valid JSON string. Please validate and try running the action again.")
+            return action_result.set_status(phantom.APP_ERROR, "'fields' is not a valid JSON string. Please validate and try running the action again.")
 
         incident = {
             'Incident': {
@@ -279,7 +277,7 @@ class MfServiceManagerConnector(BaseConnector):
             try:
                 impact = int(param.get('impact'))
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the 'impact' parameter")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'impact' parameter")
 
             update_fields['Impact'] = str(impact)
 
@@ -287,7 +285,7 @@ class MfServiceManagerConnector(BaseConnector):
             try:
                 urgency = int(param.get('urgency'))
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the 'urgency' parameter")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'urgency' parameter")
 
             update_fields['Urgency'] = str(urgency)
 
@@ -411,7 +409,7 @@ class MfServiceManagerConnector(BaseConnector):
                 fields = '{}'
             fields = json.loads(fields)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "fields is not a valid JSON string. Please validate and try running the action again.")
+            return action_result.set_status(phantom.APP_ERROR, "'fields' is not a valid JSON string. Please validate and try running the action again.")
 
         change = {
             'Change': {
@@ -542,7 +540,7 @@ class MfServiceManagerConnector(BaseConnector):
                 fields = '{}'
             fields = json.loads(fields)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "fields is not a valid JSON string. Please validate and try running the action again.")
+            return action_result.set_status(phantom.APP_ERROR, "'fields' is not a valid JSON string. Please validate and try running the action again.")
 
         device = {
             "Device": {
@@ -613,7 +611,7 @@ class MfServiceManagerConnector(BaseConnector):
                 update_fields = '{}'
             update_fields = json.loads(update_fields)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "update_fields is not a valid JSON string. Please validate and try running the action again.")
+            return action_result.set_status(phantom.APP_ERROR, "'update_fields' is not a valid JSON string. Please validate and try running the action again.")
 
         project_key = self._unicode_string_handler(param.get('project_key', 'incidents')).lower()
         endpoint = HPSM_GET_RESOURCE.format(id=id, project_key=project_key)
