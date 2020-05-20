@@ -1290,6 +1290,7 @@ class JiraConnector(phantom.BaseConnector):
                 with open(path, 'rb') as f:
                     self._jira.add_attachment(issue=issue, attachment=f, filename=filename)
             except Exception as e:
+                # Remove this block of exception handling once the PAPP-9898 bug is fixed
                 self.debug_print("First attempt failed while adding attachment to the given Jira ticket ID")
                 try:
                     # This faliure might be happened beacuse if we let pass the Unicode chars with filename into the add_attachment() method of Jira SDK,
