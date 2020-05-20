@@ -1420,7 +1420,7 @@
                 "retrieve_all": {
                     "data_type": "boolean",
                     "order": 1,
-                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is provided, it will internally treated as 'false')",
+                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is not provided, it will internally be treated as 'false')",
                     "default": true
                 },
                 "container_id": {
@@ -3590,7 +3590,7 @@
                     "required": true
                 },
                 "internal": {
-                    "description": "Whether comment should be internal only or not in Jira Service Desk (if the value is provided, it will internally treated as 'false')",
+                    "description": "Whether comment should be internal only or not in Jira Service Desk (if the value is not provided, it will internally be treated as 'false')",
                     "data_type": "boolean",
                     "order": 2,
                     "default": true
@@ -5735,7 +5735,7 @@
             "type": "investigate",
             "identifier": "search_users",
             "read_only": true,
-            "verbose": "This action will be used to fetch username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for [max_results] action parameter is <b>1000</b>. The maximum number of tickets as specified by the parameter [max_results] will be fetched starting from the first.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to search users using username for Jira cloud, we will use user's display name to search users. You can use [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be use to search users for Jira on-prem.",
+            "verbose": "This action will be used to fetch username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for [max_results] action parameter is <b>1000</b>. The maximum number of users as specified by the parameter [max_results] will be fetched starting from the first.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to search users using username for Jira cloud, we will use user's display name to search users. You can use [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be use to search users for Jira on-prem.",
             "parameters": {
                 "username": {
                     "data_type": "string",
