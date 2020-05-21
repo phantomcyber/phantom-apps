@@ -176,7 +176,7 @@
                     ]
                 },
                 "assignee": {
-                    "description": "Assignee user name(Use it for Jira on-prem, assign required permissions)",
+                    "description": "Assignee username (required for Jira on-prem, assign required permissions)",
                     "data_type": "string",
                     "order": 5,
                     "required": false,
@@ -186,7 +186,7 @@
                     ]
                 },
                 "assignee_account_id": {
-                    "description": "Assignee user account ID(Use it for Jira cloud, assign required permissions)",
+                    "description": "Assignee user account ID (required for Jira cloud, assign required permissions)",
                     "data_type": "string",
                     "order": 6,
                     "required": false,
@@ -1634,7 +1634,6 @@
                     "example_values": [
                         "{\"update\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}}",
                         "{ \"priority\":{ \"name\": \"test/\\\"\"}}",
-                        "{\"fields\":{\"\u65e5\u672c\u6a19\u6e96\u6642\u26f0\u26f1\u26f2\u26f3\u26f5\u2714\ufe0f\u2764\ufe0f\ufb17\u256c\u238b\u231a\u214d\u214e\u20ac \u20ad\u2042\u1fa7\u0488\u20ae\u20af\u214f\u231b\u238e\u2606\u1e02\" : [\"\u6f22\u5b57\u00a9\u00ac\u0278\u0460\u058d\u06de\u0a0a\u0bf5\u0d6c\u0f03\u1024\u1128\u11d7\u1296\u13cc\u1520\u16ef\u1720\u17a6\u1864\u18bb\u1910\u19aa\u5e73\u4eee\u540d\"]}}",
                         "{\"fields\":{\"test-label\" : [\"test\"]}}"
                     ]
                 },
@@ -3221,7 +3220,7 @@
                     "data_path": "action_result.data.*.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -4338,7 +4337,7 @@
                     "data_path": "action_result.data.*.fields.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ],
                     "contains": [
                         "url"
@@ -4456,7 +4455,7 @@
                     "data_path": "action_result.data.*.fields.issuelinks.*.outwardIssue.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample fields status description"
+                        "This is a sample fields status description"
                     ]
                 },
                 {
@@ -4779,7 +4778,7 @@
                     "data_path": "action_result.data.*.fields.parent.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -5218,7 +5217,7 @@
                     "data_path": "action_result.data.*.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -5400,7 +5399,7 @@
                     "data_path": "action_result.data.*.fields.subtasks.*.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -5740,7 +5739,7 @@
                 "username": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "A string to match with usernames, name or email against for JIRA on-prem",
+                    "description": "A string to match with usernames, name or email against for JIRA on-prem (required for Jira on-prem)",
                     "contains": [
                         "user name"
                     ],
@@ -5750,7 +5749,7 @@
                 "display_name": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "A string to match with display name for JIRA cloud",
+                    "description": "A string to match with display name for JIRA cloud (required for Jira cloud)",
                     "contains": [
                         "jira user display name"
                     ],
@@ -6467,7 +6466,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.body",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing comment body"
+                        "This is a sample testing comment body"
                     ]
                 },
                 {
@@ -7557,7 +7556,7 @@
                     "data_path": "action_result.data.*.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -8421,7 +8420,7 @@
                     "data_path": "action_result.data.*.fields.comment.comments.*.body",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing comment body"
+                        "This is a sample testing comment body"
                     ]
                 },
                 {
@@ -9153,7 +9152,7 @@
                     "data_path": "action_result.data.*.fields.status.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample testing description"
+                        "This is a sample testing description"
                     ]
                 },
                 {
@@ -9558,7 +9557,7 @@
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "This is sample comment for the link tickets"
+                        "This is a sample comment for the link tickets"
                     ]
                 },
                 {
@@ -9673,7 +9672,7 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to add to the watchers list(Use it for Jira on-prem)",
+                    "description": "Username of the user to add to the watchers list (required for Jira on-prem)",
                     "data_type": "string",
                     "required": false,
                     "contains": [
@@ -9683,7 +9682,7 @@
                     "primary": true
                 },
                 "user_account_id": {
-                    "description": "Account ID of the user to add to the watchers list(Use it for Jira cloud)",
+                    "description": "Account ID of the user to add to the watchers list (required for Jira cloud)",
                     "data_type": "string",
                     "required": false,
                     "contains": [
@@ -9798,7 +9797,7 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to add to the watchers list(Use it for Jira on-prem)",
+                    "description": "Username of the user to remove from watchers list (required for Jira on-prem)",
                     "data_type": "string",
                     "required": false,
                     "contains": [
@@ -9808,7 +9807,7 @@
                     "primary": true
                 },
                 "user_account_id": {
-                    "description": "Account ID of the user to add to the watchers list(Use it for Jira cloud)",
+                    "description": "Account ID of the user to remove from the watchers list (required for Jira cloud)",
                     "data_type": "string",
                     "required": false,
                     "contains": [

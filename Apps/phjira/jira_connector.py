@@ -228,7 +228,7 @@ class JiraConnector(phantom.BaseConnector):
 
         headers.update({'Content-Type': 'application/json'})
 
-        # Create a URL to connect to Flashpoint
+        # Create a URL to connect to Jira server
         url = "{}/rest/api/2/{}".format(self._base_url, endpoint)
 
         self.debug_print("Making a REST call with provided request parameters")
