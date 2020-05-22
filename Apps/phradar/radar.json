@@ -1,12 +1,12 @@
 {
   "appid": "f8fbcb9f-fc58-438c-9e39-14f034279b29",
   "name": "Radar",
-  "description": "This app integrates with the Radar Incident Response Platform",
+  "description": "This app integrates with the Radar incident response platform",
   "type": "privacy incident response",
   "product_vendor": "RADAR, LLC",
   "url": "https://www.radarfirst.com/radar",
-  "logo": "radar.png",
-  "logo_dark": "radar_dark.svg",
+  "logo": "logo_radar.svg",
+  "logo_dark": "logo_radar_dark.svg",
   "product_name": "Radar",
   "product_version_regex": ".*",
   "publisher": "RADAR, LLC",
@@ -18,8 +18,12 @@
   "min_phantom_version": "4.6.19142",
   "pip_dependencies": {
     "pypi": [
-      {"module": "pytz"},
-      {"module": "python-dateutil"}
+      {
+        "module": "pytz"
+      },
+      {
+        "module": "python-dateutil"
+      }
     ]
   },
   "configuration": {
@@ -403,7 +407,6 @@
       "action": "test connectivity",
       "identifier": "test_connectivity",
       "description": "Validate Radar asset configuration for connectivity using supplied configuration",
-      "verbose": "",
       "type": "test",
       "read_only": true,
       "parameters": {},
@@ -413,8 +416,8 @@
     {
       "action": "create privacy incident",
       "identifier": "create_privacy_incident",
-      "description": "Create Radar Privacy Incident",
-      "verbose": "This action creates a privacy incident in Radar using Phantom settings and asset configurations. The Base URL For Phantom Appliance configured on the Company Settings page is used to link the incident's \"intake method\" to this instance of Phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated Phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the Phantom container. Action parameters are used to set the Radar incident name and description.",
+      "description": "Create Radar privacy incident",
+      "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
       "type": "generic",
       "read_only": false,
       "parameters": {
@@ -422,7 +425,6 @@
           "description": "A name summarizing the privacy incident",
           "data_type": "string",
           "required": true,
-          "default": "",
           "order": 0
         },
         "description": {
@@ -435,7 +437,7 @@
         {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
-          "column_name": "id",
+          "column_name": "ID",
           "column_order": 0,
           "contains": [
             "radar incident id"
@@ -444,39 +446,58 @@
         {
           "data_path": "action_result.data.*.name",
           "data_type": "string",
-          "column_name": "name",
+          "column_name": "Name",
           "column_order": 1
         },
         {
           "data_path": "action_result.data.*.description",
           "data_type": "string",
-          "column_name": "description",
+          "column_name": "Description",
           "column_order": 2
         },
         {
           "data_path": "action_result.data.*.discovered",
           "data_type": "string",
-          "column_name": "discovered at",
+          "column_name": "Discovered At",
           "column_order": 3
         },
         {
           "data_path": "action_result.data.*.url",
           "data_type": "string",
-          "column_name": "url",
+          "column_name": "URL",
           "column_order": 4
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 5
+          "column_name": "Status",
+          "column_order": 5,
+          "example_values": [
+            "success",
+            "failed"
+        ]
         },
         {
           "data_path": "action_result.message",
           "data_type": "string",
+          "column_name": "Message",
           "column_order": 6,
           "example_values": [
             "Successfully created a privacy incident"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+            1
           ]
         }
       ],
@@ -492,12 +513,12 @@
       "action": "get privacy incident",
       "identifier": "get_privacy_incident",
       "description": "Get a Radar privacy incident",
-      "verbose": "This action gets a Radar privacy incident using the incident ID supplied in the action parameters",
-      "type": "generic",
+      "verbose": "This action gets a Radar privacy incident using the incident ID supplied in the action parameters.",
+      "type": "investigate",
       "read_only": true,
       "parameters": {
         "incident_id": {
-          "description": "Radar Incident ID",
+          "description": "Radar incident ID",
           "data_type": "numeric",
           "required": true,
           "order": 0,
@@ -511,7 +532,7 @@
         {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
-          "column_name": "id",
+          "column_name": "ID",
           "column_order": 0,
           "contains": [
             "radar incident id"
@@ -520,69 +541,88 @@
         {
           "data_path": "action_result.data.*.name",
           "data_type": "string",
-          "column_name": "name",
+          "column_name": "Name",
           "column_order": 1
         },
         {
           "data_path": "action_result.data.*.description",
           "data_type": "string",
-          "column_name": "description",
+          "column_name": "Description",
           "column_order": 2
         },
         {
           "data_path": "action_result.data.*.url",
           "data_type": "string",
-          "column_name": "url",
+          "column_name": "URL",
           "column_order": 3
         },
         {
           "data_path": "action_result.data.*.created_at",
           "data_type": "string",
-          "column_name": "created at",
+          "column_name": "Created At",
           "column_order": 4
         },
         {
           "data_path": "action_result.data.*.discovered_at",
           "data_type": "string",
-          "column_name": "discovered at",
+          "column_name": "Discovered At",
           "column_order": 5
         },
         {
           "data_path": "action_result.data.*.updated_at",
           "data_type": "string",
-          "column_name": "updated at",
+          "column_name": "Updated At",
           "column_order": 6
         },
         {
           "data_path": "action_result.data.*.updated_by",
           "data_type": "string",
-          "column_name": "updated by",
+          "column_name": "Updated By",
           "column_order": 7
         },
         {
           "data_path": "action_result.data.*.incident_status",
           "data_type": "string",
-          "column_name": "status",
+          "column_name": "Incident Status",
           "column_order": 8
         },
         {
           "data_path": "action_result.data.*.assignee",
           "data_type": "string",
-          "column_name": "assignee",
+          "column_name": "Assignee",
           "column_order": 9
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 10
+          "column_name": "Status",
+          "column_order": 10,
+          "example_values": [
+            "success",
+            "failed"
+        ]
         },
         {
           "data_path": "action_result.message",
           "data_type": "string",
+          "column_name": "Message",
           "column_order": 11,
           "example_values": [
             "Successfully fetched privacy incident"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+            1
           ]
         }
       ],
@@ -597,13 +637,13 @@
     {
       "action": "add note",
       "identifier": "add_note",
-      "description": "Add a Note to a Radar Privacy Incident",
+      "description": "Add a note to a Radar privacy incident",
       "verbose": "This action adds a note to a given Radar incident using asset configurations and action parameters. The incident ID action parameter is used to add a note to a given incident. The content action parameter is used for the content of the note.",
       "type": "generic",
       "read_only": false,
       "parameters": {
         "incident_id": {
-          "description": "Radar Incident ID",
+          "description": "Radar incident ID",
           "data_type": "numeric",
           "required": true,
           "order": 0,
@@ -623,13 +663,13 @@
         {
           "data_path": "action_result.data.*.id",
           "data_type": "numeric",
-          "column_name": "note id",
+          "column_name": "Note ID",
           "column_order": 0
         },
         {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
-          "column_name": "incident id",
+          "column_name": "Incident ID",
           "column_order": 1,
           "contains": [
             "radar incident id"
@@ -638,21 +678,40 @@
         {
           "data_path": "action_result.data.*.content",
           "data_type": "string",
-          "column_name": "note content",
+          "column_name": "Note Content",
           "column_order": 2
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 3
+          "column_name": "Status",
+          "column_order": 3,
+          "example_values": [
+            "success",
+            "failed"
+        ]
         },
         {
           "data_path": "action_result.message",
           "data_type": "string",
+          "column_name": "Message",
           "column_order": 4,
           "example_values": [
             "Successfully added note"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+            1
           ]
         }
       ],
@@ -669,11 +728,11 @@
       "identifier": "get_notes",
       "description": "Get all notes for a Radar privacy incident",
       "verbose": "This action gets all notes for a given Radar incident using the incident ID supplied in the action parameters. Only notes that were created with the 'create note' action will be fetched from Radar.",
-      "type": "generic",
+      "type": "investigate",
       "read_only": true,
       "parameters": {
         "incident_id": {
-          "description": "Radar Incident ID",
+          "description": "Radar incident ID",
           "data_type": "numeric",
           "required": true,
           "order": 0,
@@ -687,13 +746,13 @@
         {
           "data_path": "action_result.data.*.*.id",
           "data_type": "numeric",
-          "column_name": "note id",
+          "column_name": "Note ID",
           "column_order": 0
         },
         {
           "data_path": "action_result.parameter.incident_id",
           "data_type": "numeric",
-          "column_name": "incident id",
+          "column_name": "Incident ID",
           "column_order": 1,
           "contains": [
             "radar incident id"
@@ -702,45 +761,64 @@
         {
           "data_path": "action_result.data.*.*.content",
           "data_type": "string",
-          "column_name": "note content",
+          "column_name": "Note Content",
           "column_order": 2
         },
         {
           "data_path": "action_result.data.*.*.created_at",
           "data_type": "string",
-          "column_name": "created at",
+          "column_name": "Created At",
           "column_order": 3
         },
         {
           "data_path": "action_result.data.*.*.created_by",
           "data_type": "string",
-          "column_name": "created by",
+          "column_name": "Created By",
           "column_order": 4
         },
         {
           "data_path": "action_result.data.*.*.updated_at",
           "data_type": "string",
-          "column_name": "updated at",
+          "column_name": "Updated At",
           "column_order": 5
         },
         {
           "data_path": "action_result.data.*.*.updated_by",
           "data_type": "string",
-          "column_name": "updated by",
+          "column_name": "Updated By",
           "column_order": 6
         },
         {
           "data_path": "action_result.status",
           "data_type": "string",
-          "column_name": "status",
-          "column_order": 7
+          "column_name": "Status",
+          "column_order": 7,
+          "example_values": [
+            "success",
+            "failed"
+        ]
         },
         {
           "data_path": "action_result.message",
           "data_type": "string",
+          "column_name": "Message",
           "column_order": 8,
           "example_values": [
             "Successfully fetched notes"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [
+            1
           ]
         }
       ],
