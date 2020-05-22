@@ -1,5 +1,5 @@
 # File: haveibeenpwned_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -141,6 +141,6 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
         # Dump the return value
-        print ret_val
+        print(ret_val)
 
     exit(0)
