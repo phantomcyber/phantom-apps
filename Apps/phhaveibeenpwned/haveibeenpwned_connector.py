@@ -3,10 +3,17 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status
+    from phantom import utils
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status
+    import utils
 
 # THIS Connector imports
 from haveibeenpwned_consts import *
@@ -26,7 +33,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         config = self.get_config()
         self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
 
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     def _make_rest_call(self, endpoint, params=None, truncate=False):
         full_url = HAVEIBEENPWNED_API_BASE_URL + endpoint
@@ -38,25 +45,25 @@ class HaveIBeenPwnedConnector(BaseConnector):
         try:
             response = requests.get(full_url, params=params, headers=headers)
         except:
-            return phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_FAILURE
+            return status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_FAILURE
 
         if response.status_code in HAVEIBEENPWNED_BAD_RESPONSE_CODES:
             if response.status_code == HAVEIBEENPWNED_STATUS_CODE_NO_DATA:
-                return phantom.APP_SUCCESS, [{"not_found": HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]}]
-            return phantom.APP_ERROR, HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]
+                return status.APP_SUCCESS, [{"not_found": HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]}]
+            return status.APP_ERROR, HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]
 
         try:
             resp_json = response.json()
         except:
-            return phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
+            return status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
 
-        return phantom.APP_SUCCESS, resp_json
+        return status.APP_SUCCESS, resp_json
 
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
         domain = params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN]
         if phantom.is_url(domain):
-            domain = phantom.get_host_from_url(domain).replace("www.", "")
+            domain = utils.get_host_from_url(domain).replace("www.", "")
 
         if "www." in domain:
             domain = domain.replace("www.", "")
@@ -65,8 +72,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
         kwargs = {HAVEIBEENPWEND_PARAM_DOMAIN_KEY: domain}
         ret_val, response = self._make_rest_call(endpoint, params=kwargs)
 
-        if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
+        if (status.is_fail(ret_val)):
+            return action_result.set_status(status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
 
         for item in response:
             action_result.add_data(item)
@@ -74,7 +81,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         action_result.set_summary(
             {HAVEIBEENPWNED_TOTAL_BREACHES: len(response)})
 
-        return action_result.set_status(phantom.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_DOMAIN_SUCCESS)
+        return action_result.set_status(status.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_DOMAIN_SUCCESS)
 
     def _lookup_email(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
@@ -85,8 +92,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
 
-        if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
+        if (status.is_fail(ret_val)):
+            return action_result.set_status(status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
 
         for item in response:  # Response ends up being a list
             action_result.add_data(item)
@@ -97,12 +104,12 @@ class HaveIBeenPwnedConnector(BaseConnector):
             action_result.set_summary(
                 {HAVEIBEENPWNED_TOTAL_BREACHES: len(response)})
 
-        return action_result.set_status(phantom.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_EMAIL_SUCCESS)
+        return action_result.set_status(status.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_EMAIL_SUCCESS)
 
     def handle_action(self, params):
 
         action = self.get_action_identifier()
-        ret_val = phantom.APP_SUCCESS
+        ret_val = status.APP_SUCCESS
         if (action == self.ACTION_ID_LOOKUP_DOMAIN):
             ret_val = self._lookup_domain(params)
         elif (action == self.ACTION_ID_LOOKUP_EMAIL):
