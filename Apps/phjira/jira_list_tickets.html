@@ -130,10 +130,26 @@
                                     {{ ticket.status }}
                             </td>
                             <td class="widget-td">
-                                    {{ ticket.priority }}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket priority'], 'value':'{{ ticket.priority }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.priority }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
                             </td>
-                            <td class="widget-td">{{ ticket.resolution }}</td>
-                            <td class="widget-td">{{ ticket.reporter }}</td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket resolution'], 'value':'{{ ticket.resolution }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.resolution }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira user display name'], 'value':'{{ ticket.reporter }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.reporter }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
                             <td class="widget-td">{{ ticket.summary }}</td>
                             <td class="widget-td">{{ ticket.description }}</td>
                         </tr>
