@@ -435,6 +435,14 @@
       },
       "output": [
         {
+          "data_path": "action_result.parameter.name",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.parameter.description",
+          "data_type": "string"
+        },
+        {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
           "column_name": "ID",
@@ -487,6 +495,10 @@
           ]
         },
         {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
           "data_path": "summary.total_objects",
           "data_type": "numeric",
           "example_values": [
@@ -529,6 +541,13 @@
         }
       },
       "output": [
+        {
+          "data_path": "action_result.parameter.incident_id",
+          "data_type": "numeric",
+          "contains": [
+            "radar incident id"
+          ]
+        },
         {
           "data_path": "action_result.data.*.incident_id",
           "data_type": "numeric",
@@ -612,6 +631,10 @@
           ]
         },
         {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
           "data_path": "summary.total_objects",
           "data_type": "numeric",
           "example_values": [
@@ -661,6 +684,17 @@
       },
       "output": [
         {
+          "data_path": "action_result.parameter.incident_id",
+          "data_type": "numeric",
+          "contains": [
+            "radar incident id"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.content",
+          "data_type": "string"
+        },
+        {
           "data_path": "action_result.data.*.id",
           "data_type": "numeric",
           "column_name": "Note ID",
@@ -699,6 +733,10 @@
           "example_values": [
             "Successfully added note"
           ]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
         },
         {
           "data_path": "summary.total_objects",
@@ -806,6 +844,10 @@
           "example_values": [
             "Successfully fetched notes"
           ]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
         },
         {
           "data_path": "summary.total_objects",

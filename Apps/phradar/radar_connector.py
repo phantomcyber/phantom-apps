@@ -208,10 +208,17 @@ class RadarConnector(BaseConnector):
 
         # use timezone set in asset configuration to set discovered date_time timezone
         config = self.get_config()
+        incident_group = config.get("radar_incident_group")
         try:
-            incident_group = int(config.get("radar_incident_group"))
+            if isinstance(incident_group, float):
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
+            incident_group = int(incident_group)
         except:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
+
+        if incident_group < 0:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'radar_incident_group' asset parameter")
+
         discovered = datetime.now(pytz.timezone(self._time_zone))
 
         # get incident channel information
@@ -272,14 +279,21 @@ class RadarConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         incident_id = param.get("incident_id")
-        if not incident_id:
+        if incident_id is None:
             self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
         try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
             incident_id = int(incident_id)
         except:
             self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
+
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}", action_result, method="get")
 
@@ -345,15 +359,21 @@ class RadarConnector(BaseConnector):
         category = "Splunk Phantom"
 
         incident_id = param.get("incident_id")
-        if not incident_id:
+        if incident_id is None:
             self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
         try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
             incident_id = int(incident_id)
         except:
             self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
 
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
         body = {
             "content": content,
             "category": category,
@@ -388,14 +408,21 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        if not incident_id:
+        if incident_id is None:
             self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
         try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
             incident_id = int(incident_id)
         except:
             self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
+
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")
 
