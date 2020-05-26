@@ -417,7 +417,7 @@
       "action": "create privacy incident",
       "identifier": "create_privacy_incident",
       "description": "Create Radar privacy incident",
-      "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
+      "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
       "type": "generic",
       "read_only": false,
       "parameters": {
