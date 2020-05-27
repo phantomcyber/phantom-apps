@@ -55,6 +55,9 @@ class RadarConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -65,7 +68,6 @@ class RadarConnector(BaseConnector):
 
         message = f"HTML Response Status Code: {status_code}: {error_text}\n"
         message = message.replace(u"{", "{{").replace(u"}", "}}")
-
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, response, action_result):
@@ -166,8 +168,12 @@ class RadarConnector(BaseConnector):
             return self._process_response(resp, action_result)
         except Exception as ex:
             self.debug_print(f"Make REST call during action: {self.get_action_identifier()}. Error:", ex)
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
+            try:
+                return RetVal(
+                    action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
+            except Exception:
+                message = f'Unable to connect to the URL: {url}. Error Details: {ex}'
+                return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
 
     def _payload_err(self, ex, action_result, data):
         msg = f"Response payload is missing necessary fields: {ex}"
@@ -195,18 +201,29 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param.get("name")
         if not name:
-            self.debug_print(f"required name param not present in action: {self.get_action_identifier()}")
+            self.debug_print(f"required 'name' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident name not specified")
 
         description = param.get("description", "Privacy incident created by Splunk Phantom")
 
         # use timezone set in asset configuration to set discovered date_time timezone
         config = self.get_config()
-        incident_group = int(config.get("radar_incident_group"))
+        incident_group = config.get("radar_incident_group")
+        try:
+            if isinstance(incident_group, float):
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
+            incident_group = int(incident_group)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
+
+        if incident_group < 0:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'radar_incident_group' asset parameter")
+
         discovered = datetime.now(pytz.timezone(self._time_zone))
 
         # get incident channel information
-        phantom_base_url = self._get_system_settings()["company_info_settings"]["fqdn"]
+        system_settings = self._get_system_settings()
+        phantom_base_url = system_settings["company_info_settings"]["fqdn"] if system_settings else None
         if not phantom_base_url:
             return action_result.set_status(phantom.APP_ERROR, "Base URL for phantom appliance must be configured")
         container_path = ""
@@ -262,9 +279,21 @@ class RadarConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         incident_id = param.get("incident_id")
-        if not incident_id:
-            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+        if incident_id is None:
+            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
+        try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
+            incident_id = int(incident_id)
+        except:
+            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
+
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}", action_result, method="get")
 
@@ -311,6 +340,7 @@ class RadarConnector(BaseConnector):
             resp_json = resp.json()
         except Exception as ex:
             self.debug_print(f"Get system settings during action: {self.get_action_identifier()}. Error:", ex)
+            return None
 
         return resp_json
 
@@ -329,10 +359,21 @@ class RadarConnector(BaseConnector):
         category = "Splunk Phantom"
 
         incident_id = param.get("incident_id")
-        if not incident_id:
-            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+        if incident_id is None:
+            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
+        try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
+            incident_id = int(incident_id)
+        except:
+            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
 
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
         body = {
             "content": content,
             "category": category,
@@ -349,7 +390,7 @@ class RadarConnector(BaseConnector):
             note["id"] = data["headers"]["Location"].split("/")[4]
         # return error for missing id from response headers
         except Exception:
-            self.debug_print("could not parse id from response headers: ", data["headers"])
+            self.debug_print("could not parse 'id' from response headers: ", data["headers"])
             return action_result.set_status(phantom.APP_ERROR, "Response payload is missing necessary fields: 'id'")
 
         note["incident_id"] = incident_id
@@ -367,9 +408,21 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        if not incident_id:
-            self.debug_print(f"required incident_id param not present in action: {self.get_action_identifier()}")
+        if incident_id is None:
+            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
             return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
+        try:
+            if isinstance(incident_id, float):
+                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
+            incident_id = int(incident_id)
+        except:
+            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
+
+        if incident_id < 0:
+            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")
 
