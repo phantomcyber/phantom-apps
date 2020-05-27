@@ -62,7 +62,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
         domain = params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN]
-        if phantom.is_url(domain):
+        if utils.is_url(domain):
             domain = utils.get_host_from_url(domain).replace("www.", "")
 
         if "www." in domain:
