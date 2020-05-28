@@ -10,14 +10,14 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.0",
+    "app_version": "2.0.1",
     "utctime_updated": "2020-02-03T19:42:48.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
     "min_phantom_version": "4.6.19142",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, December 17 2019"
+        "Cloud, API api.crowdstrike.com, May 26 2020"
     ],
     "python_version": "3",
     "app_wizard_version": "1.0.0",
@@ -1512,6 +1512,1604 @@
                 "type": "custom",
                 "height": 5,
                 "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "list incidents",
+            "description": "Search for incidents by providing an FQL filter, sorting, and paging details",
+            "type": "generic",
+            "identifier": "list_incidents",
+            "read_only": false,
+            "parameters": {
+                "filter": {
+                    "data_type": "string",
+                    "description": "Optional filter and sort criteria in the form of an FQL query.",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
+                    "required": false,
+                    "primary": false,
+                    "order": 1,
+                    "value_list": ["--", "assigned_to.asc", "assigned_to.desc", "assigned_to_name.asc", "assigned_to_name.desc", "end.asc", "end.desc", "modified_timestamp.asc", "modified_timestamp.desc", "name.asc", "name.desc", "sort_score.asc", "sort_score.desc", "start.asc", "start.desc", "state.asc", "state.desc", "status.asc", "status.desc"]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "required": false,
+                    "primary": false,
+                    "order": 2,
+                    "default": 0
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Limit the number of results to return. (Defaults to 50, Max 500)",
+                    "required": false,
+                    "primary": false,
+                    "order": 3,
+                    "default": 50
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d']"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "assigned_to.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "example_values": [
+                        "incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d']"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "list incident behaviors",
+            "description": "Search for behaviors by providing an FQL filter, sorting, and paging details",
+            "type": "generic",
+            "identifier": "list_incident_behaviors",
+            "read_only": false,
+            "parameters": {
+                "filter": {
+                    "data_type": "string",
+                    "description": "Optional filter and sort criteria in the form of an FQL query.",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
+                    "required": false,
+                    "primary": false,
+                    "order": 1,
+                    "value_list": ["--", "assigned_to.asc", "assigned_to.desc", "assigned_to_name.asc", "assigned_to_name.desc", "end.asc", "end.desc", "modified_timestamp.asc", "modified_timestamp.desc", "name.asc", "name.desc", "sort_score.asc", "sort_score.desc", "start.asc", "start.desc", "state.asc", "state.desc", "status.asc", "status.desc"]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "required": false,
+                    "primary": false,
+                    "order": 2,
+                    "default": 0
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Limit the number of results to return. (Defaults to 50, Max 500)",
+                    "required": false,
+                    "primary": false,
+                    "order": 3,
+                    "default": 50
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d']"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "assigned_to.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9e262c70027a46916beeaef04e45bc6a:45890386125841-10264-352683776"
+                    ],
+                    "contains": [
+                        "crowdstrike incidentbehavior id"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "get incident details",
+            "description": "Get details on incidents by providing incident IDs",
+            "type": "investigate",
+            "identifier": "get_incident_details",
+            "read_only": false,
+            "parameters": {
+                "ids": {
+                    "data_type": "string",
+                    "description": "List of incident IDs. Comma seperated list allowed",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike incident id"
+                    ],
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "ctw6caruad3lkbnnt22qzeyoxgf38zap"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.end",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.fine_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.host_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "c9vnt7jbugw32626p9qsq3f9dx13sdnn"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_load_flags",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "5.23.10503.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.bios_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phoenix Technologies LTD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.bios_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "ctw6caruad3lkbnnt22qzeyoxgf38zap"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_base",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "65994753"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_build",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "10503"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_platform",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c9vnt7jbugw32626p9qsq3f9dx13sdnn"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "column_name": "Host ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.external_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sever01"
+                    ],
+                    "column_name": "Host Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.local_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.168.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.mac_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "00-00-00-00-00-00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.machine_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.major_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.minor_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.ou",
+                    "data_type": "string",
+                    "example_values": [
+                        "DOMAIN", "LOCAL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.platform_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.platform_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.product_type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.product_type_desc",
+                    "data_type": "string",
+                    "example_values": [
+                        "Workstation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.site_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "noraml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.system_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.hosts.*.system_product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware Virtual Platform"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.incident_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ],
+                    "column_name": "Start",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "open", "closed"
+                    ],
+                    "column_name": "State",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.users",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "get incident behaviors",
+            "description": "Get details on behaviors by providing behavior IDs",
+            "type": "investigate",
+            "identifier": "get_incident_behaviors",
+            "read_only": false,
+            "parameters": {
+                "ids": {
+                    "data_type": "string",
+                    "description": "List of behavior IDs. Comma seperated list allowed",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike incidentbehavior id"
+                    ],
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incidentbehavior id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.aid",
+                    "data_type": "string",
+                    "example_values": [
+                        "w6h79wgbzy4ofsa093dp2s808qe8gswr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.behavior_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incidentbehavior id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "e6m35yiizlefbv6o4az6b46sgjipx6lg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.cmdline",
+                    "data_type": "string",
+                    "column_name": "Command Line",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.compound_tto",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\user\\somefile.txt"
+                    ],
+                    "column_name": "File Path",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.incident_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.incident_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.objective",
+                    "data_type": "string",
+                    "example_values": [
+                        "Keep Access"
+                    ],
+                    "column_name": "Objective",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "2048"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.detect",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.inddet_mask",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.indicator",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_process",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_subprocess",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.policy_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.process_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.quarantine_file",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.quarantine_machine",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.registry_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.rooting",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.sensor_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true, false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.pattern_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "1024"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "ln3g11yf8r40be90ups2q1435ybhzdopbkt103wce5ligiuhww2b4l1f7tmp1vhi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Persistance"
+                    ],
+                    "column_name": "Tactic",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Hidden Files and Directories"
+                    ],
+                    "column_name": "Technique",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.template_instance_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "102"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ],
+                    "column_name": "Timestamp",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "list crowdscores",
+            "description": "Query environment wide CrowdScore and return the entity data",
+            "type": "generic",
+            "identifier": "list_crowdscores",
+            "read_only": false,
+            "parameters": {
+                "filter": {
+                    "data_type": "string",
+                    "description": "Optional filter and sort criteria in the form of an FQL query.",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
+                    "required": false,
+                    "primary": false,
+                    "order": 1,
+                    "value_list": ["--", "score.asc", "score.desc", "timestamp.asc", "timestamp.desc"]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "required": false,
+                    "primary": false,
+                    "order": 2,
+                    "default": 0
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Limit the number of results to return. (Defaults to 50, Max 500)",
+                    "required": false,
+                    "primary": false,
+                    "order": 3,
+                    "default": 50
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "assigned_to.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.pagination.*.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "99ff72e8c9c14955ba33cbcbd4112345_2020-05-18 07:38:05.219 +0000 UTC"
+                    ],
+                    "contains": [
+                        "crowdstrike crowdscore id"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "0"
+                    ],
+                    "column_name": "Score",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-04T10:00:00Z"
+                    ],
+                    "column_name": "Timestamp",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "update incident",
+            "description": "Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description",
+            "type": "generic",
+            "identifier": "update_incident",
+            "read_only": false,
+            "parameters": {
+                "ids": {
+                    "data_type": "string",
+                    "description": "List of incident IDs. Comma seperated list allowed",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike incident id"
+                    ],
+                    "allow_list": true
+                },
+                "add_tag": {
+                    "data_type": "string",
+                    "description": "Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list.",
+                    "required": false,
+                    "primary": false,
+                    "order": 1,
+                    "example_values": ["False Positive", "Ignored", "Testing", "True Positive"],
+                    "allow_list": true
+                },
+                "delete_tag": {
+                    "data_type": "string",
+                    "description": "Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list.",
+                    "required": false,
+                    "primary": false,
+                    "order": 2,
+                    "example_values": ["False Positive", "Ignored", "Testing", "True Positive"],
+                    "allow_list": true
+                },
+                "update_name": {
+                    "data_type": "string",
+                    "description": "Updates the name of all the incident(s) in the ids list",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "update_description": {
+                    "data_type": "string",
+                    "description": "Updates the description of all the incident(s) listed in the ids",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                },
+                "update_status": {
+                    "data_type": "string",
+                    "description": "Updates the status of all the incident(s) in the ids list",
+                    "required": false,
+                    "primary": false,
+                    "order": 5,
+                    "value_list": ["New", "Reopened", "In Progress", "Closed"]
+                },
+                "add_comment": {
+                    "data_type": "string",
+                    "description": "Adds a comment for all the incident(s) in the ids list",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                },
+                "update_assigned_to": {
+                    "data_type": "string",
+                    "description": "Assign all incident(s) to a user for all the incidents in the ids list by CrowdStrike User id",
+                    "required": false,
+                    "primary": true,
+                    "order": 7,
+                    "example_values": [
+                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
+                    ],
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ]
+                },
+                "update_assigned_to_name": {
+                    "data_type": "string",
+                    "description": "Assign all incident(s) to a user for all the incidents in the ids list by Name",
+                    "example_values": [
+                        "Jon Doe"
+                    ],
+                    "required": false,
+                    "primary": false,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                    ],
+                    "contains": [
+                        "crowdstrike incident id"
+                    ],
+                    "column_name": "IDs",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.add_tag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.delete_tag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.update_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.update_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.update_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.add_comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.update_assigned_to",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.update_assigned_to_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "list users",
+            "description": "Get information about all users in your Customer ID",
+            "type": "generic",
+            "identifier": "list_users",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.firstName",
+                    "data_type": "string",
+                    "column_name": "First Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.lastName",
+                    "data_type": "string",
+                    "column_name": "Last Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.uid",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
+                    "column_name": "Unique User ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.customer",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike customer id"
+                    ],
+                    "column_name": "Customer ID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "get user roles",
+            "description": "Gets the roles that are assigned to the user",
+            "type": "generic",
+            "identifier": "get_user_roles",
+            "read_only": true,
+            "parameters": {
+                "user_uuid": {
+                    "data_type": "string",
+                    "description": "Users Unqiue ID to get the roles for",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "example_values": [
+                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
+                    ],
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user_uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user role id"
+                    ],
+                    "column_name": "Roles",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "list roles",
+            "description": "Get information about all user roles from your Customer ID",
+            "type": "generic",
+            "identifier": "list_roles",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user role id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.display_name",
+                    "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "get role",
+            "description": "Get information about all user roles from your Customer ID",
+            "type": "generic",
+            "identifier": "get_role",
+            "read_only": true,
+            "parameters": {
+                "role_id": {
+                    "data_type": "string",
+                    "description": "Role ID to get information about. Comma seperated list allowed.",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "example_values": [
+                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
+                    ],
+                    "contains": [
+                        "crowdstrike user role id"
+                    ],
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.role_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user role id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user role id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.display_name",
+                    "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total removed device: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
             }
         }
     ]

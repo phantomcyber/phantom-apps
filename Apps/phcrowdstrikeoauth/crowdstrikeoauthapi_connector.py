@@ -14,6 +14,7 @@ from crowdstrikeoauthapi_consts import *
 import requests
 from bs4 import BeautifulSoup
 import simplejson as json
+# import pudb
 
 
 class RetVal(tuple):
@@ -672,6 +673,369 @@ class CrowdstrikeConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _handle_list_incidents(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        params['offset'] = param.get('offset')
+
+        if param.get('limit') >= 0 and param.get('limit') <= 500:
+            params['limit'] = param.get('limit')
+        elif param.get('limit') > 500:
+            params['limit'] = 500
+
+        if param.get('filter'):
+            param['filter'] = param.get('filter')
+
+        if param.get('sort') and param.get('sort') != "--":
+            param['sort'] = param.get('sort')
+
+        endpoint = CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_incident_behaviors(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        params["offset"] = param.get("offset")
+
+        if param.get("limit") >= 0 and param.get("limit") <= 500:
+            params["limit"] = param.get("limit")
+        elif param.get("limit") > 500:
+            params["limit"] = 500
+
+        if param.get("filter"):
+            param["filter"] = param.get("filter")
+
+        if param.get("sort") and param.get("sort") != "--":
+            param["sort"] = param.get("sort")
+
+        endpoint = CROWDSTRIKE_LIST_BEHAVIORS_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_incident_details(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids = param.get("ids").split(",")
+
+        data = {"ids": ids}
+
+        endpoint = CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, data=data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_incident_behaviors(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids = param.get("ids").split(",")
+
+        data = {"ids": ids}
+
+        endpoint = CROWDSTRIKE_GET_INCIDNET_BEHAVIORS_ID_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, data=data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_crowdscores(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        params['offset'] = param.get('offset')
+
+        if param.get('limit') >= 0 and param.get('limit') <= 500:
+            params['limit'] = param.get('limit')
+        elif param.get('limit') > 500:
+            params['limit'] = 500
+
+        if param.get('filter'):
+            param['filter'] = param.get('filter')
+
+        if param.get('sort') and param.get('sort') != "--":
+            param['sort'] = param.get('sort')
+
+        endpoint = CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_update_incident(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Hold the values for the status
+        statuses = {"new": 20, "reopened": 25, "in progress": 30, "closed": 40}
+
+        ids = param.get("ids").split(",")
+
+        # Default data we will send
+        data = {"action_parameters": [], "ids": ids}
+
+        if param.get("add_tag"):
+            add_tags = param.get("add_tag").split(",")
+            for tag in add_tags:
+                data["action_parameters"].append({"name": "add_tag", "value": tag})
+
+        if param.get("delete_tag"):
+            delete_tags = param.get("delete_tag").split(",")
+            for tag in delete_tags:
+                data["action_parameters"].append({"name": "delete_tag", "value": tag})
+
+        if param.get("update_name"):
+            name = param.get("update_name")
+            data["action_parameters"].append({"name": "update_name", "value": name})
+
+        if param.get("update_description"):
+            description = param.get("update_description")
+            data["action_parameters"].append({"name": "update_description", "value": description})
+
+        if param.get("update_status"):
+            status = param.get("update_status").lower()
+            data["action_parameters"].append({"name": "update_status", "value": str(statuses[status])})
+
+        endpoint = CROWDSTRIKE_UPDATE_INCIDENT_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json=data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_users(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        # Get all the UIDS from your Customer ID
+        endpoint = CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+        # Now that we have all the user ID's send them to the Get User Info endpoint to get all the info about each user
+        # Create the param variable to send
+        params = {'ids': response['resources']}
+
+        endpoint = CROWDSTRIKE_GET_USER_INFO_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_user_roles(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        params = {"user_uuid": param.get("user_uuid")}
+
+        endpoint = CROWDSTRIKE_GET_USER_ROLES_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_roles(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        # Get all the Roles from your Customer ID
+        endpoint = CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+        # Create the param variable to send
+        params = {'ids': response['resources']}
+
+        endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_roles(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+
+        # Create the param variable to send
+        params = {'ids': param.get("role_id").split(',')}
+
+        endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -684,7 +1048,17 @@ class CrowdstrikeConnector(BaseConnector):
             'quarantine_device': self._handle_quarantine_device,
             'unquarantine_device': self._handle_unquarantine_device,
             'remove_hosts': self._handle_remove_hosts,
-            'assign_hosts': self._handle_assign_hosts
+            'assign_hosts': self._handle_assign_hosts,
+            'list_incidents': self._handle_list_incidents,
+            'list_incident_behaviors': self._handle_list_incident_behaviors,
+            'get_incident_details': self._handle_get_incident_details,
+            'get_incident_behaviors': self._handle_get_incident_behaviors,
+            'list_crowdscores': self._handle_list_crowdscores,
+            'update_incident': self._handle_update_incident,
+            'list_users': self._handle_list_users,
+            'get_user_roles': self._handle_get_user_roles,
+            'list_roles': self._handle_list_roles,
+            'get_role': self._handle_get_roles
         }
 
         action = self.get_action_identifier()
@@ -699,10 +1073,10 @@ class CrowdstrikeConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
+    # import pudb
     import argparse
 
-    pudb.set_trace()
+    # pudb.set_trace()
 
     argparser = argparse.ArgumentParser()
 
