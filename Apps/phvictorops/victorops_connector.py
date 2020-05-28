@@ -1,13 +1,18 @@
 # File: victorops_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status as status_strings
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status as status_strings
 
 # Usage of the consts file is recommended
 from victorops_consts import *
@@ -38,9 +43,9 @@ class VictoropsConnector(BaseConnector):
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {})
+            return RetVal(status_strings.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -61,7 +66,7 @@ class VictoropsConnector(BaseConnector):
 
         message = message.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
 
@@ -69,17 +74,17 @@ class VictoropsConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
+            return RetVal(status_strings.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
 
@@ -113,7 +118,7 @@ class VictoropsConnector(BaseConnector):
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", json=None):
 
@@ -124,7 +129,7 @@ class VictoropsConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
         url = ""
@@ -149,7 +154,7 @@ class VictoropsConnector(BaseConnector):
                             verify=config.get('verify_server_cert', True),
                             params=params)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status( status_strings.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -162,7 +167,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/team', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
@@ -174,13 +179,13 @@ class VictoropsConnector(BaseConnector):
             body = { "message_type": "INFO", "state_message": "Test integration_url connectivity" }
             # make rest call
             ret_val, response = self._make_rest_call(self._integration_url, action_result, params=None, headers=None, json=body, method="post")
-            if (phantom.is_fail(ret_val)):
+            if (status_strings.is_fail(ret_val)):
                 self.save_progress("Test Connectivity for integration_url Failed")
                 return action_result.get_status()
             # Return success
             self.save_progress("Test Connectivity for integration_url Passed")
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_teams(self, param):
 
@@ -192,7 +197,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/team', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -205,7 +210,7 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_users(self, param):
 
@@ -220,7 +225,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/user', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -232,11 +237,11 @@ class VictoropsConnector(BaseConnector):
             summary = action_result.update_summary({})
             summary['num_users'] = len(users[0])
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrieve users")
+            return action_result.set_status(status_strings.APP_ERROR, "Could not retrieve users")
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_incidents(self, param):
 
@@ -251,7 +256,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/incidents', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -265,7 +270,7 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_oncalls(self, param):
 
@@ -280,7 +285,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/oncall/current', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -296,7 +301,7 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_policies(self, param):
 
@@ -311,7 +316,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/policies', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -325,7 +330,7 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_routing(self, param):
 
@@ -340,7 +345,7 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/v1/org/routing-keys', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -354,7 +359,7 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_update_incident(self, param):
 
@@ -373,7 +378,7 @@ class VictoropsConnector(BaseConnector):
             else:
                 endpoint = self._integration_url
         else:
-            return action_result.set_status(phantom.APP_ERROR, INTEGRATION_URL_MISSING)
+            return action_result.set_status(status_strings.APP_ERROR, INTEGRATION_URL_MISSING)
 
         param_type = param.get('message_type')
         param_name = param.get('entity_display_name')
@@ -392,14 +397,14 @@ class VictoropsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, data=None, json=body, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if (status_strings.is_fail(ret_val)):
             return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
 
         if response['result'] == 'failure':
-            return action_result.set_status(phantom.APP_ERROR, response.get('message', UPDATE_INCIDENT_ERROR))
+            return action_result.set_status(status_strings.APP_ERROR, response.get('message', UPDATE_INCIDENT_ERROR))
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
@@ -407,11 +412,11 @@ class VictoropsConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def handle_action(self, param):
 
-        ret_val = phantom.APP_SUCCESS
+        ret_val = status_strings.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
@@ -460,13 +465,13 @@ class VictoropsConnector(BaseConnector):
         self._api_key = config.get('api_key')
         self._integration_url = config.get('integration_url').rstrip('/')
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
 
 if __name__ == '__main__':
