@@ -154,7 +154,7 @@ class VictoropsConnector(BaseConnector):
                             verify=config.get('verify_server_cert', True),
                             params=params)
         except Exception as e:
-            return RetVal(action_result.set_status( status_strings.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
