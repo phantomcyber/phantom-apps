@@ -1,0 +1,109 @@
+<!-- File: readme.html
+ Copyright (c) 2016-2020 Splunk Inc.
+
+ SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+ without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+
+<p><b>Prerequisite for [Delete Incident] action</b>
+	<ul>
+		<li>The authenticated user in the app should have appropriate permissions (Organization Admin) of deleting the incidents on the Anomali Threatstream instance for this action to be executed successfully.</li>
+	</ul>
+</p>
+
+<p><b>Behavior for [Whois IP] action</b>
+	<ul>
+		<li>If the action is able to fetch additional whois data for the provided IP then, the action will pass successfully with that additional data.</li>
+		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully without that additional data but with an appropriate message.</li>
+	</ul>
+</p>
+
+<p><b>Playbook Backward Compatibility</b>
+	<ul>
+		<li>New action parameters have been added to the actions given below. Hence, it is requested to the end-user to please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+		<ul>
+			<li>Create Incident - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import domain observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import URL observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import IP observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import file observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import email observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import observables - <b>create_on_cloud</b> parameter has been added</li>
+		</ul>
+	</ul>
+</p>
+
+<p><b>Asset Configuration Parameters</b>
+	<ul>
+		<li><b>is_cloud_instance</b> - This boolean parameter is used to indicate whether the Anomali Threatstream instance is on the cloud. If the parameter is left unchecked, the app and its functionalities will internally consider it as an on-prem instance.</li>
+	</ul>
+</p>
+
+<p><b>Confidence action parameter for import observable related actions</b>
+	<ul>
+		<li>For [import file observable] and [import email observable] actions user has to provide the confidence value in [confidence] action parameter</li>
+		<li>For [import domain observable], [import ip observable], and [import url observable] actions ThreatStream automatically gives the confidence value based on some internal logical operations | processes as per the API documentation</li>
+		<li>For [import observable] action user can provide confidence value in 'fields' parameter as {"confidence": &lt;confidence_value&gt;}</li>
+		<ul>
+			<li>For hash and email type of observable, the value of the confidence will be reflected</li>
+			<li>For domain, IP, and URL type of observable, the value of the confidence will be ignored</li>
+		</ul>
+	</ul>
+</p>
+
+<p><b>Domain Reputation</b>
+	<ul>
+		<li>The action will try to find an intelligence with the same name provided in the [domain] parameter in the Anomali ThreatStream instance. If it is not found, then 'None' will be displayed under the corresponding columns in the output view.</li>
+		<li>If the provided domain is not found as intelligence in Anomali ThreatStream instance, then the user needs to import a domain observable with the provided domain as input and then try to re-run the [domain reputation] action.</li>
+	</ul>
+
+<p><b>On Poll Functionality</b>
+	<ul>
+		<li>It fetches the incidents (belonging to the configured organization ID in the configuration parameters) and their intelligence data to ingest them as containers and artifacts.</li>
+		<li>Approaches for fetching incidents based on the <b>Ingest only incidents marked published</b> configuration parameter</li>
+			<ul>
+				<li>Parameter kept unchecked: Ingesting all the incidents irrespective of their publication status</li>
+				<li>Parameter kept checked: Ingesting the incidents which are only in the published state</li>
+			</ul>
+		<li>Types of polling</li>
+		<ul>
+			<li>Manual Polling</li>
+			<ul>
+				<li>All the incidents are fetched, controlled by the count mentioned in the container_count parameter in the oldest first order based on the <b>modified_ts</b> value of the incidents irrespective of the incidents fetched in the last run. If the user tries to run the manual polling again with a value less than the already ingested incidents, then, again the same incidents will be fetched starting from the oldest first and will be marked as duplicates. It is recommended to run manual polling using a relatively greater value in the container_count parameter to ensure all the incidents are ingested.</li>
+				<li>The <b>modified_ts</b> time of the last fetched incident is not considered for consequent runs of the manual polling.</li>
+			</ul>
+
+			<li>Scheduled | Interval Polling</li>
+			<ul>
+				<li>Same functionality as manual polling along with the additional points mentioned below:</li>
+				<ul>
+					<li><b>The maximum number of incidents to poll in the first run of the scheduled polling</b> configuration parameter governs the number of incidents fetched in the first run.</li>
+					<li>The <b>modified_ts</b> time of the last fetched incident is stored in the <b>last_incident_time</b> key of the state file.</li>
+					<li>For the consecutive runs, the incidents are fetched starting from the time stored in the <b>last_incident_time</b> key of the state file.</li>
+					<li>Please provide a larger value in the <b>Maximum number of incidents to poll in the first run of the scheduled polling</b> configuration parameter to fetch all the existing (older) incidents in the first run itself. From the consecutive runs, the newly created or the modified incidents will be automatically ingested.</li>
+				</ul>
+			</ul>
+		</ul>
+	</ul>
+</p>
+
+<br>
+
+<p><b>Behavior of import_&lt;indicator_type&gt;_observable and the import_observables actions</b>
+	<ul>
+		<li>The action run just sends a request for importing the observable value to the Anomali server.</li>
+		<li>The action run is a success if a response of <b>202 Accepted</b> is returned by the Anomali API. The action does not wait for the observable to reflect on the Anomali UI.</li>
+		<li>The successful run of the actions does not guarantee the successful import of the observable on the Anomali server</li>
+		<ul>
+			<li>If the provided parameters and their expected combinations are correct, then the observable will be successfully imported after an indefinite interval of time (based on the Anomali server).</li>
+			<li>If the provided parameters and their combinations are incorrect, then the action run would be a success (because the API does not return an error response for this and accepts the request) though the observable is not imported on the Anomali server.</li>
+		</ul>
+		<li>It is recommended to add a required time delay between the action blocks which are dependent on the successful import of an observable.</li>
+		<li>To check if the observable was successfully imported, the user can run and check the <b>List Observables</b> action which fetches the observables in the latest first order (based on <b>created_ts</b> time).</li>
+	</ul>
+</p>
+
+<p>
+	<h2>ipwhois</h2>
+    This app uses the python-ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019 Philip Hane.
+</p>
