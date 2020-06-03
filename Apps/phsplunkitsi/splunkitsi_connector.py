@@ -1,3 +1,8 @@
+# File: splunkitsi_connector.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 # -----------------------------------------
 # Phantom sample App Connector python file
 # -----------------------------------------
@@ -11,7 +16,7 @@ from phantom.action_result import ActionResult
 # from splunkitsi_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 import random
 
 # Need some time
@@ -47,12 +52,28 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.object_status_values = { 'Disabled': 0, 'Enabled': 1 }
         self.relative_time_values = { '15 min': '15m', '60 mins': '60m', '4 hours': '4h', '24 hours': '24h', '7 days': '7d', '30 days': '30d' }
 
+    def _unicode_string_handler(self, input_str):
+        """helper method for handling unicode strings
+
+        Arguments:
+            input_str  -- Input string that needs to be processed
+
+        Returns:
+             -- Processed input string based on input_str
+        """
+        try:
+            if input_str:
+                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error ocurred while Unicode handling of the string")
+        return input_str
+
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -61,6 +82,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -69,9 +93,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
-
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+                self._unicode_string_handler(error_text))
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -88,8 +111,10 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
+        error_message = r.text.replace('{', '{{').replace('}', '}}')
+        error_message = self._unicode_string_handler(error_message)
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+                r.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -125,7 +150,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, self._unicode_string_handler(r.text.replace('{', '{{').replace('}', '}}')))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
@@ -148,9 +173,15 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
                 auth=self._auth,
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-
+            if e.message:
+                error_message = self._unicode_string_handler(e.message)
+            else:
+                error_message = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message), resp_json))
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -196,7 +227,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_group_id = param['itsi_group_id']
+        itsi_group_id = self._unicode_string_handler(param['itsi_group_id'])
 
         # Optional values should use the .get() function
 
@@ -243,11 +274,17 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._handle_update_episode_helper(param, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_update_episode_helper(self, param, action_result):
+        """Helper function for update episode"""
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_group_id = param['itsi_group_id']
+        itsi_group_id = self._unicode_string_handler(param['itsi_group_id'])
 
         # Optional values should use the .get() function
         status = param.get('status', None)
@@ -308,6 +345,13 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._handle_break_episode_helper(param, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_break_episode_helper(self, param, action_result):
+        """Helper function for break episode"""
 
         # Access action parameters passed in the 'param' dictionary
 
@@ -380,7 +424,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Missing notable event aggregation policy id"), None)
 
         if (break_episode):
-            ret_val = self._handle_break_episode(param)
+            ret_val = self._handle_break_episode_helper(param, action_result)
             if (phantom.is_fail(ret_val)):
                 # the call to the 3rd party device or service failed, action result should contain all the error details
                 # for now the return is commented out, but after implementation, return from here
@@ -391,7 +435,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Set episode status to Closed and call update episode handler
         param['status'] = 'Closed'
 
-        ret_val = self._handle_update_episode(param)
+        ret_val = self._handle_update_episode_helper(param, action_result)
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -594,7 +638,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_group_id = param['itsi_group_id']
+        itsi_group_id = self._unicode_string_handler(param['itsi_group_id'])
 
         # Optional values should use the .get() function
 
@@ -643,7 +687,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_service_id = param['itsi_service_id']
+        itsi_service_id = self._unicode_string_handler(param['itsi_service_id'])
 
         # Optional values should use the .get() function
 
@@ -745,7 +789,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_service_id = param['itsi_service_id']
+        itsi_service_id = self._unicode_string_handler(param['itsi_service_id'])
         service_status = param['service_status']
 
         # Optional values should use the .get() function
@@ -803,7 +847,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        itsi_entity_id = param['itsi_entity_id']
+        itsi_entity_id = self._unicode_string_handler(param['itsi_entity_id'])
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/itoa_interface/entity/{0}'.format(itsi_entity_id),
@@ -848,7 +892,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        maintenance_window_id = param['maintenance_window_id']
+        maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
 
         # Optional values should use the .get() function
 
@@ -903,15 +947,37 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Optional values should use the .get() function
         start_time = param.get('start_time', None)
+        if start_time is not None:
+            try:
+                start_time = float(start_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+
         end_time = param.get('end_time', None)
+        if end_time is not None:
+            try:
+                end_time = float(end_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+
         relative_start_time = param.get('relative_start_time', 0)
+        try:
+            relative_start_time = float(relative_start_time)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+
         relative_end_time = param.get('relative_end_time', 300)
+        try:
+            relative_end_time = float(relative_end_time)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
         comment = param.get('comment', None)
 
         # start_time and end_time are expected to be defined in seconds since the epoch.
-        # The input type is numeric. Check wehether we are within the limits, that is
+        # The input type is numeric. Check whether we are within the limits, that is
         # 0 <= t <= 2147483647
         if ((start_time is not None) and ((start_time < 0) or (start_time > 2147483647))):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "start_time out of range"), None)
@@ -985,14 +1051,38 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        maintenance_window_id = param['maintenance_window_id']
+        maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
 
         # Optional values should use the .get() function
         title = param.get('title', None)
         start_time = param.get('start_time', None)
+        if start_time is not None:
+            try:
+                start_time = float(start_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+
         end_time = param.get('end_time', None)
+        if end_time is not None:
+            try:
+                end_time = float(end_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+
         relative_start_time = param.get('relative_start_time', None)
+        if relative_start_time is not None:
+            try:
+                relative_start_time = float(relative_start_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+
         relative_end_time = param.get('relative_end_time', None)
+        if relative_end_time is not None:
+            try:
+                relative_end_time = float(relative_end_time)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
         comment = param.get('comment', None)
@@ -1006,7 +1096,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             objects = [ { '_key': i, 'object_type': object_type } for i in object_id_list ]
 
         # start_time and end_time are expected to be defined in seconds since the epoch.
-        # The input type is numeric. Check wehether we are within the limits, that is
+        # The input type is numeric. Check whether we are within the limits, that is
         # 0 <= t <= 2147483647
         if ((start_time is not None) and ((start_time < 0) or (start_time > 2147483647))):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "start_time out of range"), None)
@@ -1076,7 +1166,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        maintenance_window_id = param['maintenance_window_id']
+        maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
 
         # Optional values should use the .get() function
         comment = param.get('comment', None)
@@ -1203,9 +1293,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = config.get('base_url')
+        self._base_url = self._unicode_string_handler(config.get('base_url'))
         self._port = config.get('port')
-        self._username = config.get('username')
+        self._username = self._unicode_string_handler(config.get('username'))
         self._password = config.get('password')
         self._token = config.get('token')
 

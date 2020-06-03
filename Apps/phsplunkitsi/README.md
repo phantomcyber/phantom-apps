@@ -1,7 +1,7 @@
 # Phantom App for Splunk IT Service Intelligence
 
 Author: Splunk Inc.
-Latest Version Tag: 0.5.0  
+Latest Version Tag: 0.5.0
 Date: 2020-01-08
 
 This app integrates with Splunk IT Service Intelligence to provide operations on Splunk IT Service Intelligence episodes, services, entites, and object maintenance.
@@ -9,7 +9,7 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 ## Actions
 
 * `test connectivity`: test connectivity to Splunk ITSI instance
-  
+
 ### episode actions
 
 * `get episode`: get Splunk ITSI episode information
@@ -20,17 +20,17 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 * `get episode events`: get latest events for Splunk ITSI episode
 * `add episode ticket`: add ticketing information to Splunk ITSI episode
 * `get episode tickets`: get ticketing information for Splunk ITSI episode
-  
+
 ### service actions
 
 * `get service`: get Splunk ITSI service information
 * `get service entities`: get entities of a Splunk ITSI service
 * `update service status`: set Splunk ITSI service status to enabled or disabled
-  
+
 ### entity actions
 
 * `get entity`: get Splunk ITSI entity information
-  
+
 ### object maintenance actions
 
 * `get maintenance window`: get Splunk ITSI maintenance window information
@@ -63,7 +63,7 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 * New action `get episode events`
 * New action `add episode ticket`
 * New action `get episode tickets`
-  
+
 * New action `get service`
 * New action `get service entities`
 * New action `update service status`
