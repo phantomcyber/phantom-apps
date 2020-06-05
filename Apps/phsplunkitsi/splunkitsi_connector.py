@@ -12,8 +12,6 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from splunkitsi_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup, UnicodeDammit
@@ -144,7 +142,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # Looks like Splunk ITSI 4.2.x does not send Content-Type response headers.
-        # Therefore, based on status conde we return success,
+        # Therefore, based on status code we return success,
         if 200 <= r.status_code < 400:
             return RetVal(phantom.APP_SUCCESS, {})
 
