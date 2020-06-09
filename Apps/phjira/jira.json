@@ -8,7 +8,7 @@
     "main_module": "jira_connector.py",
     "app_version": "2.0.47",
     "connector_version": "2.0.47",
-    "utctime_updated": "2020-05-06T21:46:40.000000Z",
+    "utctime_updated": "2020-06-09T18:05:40.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
@@ -162,7 +162,7 @@
             "description": "Jira instance timezone (used for timezone conversions for querying in ingestion). Refer to README",
             "default": "GMT",
             "required": true
-         }
+        }
     },
     "actions": [
         {
@@ -9491,7 +9491,7 @@
                     ],
                     "order": 2,
                     "primary": true
-                 }
+                }
             },
             "output": [
                 {
