@@ -6,16 +6,17 @@
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "2.0.46",
-    "connector_version": "2.0.46",
+    "app_version": "2.0.47",
+    "connector_version": "2.0.47",
     "utctime_updated": "2020-05-06T21:46:40.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.6.19142",
     "latest_tested_versions": [
-        "On prem v7.1.9"
+        "On prem v7.1.9",
+        "Cloud Copyright (c) 2002 - 2020 Atlassian Corporation Pty Ltd."
     ],
     "python_version": "3",
     "logo": "logo_atlassian.svg",
@@ -154,7 +155,14 @@
             "order": 8,
             "description": "Comma-separated string of custom fields (case-sensitive) to be ingested",
             "required": false
-        }
+        },
+        "timezone": {
+            "data_type": "timezone",
+            "order": 9,
+            "description": "Jira instance timezone (used for timezone conversions for querying in ingestion). Refer to README",
+            "default": "GMT",
+            "required": true
+         }
     },
     "actions": [
         {
@@ -214,21 +222,31 @@
                     "required": false
                 },
                 "assignee": {
-                    "description": "Assignee user (assign required permissions)",
+                    "description": "Assignee username (required for Jira on-prem, assign required permissions)",
                     "data_type": "string",
                     "order": 5,
                     "required": false
+                },
+                "assignee_account_id": {
+                    "description": "Assignee user account ID (required for Jira cloud, assign required permissions)",
+                    "data_type": "string",
+                    "order": 6,
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "jira user account id"
+                    ]
                 },
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
                     "required": false,
-                    "order": 6
+                    "order": 7
                 },
                 "vault_id": {
                     "description": "Vault ID of attachment",
                     "data_type": "string",
-                    "order": 7,
+                    "order": 8,
                     "required": false,
                     "primary": true,
                     "contains": [
@@ -253,7 +271,23 @@
                 },
                 {
                     "data_path": "action_result.parameter.assignee",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.assignee_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5d2ef6ab52a8370c567f27bb"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.description",
@@ -1337,6 +1371,179 @@
                     "example_values": [
                         "Created ticket with id: 11850, key: MAN-240",
                         "Created ticket with id: 11911, key: PHANINCIDE-370"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get attachments",
+            "description": "Gets specific attachments from a Jira Ticket (issue)",
+            "verbose": "The function will store specific attachments from a given Jira ticket inside the vault.",
+            "type": "investigate",
+            "identifier": "get_attachments",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The key of the Jira issue",
+                    "contains": [
+                        "jira ticket key"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "retrieve_all": {
+                    "data_type": "boolean",
+                    "order": 1,
+                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is not provided, it will internally be treated as 'false')",
+                    "default": true
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "order": 2,
+                    "description": "The Container ID to associate the file with",
+                    "required": true
+                },
+                "extension_filter": {
+                    "data_type": "string",
+                    "order": 3,
+                    "description": "Comma-separated list of file extensions to be returned from the issue"
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "get attachments",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "jira ticket key"
+                    ],
+                    "example_values": [
+                        "AUA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.retrieve_all",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "234"
+                    ],
+                    "column_name": "Container ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.extension_filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "txt,png,exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "2446"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.succeeded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
+                    ],
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        501
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "231003"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved attachments from Jira ticket"
                     ]
                 },
                 {
@@ -3286,6 +3493,12 @@
                     "data_type": "string",
                     "order": 1,
                     "required": true
+                },
+                "internal": {
+                    "description": "Whether comment should be internal only or not in Jira Service Desk (if the value is not provided, it will internally be treated as 'false')",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "default": true
                 }
             },
             "render": {
@@ -3325,6 +3538,14 @@
                     ],
                     "column_name": "Key",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -5357,6 +5578,240 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "lookup users",
+            "description": "Get a list of user resources that match the specified search string",
+            "type": "investigate",
+            "identifier": "search_users",
+            "read_only": true,
+            "verbose": "This action will be used to fetch username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for [max_results] action parameter is <b>1000</b>. The maximum number of users as specified by the parameter [max_results] will be fetched starting from the first.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to search users using username for Jira cloud, we will use user's display name to search users. You can use [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be use to search users for Jira on-prem.",
+            "parameters": {
+                "username": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "A string to match with usernames, name or email against for JIRA on-prem (required for Jira on-prem)",
+                    "contains": [
+                        "user name"
+                    ],
+                    "required": false,
+                    "primary": true
+                },
+                "display_name": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "A string to match with display name for JIRA cloud (required for Jira cloud)",
+                    "contains": [
+                        "jira user display name"
+                    ],
+                    "required": false,
+                    "primary": true
+                },
+                "max_results": {
+                    "description": "Maximum number of users to return",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "default": 1000
+                }
+            },
+            "render": {
+                "type": "custom",
+                "view": "jira_view.display_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name",
+                        "test3.test"
+                    ],
+                    "contains": [
+                        "jira user display name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.locale",
+                    "data_type": "string",
+                    "example_values": [
+                        "en_US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://10.1.16.180:8080/rest/api/2/user?username=test"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.24x24",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=24"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.16x16",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=16"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.48x48",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=48"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.32x32",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=32"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@domain.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timeZone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        4
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.accountType",
+                    "data_type": "string",
+                    "example_values": [
+                        "atlassian"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.accountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "5d2ef6aa6637260c19b78dfd"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Name"
+                    ],
+                    "contains": [
+                        "jira user display name"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get ticket",
             "description": "Get ticket (issue) information",
             "type": "investigate",
@@ -7297,83 +7752,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.fields.",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
                     "data_path": "action_result.data.*.fields.Epic Link",
                     "data_type": "string"
                 },
@@ -8835,7 +9213,7 @@
                     "description": "How to limit the comment visibility",
                     "required": false
                 },
-                "comment_visibility": {
+                "comment_visibility_name": {
                     "data_type": "string",
                     "order": 5,
                     "description": "Name of group/role able to see the comment",
@@ -8862,7 +9240,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.comment_visibility",
+                    "data_path": "action_result.parameter.comment_visibility_name",
                     "data_type": "string",
                     "example_values": [
                         "jira-users",
@@ -8953,6 +9331,7 @@
         {
             "action": "add watcher",
             "description": "Add a user to an issue's watchers list",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to add watcher using username for Jira cloud, we will use user's account_id to add watcher for Jira cloud. Use 'lookup users' action to find out user's account_id. You can use [user_account_id] action parameter to add watcher to the Jira ticket for Jira cloud, and, [username] action parameter will be use to add watcher to the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "add_watcher",
             "read_only": false,
@@ -8969,13 +9348,23 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to add to the watchers list",
+                    "description": "Username of the user to add to the watchers list (required for Jira on-prem)",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "contains": [
                         "user name"
                     ],
                     "order": 1,
+                    "primary": true
+                },
+                "user_account_id": {
+                    "description": "Account ID of the user to add to the watchers list (required for Jira cloud)",
+                    "data_type": "string",
+                    "required": false,
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "order": 2,
                     "primary": true
                 }
             },
@@ -8988,7 +9377,7 @@
                         "failed"
                     ],
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -9013,6 +9402,18 @@
                     ],
                     "column_name": "Username",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.user_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "column_name": "Account ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
@@ -9055,6 +9456,7 @@
         {
             "action": "remove watcher",
             "description": "Remove a user from an issue's watchers list",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to remove watcher using username for Jira cloud, we will use user's account_id to remove watcher for Jira cloud. Use 'lookup users' action to find out user's account_id. You can use [user_account_id] action parameter to remove watcher from the Jira ticket for Jira cloud, and, [username] action parameter will be use to remove watcher from the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "remove_watcher",
             "read_only": false,
@@ -9071,15 +9473,25 @@
                     "primary": true
                 },
                 "username": {
-                    "description": "Username of the user to remove from the watchers list",
+                    "description": "Username of the user to remove from watchers list (required for Jira on-prem)",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "contains": [
                         "user name"
                     ],
                     "order": 1,
                     "primary": true
-                }
+                },
+                "user_account_id": {
+                    "description": "Account ID of the user to remove from the watchers list (required for Jira cloud)",
+                    "data_type": "string",
+                    "required": false,
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "order": 2,
+                    "primary": true
+                 }
             },
             "output": [
                 {
@@ -9090,7 +9502,7 @@
                         "failed"
                     ],
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -9115,6 +9527,18 @@
                     ],
                     "column_name": "Username",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.user_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "557058:c4593bd2-4853-4a5e-a9ed-278ca5f17dce"
+                    ],
+                    "contains": [
+                        "jira user account id"
+                    ],
+                    "column_name": "Account ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
