@@ -276,8 +276,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Create params for POST request
         q_params = { 'is_partial_update': '1' }
 
-        # Check whether at least one of status, severity, owner is not None...
-
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/notable_event_group/{0}'.format(itsi_group_id),
             action_result,
@@ -288,23 +286,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Update Episode Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Update Episode Passed")
@@ -326,14 +312,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
     def _handle_break_episode_helper(self, param, action_result):
         """Helper function for break episode"""
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_group_id = param['itsi_group_id']
         itsi_policy_id = param['itsi_policy_id']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # Create payload for POST request
         payload = { '_key': itsi_group_id }
@@ -354,23 +335,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Break Episode Failed")
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Break Episode Passed")
@@ -385,10 +351,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-
         # Optional values should use the .get() function
         break_episode = param.get('break_episode', True)
         itsi_policy_id = param.get('itsi_policy_id', None)
@@ -400,8 +362,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             ret_val = self._handle_break_episode_helper(param, action_result)
             if (phantom.is_fail(ret_val)):
                 # the call to the 3rd party device or service failed, action result should contain all the error details
-                # for now the return is commented out, but after implementation, return from here
-                # return action_result.get_status()
                 self.save_progress("Close Episode Failed")
                 return action_result.get_status()
 
@@ -412,23 +372,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Close Episode Failed")
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        # action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Close Episode Passed")
@@ -443,13 +388,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_group_id = param['itsi_group_id']
         comment = param['comment']
-
-        # Optional values should use the .get() function
 
         # Create payload for POST request
         payload = dict()
@@ -466,12 +407,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Add Episode Comment Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -479,10 +417,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({ 'itsi_group_id': itsi_group_id})
         summary['comment_id'] = response['comment_id']
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Add Episode Comment Passed")
@@ -496,8 +430,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         itsi_group_id = param['itsi_group_id']
@@ -529,8 +461,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Episode Events Failed")
             return action_result.get_status()
 
@@ -549,8 +479,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         itsi_group_id = param['itsi_group_id']
@@ -577,23 +505,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Add Episode Ticket Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Add Episode Ticket Passed")
@@ -608,14 +524,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_group_id = self._unicode_string_handler(param['itsi_group_id'])
-
-        # Optional values should use the .get() function
-
-        # Create payload for POST request
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/ticketing/{0}'.format(itsi_group_id),
@@ -626,23 +536,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Episode Tickets Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Episode Tickets Passed")
@@ -657,14 +555,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_service_id = self._unicode_string_handler(param['itsi_service_id'])
-
-        # Optional values should use the .get() function
-
-        # Create payload for POST request
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/itoa_interface/service/{0}'.format(itsi_service_id),
@@ -675,23 +567,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Service Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Service Passed")
@@ -706,14 +586,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_service_id = param['itsi_service_id']
 
-        # Optional values should use the .get() function
-
-        # Create payload for POST request
 
         # Create params for GET request
         q_params = {'filter': json.dumps({ 'services._key': itsi_service_id })}
@@ -727,24 +602,13 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Service Entities Failed")
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
 
         # Return only the entity information
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Service Entities Passed")
@@ -759,13 +623,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_service_id = self._unicode_string_handler(param['itsi_service_id'])
         service_status = param['service_status']
-
-        # Optional values should use the .get() function
 
         # Create payload for POST request
         payload = dict()
@@ -773,8 +633,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Create params for POST request
         params = { 'is_partial_data': '1' }
-
-        # Check whether at least one of status, severity, owner is not None...
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/itoa_interface/service/{0}'.format(itsi_service_id),
@@ -786,23 +644,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Update Service Status Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Update Service Status Passed")
@@ -817,8 +663,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_entity_id = self._unicode_string_handler(param['itsi_entity_id'])
 
@@ -831,23 +675,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Entity Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Entity Passed")
@@ -862,16 +694,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
-
-        # Optional values should use the .get() function
-
-        # Create payload for POST request
-
-        # Create params for GET request
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/maintenance_services_interface/maintenance_calendar/{0}'.format(maintenance_window_id),
@@ -882,23 +706,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Maintenance Window Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Maintenance Window Passed")
@@ -912,8 +724,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         title = param['title']
@@ -990,23 +800,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Create Maintenance Window Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Create Maintenance Window Passed")
@@ -1020,8 +818,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
@@ -1105,23 +901,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Update Maintenance Window Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Update Maintenance Window Passed")
@@ -1135,8 +919,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         maintenance_window_id = self._unicode_string_handler(param['maintenance_window_id'])
@@ -1163,23 +945,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("End Maintenance Window Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("End Maintenance Window Passed")
@@ -1255,16 +1025,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = self._unicode_string_handler(config.get('base_url'))
         self._port = config.get('port')
