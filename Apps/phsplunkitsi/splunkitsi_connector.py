@@ -175,7 +175,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             error_message = 'Error Details: Connection Refused from the Server'
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            if e.message:
+            if hasattr(e, 'message'):
                 error_message = self._unicode_string_handler(e.message)
             else:
                 error_message = "Error message unavailable. Please check the asset configuration and|or action parameters."
@@ -201,13 +201,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
-
-        # Return success
-        # self.save_progress("Test Connectivity Passed")
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Test Connectivity Passed")
@@ -222,16 +217,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         itsi_group_id = self._unicode_string_handler(param['itsi_group_id'])
-
-        # Optional values should use the .get() function
-
-        # Create payload for POST request
-
-        # Create params for GET request
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/notable_event_group/{0}'.format(itsi_group_id),
@@ -242,23 +229,11 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             self.save_progress("Get Episode Failed")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({'itsi_group_id': itsi_group_id})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Get Episode Passed")
