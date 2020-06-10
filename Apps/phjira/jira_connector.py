@@ -1088,7 +1088,7 @@ class JiraConnector(BaseConnector):
 
     def _handle_search_users(self, param):
 
-        action_result = self.add_action_result(status.ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Progress
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
@@ -1933,7 +1933,7 @@ class JiraConnector(BaseConnector):
 
     def _handle_get_attachments(self, param):
 
-        action_result = self.add_action_result(status.ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
         self.save_progress(status.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
