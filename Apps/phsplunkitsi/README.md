@@ -2,7 +2,7 @@
 
 Author: Splunk Inc.
 Latest Version Tag: 1.0.0
-Date: 2020-01-08
+Date: 2020-06-10
 
 This app integrates with Splunk IT Service Intelligence to provide operations on Splunk IT Service Intelligence episodes, services, entites, and object maintenance.
 
@@ -44,7 +44,7 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 
 ### Version: 1.0.0
 
-#### Release Date: Jan 08, 2020
+#### Release Date: June 10, 2020
 
 #### Compatibility
 
