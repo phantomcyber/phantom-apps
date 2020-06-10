@@ -1094,7 +1094,7 @@ class JiraConnector(BaseConnector):
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
 
         # Connectivity
-        self.save_progress(status.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+        self.save_progress(progress.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
         if (status.is_fail(self._create_jira_object())):
@@ -1936,7 +1936,7 @@ class JiraConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(JIRA_USING_BASE_URL, base_url=self._base_url)
-        self.save_progress(status.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+        self.save_progress(progress.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Create the jira object
         if (status.is_fail(self._create_jira_object())):
