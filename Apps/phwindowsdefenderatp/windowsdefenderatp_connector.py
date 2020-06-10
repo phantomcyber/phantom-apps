@@ -558,7 +558,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DEFENDERATP_MAKING_CONNECTION_MSG)
-        self._state = {}
+
+        if not self._state:
+            self._state = {}
 
         # Get initial REST URL
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
