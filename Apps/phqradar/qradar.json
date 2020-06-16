@@ -1,0 +1,2779 @@
+{
+  "appid": "6cf34589-6947-409f-b776-e8fa62e01509",
+  "name": "QRadar",
+  "description": "This app supports generic, investigative, and ingestion actions on an IBM QRadar device",
+  "type": "siem",
+  "publisher": "Splunk",
+  "main_module": "qradar_connector.pyc",
+  "app_version": "1.2.70",
+  "latest_tested_versions": ["On-premise v7.3.1"],
+  "utctime_updated": "2020-03-16T16:11:04.000000Z",
+  "package_name": "phantom_qradar",
+  "product_vendor": "IBM",
+  "product_name": "QRadar",
+  "product_version_regex": ".*",
+  "min_phantom_version": "4.6.19142",
+  "logo": "logo_ibmqradar.svg",
+  "logo_dark": "logo_ibmqradar_dark.svg",
+  "license": "Copyright (c) 2016-2020 Splunk Inc.",
+  "app_config_render": "default",
+  "configuration": {
+    "device": {
+      "data_type": "string",
+      "order": 0,
+      "description": "Server IP/Hostname",
+      "required": true
+    },
+    "containers_only": {
+      "data_type": "boolean",
+      "order": 20,
+      "description": "Ingest only offenses while polling"
+    },
+    "verify_server_cert": {
+      "data_type": "boolean",
+      "description": "Verify server certificate",
+      "order": 1,
+      "default": false
+    },
+    "username": {
+      "data_type": "string",
+      "order": 2,
+      "description": "Username",
+      "required": false
+    },
+    "password": {
+      "data_type": "password",
+      "order": 3,
+      "description": "Password",
+      "required": false
+    },
+    "authorization_token": {
+      "data_type": "password",
+      "order": 4,
+      "description": "Auth Token for QRadar REST API calls",
+      "required": false
+    },
+    "timezone": {
+      "data_type": "timezone",
+      "order": 5,
+      "description": "Qradar timezone",
+      "required": true
+    },
+    "add_to_resolved": {
+      "data_type": "boolean",
+      "order": 6,
+      "description": "Ingest artifacts into closed/resolved containers",
+      "default": false
+    },
+    "artifact_max": {
+      "data_type": "numeric",
+      "order": 7,
+      "description": "Maximum event artifacts count (excluding the default generated offense artifact)",
+      "required": false,
+      "default": 1000
+    },
+    "ingest_resolved": {
+      "data_type": "boolean",
+      "order": 8,
+      "description": "Ingest only open offenses"
+    },
+    "cef_event_map": {
+      "data_type": "string",
+      "order": 9,
+      "description": "CEF event map",
+      "required": false
+    },
+    "cef_value_map": {
+      "data_type": "string",
+      "order": 10,
+      "description": "CEF value map",
+      "required": false
+    },
+    "delete_empty_cef_fields": {
+      "data_type": "boolean",
+      "order": 11,
+      "description": "Delete the empty CEF fields",
+      "default": false
+    },
+    "event_fields_for_query": {
+      "data_type": "string",
+      "order": 12,
+      "description": "Event fields to include while querying",
+      "required": false
+    },
+    "add_offense_id_to_name": {
+      "data_type": "boolean",
+      "order": 13,
+      "description": "Add offense ID to name of containers"
+    },
+    "alternative_ariel_query": {
+      "data_type": "boolean",
+      "default": false,
+      "order": 14,
+      "description": "Alternative ariel query"
+    },
+    "alternative_ingest_algorithm": {
+      "data_type": "boolean",
+      "default": false,
+      "order": 15,
+      "description": "Alternative ingest algorithm for offenses"
+    },
+    "alt_time_field": {
+      "data_type": "string",
+      "default": "start_time",
+      "required": false,
+      "order": 16,
+      "value_list": ["start_time", "last_updated_time", "either"],
+      "description": "Alternative ingestion time field"
+    },
+    "alt_initial_ingest_time": {
+      "data_type": "string",
+      "default": "yesterday",
+      "required": false,
+      "order": 17,
+      "description": "Alternative initial ingestion time"
+    },
+    "alt_ingestion_order": {
+      "data_type": "string",
+      "default": "oldest first",
+      "required": false,
+      "order": 18,
+      "value_list": ["oldest first", "latest first"],
+      "description": "Alternative ingestion order for offenses"
+    },
+    "events_ingest_start_time": {
+      "data_type": "numeric",
+      "default": 60,
+      "required": false,
+      "order": 19,
+      "description": "Events ingestion initial time relative to offense start time (default is 60 min)"
+    },
+    "client_auth_cert": {
+      "order": 21,
+      "data_type": "string",
+      "description": "File name for the client auth cert"
+    },
+    "client_auth_key": {
+      "order": 22,
+      "data_type": "string",
+      "description": "File name for the unencrypted client auth key"
+    }
+  },
+  "app_config": {
+    "interval_days": {
+      "data_type": "numeric",
+      "order": 0,
+      "description": "Interval days used in all the offenses, events, and flows related actions",
+      "value": 5,
+      "required": false
+    }
+  },
+  "actions": [
+    {
+      "action": "test connectivity",
+      "description": "Validate the asset configuration for connectivity. This action runs a quick query on the device to check the connection and credentials",
+      "type": "test",
+      "identifier": "test_asset_connectivity",
+      "read_only": true,
+      "parameters": {},
+      "output": [],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "list offenses",
+      "description": "Get a list of offenses",
+      "verbose": "The default start_time is the past 5 days. The default end_time is now. The default count is 100 offenses.",
+      "type": "investigate",
+      "identifier": "list_offenses",
+      "read_only": true,
+      "parameters": {
+        "start_time": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Start of time range, in epoch time (milliseconds)"
+        },
+        "end_time": {
+          "data_type": "numeric",
+          "order": 1,
+          "description": "End of time range, in epoch time (milliseconds)"
+        },
+        "count": {
+          "data_type": "numeric",
+          "order": 2,
+          "description": "Number of offenses to retrieve"
+        },
+        "offense_id": {
+          "data_type": "string",
+          "order": 3,
+          "description": "Comma-separated list of offense IDs to fetch",
+          "contains": ["qradar offense id"],
+          "primary": true,
+          "allow_list": true
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Offenses List"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.count",
+          "data_type": "numeric",
+          "example_values": [100]
+        },
+        {
+          "data_path": "action_result.parameter.end_time",
+          "data_type": "numeric",
+          "example_values": [1669900000000]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "example_values": ["44"]
+        },
+        {
+          "data_path": "action_result.parameter.start_time",
+          "data_type": "numeric",
+          "example_values": [1559900000000]
+        },
+        {
+          "data_path": "action_result.data.*.assigned_to",
+          "data_type": "string",
+          "example_values": ["admin"]
+        },
+        {
+          "data_path": "action_result.data.*.categories",
+          "data_type": "string",
+          "example_values": ["License Status"]
+        },
+        {
+          "data_path": "action_result.data.*.category_count",
+          "data_type": "numeric",
+          "example_values": [10]
+        },
+        {
+          "data_path": "action_result.data.*.close_time",
+          "data_type": "numeric",
+          "column_name": "Close Time",
+          "column_order": 9
+        },
+        {
+          "data_path": "action_result.data.*.closing_reason_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense closing reason id"],
+          "column_name": "Offense Closing Reason ID",
+          "column_order": 11
+        },
+        {
+          "data_path": "action_result.data.*.closing_user",
+          "data_type": "string",
+          "column_name": "Closing User",
+          "column_order": 10
+        },
+        {
+          "data_path": "action_result.data.*.credibility",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "Description",
+          "column_order": 4,
+          "example_values": ["Local Malware Events\n"]
+        },
+        {
+          "data_path": "action_result.data.*.destination_networks",
+          "data_type": "string",
+          "example_values": ["other"]
+        },
+        {
+          "data_path": "action_result.data.*.device_count",
+          "data_type": "numeric",
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.data.*.event_count",
+          "data_type": "numeric",
+          "column_name": "Event Count",
+          "column_order": 6,
+          "example_values": [28603163]
+        },
+        {
+          "data_path": "action_result.data.*.flow_count",
+          "data_type": "numeric",
+          "column_name": "Flow Count",
+          "column_order": 7,
+          "example_values": [110]
+        },
+        {
+          "data_path": "action_result.data.*.follow_up",
+          "data_type": "boolean",
+          "column_name": "Follow Up",
+          "column_order": 14,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "column_name": "Offense Id",
+          "column_order": 0,
+          "example_values": [44]
+        },
+        {
+          "data_path": "action_result.data.*.inactive",
+          "data_type": "boolean",
+          "column_name": "Inactive",
+          "column_order": 5,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.last_updated_time",
+          "data_type": "numeric",
+          "column_name": "Last Updated Time",
+          "column_order": 13,
+          "example_values": [1559194600958]
+        },
+        {
+          "data_path": "action_result.data.*.local_destination_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.magnitude",
+          "data_type": "numeric",
+          "column_name": "Magnitude",
+          "column_order": 15,
+          "example_values": [5]
+        },
+        {
+          "data_path": "action_result.data.*.offense_source",
+          "data_type": "string",
+          "column_name": "Offense Source",
+          "contains": ["ip"],
+          "column_order": 1,
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.offense_type",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.policy_category_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.protected",
+          "data_type": "boolean",
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.relevance",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.remote_destination_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.security_category_count",
+          "data_type": "numeric",
+          "example_values": [10]
+        },
+        {
+          "data_path": "action_result.data.*.severity",
+          "data_type": "numeric",
+          "column_name": "Severity",
+          "column_order": 12,
+          "example_values": [6]
+        },
+        {
+          "data_path": "action_result.data.*.source_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.source_network",
+          "data_type": "string",
+          "column_name": "Source Network",
+          "column_order": 3,
+          "example_values": ["Net-10-172-192.Net_10_0_0_0"]
+        },
+        {
+          "data_path": "action_result.data.*.start_time",
+          "data_type": "numeric",
+          "column_name": "Start Time",
+          "column_order": 8,
+          "example_values": [1558009780686]
+        },
+        {
+          "data_path": "action_result.data.*.status",
+          "data_type": "string",
+          "column_name": "Status",
+          "column_order": 2,
+          "example_values": ["OPEN"]
+        },
+        {
+          "data_path": "action_result.data.*.username_count",
+          "data_type": "numeric",
+          "example_values": [0],
+          "contains": ["user name"]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_offenses",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Fetching all open offenses. Total offenses: 1",
+            "Total Offenses: 1"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "list closing reasons",
+      "description": "Get a list of offense closing reasons",
+      "type": "investigate",
+      "identifier": "list_closing_reasons",
+      "read_only": true,
+      "parameters": {
+        "include_reserved": {
+          "description": "Include reserved offense closing reasons",
+          "data_type": "boolean",
+          "default": false,
+          "order": 0
+        },
+        "include_deleted": {
+          "description": "Include deleted offense closing reasons",
+          "data_type": "boolean",
+          "default": false,
+          "order": 1
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Offense Closing Reasons List"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.include_deleted",
+          "data_type": "boolean",
+          "example_values": [true, false]
+        },
+        {
+          "data_path": "action_result.parameter.include_reserved",
+          "data_type": "boolean",
+          "example_values": [true, false]
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "contains": ["qradar offense closing reason id"],
+          "column_name": "Offense Closing Reason ID",
+          "column_order": 1,
+          "example_values": [2]
+        },
+        {
+          "data_path": "action_result.data.*.is_deleted",
+          "data_type": "boolean",
+          "example_values": [true, false]
+        },
+        {
+          "data_path": "action_result.data.*.is_reserved",
+          "data_type": "boolean",
+          "example_values": [true, false]
+        },
+        {
+          "data_path": "action_result.data.*.text",
+          "data_type": "string",
+          "column_name": "Offense Closing Reason Name",
+          "column_order": 0,
+          "example_values": ["False-Positive, Tuned"]
+        },
+        {
+          "data_path": "action_result.summary.total_offense_closing_reasons",
+          "data_type": "numeric",
+          "example_values": [5]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Total offense closing reasons: 5"]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "get events",
+      "description": "Get events belonging to an offense",
+      "verbose": "Use fields_filter parameter to restrict the events returned that match the filter. For e.g. destinationip='10.10.0.52' and protocolid='6'. For further details refer to the documentation section of the action in the README.",
+      "type": "investigate",
+      "identifier": "get_events",
+      "read_only": true,
+      "parameters": {
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Offense ID to get events of",
+          "contains": ["qradar offense id"],
+          "primary": true
+        },
+        "ph": {
+          "data_type": "ph",
+          "order": 1
+        },
+        "start_time": {
+          "data_type": "numeric",
+          "order": 2,
+          "description": "Start of time range, in epoch time (milliseconds)"
+        },
+        "end_time": {
+          "data_type": "numeric",
+          "order": 3,
+          "description": "End of time range, in epoch time (milliseconds)"
+        },
+        "count": {
+          "data_type": "numeric",
+          "order": 4,
+          "description": "Number of events to retrieve"
+        },
+        "fields_filter": {
+          "data_type": "string",
+          "order": 5,
+          "description": "Filter on event field values"
+        },
+        "interval_days": {
+          "data_type": "numeric",
+          "order": 6,
+          "description": "Interval days",
+          "required": false
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "List Events"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.count",
+          "data_type": "numeric",
+          "example_values": [10]
+        },
+        {
+          "data_path": "action_result.parameter.end_time",
+          "data_type": "numeric",
+          "example_values": [1669891174855]
+        },
+        {
+          "data_path": "action_result.parameter.fields_filter",
+          "data_type": "string",
+          "example_values": ["sourceip='122.122.122.122'"]
+        },
+        {
+          "data_path": "action_result.parameter.interval_days",
+          "data_type": "numeric",
+          "example_values": [20]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "example_values": [44]
+        },
+        {
+          "data_path": "action_result.parameter.start_time",
+          "data_type": "numeric",
+          "example_values": [1559891174855]
+        },
+        {
+          "data_path": "action_result.data.*.AccountDomain",
+          "data_type": "string",
+          "contains": ["domain", "url"]
+        },
+        {
+          "data_path": "action_result.data.*.Application",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Bytes",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.BytesReceived",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.BytesSent",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.Destination Host Name",
+          "data_type": "string",
+          "column_name": "Dest Host Name",
+          "column_order": 4,
+          "contains": ["host name"]
+        },
+        {
+          "data_path": "action_result.data.*.EventID",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.File Hash",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.File ID",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.File Path",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Filename",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Hostname",
+          "data_type": "string",
+          "contains": ["host name"],
+          "column_name": "Host Name",
+          "column_order": 11
+        },
+        {
+          "data_path": "action_result.data.*.Installer Filename",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Message",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.data.*.Payload",
+          "data_type": "string",
+          "example_values": [
+            "Communication with Known Watched Networks\tThere has been event communication with networks that appear on the systems watch and darknet lists."
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.Source Host Name",
+          "data_type": "string",
+          "column_name": "Source Host Name",
+          "column_order": 1,
+          "contains": ["host name"]
+        },
+        {
+          "data_path": "action_result.data.*.categoryname_category",
+          "data_type": "string",
+          "column_name": "Category Name",
+          "column_order": 7,
+          "example_values": ["Suspicious Activity"]
+        },
+        {
+          "data_path": "action_result.data.*.destinationaddress",
+          "data_type": "string",
+          "contains": ["ip"],
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.destinationip",
+          "data_type": "string",
+          "column_name": "Destination IP",
+          "column_order": 3,
+          "contains": ["ip"],
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.destinationmac",
+          "data_type": "string",
+          "example_values": ["00:00:00:00:00:00"]
+        },
+        {
+          "data_path": "action_result.data.*.destinationport",
+          "data_type": "string",
+          "column_name": "Destination Port",
+          "column_order": 5,
+          "contains": ["port"],
+          "example_values": ["0"]
+        },
+        {
+          "data_path": "action_result.data.*.endtime",
+          "data_type": "string",
+          "column_name": "End Time",
+          "column_order": 10,
+          "example_values": ["1559194870184"]
+        },
+        {
+          "data_path": "action_result.data.*.eventcount",
+          "data_type": "string",
+          "column_name": "Event Count",
+          "column_order": 8,
+          "example_values": ["1"]
+        },
+        {
+          "data_path": "action_result.data.*.eventdirection",
+          "data_type": "string",
+          "example_values": ["L2R", "R2R"]
+        },
+        {
+          "data_path": "action_result.data.*.hostname_logsourceid",
+          "data_type": "string",
+          "column_name": "Log Source Host Name",
+          "column_order": 13,
+          "example_values": ["Unknown Host 63"],
+          "contains": ["host name"]
+        },
+        {
+          "data_path": "action_result.data.*.identityip",
+          "data_type": "string",
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.data.*.logsourcegroupname_logsourceid",
+          "data_type": "string",
+          "example_values": ["Other"]
+        },
+        {
+          "data_path": "action_result.data.*.logsourceid",
+          "data_type": "string",
+          "example_values": ["63"]
+        },
+        {
+          "data_path": "action_result.data.*.logsourcename_logsourceid",
+          "data_type": "string",
+          "example_values": ["Custom Rule Engine-8 :: qradar"]
+        },
+        {
+          "data_path": "action_result.data.*.protocolname_protocolid",
+          "data_type": "string",
+          "example_values": ["Reserved"]
+        },
+        {
+          "data_path": "action_result.data.*.qid",
+          "data_type": "string",
+          "example_values": ["70750119"]
+        },
+        {
+          "data_path": "action_result.data.*.qidname_qid",
+          "data_type": "string",
+          "column_name": "Event Name",
+          "column_order": 6,
+          "example_values": ["Communication with Known Watched Networks"]
+        },
+        {
+          "data_path": "action_result.data.*.relevance",
+          "data_type": "string",
+          "example_values": ["8"]
+        },
+        {
+          "data_path": "action_result.data.*.severity",
+          "data_type": "string",
+          "example_values": ["5"]
+        },
+        {
+          "data_path": "action_result.data.*.sourceaddress",
+          "data_type": "string",
+          "contains": ["ip"],
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.sourceip",
+          "data_type": "string",
+          "column_name": "Source IP",
+          "column_order": 0,
+          "contains": ["ip"],
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.sourcemac",
+          "data_type": "string",
+          "example_values": ["00:00:00:00:00:00"]
+        },
+        {
+          "data_path": "action_result.data.*.sourceport",
+          "data_type": "string",
+          "column_name": "Source Port",
+          "column_order": 2,
+          "contains": ["port"],
+          "example_values": ["0"]
+        },
+        {
+          "data_path": "action_result.data.*.sourcev6",
+          "data_type": "string",
+          "contains": ["ipv6"]
+        },
+        {
+          "data_path": "action_result.data.*.starttime",
+          "data_type": "string",
+          "column_name": "Start Time",
+          "column_order": 9,
+          "example_values": ["1559194870184"]
+        },
+        {
+          "data_path": "action_result.data.*.username",
+          "data_type": "string",
+          "contains": ["user name"],
+          "column_name": "User Name",
+          "column_order": 12
+        },
+        {
+          "data_path": "action_result.summary.total_events",
+          "data_type": "numeric",
+          "example_values": [10]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Total events: 10"]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "get flows",
+      "description": "Get flows that make up an offense for a particular IP",
+      "verbose": "Use the <b>fields_filter</b> parameter to restrict the flows returned. For e.g. protocolid='6'. For further details refer to the documentation section of the action in the README.",
+      "type": "investigate",
+      "identifier": "get_flows",
+      "read_only": true,
+      "parameters": {
+        "ip": {
+          "data_type": "string",
+          "order": 0,
+          "description": "IP to get all the flows of",
+          "primary": true,
+          "required": false,
+          "contains": ["ip"]
+        },
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 1,
+          "description": "Offense ID to get flows of",
+          "primary": true,
+          "contains": ["qradar offense id"]
+        },
+        "start_time": {
+          "data_type": "numeric",
+          "order": 2,
+          "description": "Start of time range, in epoch time (milliseconds)"
+        },
+        "end_time": {
+          "data_type": "numeric",
+          "order": 3,
+          "description": "End of time range, in epoch time (milliseconds)"
+        },
+        "count": {
+          "data_type": "numeric",
+          "order": 4,
+          "description": "Number of flows to retrieve"
+        },
+        "fields_filter": {
+          "data_type": "string",
+          "order": 5,
+          "description": "Filter in AQL format on flow field values"
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "List Flows"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.count",
+          "data_type": "numeric",
+          "example_values": [100]
+        },
+        {
+          "data_path": "action_result.parameter.end_time",
+          "data_type": "numeric",
+          "example_values": [1559905203000]
+        },
+        {
+          "data_path": "action_result.parameter.fields_filter",
+          "data_type": "string",
+          "example_values": ["sourceip='127.0.0.1'"]
+        },
+        {
+          "data_path": "action_result.parameter.ip",
+          "data_type": "string",
+          "contains": ["ip"],
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "example_values": [41]
+        },
+        {
+          "data_path": "action_result.parameter.start_time",
+          "data_type": "numeric",
+          "example_values": [1559905201000]
+        },
+        {
+          "data_path": "action_result.data.*.FTP Pass",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.FTP RETR File",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.FTP User",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.Google Search Terms",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Content-Type",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP GET Request",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Host",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Referer",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Response Code",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Server",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP User-Agent",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.HTTP Version",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.SMTP From",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.SMTP HELO",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.SMTP To",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.applicationid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.applicationname_applicationid",
+          "data_type": "string",
+          "column_name": "Application Name",
+          "column_order": 11
+        },
+        {
+          "data_path": "action_result.data.*.category",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.categoryname_category",
+          "data_type": "string",
+          "column_name": "Category Name",
+          "column_order": 12
+        },
+        {
+          "data_path": "action_result.data.*.credibility",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationasn",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationbytes",
+          "data_type": "string",
+          "column_name": "Bytes to Dest",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.data.*.destinationdscp",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationflags",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationifindex",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationip",
+          "data_type": "string",
+          "contains": ["ip"],
+          "column_name": "Destination IP",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.data.*.destinationpackets",
+          "data_type": "string",
+          "column_name": "Packets to Dest",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.destinationpayload",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationport",
+          "data_type": "string",
+          "contains": ["port"],
+          "column_name": "Destination Port",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.destinationprecedence",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.destinationv6",
+          "data_type": "string",
+          "column_name": "Destination V6",
+          "column_order": 13
+        },
+        {
+          "data_path": "action_result.data.*.firstpackettime",
+          "data_type": "string",
+          "column_name": "First Packet Time",
+          "column_order": 9
+        },
+        {
+          "data_path": "action_result.data.*.flowbias",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.flowdirection",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.flowinterface",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.flowinterfaceid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.flowsource",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.flowtype",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.fullmatchlist",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.geographic",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.hasdestinationpayload",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.hasoffense",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.hassourcepayload",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.icmpcode",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.icmptype",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.intervalid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.isduplicate",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.lastpackettime",
+          "data_type": "string",
+          "column_name": "Last Packet Time",
+          "column_order": 10
+        },
+        {
+          "data_path": "action_result.data.*.partialmatchlist",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.processorid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.protocolid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.protocolname_protocolid",
+          "data_type": "string",
+          "column_name": "Protocol",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.qid",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.qidname_qid",
+          "data_type": "string",
+          "column_name": "QID Name",
+          "column_order": 14
+        },
+        {
+          "data_path": "action_result.data.*.relevance",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.retentionbucket",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.severity",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourceasn",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourcebytes",
+          "data_type": "string",
+          "column_name": "Bytes to Src",
+          "column_order": 8
+        },
+        {
+          "data_path": "action_result.data.*.sourcedscp",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourceflags",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourceifindex",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourceip",
+          "data_type": "string",
+          "contains": ["ip"],
+          "column_name": "Source IP",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.sourcepackets",
+          "data_type": "string",
+          "column_name": "Packets to Src",
+          "column_order": 7
+        },
+        {
+          "data_path": "action_result.data.*.sourcepayload",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourceport",
+          "data_type": "string",
+          "column_name": "Source Port",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.sourceprecedence",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.sourcev6",
+          "data_type": "string",
+          "contains": ["ipv6"]
+        },
+        {
+          "data_path": "action_result.data.*.starttime",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.viewobjectpair",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.total_flows",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string"
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric"
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric"
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "offense details",
+      "description": "Get details about an offense",
+      "verbose": "If the <b>ingest_offense</b> parameter is checked, then, it will ingest the events within the last N days (N - value in the <b>interval_days</b> parameter if given or value in the <b>interval_days</b> parameter in the app config or default 5 days) for the offense mentioned in the <b>offense_id</b> parameter. If the <b>ingest_offense</b> parameter is unchecked, it will fetch only the details of the provided offense ID in the <b>offense_id</b> parameter. The parameter <b>tenant_id</b> is used only when the <b>ingest_offense</b> parameter is checked.",
+      "type": "investigate",
+      "identifier": "offense_details",
+      "read_only": true,
+      "parameters": {
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Offense ID to get the details of",
+          "contains": ["qradar offense id"],
+          "required": true,
+          "primary": true
+        },
+        "tenant_id": {
+          "data_type": "numeric",
+          "order": 1,
+          "description": "Tenant ID for saving container",
+          "required": false
+        },
+        "ingest_offense": {
+          "data_type": "boolean",
+          "order": 2,
+          "default": false,
+          "description": "Ingest offense into Phantom"
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Offenses Details"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.ingest_offense",
+          "data_type": "boolean",
+          "example_values": [true, false]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "example_values": [43]
+        },
+        {
+          "data_path": "action_result.parameter.tenant_id",
+          "data_type": "numeric",
+          "example_values": [123]
+        },
+        {
+          "data_path": "action_result.data.*.assigned_to",
+          "data_type": "string",
+          "example_values": ["admin"]
+        },
+        {
+          "data_path": "action_result.data.*.categories",
+          "data_type": "string",
+          "example_values": ["Error"]
+        },
+        {
+          "data_path": "action_result.data.*.category_count",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.close_time",
+          "data_type": "numeric",
+          "column_name": "Close Time",
+          "column_order": 9
+        },
+        {
+          "data_path": "action_result.data.*.closing_reason_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense closing reason id"],
+          "column_name": "Offense Closing Reason ID",
+          "column_order": 11
+        },
+        {
+          "data_path": "action_result.data.*.closing_user",
+          "data_type": "string",
+          "column_name": "Closing User",
+          "column_order": 10
+        },
+        {
+          "data_path": "action_result.data.*.credibility",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "Description",
+          "column_order": 4,
+          "example_values": [
+            "Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks\n"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.destination_networks",
+          "data_type": "string",
+          "example_values": ["other"]
+        },
+        {
+          "data_path": "action_result.data.*.device_count",
+          "data_type": "numeric",
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.data.*.event_count",
+          "data_type": "numeric",
+          "column_name": "Event Count",
+          "column_order": 6,
+          "example_values": [1035]
+        },
+        {
+          "data_path": "action_result.data.*.flow_count",
+          "data_type": "numeric",
+          "column_name": "Flow Count",
+          "column_order": 7,
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.follow_up",
+          "data_type": "boolean",
+          "column_name": "Follow Up",
+          "column_order": 14,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "column_name": "Offense Id",
+          "column_order": 0,
+          "example_values": [43]
+        },
+        {
+          "data_path": "action_result.data.*.inactive",
+          "data_type": "boolean",
+          "column_name": "Inactive",
+          "column_order": 5,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.last_updated_time",
+          "data_type": "numeric",
+          "column_name": "Last Updated Time",
+          "column_order": 13,
+          "example_values": [1559125383270]
+        },
+        {
+          "data_path": "action_result.data.*.local_destination_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.magnitude",
+          "data_type": "numeric",
+          "column_name": "Magnitude",
+          "column_order": 15,
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.offense_source",
+          "data_type": "string",
+          "column_name": "Offense Source",
+          "contains": ["ip"],
+          "column_order": 1,
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.offense_type",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.policy_category_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.protected",
+          "data_type": "boolean",
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.relevance",
+          "data_type": "numeric",
+          "example_values": [2]
+        },
+        {
+          "data_path": "action_result.data.*.remote_destination_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.security_category_count",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.severity",
+          "data_type": "numeric",
+          "column_name": "Severity",
+          "column_order": 12,
+          "example_values": [7]
+        },
+        {
+          "data_path": "action_result.data.*.source_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.source_network",
+          "data_type": "string",
+          "column_name": "Source Network",
+          "column_order": 3,
+          "example_values": ["other"]
+        },
+        {
+          "data_path": "action_result.data.*.start_time",
+          "data_type": "numeric",
+          "column_name": "Start Time",
+          "column_order": 8,
+          "example_values": [1558008289506]
+        },
+        {
+          "data_path": "action_result.data.*.status",
+          "data_type": "string",
+          "column_name": "Status",
+          "column_order": 2,
+          "example_values": ["OPEN"]
+        },
+        {
+          "data_path": "action_result.data.*.username_count",
+          "data_type": "numeric",
+          "example_values": [0],
+          "contains": ["user name"]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.flow_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.summary.name",
+          "data_type": "string",
+          "example_values": [
+            "Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks"
+          ]
+        },
+        {
+          "data_path": "action_result.summary.source",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"],
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.summary.start_time",
+          "data_type": "string",
+          "example_values": ["2019-04-04 21:28:47 UTC"]
+        },
+        {
+          "data_path": "action_result.summary.status",
+          "data_type": "string",
+          "example_values": ["OPEN"]
+        },
+        {
+          "data_path": "action_result.summary.total_offenses",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.summary.update_time",
+          "data_type": "string",
+          "example_values": ["2019-05-14 10:23:03 UTC"]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Total offenses: 1",
+            "Status: OPEN, Source: 122.122.122.122, Update time: 2019-05-14 10:23:03 UTC, Name: Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks, Flow count: 0, Start time: 2019-04-04 21:28:47 UTC"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "alt manage ingestion",
+      "description": "Manage ingestion details",
+      "verbose": "The general structure of the state file is {\"app_version\":\"app_version\", \"last_saved_ingest_time\":\"epoch_time_last_fetched_offense\", \"last_ingested_events_data\":{\"offense_id\":\"epoch_time_last_fetched_event_for_offense_id\"}}. <ul><li>There is no validation for values provided in the <b>offense_id</b> action parameter because this action does not make any API calls to the QRadar instance and it merely provides a way of manipulating the state file. It is requested to please confirm if the offense ID being provided as an input exists on the QRadar instance. Any wrong value provided in the <b>offense_id</b> parameter may corrupt the state file and the functionalities dependent on it.</li><li>No comma-separated values should be provided in any of the action input parameters or else it may corrupt the state file and the functionalities dependent on it.</li><li>The <b>set last saved offense ingest time</b> operation sets the epoch time of the provided value in the <b>datetime</b> parameter against the <b>last_saved_ingest_time</b> key in the state file.</li><li>The <b>set last saved events ingest time</b> operation sets the epoch time of the provided value in the <b>datetime</b> parameter against the key corresponding to the offense ID value provided in the <b>offense_id</b> in the dictionary structure against the key <b>last_ingested_events_data</b> in the state file. The format for the date string should match the formats 'YYYY-MM-DD HH:MM:SS.Z', 'YYYY-MM-DDTHH:MM:SS.Z', 'YYYY-MM-DD', or 'HH:MM:SS.Z'. Users can provide only date (time will be 00:00:00.000000) or only time (current date will be considered by default). The action considers that the provided value in the <b>datestring</b> parameter represents the date string in the timezone selected in the asset configuration parameter <b>timezone</b> and accordingly stores the epoch time into the state file.</li><li>The <b>delete last saved ingestion time data</b> operation deletes the entire last saved ingestion time data stored in the state file.</li><li>The <b>get last saved ingestion time data</b> operation fetches the entire last saved ingestion time data stored in the state file.</li><li>The parameter <b>offense_id</b> does not support comma-separated values. The user has to provide a single non-zero positive integer value of the corresponding Offense ID.</li><li>The parameter <b>offense_id</b> is mandatory for the operation <b>set last saved events ingest time</b>.</li></ul>",
+      "type": "generic",
+      "identifier": "alt_manage_ingestion",
+      "read_only": false,
+      "parameters": {
+        "operation": {
+          "data_type": "string",
+          "order": 0,
+          "description": "Operation to perform on the ingestion data stored in the state file",
+          "value_list": [
+            "get last saved ingestion time data",
+            "delete last saved ingestion time data",
+            "set last saved offense ingest time",
+            "set last saved events ingest time"
+          ],
+          "required": true,
+          "default": "get last saved ingestion time data"
+        },
+        "datetime": {
+          "data_type": "string",
+          "order": 1,
+          "description": "Datetime string to be stored against the ingestion data in the state file",
+          "required": false
+        },
+        "offense_id": {
+          "data_type": "string",
+          "order": 2,
+          "description": "Offense ID against which to store the 'datetime' parameter value",
+          "contains": ["qradar offense id"],
+          "primary": true,
+          "required": false
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Manage Alt Ingestion"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.datetime",
+          "data_type": "string",
+          "example_values": [
+            "2019-12-09 11:11:11.0001",
+            "2019-12-09T11:11:11.0001",
+            "2019-12-09",
+            "11:11:11.0001"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "string",
+          "example_values": ["4"],
+          "contains": ["qradar offense id"]
+        },
+        {
+          "data_path": "action_result.parameter.operation",
+          "data_type": "string",
+          "example_values": [
+            "get last saved ingestion time data",
+            "delete last saved ingestion time data",
+            "set last saved offense ingest time",
+            "set last saved events ingest time"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.last_ingested_events_ingest_time",
+          "data_type": "string",
+          "example_values": [
+            "Offense ID_1=Fri Nov 29 10:05:25 2019 UTC +0000, Offense ID_3=Fri Nov 29 10:01:24 2019 UTC +0000, Offense ID_2=Fri Nov 29 10:03:18 2019 UTC +0000"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.last_ingested_events_ingest_time_as_epoch.1",
+          "data_type": "numeric",
+          "example_values": [1575021925702]
+        },
+        {
+          "data_path": "action_result.data.*.last_saved_offense_ingest_time",
+          "data_type": "string",
+          "example_values": ["Mon Dec 09 11:11:11 2019 UTC +0000"]
+        },
+        {
+          "data_path": "action_result.data.*.last_saved_offense_ingest_time_as_epoch",
+          "data_type": "numeric",
+          "example_values": [1575889871000]
+        },
+        {
+          "data_path": "action_result.summary.last_ingested_events_ingest_time",
+          "data_type": "string",
+          "example_values": [
+            "Offense ID_1=Fri Nov 29 10:05:25 2019 UTC +0000, Offense ID_3=Fri Nov 29 10:01:24 2019 UTC +0000, Offense ID_2=Fri Nov 29 10:03:18 2019 UTC +0000"
+          ],
+          "column_name": "Last Ingested Events Ingest Time",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.summary.last_saved_offense_ingest_time",
+          "data_type": "string",
+          "example_values": ["Mon Dec 09 11:11:11 2019 UTC +0000"],
+          "column_name": "Last Ingested Offense Ingest Time",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Last saved offense ingest time: Mon Dec 09 11:11:11 2019 UTC +0000, Last ingested events ingest time: Offense ID_1=Fri Nov 29 10:05:25 2019 UTC +0000, Offense ID_3=Fri Nov 29 10:01:24 2019 UTC +0000, Offense ID_2=Fri Nov 29 10:03:18 2019 UTC +0000"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [2]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [2]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "run query",
+      "description": "Execute an ariel query on the QRadar device",
+      "verbose": "Use this action to execute queries using AQL on the QRadar device. AQL is a well documented (on the IBM website) query language with quite a few built-in functions.<br>Do note that this action could have a dynamic set of values returned in the data array since the query can specify the columns to return. This is the main reason for not listing the data paths.",
+      "type": "investigate",
+      "identifier": "run_query",
+      "read_only": true,
+      "parameters": {
+        "query": {
+          "data_type": "string",
+          "order": 0,
+          "description": "Ariel Query",
+          "contains": ["qradar ariel query"],
+          "required": true,
+          "primary": true
+        }
+      },
+      "render": {
+        "type": "custom",
+        "width": 10,
+        "height": 5,
+        "view": "qradar_view.display_query_results",
+        "title": "Question Result"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.query",
+          "data_type": "string",
+          "contains": ["qradar ariel query"],
+          "example_values": [
+            "select qid from events",
+            "select qid from events where sourceip='10.1.16.50'",
+            "select qid category, destinationip, destinationport, eventcount, identityip, logsourceid, magnitude, protocolid, sourceip, sourceport, starttime, username from events where sourceip='10.1.16.50'"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.category",
+          "data_type": "string",
+          "example_values": ["38750003"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.destinationip",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"],
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.destinationport",
+          "data_type": "string",
+          "example_values": ["0"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.eventcount",
+          "data_type": "string",
+          "example_values": ["1"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.identityip",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"],
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.logsourceid",
+          "data_type": "string",
+          "example_values": ["65"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.magnitude",
+          "data_type": "string",
+          "example_values": ["5"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.protocolid",
+          "data_type": "string",
+          "example_values": ["255"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.qid",
+          "data_type": "string",
+          "example_values": ["38750003"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.sourceip",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"],
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.sourceport",
+          "data_type": "string",
+          "example_values": ["0"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.starttime",
+          "data_type": "string",
+          "example_values": ["1559907060001"]
+        },
+        {
+          "data_path": "action_result.data.*.events.*.username",
+          "data_type": "string",
+          "contains": ["user name"]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Successfully ran query"]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "add listitem",
+      "description": "Add an item to a reference set in Qradar",
+      "type": "generic",
+      "identifier": "add_to_reference_set",
+      "read_only": false,
+      "parameters": {
+        "reference_set_name": {
+          "data_type": "string",
+          "order": 0,
+          "description": "Name of reference set to add to",
+          "required": true
+        },
+        "reference_set_value": {
+          "data_type": "string",
+          "order": 1,
+          "description": "Value to add to the reference set",
+          "required": true
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Offenses Details"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.reference_set_name",
+          "data_type": "string",
+          "example_values": ["Demo", "Asset Reconciliation IPv4 Whitelist"]
+        },
+        {
+          "data_path": "action_result.parameter.reference_set_value",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.creation_time",
+          "data_type": "numeric",
+          "example_values": [1558518483009],
+          "column_order": 2,
+          "column_name": "Creation Time"
+        },
+        {
+          "data_path": "action_result.data.*.element_type",
+          "data_type": "string",
+          "example_values": ["IP"],
+          "column_order": 1,
+          "column_name": "Element Type"
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "example_values": ["Demo", "Asset Reconciliation IPv4 Whitelist"],
+          "column_order": 3,
+          "column_name": "Name"
+        },
+        {
+          "data_path": "action_result.data.*.number_of_elements",
+          "data_type": "numeric",
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.data.*.timeout_type",
+          "data_type": "string",
+          "example_values": ["FIRST_SEEN"],
+          "column_order": 0,
+          "column_name": "Timeout Type"
+        },
+        {
+          "data_path": "action_result.summary.element_type",
+          "data_type": "string",
+          "example_values": ["IP"]
+        },
+        {
+          "data_path": "action_result.summary.name",
+          "data_type": "string",
+          "example_values": ["Demo", "Asset Reconciliation IPv4 Whitelist"]
+        },
+        {
+          "data_path": "action_result.summary.number_of_elements",
+          "data_type": "numeric",
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Element type: IP, Name: Demo, Number of elements: 3",
+            "Element type: IP, Name: Asset Reconciliation IPv4 Whitelist, Number of elements: 1"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "close offense",
+      "description": "Close an active offense, marking status=CLOSED",
+      "type": "generic",
+      "identifier": "close_offense",
+      "read_only": false,
+      "parameters": {
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Offense ID to close",
+          "contains": ["qradar offense id"],
+          "required": true,
+          "primary": true
+        },
+        "closing_reason_id": {
+          "data_type": "numeric",
+          "order": 1,
+          "description": "Reason for closing offense",
+          "required": true,
+          "primary": true,
+          "contains": ["qradar offense closing reason id"]
+        }
+      },
+      "render": {
+        "type": "table",
+        "width": 12,
+        "height": 5,
+        "title": "Offenses Details"
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.closing_reason_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense closing reason id"],
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "example_values": [41]
+        },
+        {
+          "data_path": "action_result.data.*.assigned_to",
+          "data_type": "string",
+          "example_values": ["admin"]
+        },
+        {
+          "data_path": "action_result.data.*.categories",
+          "data_type": "string",
+          "example_values": ["Error"]
+        },
+        {
+          "data_path": "action_result.data.*.category_count",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.close_time",
+          "data_type": "numeric",
+          "column_name": "Close Time",
+          "column_order": 9,
+          "example_values": [1559905203000]
+        },
+        {
+          "data_path": "action_result.data.*.closing_reason_id",
+          "data_type": "numeric",
+          "contains": ["qradar offense closing reason id"],
+          "column_name": "Offense Closing Reason ID",
+          "column_order": 11,
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.closing_user",
+          "data_type": "string",
+          "column_name": "Closing User",
+          "column_order": 10,
+          "example_values": ["API_token: Phantom"]
+        },
+        {
+          "data_path": "action_result.data.*.credibility",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.description",
+          "data_type": "string",
+          "column_name": "Description",
+          "column_order": 4,
+          "example_values": [
+            "Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks\n"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.destination_networks",
+          "data_type": "string",
+          "example_values": ["other"]
+        },
+        {
+          "data_path": "action_result.data.*.device_count",
+          "data_type": "numeric",
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.data.*.event_count",
+          "data_type": "numeric",
+          "column_name": "Event Count",
+          "column_order": 6,
+          "example_values": [2660]
+        },
+        {
+          "data_path": "action_result.data.*.flow_count",
+          "data_type": "numeric",
+          "column_name": "Flow Count",
+          "column_order": 7,
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.follow_up",
+          "data_type": "boolean",
+          "column_name": "Follow Up",
+          "column_order": 14,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "contains": ["qradar offense id"],
+          "column_name": "Offense Id",
+          "column_order": 0,
+          "example_values": [41]
+        },
+        {
+          "data_path": "action_result.data.*.inactive",
+          "data_type": "boolean",
+          "column_name": "Inactive",
+          "column_order": 5,
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.last_updated_time",
+          "data_type": "numeric",
+          "column_name": "Last Updated Time",
+          "column_order": 13,
+          "example_values": [1557829383413]
+        },
+        {
+          "data_path": "action_result.data.*.local_destination_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.magnitude",
+          "data_type": "numeric",
+          "column_name": "Magnitude",
+          "column_order": 15,
+          "example_values": [3]
+        },
+        {
+          "data_path": "action_result.data.*.offense_source",
+          "data_type": "string",
+          "column_name": "Offense Source",
+          "contains": ["ip"],
+          "column_order": 1,
+          "example_values": ["122.122.122.122"]
+        },
+        {
+          "data_path": "action_result.data.*.offense_type",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.policy_category_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.data.*.protected",
+          "data_type": "boolean",
+          "example_values": [false, true]
+        },
+        {
+          "data_path": "action_result.data.*.relevance",
+          "data_type": "numeric",
+          "example_values": [2]
+        },
+        {
+          "data_path": "action_result.data.*.remote_destination_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.security_category_count",
+          "data_type": "numeric",
+          "example_values": [4]
+        },
+        {
+          "data_path": "action_result.data.*.severity",
+          "data_type": "numeric",
+          "column_name": "Severity",
+          "column_order": 12,
+          "example_values": [7]
+        },
+        {
+          "data_path": "action_result.data.*.source_count",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "action_result.data.*.source_network",
+          "data_type": "string",
+          "column_name": "Source Network",
+          "column_order": 3,
+          "example_values": ["other"]
+        },
+        {
+          "data_path": "action_result.data.*.start_time",
+          "data_type": "numeric",
+          "column_name": "Start Time",
+          "column_order": 8,
+          "example_values": [1554413327061]
+        },
+        {
+          "data_path": "action_result.data.*.status",
+          "data_type": "string",
+          "column_name": "Status",
+          "column_order": 2,
+          "example_values": ["CLOSED"]
+        },
+        {
+          "data_path": "action_result.data.*.username_count",
+          "data_type": "numeric",
+          "example_values": [0],
+          "contains": ["user name"]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary.flow_count",
+          "data_type": "numeric",
+          "example_values": [0]
+        },
+        {
+          "data_path": "action_result.summary.name",
+          "data_type": "string",
+          "example_values": [
+            "Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks"
+          ]
+        },
+        {
+          "data_path": "action_result.summary.source",
+          "data_type": "string",
+          "example_values": ["122.122.122.122"],
+          "contains": ["ip"]
+        },
+        {
+          "data_path": "action_result.summary.start_time",
+          "data_type": "string",
+          "example_values": ["2019-04-04 21:28:47 UTC"]
+        },
+        {
+          "data_path": "action_result.summary.status",
+          "data_type": "string",
+          "example_values": ["CLOSED"]
+        },
+        {
+          "data_path": "action_result.summary.update_time",
+          "data_type": "string",
+          "example_values": ["2019-05-14 10:23:03 UTC"]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Status: CLOSED, Source: 122.122.122.122, Update time: 2019-05-14 10:23:03 UTC, Name: Anomaly: Access to Test or Test Defined Address\n preceded by Communication with Known Watched Networks, Flow count: 0, Start time: 2019-04-04 21:28:47 UTC"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)"
+    },
+    {
+      "action": "update offense",
+      "description": "Attach a note to an offense",
+      "type": "generic",
+      "identifier": "add_note",
+      "read_only": false,
+      "parameters": {
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Offense ID to attach note to",
+          "contains": ["qradar offense id"],
+          "required": true,
+          "primary": true
+        },
+        "note_text": {
+          "data_type": "string",
+          "order": 1,
+          "description": "Text to put into note",
+          "required": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.note_text",
+          "data_type": "string",
+          "example_values": ["Note Added By Phantom", "test_note"]
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "string",
+          "example_values": ["41"],
+          "contains": ["qradar offense id"]
+        },
+        {
+          "data_path": "action_result.data",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Successfully added note to offense"],
+          "column_order": 0,
+          "column_name": "Message"
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)",
+      "render": {
+        "width": 12,
+        "title": "Add Note",
+        "type": "table",
+        "height": 5
+      }
+    },
+    {
+      "action": "assign user",
+      "description": "Assign the user to an offense",
+      "type": "generic",
+      "identifier": "assign_user",
+      "read_only": false,
+      "parameters": {
+        "offense_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Offense ID to assign the user to",
+          "contains": ["qradar offense id"],
+          "required": true,
+          "primary": true
+        },
+        "assignee": {
+          "data_type": "string",
+          "order": 1,
+          "description": "Name of the user",
+          "required": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"],
+          "column_order": 0,
+          "column_name": "Status"
+        },
+        {
+          "data_path": "action_result.parameter.assignee",
+          "data_type": "string",
+          "example_values": ["admin"],
+          "column_order": 1,
+          "column_name": "Assignee"
+        },
+        {
+          "data_path": "action_result.parameter.offense_id",
+          "data_type": "string",
+          "example_values": ["41"],
+          "contains": ["qradar offense id"],
+          "column_order": 2,
+          "column_name": "Offense ID"
+        },
+        {
+          "data_path": "action_result.data",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Successfully assigned user to offense"]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)",
+      "render": {
+        "width": 12,
+        "title": "Assign User",
+        "type": "table",
+        "height": 5
+      }
+    },
+    {
+      "action": "get rule info",
+      "identifier": "get_rule_info",
+      "description": "Retrieve QRadar rule information",
+      "type": "investigate",
+      "read_only": true,
+      "parameters": {
+        "rule_id": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Rule ID for which information needs to be extracted",
+          "contains": ["qradar rule id"],
+          "required": true,
+          "primary": true
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.rule_id",
+          "data_type": "numeric",
+          "example_values": [1421],
+          "contains": ["qradar rule id"],
+          "column_name": "Rule ID",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.average_capacity",
+          "data_type": "numeric",
+          "example_values": [3541750]
+        },
+        {
+          "data_path": "action_result.data.*.base_capacity",
+          "data_type": "numeric",
+          "example_values": [3541750]
+        },
+        {
+          "data_path": "action_result.data.*.base_host_id",
+          "data_type": "numeric",
+          "example_values": [384]
+        },
+        {
+          "data_path": "action_result.data.*.capacity_timestamp",
+          "data_type": "numeric",
+          "example_values": [1566896735557]
+        },
+        {
+          "data_path": "action_result.data.*.creation_date",
+          "data_type": "numeric",
+          "example_values": [1155662266056],
+          "column_name": "Creation date",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.enabled",
+          "data_type": "boolean",
+          "example_values": [true, false],
+          "column_name": "Rule Enabled",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "example_values": [1421]
+        },
+        {
+          "data_path": "action_result.data.*.identifier",
+          "data_type": "string",
+          "example_values": ["SYSTEM-1421"],
+          "column_name": "Identifier",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.linked_rule_identifier",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.modification_date",
+          "data_type": "numeric",
+          "example_values": [1267729985038]
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "example_values": [
+            "User:BB:FalsePositives: User Defined Server Type 2 False Positive Categories"
+          ],
+          "column_name": "Rule Name",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.origin",
+          "data_type": "string",
+          "example_values": ["SYSTEM"]
+        },
+        {
+          "data_path": "action_result.data.*.owner",
+          "data_type": "string",
+          "example_values": ["admin"],
+          "column_name": "Rule Owner",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.data.*.type",
+          "data_type": "string",
+          "example_values": ["EVENT"],
+          "column_name": "Type",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.summary.id",
+          "data_type": "numeric",
+          "example_values": [1421]
+        },
+        {
+          "data_path": "action_result.summary.name",
+          "data_type": "string",
+          "example_values": [
+            "User:BB:FalsePositives: User Defined Server Type 2 False Positive Categories"
+          ]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Id: 1421, Name: User:BB:FalsePositives: User Defined Server Type 2 False Positive Categories"
+          ]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)",
+      "render": {
+        "width": 12,
+        "title": "Get Rule Info",
+        "type": "table",
+        "height": 5
+      }
+    },
+    {
+      "action": "list rules",
+      "identifier": "list_rules",
+      "description": "List all QRadar rules",
+      "type": "investigate",
+      "read_only": true,
+      "parameters": {
+        "count": {
+          "data_type": "numeric",
+          "order": 0,
+          "description": "Number of rules to retrieve"
+        }
+      },
+      "output": [
+        {
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": ["success", "failed"]
+        },
+        {
+          "data_path": "action_result.parameter.count",
+          "data_type": "numeric",
+          "example_values": [31]
+        },
+        {
+          "data_path": "action_result.data.*.average_capacity",
+          "data_type": "numeric",
+          "example_values": [3541750]
+        },
+        {
+          "data_path": "action_result.data.*.base_capacity",
+          "data_type": "numeric",
+          "example_values": [3541750]
+        },
+        {
+          "data_path": "action_result.data.*.base_host_id",
+          "data_type": "numeric",
+          "example_values": [384]
+        },
+        {
+          "data_path": "action_result.data.*.capacity_timestamp",
+          "data_type": "numeric",
+          "example_values": [1566896735557]
+        },
+        {
+          "data_path": "action_result.data.*.creation_date",
+          "data_type": "numeric",
+          "example_values": [1155662266056],
+          "column_name": "Creation date",
+          "column_order": 4
+        },
+        {
+          "data_path": "action_result.data.*.enabled",
+          "data_type": "boolean",
+          "example_values": [true, false],
+          "column_name": "Rule Enabled",
+          "column_order": 5
+        },
+        {
+          "data_path": "action_result.data.*.id",
+          "data_type": "numeric",
+          "example_values": [1421],
+          "contains": ["qradar rule id"],
+          "column_name": "Rule ID",
+          "column_order": 0
+        },
+        {
+          "data_path": "action_result.data.*.identifier",
+          "data_type": "string",
+          "example_values": ["SYSTEM-1421"],
+          "column_name": "Identifier",
+          "column_order": 1
+        },
+        {
+          "data_path": "action_result.data.*.linked_rule_identifier",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.modification_date",
+          "data_type": "numeric",
+          "example_values": [1267729985038]
+        },
+        {
+          "data_path": "action_result.data.*.name",
+          "data_type": "string",
+          "example_values": [
+            "User:BB:FalsePositives: User Defined Server Type 2 False Positive Categories"
+          ],
+          "column_name": "Rule Name",
+          "column_order": 2
+        },
+        {
+          "data_path": "action_result.data.*.origin",
+          "data_type": "string",
+          "example_values": ["SYSTEM"]
+        },
+        {
+          "data_path": "action_result.data.*.owner",
+          "data_type": "string",
+          "example_values": ["admin"],
+          "column_name": "Rule Owner",
+          "column_order": 6
+        },
+        {
+          "data_path": "action_result.data.*.type",
+          "data_type": "string",
+          "example_values": ["EVENT"],
+          "column_name": "Type",
+          "column_order": 3
+        },
+        {
+          "data_path": "action_result.summary.num_rules",
+          "data_type": "numeric",
+          "example_values": [135]
+        },
+        {
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": ["Total rules: 135"]
+        },
+        {
+          "data_path": "summary.total_objects",
+          "data_type": "numeric",
+          "example_values": [1]
+        },
+        {
+          "data_path": "summary.total_objects_successful",
+          "data_type": "numeric",
+          "example_values": [1]
+        }
+      ],
+      "versions": "EQ(*)",
+      "render": {
+        "width": 12,
+        "title": "List Rules",
+        "type": "table",
+        "height": 5
+      }
+    },
+    {
+      "action": "on poll",
+      "description": "Callback action for the on_poll ingest functionality",
+      "verbose": "The default start_time is the past 5 days. The default end_time is now.",
+      "type": "ingest",
+      "identifier": "on_poll",
+      "read_only": true,
+      "parameters": {
+        "container_id": {
+          "data_type": "string",
+          "order": 0,
+          "description": "Container IDs to limit the ingestion to",
+          "allow_list": true
+        },
+        "start_time": {
+          "data_type": "numeric",
+          "order": 1,
+          "description": "Start of time range, in epoch time (milliseconds)"
+        },
+        "end_time": {
+          "data_type": "numeric",
+          "order": 2,
+          "description": "End of time range, in epoch time (milliseconds)"
+        },
+        "container_count": {
+          "data_type": "numeric",
+          "order": 3,
+          "description": "Maximum number of container records to query for"
+        },
+        "artifact_count": {
+          "data_type": "numeric",
+          "order": 4,
+          "description": "Parameter ignored for this app"
+        }
+      },
+      "output": [],
+      "versions": "EQ(*)"
+    }
+  ]
+}
