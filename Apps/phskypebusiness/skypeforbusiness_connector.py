@@ -34,11 +34,11 @@ def _handle_login_redirect(request, key):
     # Get asset ID
     asset_id = request.GET.get('asset_id')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL')
+        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=400)
     state = _load_app_state(asset_id)
     url = state.get(key)
     if not url:
-        return HttpResponse('App state is invalid, {key} not found.'.format(key=key))
+        return HttpResponse('App state is invalid, {key} not found.'.format(key=key), content_type="text/plain", status=400)
     response = HttpResponse(status=302)
     response['Location'] = url
     return response
@@ -54,7 +54,7 @@ def _handle_login_response(request):
     # Get asset ID
     asset_id = request.GET.get('state')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)))
+        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     # Check for error and description in URL
     error = request.GET.get('error')
@@ -65,20 +65,20 @@ def _handle_login_response(request):
         message = 'Error: {0}'.format(error)
         if error_description:
             message = '{0} Details: {1}'.format(message, error_description)
-        return HttpResponse('Server returned {0}'.format(message))
+        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=400)
 
     # Code used for generating token
     code = request.GET.get('code')
 
     # If code is not available
     if not code:
-        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)))
+        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     state = _load_app_state(asset_id)
     state['code'] = code
     _save_app_state(state, asset_id, None)
 
-    return HttpResponse('Code received. Please close this window, the action will continue to get new token.')
+    return HttpResponse('Code received. Please close this window, the action will continue to get new token.', content_type="text/plain")
 
 
 def _load_app_state(asset_id, app_connector=None):
@@ -138,7 +138,7 @@ def _handle_rest_request(request, path_parts):
     """
 
     if len(path_parts) < 2:
-        return HttpResponse('error: True, message: Invalid REST endpoint request')
+        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=400)
 
     call_type = path_parts[1]
 
@@ -163,7 +163,7 @@ def _handle_rest_request(request, path_parts):
                 pass
 
         return return_val
-    return HttpResponse('error: Invalid endpoint')
+    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=400)
 
 
 def _get_dir_name_from_app_name(app_name):
