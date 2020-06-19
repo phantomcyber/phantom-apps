@@ -10,9 +10,9 @@ import os
 import sys
 import time
 try:
-    from urllib.parse import urlencode, quote
+    from urllib.parse import urlencode
 except:
-    from urllib import urlencode, quote
+    from urllib import urlencode
 import ipaddress
 import pwd
 import grp
