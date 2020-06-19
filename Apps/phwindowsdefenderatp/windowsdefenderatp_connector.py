@@ -7,8 +7,12 @@
 # Phantom App imports
 import json
 import os
+import sys
 import time
-import urllib
+try:
+    from urllib.parse import urlencode, quote
+except:
+    from urllib import urlencode, quote
 import ipaddress
 import pwd
 import grp
@@ -86,7 +90,7 @@ def _save_app_state(state, asset_id, app_connector):
         with open(state_file, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
-        print 'Unable to save state file: {0}'.format(str(e))
+        print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
@@ -223,7 +227,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = self._handle_py_ver_compat_for_input_str(soup.text)
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
@@ -233,7 +240,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if not error_text:
             error_text = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -264,18 +271,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # This condition will be used in test_connectivity
         if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
             err = "Error:{0}, Error Description:{1}".format(
-                    UnicodeDammit(resp_json.get('error')).unicode_markup.encode('utf-8'), UnicodeDammit(resp_json.get('error_description')).unicode_markup.encode('utf-8'))
+                    self._handle_py_ver_compat_for_input_str(resp_json.get('error')), self._handle_py_ver_compat_for_input_str(resp_json.get('error_description')))
             err += " Please check your asset configuration parameters and run the test connectivity."
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
         if isinstance(resp_json.get('error'), dict) and resp_json.get('error', {}).get('code'):
             message = "Error from server. Status Code: {0} Error Code: {1} Data from server: {2}".format(
-                response.status_code, resp_json.get('error', {}).get('code'), UnicodeDammit(resp_json.get('error', {}).get('message')).unicode_markup.encode('utf-8'))
+                response.status_code, resp_json.get('error', {}).get('code'), self._handle_py_ver_compat_for_input_str(resp_json.get('error', {}).get('message')))
 
         if not message:
             message = "Error from server. Status Code: {0} Data from server: {1}"\
-                .format(response.status_code, UnicodeDammit(response.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
+                .format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -314,9 +321,54 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            response.status_code, UnicodeDammit(response.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
+            response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _update_request(self, action_result, endpoint, headers=None, params=None, data=None, method='get'):
         """ This function is used to update the headers with access_token before making REST call.
@@ -402,19 +454,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
-            if e.message:
-                if isinstance(e.message, basestring):
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8')
-                else:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-            else:
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
-                                                   .format(error_msg)), resp_json)
+                                                   .format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(response, action_result)
 
@@ -493,7 +534,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
-                                                  data=urllib.urlencode(data), method="post")
+                                                  data=urlencode(data), method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -797,7 +838,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        event_id = UnicodeDammit(param[DEFENDERATP_EVENT_ID]).unicode_markup.encode('utf-8')
+        event_id = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_EVENT_ID])
 
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINEACTIONS_ENDPOINT
                                    .format(action_id=event_id))
@@ -1001,7 +1042,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         input_type = param[DEFENDERATP_JSON_INPUT_TYPE]
         input = param.get(DEFENDERATP_JSON_INPUT)
         if input:
-            input = UnicodeDammit(input).unicode_markup.encode('utf-8')
+            input = self._handle_py_ver_compat_for_input_str(input)
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
@@ -1082,7 +1123,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         input_type = param.get(DEFENDERATP_JSON_INPUT_TYPE, DEFENDERATP_ALL_CONST)
         input = param.get(DEFENDERATP_JSON_INPUT, "")
         if input:
-            input = UnicodeDammit(input).unicode_markup.encode('utf-8')
+            input = self._handle_py_ver_compat_for_input_str(input)
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
@@ -1107,7 +1148,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             # Check for valid IP
             if input_type == DEFENDERATP_IP_CONST:
                 try:
-                    ipaddress.ip_address(unicode(input))
+                    ipaddress.ip_address(UnicodeDammit(input).unicode_markup)
                 except:
                     return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                     .format(DEFENDERATP_IP_CONST))
@@ -1212,7 +1253,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -1226,16 +1267,22 @@ class WindowsDefenderAtpConnector(BaseConnector):
         called.
         """
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._state = self.load_state()
 
         # get the asset config
         config = self.get_config()
 
-        self._tenant = UnicodeDammit(config[DEFENDERATP_CONFIG_TENANT_ID]).unicode_markup.encode('utf-8')
-        self._client_id = UnicodeDammit(config[DEFENDERATP_CONFIG_CLIENT_ID]).unicode_markup.encode('utf-8')
+        self._tenant = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_TENANT_ID])
+        self._client_id = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_ID])
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
-        self._client_secret = UnicodeDammit(config[DEFENDERATP_CONFIG_CLIENT_SECRET]).unicode_markup.encode('utf-8')
+        self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
 
         return phantom.APP_SUCCESS
 
@@ -1282,7 +1329,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print "Accessing the Login page"
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1295,11 +1342,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print "Logging into Platform to get the session id"
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1315,6 +1362,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
