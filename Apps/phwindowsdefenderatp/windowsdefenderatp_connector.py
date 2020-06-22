@@ -259,7 +259,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             resp_json = response.json()
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
-                                                   .format(str(e))), None)
+                                                   .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -981,7 +981,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        file_hash = param[DEFENDERATP_JSON_FILE_HASH]
+        file_hash = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_JSON_FILE_HASH])
         comment = param[DEFENDERATP_JSON_COMMENT]
 
         endpoint = '{0}{1}'.format(DEFENDERATP_MSGRAPH_API_BASE_URL,
@@ -1010,7 +1010,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        file_hash = param[DEFENDERATP_JSON_FILE_HASH]
+        file_hash = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_JSON_FILE_HASH])
         comment = param[DEFENDERATP_JSON_COMMENT]
 
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_FILE_BLOCK_ENDPOINT
