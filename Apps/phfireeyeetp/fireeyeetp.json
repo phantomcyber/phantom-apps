@@ -1,0 +1,131 @@
+{
+    "appid": "22dc105b-5791-4483-a408-8ad586649159",
+    "name": "Fireeye ETP",
+    "description": "Cloud Edition provides RESTful APIs for custom integration. The APIs are provided for Advanced Threats, Email Trace and Quarantine functionalities.",
+    "type": "email",
+    "product_vendor": "Fireeye",
+    "logo": "fireeyeetp.svg",
+    "logo_dark": "fireeyeetp_dark.svg",
+    "product_name": "Email Threat Prevention",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Robert Drouin",
+    "license": "Copyright (c) Robert Drouin, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-22T21:07:35.969328Z",
+    "package_name": "phantom_fireeyeetp",
+    "main_module": "fireeyeetp_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "host": {
+            "description": "Select the instance that your ETP resides in",
+            "data_type": "string",
+            "required": true,
+            "value_list": [
+                "US Instance",
+                "EMEA Instance",
+                "APJ Instance"
+            ],
+            "default": "",
+            "order": 0
+        },
+        "api_key": {
+            "description": "API key for the ETP Instance",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get email",
+            "identifier": "get_email",
+            "description": "Get an email from the server",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Message ID to get",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "email id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "email": {
+                    "description": "Email of the mailbox owner",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "email"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "email id"
+                    ],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "email",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
