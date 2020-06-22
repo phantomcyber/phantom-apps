@@ -99,7 +99,7 @@ class CuckooConnector(BaseConnector):
             if not status_strings.is_fail(ret_val):
                 return RetVal(ret_val, response)
 
-        # An html response, treat it like an error
+        # An HTML response, treat it like an error
         status_code = response.status_code
 
         try:
