@@ -1,0 +1,1864 @@
+{
+    "appid": "4673bdae-3d55-4ea2-8b10-b8060f43ee51",
+    "name": "McAfee Web Gateway",
+    "description": "McAfee Web Gateway app for maintaining lists",
+    "type": "network security",
+    "product_vendor": "McAfee",
+    "logo": "mcafeewebgateway.svg",
+    "logo_dark": "mcafeewebgateway_dark.svg",
+    "product_name": "McAfee Web Gateway",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "python_version": "3",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-05-14T19:45:12.601161Z",
+    "package_name": "phantom_mcafeewebgateway",
+    "main_module": "mcafeewebgateway_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL; use port 4712 for https, 4711 for http",
+            "data_type": "string",
+            "required": true,
+            "default": "https://<Hostname_OR_IP>:4712/Konfigurator/REST/",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify SSL",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block url",
+            "identifier": "block_url",
+            "description": "Add URL to a list",
+            "verbose": "Either list_title or list_id are required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds URL to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock url",
+            "parameters": {
+                "url": {
+                    "description": "URL to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description to add to the entry",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "Added by Phantom",
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                },
+                "entry_position": {
+                    "description": "Position of the list to add the block entry",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 4
+                },
+                "complex": {
+                    "description": "Complex entry, to include a category and specify a protocol",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 5
+                },
+                "category": {
+                    "description": "Category (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                },
+                "protocol": {
+                    "description": "Protocol (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "any",
+                        "https",
+                        "ftp"
+                    ],
+                    "default": "any",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.complex",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "column_name": "list id",
+                    "column_order": 1,
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "column_name": "list title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0,
+                    "example_values": [
+                        "https://fakeurl.com/fake2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added url to list."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://fakeurl.com/fake2"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 0"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock url",
+            "identifier": "unblock_url",
+            "description": "Remove URL from a list.",
+            "verbose": "Either entry_position or url are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "block url",
+            "parameters": {
+                "url": {
+                    "description": "URL to unblock (either url or entry_position are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "entry_position": {
+                    "description": "Position of the list entry to remove from the list",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed url from list."
+                    ],
+                    "column_name": "message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://fakeurl.com/fake4"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "column_name": "entry position",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block ip",
+            "identifier": "block_ip",
+            "description": "Add IP to a list",
+            "verbose": "Either list_title or list_id are required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds IP to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock ip",
+            "parameters": {
+                "ip": {
+                    "description": "IP to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description to add to the entry",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "Added by Phantom",
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                },
+                "entry_position": {
+                    "description": "Position of the list to add the block entry",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 4
+                },
+                "complex": {
+                    "description": "Complex entry, to include a category and specify a protocol",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 5
+                },
+                "category": {
+                    "description": "Category (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                },
+                "protocol": {
+                    "description": "Protocol (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "any",
+                        "https",
+                        "ftp"
+                    ],
+                    "default": "any",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.complex",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "column_name": "list id",
+                    "column_order": 1,
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "column_name": "list title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "192.0.2.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added ip to list."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.0.2.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 0"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock ip",
+            "identifier": "unblock_ip",
+            "description": "Remove IP from a list.",
+            "verbose": "Either entry_position or ip are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "block ip",
+            "parameters": {
+                "ip": {
+                    "description": "IP to unblock (either ip or entry_position are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                },
+                "entry_position": {
+                    "description": "Position of the list entry to remove from the list",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed ip from list."
+                    ],
+                    "column_name": "message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.0.2.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "column_name": "entry position",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block domain",
+            "identifier": "block_domain",
+            "description": "Add domain to a list",
+            "verbose": "Either list_title or list_id are required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds domain to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock domain",
+            "parameters": {
+                "domain": {
+                    "description": "Domain to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description to add to the entry",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "Added by Phantom",
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                },
+                "entry_position": {
+                    "description": "Position of the list to add the block entry",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 4
+                },
+                "complex": {
+                    "description": "Complex entry, to include a category and specify a protocol",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 5
+                },
+                "category": {
+                    "description": "Category (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                },
+                "protocol": {
+                    "description": "Protocol (complex entry only)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "any",
+                        "https",
+                        "ftp"
+                    ],
+                    "default": "any",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.complex",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "column_name": "list id",
+                    "column_order": 1,
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "column_name": "list title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "fakedomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added domain to list."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "fakedomain.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 0"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock domain",
+            "identifier": "unblock_domain",
+            "description": "Remove domain from a list.",
+            "verbose": "Either entry_position or domain are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "block domain",
+            "parameters": {
+                "domain": {
+                    "description": "Domain to unblock (either domain or entry_position are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                },
+                "entry_position": {
+                    "description": "Position of the list entry to remove from the list",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed domain from list."
+                    ],
+                    "column_name": "message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "fakedomain.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "domain",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "column_name": "entry position",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add entry",
+            "identifier": "add_entry",
+            "description": "Add entry to a list",
+            "verbose": "Either list_title or list_id are required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds an entry to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "type": "contain",
+            "read_only": false,
+            "undo": "remove entry",
+            "parameters": {
+                "entry": {
+                    "description": "entry to add",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description to add to the entry",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "Added by Phantom",
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                },
+                "entry_position": {
+                    "description": "Position of the list to add the block entry",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "column_name": "list id",
+                    "column_order": 1,
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "column_name": "list title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.entry",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ],
+                    "column_name": "item",
+                    "column_order": 0,
+                    "example_values": [
+                        "https://my.phantom.us/",
+                        "splunk.com",
+                        "10.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added item to list."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://my.phantom.us/",
+                        "splunk.com",
+                        "10.0.0.0"
+                    ],
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 0"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove entry",
+            "identifier": "remove_entry",
+            "description": "Remove entry from a list.",
+            "verbose": "Either entry_position or item are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "type": "correct",
+            "read_only": false,
+            "undo": "add entry",
+            "parameters": {
+                "entry": {
+                    "description": "entry to remove (either entry or entry_position are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ],
+                    "order": 0
+                },
+                "entry_position": {
+                    "description": "Position of the list entry to remove from the list",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "order": 1
+                },
+                "list_title": {
+                    "description": "List Title (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 2
+                },
+                "list_id": {
+                    "description": "List ID (either list_title or list_id are required)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.type.string.261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entry",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed item from list."
+                    ],
+                    "column_name": "message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://my.phantom.us/",
+                        "splunk.com",
+                        "10.0.0.0"
+                    ],
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ],
+                    "column_name": "item",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.entry.content.listEntry.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Added by Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entry.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "column_name": "entry position",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entry.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "List entry at position 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list lists",
+            "identifier": "list_lists",
+            "description": "Returns the available lists",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "type": {
+                    "description": "List Type",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "any",
+                    "value_list": [
+                        "any",
+                        "category",
+                        "ip",
+                        "iprange",
+                        "mediatype",
+                        "number",
+                        "regex",
+                        "string"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.list.applcntrl.data_analytics"
+                    ],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "example_values": [
+                        "Data Analytics"
+                    ],
+                    "column_name": "title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.listType",
+                    "data_type": "string",
+                    "example_values": [
+                        "applcontrol"
+                    ],
+                    "column_name": "list type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.lists_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        198
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully returned lists"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get list",
+            "identifier": "get_list",
+            "description": "Returns contents of a list",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "list_title": {
+                    "description": "List Title",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "order": 0
+                },
+                "list_id": {
+                    "description": "list id",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_id",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ],
+                    "example_values": [
+                        "com.scur.type.string.893"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list_title",
+                    "data_type": "string",
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ],
+                    "example_values": [
+                        "Phantom Blocks"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entry_position",
+                    "data_type": "numeric",
+                    "contains": [
+                        "mcafee web gateway entry position"
+                    ],
+                    "column_name": "Entry Position",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entry",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://my.phantom.us/",
+                        "splunk.com",
+                        "10.0.0.0"
+                    ],
+                    "contains": [
+                        "url",
+                        "domain",
+                        "ip",
+                        "ip range"
+                    ],
+                    "column_name": "Entry",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.classifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "Other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.defaultRights",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.scur.type.string.893"
+                    ],
+                    "contains": [
+                        "mcafee web gateway list id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.list_entries",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.mwg-version",
+                    "data_type": "string",
+                    "example_values": [
+                        "7.8.2.12.0-29703"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Blocks"
+                    ],
+                    "contains": [
+                        "mcafee web gateway list title"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.structuralList",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.systemList",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.typeId",
+                    "data_type": "string",
+                    "example_values": [
+                        "com.scur.type.string"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.3.46"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully returned list"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
