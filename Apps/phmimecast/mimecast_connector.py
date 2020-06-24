@@ -50,6 +50,10 @@ class MimecastConnector(BaseConnector):
         try:
             encoded_auth_token = base64.b64encode(('{0}:{1}').format(self._username, self._password))
         except:
+            # In Python v3, strings are not binary,
+            # so we need to explicitly convert them to 'bytes' (which are binary)
+            # We need to convert 'bytes' back to string,
+            # as the contents of headers are of the 'string' form
             encoded_auth_token = base64.b64encode(bytes(('{0}:{1}').format(self._username, self._password), 'utf-8')).decode('utf-8')
         headers = {'Authorization': auth_type + ' ' + encoded_auth_token,
            'x-mc-app-id': self._app_id,
@@ -78,9 +82,19 @@ class MimecastConnector(BaseConnector):
             self.save_progress("Skipped login")
         request_id = str(uuid.uuid4())
         hdr_date = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S') + ' UTC'
-        hmac_sha1 = hmac.new(self._secret_key.decode('base64'), (':').join([hdr_date, request_id, uri, self._app_key]), digestmod=hashlib.sha1).digest()
+        # The 'hmac' library on Python v3 expects the parameters in bytes (or binary format),
+        # while the 'hmac' library on Python v3 expects the parameters in string
+        # (which are stored in binary and Unicode form on Python v2 and Python v3 respectively).
+        # UnicodeDammit.unicode_markup.encode() works for both the versions, as it converts the
+        # provided input to string on Python v2 and bytes on Python v3.
+        encoded_secret_key = UnicodeDammit(self._secret_key).unicode_markup.encode("utf-8")
+        encoded_msg = UnicodeDammit(':'.join([hdr_date, request_id, uri, self._app_key])).unicode_markup.encode("utf-8")
+        hmac_sha1 = hmac.new(base64.b64decode(encoded_secret_key), encoded_msg, digestmod=hashlib.sha1).digest()
         sig = base64.encodestring(hmac_sha1).rstrip()
-        headers = {'Authorization': 'MC ' + self._access_key + ':' + sig,
+        # For Python v3 'bytes' need to be converted back to 'string'
+        # as the contents of headers are of the 'string' form
+        decoded_sig = UnicodeDammit(sig).unicode_markup
+        headers = {'Authorization': 'MC ' + self._access_key + ':' + decoded_sig,
            'x-mc-app-id': self._app_id,
            'x-mc-date': hdr_date,
            'x-mc-req-id': request_id,
@@ -92,7 +106,8 @@ class MimecastConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR,
+        "Empty response and no information in the header. Please check the asset configuration and|or action parameters."), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -216,7 +231,7 @@ class MimecastConnector(BaseConnector):
 
     def _paginator(self, endpoint, action_result, limit=None, headers=None, data=None, method="get", **kwargs):
 
-        default_max_results = 1
+        default_max_results = 100
         page_size = default_max_results
         # If page_size param is present, then validate if pageSize is a positive integer greater than zero
         data_object = {}

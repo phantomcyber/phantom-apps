@@ -91,6 +91,7 @@
                 "match_type": {
                     "description": "Set to 'explicit' to block instances of the full URL or set to 'domain' to block any URL with the same domain",
                     "data_type": "string",
+                    "default": "explicit",
                     "value_list": [
                         "explicit",
                         "domain"
@@ -286,7 +287,7 @@
             "action": "add member",
             "identifier": "add_member",
             "description": "Add a sender or domain to a Mimecast group",
-            "type": "generic",
+            "type": "contain",
             "read_only": false,
             "undo": "remove member",
             "parameters": {
@@ -432,7 +433,7 @@
             "action": "remove member",
             "identifier": "remove_member",
             "description": "Remove a sender or domain from a Mimecast group",
-            "type": "generic",
+            "type": "correct",
             "read_only": false,
             "undo": "add member",
             "parameters": {
@@ -854,6 +855,7 @@
                 "match_type": {
                     "description": "Set to 'explicit' to permit instances of the full URL or set to 'domain' to permit any URL with the same domain",
                     "data_type": "string",
+                    "default": "explicit",
                     "value_list": [
                         "explicit",
                         "domain"
