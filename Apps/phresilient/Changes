@@ -1,0 +1,13 @@
+Changes from 1.0.26 -> 1.0.27
+
+1. create_artifact action: fixed  bug with missing description error
+2. list_comments action: set client header text_content_output_format=objects_no_convert
+3. update_table_row_with_key action: fixed naming issue with code. action should now be correctly invoked
+4. parameter handle_format_is_name parameter to following actions:
+    list_comments
+    get_comments
+    create_comment
+    update_comment
+    download_attachment
+    add_attachment
+5. close_task action: remove handle_format_is_name parameter

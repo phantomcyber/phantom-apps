@@ -1,0 +1,247 @@
+#! /usr/bin/env python
+
+# ---
+# action:
+#   by default:
+#       identifier: derived from name
+#       description: derived from name
+#       type: "investigate"
+#       read_only: true, for type(investigate)
+#       read_only: false, for type(generic)
+#
+# parameters:
+#   by default:
+#       description: derived from name
+#       data_type: string
+#       required: false
+#       primary: false
+#       default: "", for data_type(string)
+#       default: false for data_type(boolean)
+#   parameter name is changed to all lowercase as per API guidelines
+#   spaces in parameter name is changed to '_' as per API guidelines
+#
+# output:
+#   by default:
+#       adds "default" output definition
+#       checks for ':' and if char not in string, then it assumes it should be converte into action_results data_path
+#   "output": null, does not add any output definition
+# 
+# render:
+#   by default:
+#       adds "default" render definition
+# ---
+
+from __future__ import print_function
+from collections import OrderedDict
+import sys, json, datetime
+
+def main(orig, conf):
+    appj = json.loads(whole_file(orig), object_pairs_hook=OrderedDict)
+    conf = json.loads(whole_file(conf), object_pairs_hook=OrderedDict)
+
+    appj['app_version'] = up_minor_version(appj['app_version'])
+    appj['utctime_updated'] = datetime.datetime.utcnow().isoformat()
+
+    if conf['output']:
+        output_list = conf['output']
+        output_defs = OrderedDict()
+        for key, outdef in output_list.iteritems():
+            output_defs[key] = list()
+            do_dump_output(output_defs[key], outdef)
+
+    if conf['render']:
+        render_list = conf['render']
+        render_defs = OrderedDict()
+        for key, renddef in render_list.iteritems():
+            render_defs[key] = dump_render(renddef)
+
+    actions = list()
+    appj['actions'] = actions
+    actions_list = conf['actions']
+    for action in actions_list:
+        retval = dump_action(action, output_defs, render_defs)
+        if retval:
+                actions.append(retval)
+    printout(appj)
+
+
+def dump_action(json, output_defs, render_defs):
+    if 'action' not in json:
+        return None
+
+    action = OrderedDict()
+
+    # add defaults
+    action['action'] = json['action'].lower()
+    action['identifier'] = json['action'].replace(' ', '_')
+    action['description'] = json['action'].capitalize()
+    #action['verbose'] = ""
+    action['type'] = "investigate"
+    action['read_only'] = False
+
+    addifkey(action, 'identifier', json, func=lambda x: x.replace(' ', '_'))
+    addifkey(action, 'description', json, func=lambda x:x.capitalize())
+    addifkey(action, 'verbose', json)
+    addifkey(action, 'type', json)
+    if action['type'] == "investigate":
+        action['read_only'] = True
+    addifkey(action, 'read_only', json)
+
+    parameters = OrderedDict()
+    action['parameters'] = parameters
+    if 'parameters' in json:
+        parameters_list = json['parameters']
+        if len(parameters_list) > 0:
+            order = 10
+            for parameter in parameters_list:
+                key, value = (dump_parameter(parameter, order))
+                if key:
+                    parameters[key] = value
+                    order += 10
+
+    output = list()
+    output.append({"data_path": "action_result.message", "data_type": "string"})
+    output.append({"data_path": "summary.total_objects", "data_type": "numeric"})
+    output.append({"data_path": "summary.total_objects_successful", "data_type": "numeric"})
+    action['output'] = output
+    if 'output' in json:
+        # "output": null
+        if json['output'] == None:
+            pass
+        elif isinstance(json['output'], basestring):
+            if json['output'] in output_defs:
+                output.extend(output_defs[json['output']])
+            else:
+                error("Error: output definition not found: {}".format(json['output']))
+        else:
+            if isinstance(json['output'], list):
+                output_list = json['output']
+                do_dump_output(output, output_list)
+            else:
+                error("Error: output definition is not a list: {}".format(json['output']))
+    elif 'default' in output_defs:
+        output.extend(output_defs['default'])
+    
+    if 'render' in json:
+        if isinstance(json['render'], basestring):
+            if json['render'] in render_defs:
+                action['render'] = render_defs[json['render']]
+            else:
+                error("Error: dumping undefined render {}, skipping: {}".format(json['render']))
+        else:
+            action['render'] = dump_render(json['render'])
+    elif 'default' in render_defs:
+        action['render'] = render_defs['default']
+    else:
+        action['render'] = { "type": "table" }
+
+    action['versions'] = "EQ(*)"
+
+    return action
+
+
+def dump_render(json):
+    render = OrderedDict()
+    if 'type' not in json:
+        render['type'] = "table"
+    else:
+        addifkey(render, 'type', json)
+    addifkey(render, 'title', json)
+    return render
+
+
+def do_dump_output(output, output_list):
+    order = 10
+    for out in output_list:
+        stuff = dump_output(out, order, lambda x: x.split()[-1].split('.')[-1].replace('_',' '))
+        if stuff:
+            output.append(stuff)
+            order += 10
+
+
+def dump_output(json, order, mangle_path=None):
+    if 'path' not in json:
+        return None
+    output = OrderedDict()
+
+    # add defaults
+    # default is to translate to action_result
+    if json['path'].find(':') == 1:
+        output['data_path'] = json['path']
+    else:
+        output['data_path'] = "action_result.data.*.{}".format(json['path'])
+    output['data_type'] = "string"
+    if callable(mangle_path):
+        output['column_name'] = mangle_path(json['path'])
+    else:
+        output['column_name'] = json['path']
+    output['column_order'] = order
+
+    addifkey(output, 'data_type', json)
+    addifkey(output, 'column_name', json)
+    addifkey(output, 'contains', json)
+    addifkey(output, 'order', json, "column_order")
+    return output
+
+
+def dump_parameter(json, order):
+    if 'name' not in json:
+        error("Error: dumping parameter without name, skipping: {}".format(json))
+        return None, None
+    parameter = OrderedDict()
+    name = json['name'].lower().replace(' ', '_')
+
+    # add defaults
+    parameter['description'] = name.capitalize().replace('_', ' ')
+    parameter['data_type'] = "string"
+    parameter['required'] = False
+    parameter['primary'] = False
+    parameter['default'] = ""
+    parameter['order'] = order
+
+    addifkey(parameter, 'description', json)
+    addifkey(parameter, 'data_type', json)
+    addifkey(parameter, 'required', json)
+    addifkey(parameter, 'primary', json)
+    addifkey(parameter, 'contains', json)
+    if parameter['data_type'] == "boolean":
+        parameter['default'] = False
+    addifkey(parameter, 'default', json)
+    addifkey(parameter, 'order', json)
+    return name, parameter
+
+
+def addifkey(out, key, dic, output_key=None, func=None):
+    if not output_key:
+        output_key = key
+    if key in dic:
+        if callable(func):
+            value = func(dic[key])
+        else:
+            value = dic[key]
+        out[output_key] = value
+
+
+def up_minor_version(version):
+    version_subs = version.split(".")
+    version_subs[-1] = str(int(version_subs[-1]) + 1)
+    return ".".join(version_subs)
+
+
+def printout(json):
+    dumps(json)
+
+
+def dumps(jso):
+    print(json.dumps(jso, indent=4, separators=(",",": ")))
+
+
+def error(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+def whole_file(filename):
+    with open(filename) as f:
+        return f.read()
+    
+main(sys.argv[1], sys.argv[2])

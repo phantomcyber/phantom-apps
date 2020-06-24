@@ -1,0 +1,6 @@
+rm -f *.pyc
+if test -n "$1"; then
+	/opt/phantom/bin/phenv python /opt/phantom/bin/compile_app.pyc -d -s "$1"
+else
+	sudo -u phantom /opt/phantom/bin/phenv python /opt/phantom/bin/compile_app.pyc -i -d
+fi

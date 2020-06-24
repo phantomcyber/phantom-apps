@@ -1,0 +1,643 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.7
+date	2018.05.03.22.33.44;	author jang;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2018.05.03.20.08.05;	author jang;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2017.10.30.00.43.42;	author iam;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2017.10.12.21.28.22;	author james.ng;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2017.10.11.22.12.26;	author james.ng;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2017.10.09.21.15.33;	author iam;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2017.10.04.04.11.45;	author iam;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.7
+log
+@1.0.27
+@
+text
+@{
+    "actions": [
+        {
+            "action": "test connectivity",
+            "output": null,
+            "endpoint": "\"/orgs/{org_id}/users/{id}\".format(**param)",
+            "method": "get"
+        },
+        {
+            "action": "list tickets",
+            "description": "List all incidents",
+            "parameters": [
+                { "name": "want_closed", "data_type": "boolean", "default": true, "description": "Also returns closed incidents. Default is true" }
+            ],
+            "endpoint": "\"/orgs/{org_id}/incidents}\".format(**param)",
+            "method": "get"
+        },
+        {
+            "action": "get ticket",
+            "description": "Get incident details by id",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident to retrieve", "contains": ["ticketid"] }
+            ],
+            "endpoint": "\"/orgs/{org_id}/incidents/{incidentID}\".format(**param)",
+            "method": "get"
+        },
+        {
+            "action": "create ticket",
+            "description": "Create new incident",
+            "type": "generic",
+            "parameters": [
+                { "name": "incident_name", "required": true, "primary": true, "description": "Name of incident" },
+                { "name": "incident_description", "required": true, "description": "Short description of incident" },
+                { "name": "FullIncidentDataDTO", "description": "Incident data as JSON String, format is FullIncidentDataDTO data type from API" },
+                { "name": "want_full_data", "data_type": "boolean", "default": true, "description": "Returns full incident instead of summary. Default is true" },
+                { "name": "want_tasks", "data_type": "boolean", "description": "Also returns associated tasks. Default is false" }
+            ],
+            "endpoint": "\"/orgs/{org_id}/incidents\".format(**param)",
+            "method": "put"
+        },
+        {
+            "action": "update ticket",
+            "description": "Update existing incident",
+            "type": "generic",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident to update", "contains": ["ticketid"] },
+                { "name": "FullIncidentDataDTO", "required": true, "description": "Incident data as JSON String, format is FullIncidentDataDTO data type from API. This data should first be retrieved from Resilient and then modified with the desired changes" }
+            ],
+            "endpoint": "\"/orgs/{org_id}/incidents\".format(**param)",
+            "method": "put"
+        },
+        {
+            "action": "search tickets",
+            "description": "Submit search query for incidents",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "QueryDTO", "description": "Query data as JSON String, format is QueryDTO data type from API" },
+                { "name": "add_condition_all_active_tickets", "data_type": "boolean", "description": "Filters for active tickets" },
+                { "name": "add_condition_closed_in_last_24_hours", "data_type": "boolean", "description": "Filters for tickets closed in last 24 hours" },
+                { "name": "add_condition_created_in_last_24_hours", "data_type": "boolean", "description": "Filters for tickets created in last 24 hours" },
+                { "name": "1st_condition_field_name", "description": "The field name in the condition" },
+                { "name": "1st_condition_field_value", "description": "The value used for comparison" },
+                { "name": "1st_condition_value_is_datetime", "data_type": "boolean", "description": "The value is a datetime; convert to Resilient internal representation" },
+                { "name": "1st_condition_comparison_method", "description": "The method used to compare the value, [equals, gt, lte]. Look up MethodName datatype in the api" },
+                { "name": "2nd_condition_field_name", "description": "The field name in the condition" },
+                { "name": "2nd_condition_field_value", "description": "The value used for comparison" },
+                { "name": "2nd_condition_value_is_datetime", "data_type": "boolean", "description": "The value is a datetime" },
+                { "name": "2nd_condition_comparison_method", "description": "The method used to compare the value" },
+                { "name": "3rd_condition_field_name", "description": "The field name in the condition" },
+                { "name": "3rd_condition_field_value", "description": "The value used for comparison" },
+                { "name": "3rd_condition_value_is_datetime", "data_type": "boolean", "description": "The value is a datetime" },
+                { "name": "3rd_condition_comparison_method", "description": "The method used to compare the value" },
+                { "name": "4th_condition_field_name", "description": "The field name in the condition" },
+                { "name": "4th_condition_field_value", "description": "The value used for comparison" },
+                { "name": "4th_condition_value_is_datetime", "data_type": "boolean", "description": "The value is a datetime" },
+                { "name": "4th_condition_comparison_method", "description": "The method used to compare the value" },
+                { "name": "5th_condition_field_name", "description": "The field name in the condition" },
+                { "name": "5th_condition_field_value", "description": "The value used for comparison" },
+                { "name": "5th_condition_value_is_datetime", "data_type": "boolean", "description": "The value is a datetime" },
+                { "name": "5th_condition_comparison_method", "description": "The method used to compare the value" }
+            ],
+            "output": "search tickets"
+        },
+        {
+            "action": "list artifacts",
+            "description": "List all artifacts for incident",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] }
+            ],
+            "output": "artifacts"
+        },
+        {
+            "action": "get artifact",
+            "description": "get artifact details by incident and artifact id",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "artifact_id", "required": true, "primary": true, "description": "ID of artifact to retrieve", "contains": ["artifactid"] }
+            ],
+            "output": "artifacts"
+        },
+        {
+            "action": "create artifact",
+            "description": "create new artifact",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "IncidentArtifactDTO", "description": "Artifact data as JSON String, format is IncidentArtifactDTO data type from API" },
+                { "name": "type", "values": ["url", "domain", "file"], "description": "Type of artifact. Known values are; url(3), domain(2), file(13)" },
+                { "name": "value", "description": "artifact value field" },
+                { "name": "description", "description": "short description of artifact" }
+            ],
+            "type": "generic",
+            "output": "artifacts"
+        },
+        {
+            "action": "update artifact",
+            "description": "update existing artifact",
+            "parameters": [
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "artifact_id", "required": true, "primary": true, "description": "ID of artifact to update", "contains": ["artifactid"] },
+                { "name": "IncidentArtifactDTO", "required": true, "description": "Artifact data as JSON String, format is IncidentArtifactDTO data type from API" }
+            ],
+            "type": "generic",
+            "output": "artifacts"
+        },
+        {
+            "action": "list comments",
+            "description": "list all comment for incident",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] }
+            ],
+            "output": "comments"
+        },
+        {
+            "action": "get comment",
+            "description": "get comment details by incident and comment id",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "comment_id", "required": true, "primary": true, "description": "ID of comment to retrieve", "contains": ["commentid"] }
+            ],
+            "output": "comments"
+        },
+        {
+            "action": "create comment",
+            "description": "create new comment",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "parent_id", "primary": true, "description": "The ID of the initial comment if posting a reply", "contains": ["commentid"] },
+                { "name": "text", "description": "comment as text" },
+                { "name": "IncidentCommentDTO", "description": "comment data as JSON String, format is IncidentCommentDTO data type from API" }
+            ],
+            "type": "generic",
+            "output": "comments"
+        },
+        {
+            "action": "update comment",
+            "description": "update existing comment",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "comment_id", "required": true, "primary": true, "description": "ID of comment to retrieve", "contains": ["commentid"] },
+                { "name": "IncidentCommentDTO", "required": true, "description": "comment data as JSON String, format is IncidentCommentDTO data type from API" }
+            ],
+            "type": "generic",
+            "output": "comments"
+        },
+        {
+            "action": "list tables",
+            "description": "list tables",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "get table",
+            "description": "get table",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "table_id", "required": true, "primary": true, "description": "ID of table", "contains": ["ticketid"] }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "add table row",
+            "description": "add table row",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "table_id", "required": true, "primary": true, "description": "ID of table", "contains": ["tableid"] },
+                { "name": "DataTableRowDataDTO", "required": true, "description": "table row as JSON String, format is DataTableRowDataDTO data type from API" },
+                { "name": "1st_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "1st_condition_cell_value", "description": "The value of the cell"},
+                { "name": "2nd_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "2nd_condition_cell_value", "description": "The value of the cell"},
+                { "name": "3rd_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "3rd_condition_cell_value", "description": "The value of the cell"},
+                { "name": "4th_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "4th_condition_cell_value", "description": "The value of the cell"},
+                { "name": "5th_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "5th_condition_cell_value", "description": "The value of the cell"}
+            ],
+            "type": "generic",
+            "output": "json"
+        },
+        {
+            "action": "update table row",
+            "description": "update table row",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "table_id", "required": true, "primary": true, "description": "ID of table", "contains": ["tableid"] },
+                { "name": "row_id", "required": true, "primary": true, "description": "ID of row in table", "contains": ["rowid"] },
+                { "name": "DataTableRowDataDTO", "required": true, "description": "table row as JSON String, format is DataTableRowDataDTO data type from API" },
+                { "name": "1st_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "1st_condition_cell_value", "description": "The value of the cell"},
+                { "name": "2nd_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "2nd_condition_cell_value", "description": "The value of the cell"},
+                { "name": "3rd_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "3rd_condition_cell_value", "description": "The value of the cell"},
+                { "name": "4th_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "4th_condition_cell_value", "description": "The value of the cell"},
+                { "name": "5th_condition_cell_property", "description": "The property name of the cell" },
+                { "name": "5th_condition_cell_value", "description": "The value of the cell"}
+            ],
+            "type": "generic",
+            "output": "json"
+        },
+        {
+            "action": "update table row with key",
+            "description": "update table row with key",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "table_id", "required": true, "primary": true, "description": "ID of table", "contains": ["tableid"] },
+                { "name": "key", "required": true, "primary": true, "description": "property name in row to find", "contains": ["keyid"] },
+                { "name": "value", "required": true, "primary": false, "description": "property value in row to find" },
+                { "name": "DataTableRowDataDTO", "required": true, "description": "table row as JSON String, format is DataTableRowDataDTO data type from API" }
+            ],
+            "type": "generic",
+            "output": "json"
+        },
+        {
+            "action": "list tasks",
+            "description": "list tasks for user (defined in asset configuration)",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "get task",
+            "description": "get task details",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "task_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["taskid"] }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "update task",
+            "description": "update task",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "task_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["taskid"] },
+                { "name": "TaskDTO", "required": true, "description": "table row as JSON String, format is TaskDTO data type from API" }
+            ],
+            "type": "generic",
+            "output": "json"
+        },
+        {
+            "action": "close task",
+            "description": "close task",
+            "parameters": [
+                { "name": "task_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["taskid"] }
+            ],
+            "type": "generic",
+            "output": "json"
+        },
+        {
+            "action": "list attachments",
+            "description": "list attachments for incident",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] }
+        ],
+            "output": "json"
+        },
+        {
+            "action": "get attachment",
+            "description": "get attachment details from incident",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "attachment_id", "required": true, "primary": true, "description": "ID of attachment", "contains": ["attachmentid"] }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "download attachment",
+            "description": "download attachment from incident",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "attachment_id", "required": true, "primary": true, "description": "ID of attachment", "contains": ["attachmentid"] }
+            ],
+            "output": "json"
+        },
+        {
+            "action": "add attachment",
+            "description": "add attachment to incident",
+            "parameters": [
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Treat handles as name. Default is true" },
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident", "contains": ["ticketid"] },
+                { "name": "vault_id", "required": true, "primary": true, "description": "vault ID of file", "contains": ["vaultid"] }
+            ],
+            "type": "generic",
+            "output": "json"
+        }
+    ],
+    "output": {
+        "default":[
+            { "path": "id", "contains": ["ticketid"] },
+            { "path": "name" },
+            { "path": "create_date" },
+            { "path": "description" },
+            { "path": "creator.fname" },
+            { "path": "creator.lname" },
+            { "path": "creator.email" },
+            { "path": "creator.phone" },
+            { "path": "creator.cell" }
+        ],
+        "search tickets": [
+            { "path": "id", "contains": ["ticketid"] },
+            { "path": "name" },
+            { "path": "create_date" },
+            { "path": "description" },
+            { "path": "severity_code.name", "column_name": "severity" },
+            { "path": "plan_status", "column_name": "status" }
+        ],
+        "artifacts": [
+            { "path": "inc_id", "column_name": "incident id", "contains": ["ticketid"] },
+            { "path": "id", "column_name": "artifact id", "contains": ["artifactid"] },
+            { "path": "type" },
+            { "path": "value" },
+            { "path": "description" },
+            { "path": "inc_name", "column_name": "incident name" }
+        ],
+        "comments": [
+            { "path": "inc_id", "column_name": "incident id", "contains": ["ticketid"] },
+            { "path": "id", "column_name": "comment id", "contains": ["commentid"] },
+            { "path": "text" },
+            { "path": "inc_name", "column_name": "incident name" }
+        ],
+        "json": [
+        ]
+    },
+    "render": {
+        "default": {
+            "title": "Resilient Incident"
+        }
+    },
+    "status": [
+        { "code": 200, "success": true,  "progress": "Test connectivity successful", "response": false },
+        { "code": 400, "success": false, "progress": "Bad request", "response": false },
+        { "code": 401, "success": false, "progress": "Unauthorized - most commonly, the provided session ID is invalid", "response": false },
+        { "code": 403, "success": false, "progress": "Forbidden - most commonly, user authentication failed", "response": false },
+        { "code": 404, "success": false, "progress": "Object not found", "response": false },
+        { "code": 409, "success": false, "progress": "Conflicting PUT operation", "response": false },
+        { "code": 500, "success": false, "progress": "Internal error", "response": false },
+        { "code": 503, "success": false, "progress": "Service unavailable - usually related to LDAP not being accessible", "response": false }
+    ]
+}
+@
+
+
+1.6
+log
+@resilient-15
+@
+text
+@d56 1
+d173 1
+d307 1
+d317 1
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d128 1
+d137 1
+d147 1
+d160 1
+d190 1
+d212 1
+d232 2
+a233 2
+            "action": "update table row by key",
+            "description": "update table row by key",
+d235 1
+d238 2
+a239 2
+                { "name": "key", "required": true, "primary": true, "description": "ID of row in table", "contains": ["rowid"] },
+                { "name": "value", "required": true, "primary": true, "description": "ID of row in table", "contains": ["rowid"] },
+d244 9
+a252 1
+	},
+d257 1
+d266 1
+d286 1
+a286 1
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Also returns closed incidents. Default is true" },
+d288 1
+a288 1
+	    ],
+d295 10
+a304 1
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Also returns closed incidents. Default is true" },
+a313 1
+                { "name": "handle_format_is_name", "data_type": "boolean", "default": true, "description": "Also returns closed incidents. Default is true" },
+d315 1
+a315 1
+                { "name": "attachment_id", "required": true, "primary": true, "description": "ID of attachment", "contains": ["attachmentid"] }
+d321 1
+a321 1
+	"output": {
+d323 10
+a332 10
+	        { "path": "id", "contains": ["ticketid"] },
+	        { "path": "name" },
+	        { "path": "create_date" },
+	        { "path": "description" },
+	        { "path": "creator.fname" },
+	        { "path": "creator.lname" },
+	        { "path": "creator.email" },
+	        { "path": "creator.phone" },
+	        { "path": "creator.cell" }
+	    ],
+d334 6
+a339 6
+	        { "path": "id", "contains": ["ticketid"] },
+	        { "path": "name" },
+	        { "path": "create_date" },
+	        { "path": "description" },
+	        { "path": "severity_code.name", "column_name": "severity" },
+	        { "path": "plan_status", "column_name": "status" }
+d342 6
+a347 6
+	        { "path": "inc_id", "column_name": "incident id", "contains": ["ticketid"] },
+	        { "path": "id", "column_name": "artifact id", "contains": ["artifactid"] },
+	        { "path": "type" },
+	        { "path": "value" },
+	        { "path": "description" },
+	        { "path": "inc_name", "column_name": "incident name" }
+d350 4
+a353 4
+	        { "path": "inc_id", "column_name": "incident id", "contains": ["ticketid"] },
+	        { "path": "id", "column_name": "comment id", "contains": ["commentid"] },
+	        { "path": "text" },
+	        { "path": "inc_name", "column_name": "incident name" }
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d110 1
+d163 131
+d329 2
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d120 1
+d145 3
+a147 1
+                { "name": "IncidentCommentDTO", "required": true, "description": "comment data as JSON String, format is IncidentCommentDTO data type from API" }
+d149 1
+d160 1
+d187 1
+a187 1
+	        { "path": "type.name", "column_name": "type" },
+d195 1
+a195 1
+	        { "path": "text.content", "column_name": "text" },
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d7 1
+a7 4
+            "method": "get",
+            "doREST": [
+                [ 0, "ret_val, response, r = self._co3_api({endpoint}, method=\"{method}\")" ]
+            ]
+d85 9
+a93 1
+            "description": "List artifacts by incident id",
+d95 24
+a118 1
+                { "name": "incident_id", "required": true, "primary": true, "description": "ID of incident to retrieve", "contains": ["ticketid"] }
+d121 36
+d180 2
+a181 1
+	        { "path": "id", "contains": ["artifactid"] },
+a182 2
+	        { "path": "inc_id", "contains": ["ticketid"] },
+	        { "path": "inc_name" },
+d184 8
+a191 1
+	        { "path": "description" }
+a198 14
+    "methods": {
+        "co3 rest api call": {
+            "body": [
+                [ 0, "def _co3_api(self, endpoint, action_result, headers={{}}, params=None, data=None, method='get'):" ],
+                [ 1, "config = self.get_config()" ],
+                [ 1, "try:" ],
+                [ 2, "client = co3.SimpleClient(org_name=config['org'], base_url=self._base_url, verify=config['verify_server_cert'])" ],
+                [ 2, "client.connect(config['username'], config['password'])" ],
+                [ 1, "except Exception as e:" ],
+                [ 2, "return phantom.APP_ERROR" ],
+                [ 1, "return client, phantom.APP_SUCCESS" ]
+            ]
+        }
+    },
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d36 2
+a37 2
+                { "name": "incident_description", "required": true, "primary": true, "description": "Short description of incident" },
+                { "name": "FullIncidentDataDTO", "required": false, "primary": false, "description": "Incident data as JSON String, format is FullIncidentDataDTO data type from API" },
+d39 1
+a39 1
+                { "name": "want_task", "data_type": "boolean", "description": "Also returns associated tasks. Default is false" }
+d60 23
+a82 22
+                { "name": "add condition all active tickets", "data_type": "boolean", "description": "Filters for active tickets" },
+                { "name": "add condition created in last 24 hours", "data_type": "boolean", "description": "Filters for tickets created in last 24 hours" },
+                { "name": "1st condition field name", "description": "The field name in the condition" },
+                { "name": "1st condition field value", "description": "The value used for comparison" },
+                { "name": "1st condition value is datetime", "description": "The value is a date/time; convert to Resilient internal representation" },
+                { "name": "1st condition comparison method", "description": "The method used to compare the value, [equals, gt, lte]. Look up MethodName datatype in the api" },
+                { "name": "2nd condition field name", "description": "The field name in the condition" },
+                { "name": "2nd condition field value", "description": "The value used for comparison" },
+                { "name": "2nd condition value is datetime", "description": "The value is a date/time" },
+                { "name": "2nd condition comparison method", "description": "The method used to compare the value" },
+                { "name": "3rd condition field name", "description": "The field name in the condition" },
+                { "name": "3rd condition field value", "description": "The value used for comparison" },
+                { "name": "3rd condition value is datetime", "description": "The value is a date/time" },
+                { "name": "3rd condition comparison method", "description": "The method used to compare the value" },
+                { "name": "4th condition field name", "description": "The field name in the condition" },
+                { "name": "4th condition field value", "description": "The value used for comparison" },
+                { "name": "4th condition value is datetime", "description": "The value is a date/time" },
+                { "name": "4th condition comparison method", "description": "The method used to compare the value" },
+                { "name": "5th condition field name", "description": "The field name in the condition" },
+                { "name": "5th condition field value", "description": "The value used for comparison" },
+                { "name": "5th condition value is datetime", "description": "The value is a date/time" },
+                { "name": "5th condition comparison method", "description": "The method used to compare the value" }
+d84 9
+a92 1
+            "output": "search"
+d107 1
+a107 1
+        "search": [
+d114 8
+@
