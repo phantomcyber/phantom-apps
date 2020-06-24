@@ -37,7 +37,7 @@
             "description": "Custom REST based Integration URL defined in VictorOps",
             "verbose": "Populate this field if you plan to create, update, or resolve incidents.",
             "data_type": "string",
-            "required": false,
+            "required": true,
             "order": 2
         }
     },
