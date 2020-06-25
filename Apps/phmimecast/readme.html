@@ -14,3 +14,18 @@ It is important to note that your accessKey and secretKey binding may expire aft
 
 In the event that you do want your authentication binding to expire after a specified time, the first failed action using the expired binding will make the Mimecast app automatically reset your accessKey and secretKey. Simply run the failed action once again and it should now be authorized with a new binding.
 <br></br>
+
+<p>
+    <b>Points to remember while connecting to Mimecast</b>
+    <ul>
+    <li>IP Range Restrictions:</li>
+    Be sure to enable your mimecast to accept communication with the IP address of your Phantom server(s).
+    <li>Two Factor Authentication:</li>
+    Mimecast supports optional two factor authentication. Two factor authentication should be disabled for the account that is used to handle API communication with Phantom.
+    </ul>
+</p>
+
+<p>
+    <b>Note:</b>
+    The 'unblacklist url' and 'unwhitelist url' actions use the same API endpoint and action parameter to remove the URL from the blacklist and whitelist. Hence, removing the URL from the whitelist will automatically remove the URL from the blacklist as well.
+</p>
