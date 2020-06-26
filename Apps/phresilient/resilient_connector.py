@@ -1,7 +1,11 @@
 # -----------------------------------------
 # Phantom sample App Connector python file
 # -----------------------------------------
-
+# File: __init__.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
