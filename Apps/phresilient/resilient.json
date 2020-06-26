@@ -6,7 +6,7 @@
     "product_vendor": "Resilient",
     "logo": "logo_resilient.svg",
     "logo_dark": "logo_resilient_dark.svg",
-    "product_name": "Resilient",
+    "product_name": "resilient",
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2020 Splunk Inc.",
@@ -148,7 +148,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.create_date",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Create Date",
                     "column_order": 2,
                     "example_values": [
@@ -427,7 +427,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
@@ -873,7 +873,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.create_date",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Create Date",
                     "column_order": 2,
                     "example_values": [
@@ -1192,7 +1192,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
@@ -1674,7 +1674,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.create_date",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Create Date",
                     "column_order": 2,
                     "example_values": [
@@ -1993,7 +1993,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
@@ -2737,7 +2737,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.create_date",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Create Date",
                     "column_order": 2,
                     "example_values": [
@@ -3056,7 +3056,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
@@ -3759,7 +3759,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.create_date",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Create Date",
                     "column_order": 2,
                     "example_values": [
@@ -4076,7 +4076,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
@@ -4656,7 +4656,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Artifact ID",
                     "column_order": 1,
                     "contains": [
@@ -4668,7 +4668,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -4740,7 +4740,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.type",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Type",
                     "column_order": 2,
                     "example_values": [
@@ -4998,7 +4998,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Artifact ID",
                     "column_order": 1,
                     "contains": [
@@ -5010,7 +5010,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -5082,7 +5082,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.type",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Type",
                     "column_order": 2,
                     "example_values": [
@@ -5371,7 +5371,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Artifact ID",
                     "column_order": 1,
                     "contains": [
@@ -5383,7 +5383,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -5462,7 +5462,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.type",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Type",
                     "column_order": 2,
                     "example_values": [
@@ -5733,7 +5733,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Artifact ID",
                     "column_order": 1,
                     "contains": [
@@ -5745,7 +5745,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -5817,7 +5817,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.type",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Type",
                     "column_order": 2,
                     "example_values": [
@@ -5944,7 +5944,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
@@ -5956,7 +5956,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -6440,7 +6440,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
@@ -6452,7 +6452,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -6758,7 +6758,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
@@ -6770,7 +6770,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -7069,7 +7069,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
@@ -7081,7 +7081,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.inc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
@@ -7308,7 +7308,9 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.handle_format_is_name",
@@ -7324,7 +7326,9 @@
                     "example_values": [
                         "2096",
                         "2104"
-                    ]
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
@@ -8251,7 +8255,7 @@
                     ],
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 3
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.datatablerowdatadto",
@@ -9477,7 +9481,7 @@
                         ""
                     ],
                     "column_name": "Description",
-                    "column_order": 3
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.due_date",
@@ -9873,7 +9877,9 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.task_id",
@@ -9888,7 +9894,7 @@
                     "data_path": "action_result.data.*.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.success",
@@ -10208,7 +10214,7 @@
                         "image/png"
                     ],
                     "column_name": "Attachment Type",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.created",
@@ -10259,7 +10265,7 @@
                         "NOWAK1-Pawe\u0142-pass.png"
                     ],
                     "column_name": "Attachment Name",
-                    "column_order": 0
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.size",

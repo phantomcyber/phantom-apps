@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# File: resilient_consts.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 """Simple client for Resilient REST API"""
 from __future__ import print_function
@@ -270,7 +275,7 @@ class SimpleClient(object):
                                      timeout=timeout)
         _raise_if_error(response)
         session = json.loads(response.text)
-        orgs = session['orgs']
+        orgs = session.get('orgs')
         selected_org = None
         if orgs is None or len(orgs) == 0:
             raise Exception("User is a member of no orgs")

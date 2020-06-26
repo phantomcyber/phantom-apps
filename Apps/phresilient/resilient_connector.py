@@ -1,7 +1,7 @@
 # -----------------------------------------
 # Phantom sample App Connector python file
 # -----------------------------------------
-# File: __init__.py
+# File: resilient_connector.py
 # Copyright (c) 2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -76,7 +76,8 @@ class ResilientConnector(BaseConnector):
             payload = json.loads(value)
             return payload
         except Exception as e:
-            errmsg = "{} failed. {} field is not valid json, {}".format(action_id, key, repr(e))
+            _, error_msg = self._get_error_message_from_exception(e)
+            errmsg = "{} failed. {} field is not valid json, {}".format(action_id, key, error_msg)
             self.save_progress(errmsg)
             return action_result.set_status(phantom.APP_ERROR, errmsg)
 
@@ -134,17 +135,20 @@ class ResilientConnector(BaseConnector):
         try:
             if e.response is None:
                 return action_result.set_status(phantom.APP_ERROR, "Error code:{} Error message: {}".format(error_code, error_message))
+
             if e.response.status_code == 400:
                 self.save_progress("Bad request.")
                 return action_result.set_status(phantom.APP_ERROR, "Error, {} Failed Error code:{} Error message: Bad request.".format(action_id, e.response.status_code))
 
             elif e.response.status_code == 401:
                 self.save_progress("Unauthorized - most commonly, the provided session ID is invalid.")
-                return action_result.set_status(phantom.APP_ERROR, "Error, {} Failed Error code:{} Error message: Unauthorized - most commonly, the provided session ID is invalid.".format(action_id, e.response.status_code))
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error, {} Failed Error code:{} Error message: Unauthorized - most commonly, the provided session ID is invalid.".format(action_id, e.response.status_code))
 
             elif e.response.status_code == 403:
                 self.save_progress("Forbidden - most commonly, user authentication failed.")
-                return action_result.set_status(phantom.APP_ERROR, "Error, {} Failed Error code:{} Error message: Forbidden - most commonly, user authentication failed.".format(action_id, e.response.status_code))
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error, {} Failed Error code:{} Error message: Forbidden - most commonly, user authentication failed.".format(action_id, e.response.status_code))
 
             elif e.response.status_code == 404:
                 self.save_progress("Object not found.")
@@ -152,7 +156,8 @@ class ResilientConnector(BaseConnector):
 
             elif e.response.status_code == 409:
                 self.save_progress("Conflicting PUT operation.")
-                return action_result.set_status(phantom.APP_ERROR, "Error, {} Failed Error code:{} Error message: Conflicting PUT operation.".format(action_id, e.response.status_code))
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error, {} Failed Error code:{} Error message: Conflicting PUT operation.".format(action_id, e.response.status_code))
 
             elif e.response.status_code == 500:
                 self.save_progress("Internal error.")
@@ -214,6 +219,7 @@ class ResilientConnector(BaseConnector):
     # assumes connection already setup
     # return exception on error
     def _get_ticket(self, param):
+        action_id = self.get_action_identifier()
         incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
         call = "/incidents/{}".format(incident_id)
         self.save_progress("GET {}".format(call))
@@ -268,7 +274,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(fullincidentdatadto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. fullincidentdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. fullincidentdatadto field is not valid json.".format(action_id))
         else:
@@ -317,7 +323,7 @@ class ResilientConnector(BaseConnector):
         if len(fullincidentdatadto) > 1:
             try:
                 payload = json.loads(fullincidentdatadto)
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. fullincidentdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. fullincidentdatadto field is not valid json.".format(action_id))
         else:
@@ -400,7 +406,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(querydto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. querydto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. querydto field is not valid json.".format(action_id))
         else:
@@ -545,7 +551,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(incidentartifactdto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. incidentartifactdto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. incidentartifactdto field is not valid json.".format(action_id))
         else:
@@ -580,7 +586,7 @@ class ResilientConnector(BaseConnector):
 
         if 'type' not in payload:
             self.save_progress("json payload does not have required 'type' key")
-            return action_result.set_status(phantom.APP_ERROR, "json payload does not have required 'name' key")
+            return action_result.set_status(phantom.APP_ERROR, "json payload does not have required 'type' key")
         if 'value' not in payload:
             self.save_progress("json payload does not have required 'value' key")
             return action_result.set_status(phantom.APP_ERROR, "json payload does not have required 'value' key")
@@ -625,7 +631,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(incidentartifactdto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. incidentartifactdto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. incidentartifactdto field is not valid json.".format(action_id))
         else:
@@ -633,7 +639,7 @@ class ResilientConnector(BaseConnector):
 
         if 'type' not in payload:
             self.save_progress("json payload does not have 'type' key, payload should be result of get_artifact")
-            return action_result.set_status(phantom.APP_ERROR, "json payload does not have 'name' key, payload should be result of get_artifact")
+            return action_result.set_status(phantom.APP_ERROR, "json payload does not have 'type' key, payload should be result of get_artifact")
         if 'value' not in payload:
             self.save_progress("json payload does not have 'value' key, payload should be result of get_artifact")
             return action_result.set_status(phantom.APP_ERROR, "json payload does not have 'value' key, payload should be result of get_artifact")
@@ -896,7 +902,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(datatablerowdatadto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. datatablerowdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. datatablerowdatadto field is not valid json.".format(action_id))
         else:
@@ -952,7 +958,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(datatablerowdatadto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. datatablerowdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. datatablerowdatadto field is not valid json.".format(action_id))
         else:
@@ -1005,7 +1011,7 @@ class ResilientConnector(BaseConnector):
                 payload = json.loads(datatablerowdatadto)
                 if not isinstance(payload, dict):
                     raise Exception
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. datatablerowdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. datatablerowdatadto field is not valid json.".format(action_id))
         else:
@@ -1086,6 +1092,7 @@ class ResilientConnector(BaseConnector):
     # assumes connection already setup
     # return exception on error
     def _get_task(self, param):
+        action_id = self.get_action_identifier()
         if param.get('handle_format'):
             self._client.headers['handle_format'] = "names"
         call = "/tasks/{}".format(param['task_id'])
@@ -1134,7 +1141,7 @@ class ResilientConnector(BaseConnector):
         if len(taskdto) > 1:
             try:
                 payload = json.loads(taskdto)
-            except Exception as e:
+            except Exception:
                 self.save_progress("{} failed. taskdto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. taskdto field is not valid json.".format(action_id))
         else:
@@ -1301,7 +1308,7 @@ class ResilientConnector(BaseConnector):
             return self.__handle_exceptions(e, action_result)
 
         retval = [ retval ]
-        itemtype = "attachments"
+        # itemtype = "attachments"
         for r in retval:
             action_result.add_data("OK")
         summary = action_result.update_summary({})
