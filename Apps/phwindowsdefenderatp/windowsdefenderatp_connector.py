@@ -83,7 +83,7 @@ def _load_app_state(asset_id, app_connector=None):
 
 
 def _save_app_state(state, asset_id, app_connector):
-    """ This functions is used to save current state in file.
+    """ This function is used to save current state in file.
 
     :param state: Dictionary which contains data to write in state file
     :param asset_id: asset_id
