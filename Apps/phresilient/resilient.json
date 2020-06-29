@@ -2645,7 +2645,7 @@
         {
             "action": "update ticket",
             "identifier": "update_ticket",
-            "description": "Update existing incident. This action downloads the incident and copy the provided json onto the download data, overwriting any existing data elements",
+            "description": "Update existing incident. This action downloads the incident and copies the provided JSON onto the download data, overwriting any existing data elements",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -2660,7 +2660,7 @@
                     ]
                 },
                 "fullincidentdatadto": {
-                    "description": "Incident data as JSON String, format is FullIncidentDataDTO data type from API. This data should first be retrieved from Resilient and then modified with the desired changes",
+                    "description": "Incident data as JSON String, the format is FullIncidentDataDTO data type from API. This data should first be retrieved from Resilient and then modified with the desired changes",
                     "data_type": "string",
                     "required": true,
                     "order": 1
@@ -3418,13 +3418,13 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
                 },
                 "querydto": {
-                    "description": "Query data as JSON String, format is QueryDTO data type from API",
+                    "description": "Query data as JSON String, the format is QueryDTO data type from API",
                     "data_type": "string",
                     "order": 1
                 },
@@ -3463,7 +3463,7 @@
                     "order": 7
                 },
                 "1st_condition_comparison_method": {
-                    "description": "The method used to compare the value, [equals, gt, lte]. Look up MethodName datatype in the api",
+                    "description": "The method used to compare the value, [equals, gt, lte]. Look up MethodName datatype in the API",
                     "data_type": "string",
                     "order": 8
                 },
@@ -4134,7 +4134,7 @@
                     "column_name": "Name",
                     "column_order": 1,
                     "example_values": [
-                        "xyz"
+                        "test"
                     ]
                 },
                 {
@@ -4641,7 +4641,7 @@
                     "column_name": "Description",
                     "column_order": 4,
                     "example_values": [
-                        "Google url"
+                        "test URL"
                     ]
                 },
                 {
@@ -4983,7 +4983,7 @@
                     "column_name": "Description",
                     "column_order": 4,
                     "example_values": [
-                        "Google url"
+                        "test URL"
                     ]
                 },
                 {
@@ -5187,7 +5187,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "Google url"
+                        "test URL"
                     ]
                 },
                 {
@@ -5356,7 +5356,7 @@
                     "column_name": "Description",
                     "column_order": 4,
                     "example_values": [
-                        "Google url"
+                        "test URL"
                     ]
                 },
                 {
@@ -5577,7 +5577,7 @@
                     "data_path": "action_result.parameter.incidentartifactdto",
                     "data_type": "string",
                     "example_values": [
-                        "{\"type\":\"url\",\"value\":\"https://www.test.com\",\"description\":\"Google base url\"}"
+                        "{\"type\":\"url\",\"value\":\"https://www.test.com\",\"description\":\"test base url\"}"
                     ]
                 },
                 {
@@ -5718,7 +5718,7 @@
                     "column_name": "Description",
                     "column_order": 4,
                     "example_values": [
-                        "Google base url"
+                        "test base url"
                     ]
                 },
                 {
@@ -5879,7 +5879,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -6090,7 +6090,7 @@
                     "data_path": "action_result.data.*.text.format",
                     "data_type": "string",
                     "example_values": [
-                        "html"
+                        "Html"
                     ]
                 },
                 {
@@ -6171,7 +6171,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -6656,7 +6656,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -6974,7 +6974,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -7285,7 +7285,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -7382,7 +7382,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -7528,7 +7528,7 @@
                     "data_path": "action_result.data.*.rows.*.cells.180.value",
                     "data_type": "string",
                     "example_values": [
-                        "jdkj"
+                        "test"
                     ]
                 },
                 {
@@ -7644,7 +7644,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -7985,7 +7985,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -8198,7 +8198,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -8333,7 +8333,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -9344,7 +9344,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -9743,7 +9743,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -9951,7 +9951,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -10146,7 +10146,7 @@
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -10354,11 +10354,12 @@
             "action": "download attachment",
             "identifier": "download_attachment",
             "description": "Download attachment from incident",
+            "verbose": "The action is partially developed and not getting called by handle action.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
@@ -10452,7 +10453,7 @@
             "read_only": false,
             "parameters": {
                 "handle_format_is_name": {
-                    "description": "Treat handles as name. Default is true",
+                    "description": "Treat handles as a name. Default is true",
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
