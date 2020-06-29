@@ -6,7 +6,7 @@
     "product_vendor": "Resilient",
     "logo": "logo_resilient.svg",
     "logo_dark": "logo_resilient_dark.svg",
-    "product_name": "resilient",
+    "product_name": "Resilient",
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2020 Splunk Inc.",
@@ -172,7 +172,7 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "test name"
                     ]
                 },
                 {
@@ -181,7 +181,7 @@
                     "column_name": "Email",
                     "column_order": 6,
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -193,7 +193,7 @@
                     "column_name": "Fname",
                     "column_order": 4,
                     "example_values": [
-                        "Herman"
+                        "Test"
                     ]
                 },
                 {
@@ -231,7 +231,7 @@
                     "column_name": "Lname",
                     "column_order": 5,
                     "example_values": [
-                        "Edwards"
+                        "Test1"
                     ]
                 },
                 {
@@ -274,7 +274,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -288,7 +288,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -897,7 +897,7 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -906,7 +906,7 @@
                     "column_name": "Email",
                     "column_order": 6,
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -918,7 +918,7 @@
                     "column_name": "Fname",
                     "column_order": 4,
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -956,7 +956,7 @@
                     "column_name": "Lname",
                     "column_order": 5,
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -999,7 +999,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -1013,7 +1013,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -1698,7 +1698,7 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -1707,7 +1707,7 @@
                     "column_name": "Email",
                     "column_order": 6,
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -1719,7 +1719,7 @@
                     "column_name": "Fname",
                     "column_order": 4,
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -1757,7 +1757,7 @@
                     "column_name": "Lname",
                     "column_order": 5,
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -1800,7 +1800,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -1814,7 +1814,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -2333,7 +2333,7 @@
                     "data_path": "action_result.data.*.tasks.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -2347,7 +2347,7 @@
                     "data_path": "action_result.data.*.tasks.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -2761,7 +2761,7 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -2770,7 +2770,7 @@
                     "column_name": "Email",
                     "column_order": 6,
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -2782,7 +2782,7 @@
                     "column_name": "Fname",
                     "column_order": 4,
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -2820,7 +2820,7 @@
                     "column_name": "Lname",
                     "column_order": 5,
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -2863,7 +2863,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -2877,7 +2877,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -3777,14 +3777,14 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -3794,7 +3794,7 @@
                     "data_path": "action_result.data.*.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -3830,7 +3830,7 @@
                     "data_path": "action_result.data.*.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -3867,7 +3867,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -3881,7 +3881,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -4525,14 +4525,14 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -4542,7 +4542,7 @@
                     "data_path": "action_result.data.*.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -4578,7 +4578,7 @@
                     "data_path": "action_result.data.*.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -4608,7 +4608,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -4622,7 +4622,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -4753,7 +4753,7 @@
                     "column_name": "Value",
                     "column_order": 3,
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -4867,14 +4867,14 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -4884,7 +4884,7 @@
                     "data_path": "action_result.data.*.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -4920,7 +4920,7 @@
                     "data_path": "action_result.data.*.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -4950,7 +4950,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -4964,7 +4964,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -5095,7 +5095,7 @@
                     "column_name": "Value",
                     "column_order": 3,
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -5212,7 +5212,7 @@
                     "data_path": "action_result.parameter.value",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -5240,14 +5240,14 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -5257,7 +5257,7 @@
                     "data_path": "action_result.data.*.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -5293,7 +5293,7 @@
                     "data_path": "action_result.data.*.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -5323,7 +5323,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -5337,7 +5337,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -5475,7 +5475,7 @@
                     "column_name": "Value",
                     "column_order": 3,
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -5577,7 +5577,7 @@
                     "data_path": "action_result.parameter.incidentartifactdto",
                     "data_type": "string",
                     "example_values": [
-                        "{\"type\":\"url\",\"value\":\"https://www.amazon.com\",\"description\":\"Google base url\"}"
+                        "{\"type\":\"url\",\"value\":\"https://www.test.com\",\"description\":\"Google base url\"}"
                     ]
                 },
                 {
@@ -5602,14 +5602,14 @@
                     "data_path": "action_result.data.*.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -5619,7 +5619,7 @@
                     "data_path": "action_result.data.*.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -5655,7 +5655,7 @@
                     "data_path": "action_result.data.*.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -5685,7 +5685,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -5699,7 +5699,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -5830,7 +5830,7 @@
                     "column_name": "Value",
                     "column_order": 3,
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -6001,7 +6001,7 @@
                     "data_path": "action_result.data.*.modify_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6015,7 +6015,7 @@
                     "data_path": "action_result.data.*.modify_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -6032,7 +6032,7 @@
                     "data_path": "action_result.data.*.modify_user.first_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6046,7 +6046,7 @@
                     "data_path": "action_result.data.*.modify_user.last_name",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -6104,7 +6104,7 @@
                     "data_path": "action_result.data.*.user_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6118,14 +6118,14 @@
                     "data_path": "action_result.data.*.user_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6298,7 +6298,7 @@
                     "data_path": "action_result.data.*.children.*.modify_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6312,7 +6312,7 @@
                     "data_path": "action_result.data.*.children.*.modify_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -6329,7 +6329,7 @@
                     "data_path": "action_result.data.*.children.*.modify_user.first_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6343,7 +6343,7 @@
                     "data_path": "action_result.data.*.children.*.modify_user.last_name",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -6391,7 +6391,7 @@
                     "data_path": "action_result.data.*.children.*.user_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6405,14 +6405,14 @@
                     "data_path": "action_result.data.*.children.*.user_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.children.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6497,7 +6497,7 @@
                     "data_path": "action_result.data.*.modify_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6511,7 +6511,7 @@
                     "data_path": "action_result.data.*.modify_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -6528,7 +6528,7 @@
                     "data_path": "action_result.data.*.modify_user.first_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6542,7 +6542,7 @@
                     "data_path": "action_result.data.*.modify_user.last_name",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -6589,7 +6589,7 @@
                     "data_path": "action_result.data.*.user_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6603,14 +6603,14 @@
                     "data_path": "action_result.data.*.user_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6815,7 +6815,7 @@
                     "data_path": "action_result.data.*.modify_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -6829,7 +6829,7 @@
                     "data_path": "action_result.data.*.modify_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -6846,7 +6846,7 @@
                     "data_path": "action_result.data.*.modify_user.first_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6860,7 +6860,7 @@
                     "data_path": "action_result.data.*.modify_user.last_name",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -6907,7 +6907,7 @@
                     "data_path": "action_result.data.*.user_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -6921,14 +6921,14 @@
                     "data_path": "action_result.data.*.user_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -7126,7 +7126,7 @@
                     "data_path": "action_result.data.*.modify_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -7140,7 +7140,7 @@
                     "data_path": "action_result.data.*.modify_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -7157,7 +7157,7 @@
                     "data_path": "action_result.data.*.modify_user.first_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -7171,7 +7171,7 @@
                     "data_path": "action_result.data.*.modify_user.last_name",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -7218,7 +7218,7 @@
                     "data_path": "action_result.data.*.user_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -7232,14 +7232,14 @@
                     "data_path": "action_result.data.*.user_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -8152,7 +8152,7 @@
                         "rowid"
                     ],
                     "column_name": "Row ID",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.table_id",
@@ -8161,7 +8161,7 @@
                         "tableid"
                     ],
                     "column_name": "Table ID",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
@@ -8405,14 +8405,14 @@
                     "data_path": "action_result.data.*.inc.creator.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.inc.creator.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -8422,7 +8422,7 @@
                     "data_path": "action_result.data.*.inc.creator.fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -8462,7 +8462,7 @@
                     "data_path": "action_result.data.*.inc.creator.lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -8501,7 +8501,7 @@
                     "data_path": "action_result.data.*.inc.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ],
                     "column_name": "Display Name",
                     "column_order": 3
@@ -8517,7 +8517,7 @@
                     "data_path": "action_result.data.*.inc.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -9014,7 +9014,7 @@
                     "data_path": "action_result.data.*.tasks.*.child_tasks.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ]
                 },
                 {
@@ -9028,7 +9028,7 @@
                     "data_path": "action_result.data.*.tasks.*.child_tasks.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -9142,7 +9142,7 @@
                     "data_path": "action_result.data.*.tasks.*.child_tasks.*.owner_fname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test1"
                     ]
                 },
                 {
@@ -9156,7 +9156,7 @@
                     "data_path": "action_result.data.*.tasks.*.child_tasks.*.owner_lname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test2"
                     ]
                 },
                 {
@@ -9437,7 +9437,7 @@
                     "data_path": "action_result.data.*.creator_principal.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test"
                     ],
                     "column_name": "Display Name",
                     "column_order": 2
@@ -9453,7 +9453,7 @@
                     "data_path": "action_result.data.*.creator_principal.name",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
