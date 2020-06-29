@@ -78,7 +78,7 @@ class ResilientConnector(BaseConnector):
         except Exception as e:
             _, error_msg = self._get_error_message_from_exception(e)
             errmsg = "{} failed. {} field is not valid json, {}".format(action_id, key, error_msg)
-            self.save_progress(errmsg)
+            self.save_progress("{0}".format(errmsg))
             return action_result.set_status(phantom.APP_ERROR, errmsg)
 
     def _get_error_message_from_exception(self, e):
@@ -122,8 +122,6 @@ class ResilientConnector(BaseConnector):
         try:
             if input_str and sys.version_info[0] < 3:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-            else:
-                input_str = input_str
         except:
             self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
@@ -323,6 +321,8 @@ class ResilientConnector(BaseConnector):
         if len(fullincidentdatadto) > 1:
             try:
                 payload = json.loads(fullincidentdatadto)
+                if not isinstance(payload, dict):
+                    raise Exception
             except Exception:
                 self.save_progress("{} failed. fullincidentdatadto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. fullincidentdatadto field is not valid json.".format(action_id))
@@ -394,7 +394,7 @@ class ResilientConnector(BaseConnector):
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
             self._client.connect(config['user'], config['password'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             call = "/incidents/query?return_level=full"
         except Exception as e:
@@ -672,7 +672,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.headers['text_content_output_format'] = "objects_no_convert"
             self._client.connect(config['user'], config['password'])
@@ -701,7 +701,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -731,7 +731,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -786,7 +786,7 @@ class ResilientConnector(BaseConnector):
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
             self._client.connect(config['user'], config['password'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
             comment_id = self._handle_py_ver_compat_for_input_str(param['comment_id'])
@@ -795,6 +795,8 @@ class ResilientConnector(BaseConnector):
             return self.__handle_exceptions(e, action_result)
 
         payload = self.get_json_parameter(param, 'incidentcommentdto', action_result)
+        if not isinstance(payload, dict):
+            return action_result.set_status(phantom.APP_ERROR, "{} failed. incidentcommentdto field is not valid json.".format(action_id))
         if payload == phantom.APP_ERROR:
             return payload
 
@@ -829,7 +831,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -857,7 +859,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -887,7 +889,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -942,7 +944,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -999,7 +1001,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
         except Exception as e:
@@ -1036,8 +1038,8 @@ class ResilientConnector(BaseConnector):
                         return row['id']
             return None
 
-        key = param['key']
-        value = param['value']
+        key = self._handle_py_ver_compat_for_input_str(param['key'])
+        value = self._handle_py_ver_compat_for_input_str(param['value'])
         rowid = find_row(retval, key, value)
 
         if rowid is None:
@@ -1070,7 +1072,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             call = "/tasks"
@@ -1093,7 +1095,7 @@ class ResilientConnector(BaseConnector):
     # return exception on error
     def _get_task(self, param):
         action_id = self.get_action_identifier()
-        if param.get('handle_format'):
+        if param.get('handle_format_is_name'):
             self._client.headers['handle_format'] = "names"
         call = "/tasks/{}".format(param['task_id'])
         self.save_progress("GET {}".format(call))
@@ -1110,7 +1112,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             task_id = self._handle_py_ver_compat_for_input_str(param['task_id'])
@@ -1141,6 +1143,8 @@ class ResilientConnector(BaseConnector):
         if len(taskdto) > 1:
             try:
                 payload = json.loads(taskdto)
+                if not isinstance(payload, dict):
+                    raise Exception
             except Exception:
                 self.save_progress("{} failed. taskdto field is not valid json.".format(action_id))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. taskdto field is not valid json.".format(action_id))
@@ -1149,7 +1153,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             task_id = self._handle_py_ver_compat_for_input_str(param['task_id'])
@@ -1235,7 +1239,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -1247,7 +1251,6 @@ class ResilientConnector(BaseConnector):
         except Exception as e:
             return self.__handle_exceptions(e, action_result)
 
-        retval = retval
         itemtype = "attachments"
         for r in retval:
             action_result.add_data(r)
@@ -1264,7 +1267,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -1294,7 +1297,7 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
@@ -1324,14 +1327,15 @@ class ResilientConnector(BaseConnector):
 
         try:
             self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format'):
+            if param.get('handle_format_is_name'):
                 self._client.headers['handle_format'] = "names"
             self._client.connect(config['user'], config['password'])
             incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
             call = "/incidents/{}/attachments".format(incident_id)
 
             container_id = self.get_container_id()
-            vault_info = Vault.get_file_info(vault_id=param['vault_id'], container_id=container_id)
+            vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            vault_info = Vault.get_file_info(vault_id=vault_id, container_id=container_id)
             if len(vault_info) == 0:
                 self.save_progress("{} failed. {}: vault_id not valid.".format(action_id, param['vault_id']))
                 return action_result.set_status(phantom.APP_ERROR, "{} failed. {}: vault_id not valid.".format(action_id, param['vault_id']))

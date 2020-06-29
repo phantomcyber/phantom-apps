@@ -10,6 +10,7 @@ import collections
 
 """Methods and classes for manipulating patch-related elements for the Resilient REST API"""
 
+
 class Change(object):
     """Represents a change in a Patch object."""
     def __init__(self, field_name, new_value, old_value):
@@ -19,13 +20,13 @@ class Change(object):
 
     def to_dict(self):
         """Creates a DTO/dict object from this change."""
-        return dict(field = self.field_name,
-                    new_value = dict(object = self.new_value),
-                    old_value = dict(object = self.old_value))
+        return dict(field=self.field_name,
+                    new_value=dict(object=self.new_value),
+                    old_value=dict(object=self.old_value))
 
 class Patch(object):
     """Represents a patch to be applied to an object on the server."""
-    def __init__(self, previous_object, version = None):
+    def __init__(self, previous_object, version=None):
         """ previous_object: The last known state of the object being patched.  You can supply None here, but
                              if you do that then you'll need to provide old_value in your calls to add_value.
             version: The last known version of the object being patched.  If omitted then the 'vers' item in
@@ -167,12 +168,13 @@ class Patch(object):
         for field_name, change in self.changes.items():
             changes.append(change.to_dict())
 
-        patch = dict(changes = changes)
+        patch = dict(changes=changes)
 
         if self.version:
             patch["version"] = self.version
 
         return patch
+
 
 class PatchStatus(object):
     """Represents the patch status returned by the patch endpoint."""
@@ -243,4 +245,3 @@ class PatchStatus(object):
         Return the underlying dict representation of this PatchStatus object.
         """
         return self.patch_status_dict
-

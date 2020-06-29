@@ -153,12 +153,14 @@ class SimpleHTTPException(Exception):
 
         self.response = response
 
+
 class PatchConflictException(SimpleHTTPException):
     """Exception for patch conflicts."""
     def __init__(self, response, patch_status):
         super(PatchConflictException, self).__init__(response)
 
         self.patch_status = patch_status
+
 
 class NoChange(Exception):
     """Exception that can be raised within a get/put handler to indicate 'no change'
@@ -178,6 +180,7 @@ def _raise_if_error(response):
     if response.status_code != 200:
         raise SimpleHTTPException(response)
 
+
 def ensure_unicode(input_value):
     """ if input_value is type str, convert to unicode with utf-8 encoding """
     if sys.version_info.major == 2:
@@ -185,7 +188,6 @@ def ensure_unicode(input_value):
             return input_value
     else:
         return input_value
-
 
     if isinstance(input_value, str):
         input_unicode = UnicodeDammit(input_value).unicode_markup.encode('utf-8').decode('utf-8')
@@ -808,7 +810,7 @@ class LoggingSimpleClient(SimpleClient):
             directory = os.path.expandvars(directory)
             assert(os.path.exists(directory))
             self.logging_directory = directory
-        except Exception as e:
+        except Exception:
             raise Exception("Response Logging Directory %s does not exist!",
                             logging_directory)
 
