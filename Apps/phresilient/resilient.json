@@ -8,7 +8,7 @@
     "logo_dark": "logo_resilient_dark.svg",
     "product_name": "IBM Resilient",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.30",
     "utctime_updated": "2018-05-03T22:31:37.122043",
@@ -10342,101 +10342,6 @@
                     "example_values": [
                         1
                     ]
-                }
-            ],
-            "render": {
-                "type": "table",
-                "title": "Resilient Incident"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "download attachment",
-            "identifier": "download_attachment",
-            "description": "Download attachment from incident",
-            "verbose": "The action is partially developed and not getting called by handle action.",
-            "type": "investigate",
-            "read_only": true,
-            "parameters": {
-                "handle_format_is_name": {
-                    "description": "Treat handles as a name. Default is true",
-                    "data_type": "boolean",
-                    "default": true,
-                    "order": 0
-                },
-                "incident_id": {
-                    "description": "ID of incident",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "order": 1,
-                    "contains": [
-                        "ticketid"
-                    ]
-                },
-                "attachment_id": {
-                    "description": "ID of attachment",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "order": 2,
-                    "contains": [
-                        "attachmentid"
-                    ]
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2,
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.attachment_id",
-                    "data_type": "string",
-                    "contains": [
-                        "attachmentid"
-                    ],
-                    "column_name": "Attachment ID",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.parameter.handle_format_is_name",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.parameter.incident_id",
-                    "data_type": "string",
-                    "contains": [
-                        "ticketid"
-                    ],
-                    "column_name": "Incident ID",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 }
             ],
             "render": {

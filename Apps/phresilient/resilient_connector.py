@@ -1288,36 +1288,6 @@ class ResilientConnector(BaseConnector):
         summary['Number of {}'.format(itemtype)] = len(retval)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_download_attachment(self, param):
-        action_id = self.get_action_identifier()
-        self.save_progress("In action handler for: {0}".format(action_id))
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        config = self.get_config()
-
-        try:
-            self._client = co3.SimpleClient(org_name=config['org_id'], base_url=config['base_url'], verify=config['verify'])
-            if param.get('handle_format_is_name'):
-                self._client.headers['handle_format'] = "names"
-            self._client.connect(config['user'], config['password'])
-            incident_id = self._handle_py_ver_compat_for_input_str(param['incident_id'])
-            attachment_id = self._handle_py_ver_compat_for_input_str(param['attachment_id'])
-            call = "/incidents/{}/attachments/{}".format(incident_id, attachment_id)
-
-            self.save_progress("GET {}".format(call))
-            retval = self._client.get(call)
-            self.save_progress("{} successful.".format(action_id))
-        except Exception as e:
-            return self.__handle_exceptions(e, action_result)
-
-        retval = [ retval ]
-        # itemtype = "attachments"
-        for r in retval:
-            action_result.add_data("OK")
-        summary = action_result.update_summary({})
-        summary['Length of file'] = len(retval)
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def _handle_add_attachment(self, param):
         action_id = self.get_action_identifier()
         self.save_progress("In action handler for: {0}".format(action_id))
