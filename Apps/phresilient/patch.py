@@ -24,6 +24,7 @@ class Change(object):
                     new_value=dict(object=self.new_value),
                     old_value=dict(object=self.old_value))
 
+
 class Patch(object):
     """Represents a patch to be applied to an object on the server."""
     def __init__(self, previous_object, version=None):
