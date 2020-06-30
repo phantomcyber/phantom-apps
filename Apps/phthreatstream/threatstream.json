@@ -8214,7 +8214,7 @@
                     "description": "Record offset (used with paging, when returning many results)",
                     "data_type": "numeric",
                     "order": 3,
-                    "default": 4
+                    "default": 0
                 },
                 "limit": {
                     "description": "Record limit",

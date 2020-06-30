@@ -26,6 +26,7 @@ import simplejson as json
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
 from urlparse import urlsplit
+# import pudb
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
