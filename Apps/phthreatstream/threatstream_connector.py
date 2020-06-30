@@ -1204,6 +1204,8 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
 
+        search_dict = {}
+
         try:
             # Check to see if the saved search parameter is filled out. This will take priority over a query
             if param.get("saved_search"):
@@ -1217,7 +1219,7 @@ class ThreatstreamConnector(BaseConnector):
                     search_string = param.get("query")
                     search_dict = json.loads(json.dumps({'q': search_string}))
                 elif param.get("query_type") == "JSON":
-                    search_string = param["query"]
+                    search_string = param.get("query")
                     search_dict = json.loads(search_string)
             payload.update(search_dict)
         except Exception as e:
