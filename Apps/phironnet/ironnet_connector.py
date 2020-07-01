@@ -62,6 +62,24 @@ class IronnetConnector(BaseConnector):
         self._username = None
         self._password = None
         self._verify_server_cert = None
+        self._enable_alert_notifications = None
+        self._alert_notif_actions = None
+        self._alert_categories = None
+        self._alert_subcategories = None
+        self._alert_severity_lower = None
+        self._alert_severity_upper = None
+        self._alert_limit = None
+        self._enable_dome_notifications = None
+        self._dome_categories = None
+        self._dome_limit = None
+        self._enable_event_notifications = None
+        self._alert_event_actions = None
+        self._event_categories = None
+        self._event_subcategories = None
+        self._event_severity_lower = None
+        self._event_severity_upper = None
+        self._event_limit = None
+        self._store_event_notifs_in_alert_containers = None
 
     def _process_empty_response(self, response, action_result):
 
@@ -149,12 +167,10 @@ class IronnetConnector(BaseConnector):
         if kwargs['headers'] is None:
             kwargs['headers'] = {'Content-Type': 'application/json'}
 
-        resp_json = None
-
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
 
         # Create a URL to connect to
         url = UnicodeDammit(self._base_url).unicode_markup.encode('utf-8') + endpoint
@@ -181,7 +197,7 @@ class IronnetConnector(BaseConnector):
             self.save_progress("Error while issuing REST call - {}".format(error_msg))
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)),
-                resp_json)
+                None)
 
         return self._process_response(r, action_result)
 
@@ -209,9 +225,9 @@ class IronnetConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         request = {
-            'alert_id': param['alert_id'],
-            'comment': param['comment'],
-            'share_comment_with_irondome': param['share_comment_with_irondome'],
+            'alert_id': param.get('alert_id'),
+            'comment': param.get('comment'),
+            'share_comment_with_irondome': param.get('share_comment_with_irondome'),
             'analyst_severity': severity_mapping[param.get('analyst_severity', '')],
             'analyst_expectation': expectation_mapping[param.get('analyst_expectation', '')]
         }
@@ -239,10 +255,10 @@ class IronnetConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         request = {
-            'alert_id': param['alert_id'],
-            'comment': param['comment'],
-            'share_comment_with_irondome': param['share_comment_with_irondome'],
-            'status': status_mapping[param['alert_status']]
+            'alert_id': param.get('alert_id'),
+            'comment': param.get('comment'),
+            'share_comment_with_irondome': param.get('share_comment_with_irondome'),
+            'status': status_mapping[param.get('alert_status')]
         }
 
         # make rest call
@@ -253,10 +269,10 @@ class IronnetConnector(BaseConnector):
 
         if phantom.is_success(ret_val):
             self.debug_print("Setting alert staus was successful")
-            return action_result.set_status(phantom.APP_SUCCESS, "Setting alert staus was successful")
+            return action_result.set_status(phantom.APP_SUCCESS, "Setting alert status was successful")
         else:
-            self.debug_print("Settings alert status failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Settings alert status failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Setting alert status failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Setting alert status failed. Error: {}".format(action_result.get_message()))
 
     def _handle_irondefense_comment_on_alert(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -268,9 +284,9 @@ class IronnetConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         request = {
-            'alert_id': param['alert_id'],
-            'comment': param['comment'],
-            'share_comment_with_irondome': param['share_comment_with_irondome']
+            'alert_id': param.get('alert_id'),
+            'comment': param.get('comment'),
+            'share_comment_with_irondome': param.get('share_comment_with_irondome')
         }
 
         # make rest call
@@ -319,6 +335,310 @@ class IronnetConnector(BaseConnector):
             self.debug_print("Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
             return action_result.set_status(phantom.APP_ERROR, "Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
 
+    def _handle_irondefense_get_alert_irondome_info(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.save_progress("Received param: {0}".format(param))
+
+        # Access action parameters passed in the 'param' dictionary
+        request = {
+            'alert_id': param['alert_id']
+        }
+
+        # make rest call
+        ret_val, response = self._make_post('/GetAlertIronDomeInformation', action_result, data=request, headers=None)
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        if phantom.is_success(ret_val):
+            self.debug_print("Retrieving IronDome alert info was successful")
+            return action_result.set_status(phantom.APP_SUCCESS, "Retrieving IronDome alert info was successful")
+        else:
+            self.debug_print("Retrieving IronDome alert info failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving IronDome alert info failed. Error: {}".format(action_result.get_message()))
+
+    def _handle_irondefense_get_alert_notifications(self):
+            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+            # Add an action result object to self (BaseConnector) to represent the action for this param
+            action_result = self.add_action_result(ActionResult(dict()))
+
+            request = {
+                'limit': self._alert_limit
+            }
+
+            # make rest call
+            ret_val, response = self._make_post('/GetAlertNotifications', action_result, data=request, headers=None)
+            if phantom.is_success(ret_val):
+                self.save_progress("Fetching alert notifications was successful")
+                # Filter the response
+                for alert_notification in response['alert_notifications']:
+                    if alert_notification['alert_action'] in self._alert_notif_actions and alert_notification['alert']:
+                        alert = alert_notification['alert']
+                        if alert['category'] not in self._alert_categories and alert['sub_category'] not in self._alert_subcategories:
+                            if self._alert_severity_lower <= int(alert['severity']) <= self._alert_severity_upper:
+                                # create container
+                                container = {
+                                    'name': alert['id'],
+                                    'kill_chain': alert['category'],
+                                    'description': "IronDefense {}/{} alert".
+                                    format(alert['category'], alert['sub_category']),
+                                    'source_data_identifier': alert['id'],
+                                    'data': alert,
+                                }
+                                container_status, container_msg, container_id = self.save_container(container)
+                                if container_status == phantom.APP_ERROR:
+                                    self.debug_print("Failed to store: {}".format(container_msg))
+                                    self.debug_print("Failed with status: {}".format(container_status))
+                                    action_result.set_status(phantom.APP_ERROR, 'Alert Notification container creation failed: {}'.format(container_msg))
+                                    return container_status
+
+                                # add notification as artifact of container
+                                artifact = {
+                                    'data': alert_notification,
+                                    'name': "{} ALERT NOTIFICATION".format(alert_notification['alert_action'][4:].replace("_", " ")),
+                                    'container_id': container_id,
+                                    'source_data_identifier': "{}-{}".format(alert['id'], alert["updated"]),
+                                    'start_time': alert['updated']
+                                }
+                                artifact_status, artifact_msg, artifact_id = self.save_artifact(artifact)
+                                if artifact_status == phantom.APP_ERROR:
+                                    self.debug_print("Failed to store: {}".format(artifact_msg))
+                                    self.debug_print("Failed with status: {}".format(artifact_status))
+                                    action_result.set_status(phantom.APP_ERROR, 'Alert Notification artifact creation failed: {}'.format(artifact_msg))
+                                    return artifact_status
+
+                self.save_progress("Filtering alert notifications was successful")
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                self.debug_print(action_result.get_message())
+                self.save_progress("Fetching alert notifications failed")
+                return action_result.set_status(phantom.APP_ERROR, action_result.get_message())
+
+    def _handle_irondefense_get_dome_notifications(self):
+            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+            # Add an action result object to self (BaseConnector) to represent the action for this param
+            action_result = self.add_action_result(ActionResult(dict()))
+
+            request = {
+                'limit': self._dome_limit
+            }
+
+            # make rest call
+            ret_val, response = self._make_post('/GetDomeNotifications', action_result, data=request, headers=None)
+            if phantom.is_success(ret_val):
+                self.save_progress("Fetching dome notifications was successful")
+                # Filter the response
+                for dome_notification in response['dome_notifications']:
+                    if dome_notification['category'] not in self._dome_categories:
+                        for alert_id in dome_notification['alert_ids']:
+                            # create or find container
+                            container = {
+                                'name': alert_id,
+                                'source_data_identifier': alert_id,
+                            }
+                            container_status, container_msg, container_id = self.save_container(container)
+                            if container_status == phantom.APP_ERROR:
+                                self.debug_print("Failed to store: {}".format(container_msg))
+                                self.debug_print("Failed with status: {}".format(container_status))
+                                action_result.set_status(phantom.APP_ERROR, 'Dome Notification container creation failed: {}'.format(container_msg))
+                                return container_status
+
+                            # add notification as artifact of container
+                            artifact = {
+                                'data': dome_notification,
+                                'name': "{} DOME NOTIFICATION".format(dome_notification['category'][4:].replace("_", " ")),
+                                'container_id': container_id,
+                                'source_data_identifier': "{}".format(dome_notification["id"]),
+                                'start_time': dome_notification['created']
+                            }
+                            artifact_status, artifact_msg, artifact_id = self.save_artifact(artifact)
+                            if artifact_status == phantom.APP_ERROR:
+                                self.debug_print("Failed to store: {}".format(artifact_msg))
+                                self.debug_print("Failed with status: {}".format(artifact_status))
+                                action_result.set_status(phantom.APP_ERROR, 'Dome Notification artifact creation failed: {}'.format(artifact_msg))
+                                return artifact_status
+
+                self.save_progress("Filtering dome notifications was successful")
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                self.debug_print(action_result.get_message())
+                self.save_progress("Fetching dome notifications failed")
+                return action_result.set_status(phantom.APP_ERROR, action_result.get_message())
+
+    def _handle_irondefense_get_event_notifications(self):
+            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+            # Add an action result object to self (BaseConnector) to represent the action for this param
+            action_result = self.add_action_result(ActionResult(dict()))
+
+            request = {
+                'limit': self._event_limit
+            }
+
+            # make rest call
+            ret_val, response = self._make_post('/GetEventNotifications', action_result, data=request, headers=None)
+            if phantom.is_success(ret_val):
+                self.save_progress("Fetching event notifications was successful")
+                # Filter the response
+                for event_notification in response['event_notifications']:
+                    if event_notification['event_action'] in self._event_notif_actions and event_notification['event']:
+                        event = event_notification['event']
+                        if event['category'] not in self._event_categories and event['sub_category'] not in self._event_subcategories:
+                            if self._event_severity_lower <= int(event['severity']) <= self._event_severity_upper:
+                                if self._store_event_notifs_in_alert_containers:
+                                    # store in alert container
+                                    container = {
+                                        'name': event['alert_id'],
+                                        'source_data_identifier': event['alert_id'],
+                                    }
+                                    container_status, container_msg, container_id = self.save_container(container)
+                                    if container_status == phantom.APP_ERROR:
+                                        self.debug_print("Failed to store: {}".format(container_msg))
+                                        self.debug_print("Failed with status: {}".format(container_status))
+                                        action_result.set_status(phantom.APP_ERROR, 'Event Notification container creation failed: {}'.format(container_msg))
+                                        return container_status
+
+                                    # add notification as artifact of container
+                                    artifact = {
+                                        'data': event_notification,
+                                        'name': "{} EVENT NOTIFICATION".format(event_notification['event_action'][4:].replace("_", " ")),
+                                        'container_id': container_id,
+                                        'source_data_identifier': "{}-{}".format(event['id'], event["updated"]),
+                                        'start_time': event['updated']
+                                    }
+                                else:
+                                    # store in event container
+                                    container = {
+                                        'name': event['id'],
+                                        'kill_chain': event['category'],
+                                        'description': "IronDefense {}/{} event".
+                                        format(event['category'], event['sub_category']),
+                                        'source_data_identifier': event['id'],
+                                        'data': event,
+                                    }
+                                    container_status, container_msg, container_id = self.save_container(container)
+                                    if container_status == phantom.APP_ERROR:
+                                        self.debug_print("Failed to store: {}".format(container_msg))
+                                        self.debug_print("Failed with status: {}".format(container_status))
+                                        action_result.set_status(phantom.APP_ERROR, 'Event Notification container creation failed: {}'.format(container_msg))
+                                        return container_status
+
+                                    # add notification as artifact of container
+                                    artifact = {
+                                        'data': event_notification,
+                                        'name': "{} EVENT NOTIFICATION".format(event_notification['event_action'][4:].replace("_", " ")),
+                                        'container_id': container_id,
+                                        'source_data_identifier': "{}-{}".format(event['id'], event["updated"]),
+                                        'start_time': event['updated']
+                                    }
+                                artifact_status, artifact_msg, artifact_id = self.save_artifact(artifact)
+                                if artifact_status == phantom.APP_ERROR:
+                                    self.debug_print("Failed to store: {}".format(artifact_msg))
+                                    self.debug_print("Failed with status: {}".format(artifact_status))
+                                    action_result.set_status(phantom.APP_ERROR, 'Event Notification artifact creation failed: {}'.format(artifact_msg))
+                                    return artifact_status
+
+                self.save_progress("Filtering event notifications was successful")
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                self.debug_print(action_result.get_message())
+                self.save_progress("Fetching event notifications failed")
+                return action_result.set_status(phantom.APP_ERROR, action_result.get_message())
+
+    def _handle_irondefense_get_alerts(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.save_progress("Received param: {0}".format(param))
+
+        # Access action parameters passed in the 'param' dictionary
+        request = {}
+        if 'alert_id' in param and param['alert_id'].strip() != '':
+            request['alert_id'] = param['alert_id'].strip().split(",")
+        if 'category' in param and param['category'].strip() != '':
+            request['category'] = [str(cat).strip().replace(" ", "_").upper() for cat in param['category'].split(',')]
+        if 'sub_category' in param and param['sub_category'].strip() != '':
+            request['sub_category'] = [str(cat).strip().replace(" ", "_").upper() for cat in param['sub_category'].split(',')]
+        if 'status' in param and param['status'].strip() != '':
+            request['status'] = [status_mapping[status.strip().lower()] for status in param['status'].split(',')]
+        min_sev = 0 if 'min_severity' not in param else param['min_severity']
+        max_sev = 1000 if 'max_severity' not in param else param['max_severity']
+        request['severity'] = {
+            "lower_bound": min_sev,
+            "upper_bound": max_sev
+        }
+
+        # make rest call
+        ret_val, response = self._make_post('/GetAlerts', action_result, data=request, headers=None)
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        if phantom.is_success(ret_val):
+            self.debug_print("Retrieving alerts was successful")
+            return action_result.set_status(phantom.APP_SUCCESS, "Retrieving alerts was successful")
+        else:
+            self.debug_print("Retrieving alerts failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving alerts failed. Error: {}".format(action_result.get_message()))
+
+    def _handle_irondefense_get_events(self, param):
+            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+            # Add an action result object to self (BaseConnector) to represent the action for this param
+            action_result = self.add_action_result(ActionResult(dict()))
+
+            # Access action parameters passed in the 'param' dictionary
+            request = {
+                'alert_id': param['alert_id']
+            }
+            # make rest call
+            ret_val, response = self._make_post('/GetEvents', action_result, data=request, headers=None)
+
+            # Add the response into the data section
+            action_result.add_data(response)
+
+            if phantom.is_success(ret_val):
+                self.debug_print("Retrieving events was successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "Retrieving events was successful")
+            else:
+                self.debug_print("Retrieving events failed. Error: {}".format(action_result.get_message()))
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Retrieving events failed. Error: {}".format(
+                                                    action_result.get_message()))
+
+    def _handle_irondefense_get_event(self, param):
+            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+            # Add an action result object to self (BaseConnector) to represent the action for this param
+            action_result = self.add_action_result(ActionResult(dict()))
+
+            # Access action parameters passed in the 'param' dictionary
+            request = {
+                'event_id': param['event_id']
+            }
+            # make rest call
+            ret_val, response = self._make_post('/GetEvent', action_result, data=request, headers=None)
+
+            # Add the response into the data section
+            action_result.add_data(response)
+
+            if phantom.is_success(ret_val):
+                self.debug_print("Retrieving event was successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "Retrieving event was successful")
+            else:
+                self.debug_print("Retrieving event failed. Error: {}".format(action_result.get_message()))
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Retrieving event failed. Error: {}".format(
+                                                    action_result.get_message()))
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -337,6 +657,32 @@ class IronnetConnector(BaseConnector):
             ret_val = self._handle_irondefense_comment_on_alert(param)
         elif action_id == 'irondefense_report_observed_bad_activity':
             ret_val = self._handle_irondefense_report_observed_bad_activity(param)
+        elif action_id == 'irondefense_get_alert_irondome_info':
+            ret_val = self._handle_irondefense_get_alert_irondome_info(param)
+        elif action_id == 'irondefense_get_events':
+            ret_val = self._handle_irondefense_get_events(param)
+        elif action_id == 'on_poll':
+            alert_ret_val = phantom.APP_SUCCESS
+            dome_ret_val = phantom.APP_SUCCESS
+            event_ret_val = phantom.APP_SUCCESS
+
+            if self._enable_alert_notifications:
+                alert_ret_val = self._handle_irondefense_get_alert_notifications()
+            else:
+                self.save_progress("Fetching alert notifications is disabled")
+            if self._enable_dome_notifications:
+                dome_ret_val = self._handle_irondefense_get_dome_notifications()
+            else:
+                self.save_progress("Fetching dome notifications is disabled")
+            if self._enable_event_notifications:
+                event_ret_val = self._handle_irondefense_get_event_notifications()
+            else:
+                self.save_progress("Fetching event notifications is disabled")
+            ret_val = alert_ret_val and dome_ret_val and event_ret_val
+        elif action_id == 'irondefense_get_alerts':
+            ret_val = self._handle_irondefense_get_alerts(param)
+        elif action_id == 'irondefense_get_event':
+            ret_val = self._handle_irondefense_get_event(param)
 
         return ret_val
 
@@ -352,6 +698,76 @@ class IronnetConnector(BaseConnector):
         self._username = config.get('username')
         self._password = config.get('password')
         self._verify_server_cert = config.get('verify_server_cert')
+
+        # Alert Notification Configs
+        self._enable_alert_notifications = config.get('enable_alert_notifications')
+        if self._enable_alert_notifications:
+            alert_acts = config.get('alert_notif_actions')
+            if alert_acts:
+                self._alert_notif_actions = ["ANA_" + str(act).strip().replace(" ", "_").upper() for act in
+                                             alert_acts.split(',') if act.strip()]
+            else:
+                self._alert_notif_actions = ["ANA_ALERT_CREATED"]
+            alert_cats = config.get('alert_categories')
+            if alert_cats:
+                self._alert_categories = [str(cat).strip().replace(" ", "_").upper() for cat in alert_cats.split(',')
+                                          if cat.strip()]
+            else:
+                self._alert_categories = []
+            alert_subcats = config.get('alert_subcategories')
+            if alert_subcats:
+                self._alert_subcategories = [str(subcat).strip().replace(" ", "_").upper() for subcat in
+                                             alert_subcats.split(',') if subcat.strip()]
+            else:
+                self._alert_subcategories = []
+            self._alert_severity_lower = int(config.get('alert_severity_lower'))
+            self._alert_severity_upper = int(config.get('alert_severity_upper'))
+            if self._alert_severity_lower >= self._alert_severity_upper:
+                self.save_progress("Initialization Failed: Invalid Range for Alert Severity- {} is not lower than {}"
+                        .format(self._alert_severity_lower, self._alert_severity_upper))
+                return phantom.APP_ERROR
+            self._alert_limit = int(config.get('alert_limit'))
+
+        # Dome Notification Configs
+        self._enable_dome_notifications = config.get('enable_dome_notifications')
+        if self._enable_dome_notifications:
+            dome_cats = config.get('dome_categories')
+            if dome_cats:
+                self._dome_categories = ["DNC_{}".format(str(cat).strip().replace(" ", "_").upper()) for cat in
+                                         dome_cats.split(',') if cat.strip()]
+            else:
+                self._dome_categories = []
+            self._dome_limit = int(config.get('dome_limit'))
+
+        # Event Notification Configs
+        self._enable_event_notifications = config.get('enable_event_notifications')
+        if self._enable_event_notifications:
+            event_acts = config.get('event_notif_actions')
+            if event_acts:
+                self._event_notif_actions = ["ENA_" + str(act).strip().replace(" ", "_").upper() for act in
+                                             event_acts.split(',') if act.strip()]
+            else:
+                self._event_notif_actions = ["ENA_EVENT_CREATED"]
+            event_cats = config.get('event_categories')
+            if event_cats:
+                self._event_categories = [str(cat).strip().replace(" ", "_").upper() for cat in event_cats.split(',')
+                                          if cat.strip()]
+            else:
+                self._event_categories = []
+            event_subcats = config.get('event_subcategories')
+            if event_subcats:
+                self._event_subcategories = [str(subcat).strip().replace(" ", "_").upper() for subcat in
+                                             event_subcats.split(',') if subcat.strip()]
+            else:
+                self._event_subcategories = []
+            self._event_severity_lower = int(config.get('event_severity_lower'))
+            self._event_severity_upper = int(config.get('event_severity_upper'))
+            if self._event_severity_lower >= self._event_severity_upper:
+                self.save_progress("Initialization Failed: Invalid Range for Event Severity- {} is not lower than {}"
+                        .format(self._event_severity_lower, self._event_severity_upper))
+                return phantom.APP_ERROR
+            self._event_limit = int(config.get('event_limit'))
+            self._store_event_notifs_in_alert_containers = config.get('store_event_notifs_in_alert_containers')
 
         return phantom.APP_SUCCESS
 
