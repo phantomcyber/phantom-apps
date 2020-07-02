@@ -6,6 +6,7 @@
 
 """
 Created on August 20, 2019
+Updated on June 30, 2020
 
 @author: Saadat Abid, Umair Ahmad
 """
@@ -344,13 +345,12 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Populate the API parameter dictionary
         ep_params = {
-            'authkey': self._api_key,
-            'host': 'www.google.com'
+            'authkey': self._api_key
         }
 
-        # Making a call to OTI Host Reputation API to test connectivity with OTI Cloud
+        # Making a call to OTI Quota Status API to test connectivity with OTI Cloud
         ret_val, response = self._make_rest_call(
-            HOST_REPUTE_API, action_result, method='post', params=ep_params, headers=None)
+            API_QUOTA, action_result, method='post', params=ep_params, headers=None)
 
         # Server did not return status code: 200, return error
         if phantom.is_fail(ret_val):
@@ -378,10 +378,46 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Adding input parameters to the action results
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Accessing action parameters passed in the 'param' dictionary
+
+        # Populate the API parameter dictionary
+        ep_params = {
+            'authkey': self._api_key
+        }
+
+        # Make rest API call
+        ret_val, response = self._make_rest_call(
+            API_QUOTA, action_result, method='post', params=ep_params, headers=None)
+
+        # Server did not return status code: 200, return error
+        if phantom.is_fail(ret_val):
+            msg = 'API Quota Failed, Error Reason: Error connecting to SlashNext Cloud'
+            self.save_progress(msg)
+            action_result.update_summary({
+                'State': 'Connection Error'
+            })
+            return action_result.set_status(phantom.APP_ERROR, msg)
+
         # Return success
-        msg = 'Coming Soon...'
-        self.save_progress(msg)
-        return action_result.set_status(phantom.APP_SUCCESS, msg)
+        elif response['errorNo'] == 0:
+            msg = 'API Quota Successful'
+            self.save_progress(msg)
+            action_result.add_data(response)
+            action_result.update_summary({
+                'State': 'API Quota Fetched',
+                'Quota': response['quotaDetails']['remainingQuota']
+            })
+            return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+        # If there is an error then return the exact error message
+        else:
+            msg = 'API Quota Failed, Error Reason: {0}'.format(response['errorMsg'])
+            self.save_progress(msg)
+            action_result.add_data(response)
+            action_result.update_summary({
+                'State': 'API Error'
+            })
+            return action_result.set_status(phantom.APP_ERROR, msg)
 
     def _handle_host_reputation(self, param):
 
