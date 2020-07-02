@@ -268,7 +268,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         if not error_text:
-            error_text = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+            error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
@@ -396,7 +396,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         except TypeError:
             error_msg = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -484,6 +484,13 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
+            try:
+                self.debug_print("make_rest_call exception...")
+                self.debug_print("Exception Message - {}".format(str(e)))
+                self.debug_print("make_rest_call exception ends...")
+            except:
+                self.debug_print("Error occurred while logging the make_rest_call exception message")
+
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
                                                    .format(self._get_error_message_from_exception(e))), resp_json)
 
