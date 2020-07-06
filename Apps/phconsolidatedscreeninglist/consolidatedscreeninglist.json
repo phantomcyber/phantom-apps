@@ -1,0 +1,127 @@
+{
+    "appid": "68618e58-2fd8-4019-9bca-79271c942600",
+    "name": "Consolidated Screening List",
+    "description": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software.",
+    "type": "information",
+    "product_vendor": "Splunk",
+    "logo": "consolidatedscreeninglist.png",
+    "logo_dark": "consolidatedscreeninglist_dark.png",
+    "product_name": "Consolidated Screening List",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) Splunk, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-29T20:55:15.416688Z",
+    "package_name": "phantom_consolidatedscreeninglist",
+    "main_module": "consolidatedscreeninglist_connector.pyc",
+    "min_phantom_version": "10900.0.5",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "Auth Token": {
+            "description": "API Bearer Token",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup user",
+            "identifier": "lookup_user",
+            "description": "validate if a specified individual is found in the Consolidated Screening List watchlist",
+            "verbose": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "name": {
+                    "description": "search query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "country": {
+                    "description": "2-character country code",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "fuzzy_name": {
+                    "description": "enables fuzzy word search",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.country",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "country",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.fuzzy_name",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "fuzzy_name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
