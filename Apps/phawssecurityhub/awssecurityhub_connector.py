@@ -217,9 +217,13 @@ class AwsSecurityHubConnector(BaseConnector):
         self.debug_print("THIS CONTAINER COUNT: {0}".format(max_containers))
 
         findings = []
-        while len(findings) < max_containers:
+        max_number_of_messages = AWSSECURITYHUB_SQS_MESSAGE_LIMIT
+        total_messages_left = max_containers
 
-            ret_val, resp_json = self._make_boto_call(action_result, 'receive_message', QueueUrl=url, MaxNumberOfMessages=AWSSECURITYHUB_SQS_MESSAGE_LIMIT)
+        while len(findings) < max_containers:
+            if max_number_of_messages > total_messages_left:
+                max_number_of_messages = total_messages_left
+            ret_val, resp_json = self._make_boto_call(action_result, 'receive_message', QueueUrl=url, MaxNumberOfMessages=max_number_of_messages)
 
             if status.is_fail(ret_val):
                 return None
@@ -234,6 +238,7 @@ class AwsSecurityHubConnector(BaseConnector):
                 else:
                     return None
 
+                total_messages_left -= 1
                 ret_val, resp_json = self._make_boto_call(action_result, 'delete_message', QueueUrl=url, ReceiptHandle=message['ReceiptHandle'])
 
                 if status.is_fail(ret_val):
@@ -241,7 +246,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
             self.send_progress("Received {0} messages".format(min(len(findings), max_containers)))
 
-        return findings[:max_containers]
+        return findings
 
     def _poll_from_security_hub(self, action_result, max_containers):
 
