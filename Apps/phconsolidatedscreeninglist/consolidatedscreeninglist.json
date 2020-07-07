@@ -4,36 +4,34 @@
     "description": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software.",
     "type": "information",
     "product_vendor": "Splunk",
-    "logo": "consolidatedscreeninglist.png",
-    "logo_dark": "consolidatedscreeninglist_dark.png",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "product_name": "Consolidated Screening List",
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) Splunk, 2020",
+    "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-06-29T20:55:15.416688Z",
     "package_name": "phantom_consolidatedscreeninglist",
     "main_module": "consolidatedscreeninglist_connector.pyc",
-    "min_phantom_version": "10900.0.5",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "Auth Token": {
+        "auth_token": {
             "description": "API Bearer Token",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -41,10 +39,10 @@
         },
         {
             "action": "lookup user",
-            "identifier": "lookup_user",
-            "description": "validate if a specified individual is found in the Consolidated Screening List watchlist",
+            "description": "Validate if a specified individual is found in the Consolidated Screening List watchlist",
             "verbose": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software.",
             "type": "investigate",
+            "identifier": "lookup_user",
             "read_only": true,
             "parameters": {
                 "name": {
@@ -81,21 +79,18 @@
                 {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.country",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "country",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.fuzzy_name",
                     "data_type": "boolean",
-                    "contains": [],
                     "column_name": "fuzzy_name",
                     "column_order": 2
                 },

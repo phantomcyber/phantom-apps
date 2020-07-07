@@ -1,18 +1,16 @@
-#!/usr/bin/python
+# File: consolidatedscreeninglist_connector.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.#!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
 
-# Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
-# Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
 from consolidatedscreeninglist_consts import *
 import requests
 import json
@@ -29,14 +27,11 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
     def __init__(self):
 
-        # Call the BaseConnectors init first
         super(ConsolidatedScreeningListConnector, self).__init__()
 
         self._state = None
 
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
+
         self._base_url = None
 
     def _process_empty_response(self, response, action_result):
@@ -50,7 +45,6 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         )
 
     def _process_html_response(self, response, action_result):
-        # An html response, treat it like an error
         status_code = response.status_code
 
         try:
@@ -68,7 +62,6 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
-        # Try a json parse
         try:
             resp_json = r.json()
         except Exception as e:
@@ -78,11 +71,9 @@ class ConsolidatedScreeningListConnector(BaseConnector):
                 ), None
             )
 
-        # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
             r.text.replace(u'{', '{{').replace(u'}', '}}')
@@ -91,30 +82,20 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-        # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
             action_result.add_debug_data({'r_text': r.text})
             action_result.add_debug_data({'r_headers': r.headers})
 
-        # Process each 'Content-Type' of response separately
-
-        # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML response, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
-        # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
             return self._process_empty_response(r, action_result)
 
-        # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
             r.text.replace('{', '{{').replace('}', '}}')
@@ -123,7 +104,6 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
-        # **kwargs can be any additional parameters that requests.request accepts
 
         config = self.get_config()
 
@@ -137,14 +117,11 @@ class ConsolidatedScreeningListConnector(BaseConnector):
                 resp_json
             )
 
-        # Create a URL to connect to
-        # url = self._base_url + endpoint
         url = BASE_URL + endpoint
 
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
@@ -158,73 +135,44 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to endpoint")
-        # make rest call
         ret_val, response = self._make_rest_call(
-            '/endpoint', action_result, params=None, headers=None
+            '', action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
-            # return action_result.get_status()
 
-        # Return success
-        # self.save_progress("Test Connectivity Passed")
-        # return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_user(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         name = param['name']
 
-        # Optional values should use the .get() function
         country = param.get('country', '')
         fuzzy_name = param.get('fuzzy_name', '')
 
         params = {"q": name, "countries": country, "fuzzy_name": fuzzy_name}
 
         config = self.get_config()
-        print(config)
-        headers = {"Authorization": "Bearer " + config["Auth Token"]}
+        headers = {"Authorization": "Bearer " + config["auth_token"]}
 
-        # make rest call
         ret_val, response = self._make_rest_call(
             LOOKUP_ENDPOINT, action_result, params=params, headers=headers
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+
             return action_result.get_status()
-            # pass
 
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
 
         if response['total'] == 0:
@@ -232,17 +180,11 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         else:
             summary['match'] = True
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
-        # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
         self.debug_print("action_id", self.get_action_identifier())
@@ -256,28 +198,15 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         return ret_val
 
     def initialize(self):
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
         self._state = self.load_state()
 
-        # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = config.get('base_url')
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
-        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
@@ -302,15 +231,13 @@ def main():
 
     if username is not None and password is None:
 
-        # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
     if username and password:
         try:
-            login_url = ConsolidatedScreeningListConnector._get_phantom_base_url() + '/login'
+            login_url = BaseConnector._get_phantom_base_url() + '/login'
 
-            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -323,17 +250,14 @@ def main():
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=4))
 
         connector = ConsolidatedScreeningListConnector()
         connector.print_progress_message = True
@@ -343,7 +267,6 @@ def main():
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
 
