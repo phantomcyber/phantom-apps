@@ -11,7 +11,7 @@
   "product_version_regex": ".*",
   "publisher": "RADAR, LLC",
   "license": "Copyright (c) 2020 Splunk Inc.",
-  "app_version": "1.0.0",
+  "app_version": "1.0.1",
   "python_version": "3",
   "package_name": "phantom_radar",
   "main_module": "radar_connector.py",
@@ -39,12 +39,6 @@
       "default": "https://api.radarfirst.com",
       "required": true,
       "order": 1
-    },
-    "radar_incident_group": {
-      "description": "Incident Group ID",
-      "data_type": "numeric",
-      "required": true,
-      "order": 2
     },
     "time_zone": {
       "description": "Time Zone",
@@ -399,7 +393,7 @@
         "Pacific/Wallis",
         "UTC"
       ],
-      "order": 3
+      "order": 2
     }
   },
   "actions": [
@@ -417,7 +411,7 @@
       "action": "create privacy incident",
       "identifier": "create_privacy_incident",
       "description": "Create Radar privacy incident",
-      "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the phantom. The incident group ID in the asset settings is used for authorization. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
+      "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the phantom. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
       "type": "generic",
       "read_only": false,
       "parameters": {

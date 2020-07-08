@@ -207,18 +207,6 @@ class RadarConnector(BaseConnector):
         description = param.get("description", "Privacy incident created by Splunk Phantom")
 
         # use timezone set in asset configuration to set discovered date_time timezone
-        config = self.get_config()
-        incident_group = config.get("radar_incident_group")
-        try:
-            if isinstance(incident_group, float):
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
-            incident_group = int(incident_group)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'radar_incident_group' asset parameter")
-
-        if incident_group < 0:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'radar_incident_group' asset parameter")
-
         discovered = datetime.now(pytz.timezone(self._time_zone))
 
         # get incident channel information
@@ -236,7 +224,6 @@ class RadarConnector(BaseConnector):
         self.save_progress(f"Create payload")
 
         body = {
-            "incident_group_id": incident_group,
             "channel": {
                 "id": f"{container_id}",
                 "source": "Splunk Phantom",
