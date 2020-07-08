@@ -36,7 +36,7 @@ import requests
 import tempfile
 from datetime import *
 # from datetime import datetime
-from dateutil.parser import parse
+from dateutil.parser import parse, tz
 
 from builtins import str
 from jira.client import JIRA
@@ -2061,14 +2061,14 @@ class JiraConnector(BaseConnector):
                 # 1. Fetch the current comment's updated time and convert it to UTC
                 comment_current_updated_time = comment.updated
                 comment_current_updated_time_jira_server_tz_specific = parse(comment_current_updated_time)
-                comment_current_updated_time_utc_tz_specific = comment_current_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
+                comment_current_updated_time_utc_tz_specific = comment_current_updated_time_jira_server_tz_specific.astimezone(tz.UTC)
 
                 # 2. Fetch the current comment's artifact's updated time and convert it to UTC
                 comment_artifact_current_updated_time = full_artifact.get("cef", {}).get("updated")
 
                 if comment_artifact_current_updated_time:
                     comment_artifact_updated_time_jira_server_tz_specific = parse(comment_artifact_current_updated_time)
-                    comment_artifact_updated_time_utc_tz_specific = comment_artifact_updated_time_jira_server_tz_specific.astimezone(dateutil.tz.UTC)
+                    comment_artifact_updated_time_utc_tz_specific = comment_artifact_updated_time_jira_server_tz_specific.astimezone(tz.UTC)
 
                 # By default, we won't create the artifact for current comment
                 # to avoid duplicate artifacts for comments even if the fields are updated for the ticket
@@ -2220,7 +2220,7 @@ class JiraConnector(BaseConnector):
                 # Updating the timestamp based on the timezone mentioned
                 # in the asset configuration parameters
                 ts_dt = datetime.fromtimestamp(last_time)
-                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
+                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=tz.tzlocal())
 
                 timez = pytz.timezone(self._timezone)
                 ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
@@ -2293,7 +2293,7 @@ class JiraConnector(BaseConnector):
         if not self.is_poll_now() and issues:
             last_fetched_issue = self._jira.issue(issues[-1].key)
             last_time_jira_server_tz_specific = parse(last_fetched_issue.fields.updated)
-            last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(dateutil.tz.tzlocal())
+            last_time_phantom_server_tz_specific = last_time_jira_server_tz_specific.astimezone(tz.tzlocal())
             state['last_time'] = time.mktime(last_time_phantom_server_tz_specific.timetuple())
 
             try:
