@@ -1,0 +1,4904 @@
+    {
+    "appid": "59bb6cc4-6ae0-4bee-827c-5397a0f99cec",
+    "name": "Code42",
+    "description": "This app integrates with Code42 to execute various investigate, correct, and containment actions",
+    "type": "endpoint",
+    "product_vendor": "Code42",
+    "logo": "logo_code42.svg",
+    "logo_dark": "logo_code42_dark.svg",
+    "product_name": "Code42",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "app_version": "1.0.24",
+    "utctime_updated": "2018-09-14T17:35:56.000000Z",
+    "package_name": "phantom_code42",
+    "main_module": "code42_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "server_url": {
+            "description": "Server URL (e.g. https://example.code42.com)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "place_holder": {
+            "description": "Placeholder",
+            "data_type": "ph",
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "identifier": "list_users",
+            "description": "List all users",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-19T11:32:07.889Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "ph_test@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.emailPromo",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "column_name": "First Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.invited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "column_name": "Last Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.licenses",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin.securityTools"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.localAuthenticationOnly",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-26T12:27:10.712Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "contains": [
+                        "code42 org id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default"
+                    ],
+                    "contains": [
+                        "code42 org name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgType",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENTERPRISE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "DEFAULT_CUSTOMER_ORG_ID"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.passwordReset",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaInBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active",
+                        "Deactivated",
+                        "Blocked"
+                    ],
+                    "column_name": "User Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.userExtRef",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "contains": [
+                        "code42 user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "835995801409314401"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "ph_test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "User Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.usernameIsAnEmail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock device",
+            "identifier": "unblock_device",
+            "description": "Unblock a device",
+            "type": "correct",
+            "undo": "block device",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to unblock",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 5 unblocked successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block device",
+            "identifier": "block_device",
+            "description": "Block a device",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unblock device",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to block",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "example_values": [
+                        13
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 13 blocked successfully"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Message"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deactivate device",
+            "identifier": "deactivate_device",
+            "description": "Deactivate a device",
+            "type": "contain",
+            "undo": "activate device",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to deactivate",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 5 deactivated successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "activate device",
+            "identifier": "activate_device",
+            "description": "Activate a device",
+            "type": "correct",
+            "undo": "deactivate device",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to activate",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 5 activated successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deauthorize device",
+            "identifier": "deauthorize_device",
+            "description": "Deauthorize a device",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device to deauthorize",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 5 deauthorized successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "activate user",
+            "identifier": "activate_user",
+            "description": "Activate a user",
+            "type": "correct",
+            "read_only": false,
+            "undo": "deactivate user",
+            "parameters": {
+                "user": {
+                    "description": "ID or Username of the user to activate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "order": 0
+                },
+                "unblock_user": {
+                    "description": "Unblock the user upon activation (Default: false)",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.unblock_user",
+                    "data_type": "boolean",
+                    "column_name": "Unblock User",
+                    "column_order": 1,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "column_name": "User",
+                    "column_order": 0,
+                    "example_values": [
+                        "13"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User with ID 5 activated successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deactivate user",
+            "identifier": "deactivate_user",
+            "description": "Deactivate a user",
+            "type": "contain",
+            "read_only": false,
+            "undo": "activate user",
+            "parameters": {
+                "user": {
+                    "description": "ID or Username of the user to deactivate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "order": 0
+                },
+                "block_user": {
+                    "description": "Block the user upon deactivation (Default: false)",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.block_user",
+                    "data_type": "boolean",
+                    "column_name": "Block User",
+                    "column_order": 1,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "example_values": [
+                        "3"
+                    ],
+                    "column_name": "User",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User with ID 5 deactivated successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list devices",
+            "identifier": "list_devices",
+            "description": "List all devices",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.16.17.114:4242"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertState",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertStates",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.buildVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerExtRef",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        13
+                    ],
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-22T05:29:58.996Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "836293703078185280"
+                    ],
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.javaVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.8.0_121"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastConnected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-23T11:56:55.452Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.loginDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-22T05:30:13.251Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modelInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-26T18:16:07.366Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "W96-TEST"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Computer Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "contains": [
+                        "code42 org id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "DEFAULT_CUSTOMER_ORG_ID"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osArch",
+                    "data_type": "string",
+                    "example_values": [
+                        "amd64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentComputerGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "836293703078085180"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentComputerId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ],
+                    "contains": [
+                        "code42 device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.productVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.5.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remoteAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "49.213.53.230"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service",
+                    "data_type": "string",
+                    "example_values": [
+                        "CrashPlan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active, Deauthorized"
+                    ],
+                    "column_name": "Device Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.timeZone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia/Calcutta"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPUTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "contains": [
+                        "code42 user id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "831956969605062241"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1508734800652
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "change organization",
+            "identifier": "change_organization",
+            "description": "Move a user to a specific organization",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "organization": {
+                    "description": "ID or Name of the organization",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 org id",
+                        "code42 org name"
+                    ],
+                    "order": 0
+                },
+                "user": {
+                    "description": "ID or Username of the user to move",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 1,
+                    "example_values": [
+                        "3"
+                    ],
+                    "contains": [
+                        "code42 org id",
+                        "code42 org name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "example_values": [
+                        "3"
+                    ],
+                    "column_name": "User",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "User with ID 5 moved to organization with ID 3 successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list organizations",
+            "identifier": "list_organizations",
+            "description": "List all organizations",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCounts.backupCriticalCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCounts.backupWarningCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCounts.destinations.72.backupCriticalCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCounts.destinations.72.backupWarningCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.archiveSizes.*.archiveSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7788444587
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.archiveSizes.*.targetComputerGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupComputerCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.archiveBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2513546544
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.archiveBytesDeltaMonth",
+                    "data_type": "numeric",
+                    "example_values": [
+                        564487
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.backupSessionCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        44
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.billableBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        56465411
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.selectedBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1156648844
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.selectedFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        56456546
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.todoFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "BASIC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.coldBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.configInheritanceCounts.allDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.configInheritanceCounts.allOrgCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.configInheritanceCounts.inheritedDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.configInheritanceCounts.inheritedOrgCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-18T15:52:02.800Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.customConfig",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deactivationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014-08-22T13:03:20.485-05:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceDefaults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "DEFAULT_CUSTOMER_ORG_ID"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hierarchyCounts.allDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hierarchyCounts.allOrgCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hierarchyCounts.inheritedDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hierarchyCounts.inheritedOrgCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.licensedUserCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-17T05:22:28.820Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a note about this org."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgExtRef",
+                    "data_type": "string",
+                    "example_values": [
+                        "Minnesota Office"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "contains": [
+                        "code42 org id"
+                    ],
+                    "column_name": "Organization ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgNameProvidingDestinations",
+                    "data_type": "string",
+                    "example_values": [
+                        "LeasingOrg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgNameProvidingDeviceDefaults",
+                    "data_type": "string",
+                    "example_values": [
+                        "LeasingOrg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgNameProvidingOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "LeasingOrg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "651940104726261564"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgUidProvidingDestinations",
+                    "data_type": "string",
+                    "example_values": [
+                        "1a24c242d4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgUidProvidingDeviceDefaults",
+                    "data_type": "string",
+                    "example_values": [
+                        "1a24c242d4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgInheritDto.orgUidProvidingOrg",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default"
+                    ],
+                    "contains": [
+                        "code42 org name"
+                    ],
+                    "column_name": "Organization Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "651940104726261564"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentOrgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "contains": [
+                        "code42 org id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentOrgUid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.planCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrationKey",
+                    "data_type": "string",
+                    "example_values": [
+                        "XXXX-XXXX-XXXX-XXXX"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporting.orgManagers.*.firstName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporting.orgManagers.*.lastName",
+                    "data_type": "string",
+                    "example_values": [
+                        "user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporting.orgManagers.*.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "131f2c188ac459b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporting.orgManagers.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.alertInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.allDestinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.allDestinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.allDestinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.allowLocalFolders",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.archiveHoldDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        365
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.autoOfferSelf",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.defaultRoles",
+                    "data_type": "string",
+                    "example_values": [
+                        "PROeUser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.defaultUserMaxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.defaultUserMobileQuota",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.destinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.destinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.destinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isDefaultRolesInherited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isNativeClientsEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isSimpleOrg",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isUsingDestinationDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isUsingQuotaDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.isUsingReportingDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.ldapServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.maxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.maxSeats",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.radiusServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.reportLastSent",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-05-23T15:11:39.000-05:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.reportSchedule",
+                    "data_type": "string",
+                    "example_values": [
+                        "__T__F_"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.securityKeyInherit",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.securityKeyLocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.securityKeyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AccountPassword"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.sendReports",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.ssoIdentityProviderUids",
+                    "data_type": "string",
+                    "example_values": [
+                        "12345678"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.usernameIsAnEmail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.warnInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.webRestoreAdminLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settings.webRestoreUserLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.alertInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.allDestinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.allDestinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.allDestinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.allowLocalFolders",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.archiveHoldDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        365
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.autoOfferSelf",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.defaultRoles",
+                    "data_type": "string",
+                    "example_values": [
+                        "PROeUser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.defaultUserMaxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.defaultUserMobileQuota",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.destinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.destinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.destinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isDefaultRolesInherited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isNativeClientsEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isSimpleOrg",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isUsingDestinationDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isUsingQuotaDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.isUsingReportingDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.ldapServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.maxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.maxSeats",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.radiusServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.reportLastSent",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-05-23T15:11:39.000-05:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.reportSchedule",
+                    "data_type": "string",
+                    "example_values": [
+                        "__T__F_"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.securityKeyInherit",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.securityKeyLocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.securityKeyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AccountPassword"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.sendReports",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.ssoIdentityProviderUids",
+                    "data_type": "string",
+                    "example_values": [
+                        "98765432"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.usernameIsAnEmail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.warnInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.webRestoreAdminLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsInherited.webRestoreUserLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.alertInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.allDestinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.allDestinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.allDestinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.allowLocalFolders",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.archiveHoldDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        365
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.autoOfferSelf",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.defaultRoles",
+                    "data_type": "string",
+                    "example_values": [
+                        "PROeUser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.defaultUserMaxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.defaultUserMobileQuota",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.destinations.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "PrimaryDestination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.destinations.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "72"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.destinations.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLUSTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isDefaultRolesInherited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isNativeClientsEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isSimpleOrg",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isUsingDestinationDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isUsingQuotaDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.isUsingReportingDefaults",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.ldapServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.maxBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.maxSeats",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.radiusServerIds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.reportLastSent",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-05-23T15:11:39.000-05:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.reportSchedule",
+                    "data_type": "string",
+                    "example_values": [
+                        "__T__F_"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.securityKeyInherit",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.securityKeyLocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.securityKeyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AccountPassword"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.sendReports",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.ssoIdentityProviderUids",
+                    "data_type": "string",
+                    "example_values": [
+                        "12345678"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.usernameIsAnEmail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.warnInDays",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.webRestoreAdminLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.settingsSummary.webRestoreUserLimitMb",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.shareDeviceCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ],
+                    "column_name": "Organization Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENTERPRISE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.windowsUsmtFiles.APP.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.windowsUsmtFiles.CONFIG.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.windowsUsmtFiles.CUSTOM.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.windowsUsmtFiles.DOCS.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.windowsUsmtFiles.USER.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "User.xml"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_organizations",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total organizations: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lock device",
+            "identifier": "lock_device",
+            "description": "Invoke an access lock on a specified device",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unlock device",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        5
+                    ],
+                    "contains": [
+                        "code42 device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data",
+                    "data_type": "string",
+                    "example_values": [
+                        "The Code42 server could not connect to the device. However, the device is flagged to be locked and will lock its volumes the next time it connects to the Code42 server."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.deviceLockableResult",
+                    "data_type": "string",
+                    "example_values": [
+                        "NO_LOCKABLE_VOLUMES"
+                    ],
+                    "column_name": "Lockable Result",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.deviceRestarting",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Restarting",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.volumeStatuses",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string",
+                    "column_name": "Error",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.warnings",
+                    "data_type": "string",
+                    "column_name": "Warning",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 13 locked successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unlock device",
+            "identifier": "unlock_device",
+            "description": "Deactivate an access lock on a specified device",
+            "type": "correct",
+            "read_only": false,
+            "undo": "lock device",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        13
+                    ],
+                    "contains": [
+                        "code42 device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-21T10:12:42.439+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.deviceGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "836293703078185280"
+                    ],
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.isLockEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Lock Enabled",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.isOsVolumeLocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.lastClientResponseDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-21T10:12:43.005+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.lockEnabledDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-21T10:12:42.439+0000"
+                    ],
+                    "column_name": "Lock Date",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.lockPassphrase",
+                    "data_type": "string",
+                    "example_values": [
+                        "037213-104016-029634-571241-383273-275264-464926-705628"
+                    ],
+                    "column_name": "Passphrase",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.lockedVolumeCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.lockingUserUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "831956969605062241"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-21T10:13:23.199+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.totalVolumeCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.unlockDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-21T10:13:23.199+0000"
+                    ],
+                    "column_name": "Unlock Date",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.unlockingUserUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "831956969605062241"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.warnings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.passphrase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device",
+            "identifier": "get_device",
+            "description": "Get information for a specific device",
+            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "order": 0
+                },
+                "query": {
+                    "description": "Query to match against computer name, osHostname, or guid",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "code42 device guid",
+                        "host name"
+                    ],
+                    "required": false,
+                    "order": 1
+                },
+                "most_recent_only": {
+                    "description": "Forces action to return one result, being the most recently connected device",
+                    "data_type": "boolean",
+                    "required": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.most_recent_only",
+                    "data_type": "string",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid",
+                        "host name"
+                    ],
+                    "example_values": [
+                        "850410562961825805",
+                        "UNKNOWN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.5.10:4242"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertState",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertStates",
+                    "data_type": "string",
+                    "example_values": [
+                        "CriticalConnectionAlert",
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.alertState",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.alertStates",
+                    "data_type": "string",
+                    "example_values": [
+                        "CriticalBackupAlert"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.archiveBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        337774850
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.archiveFormat",
+                    "data_type": "string",
+                    "example_values": [
+                        "ARCHIVE_V1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.archiveGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850661634311551096"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.billableBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        417555492
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.completionRateAverage",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-31T15:44:05.499Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.isProvider",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.lastBackup",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:11:30.729Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.lastCompactDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-29T07:19:47.405Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.lastCompletedBackup",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:11:30.729Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.lastConnected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:14:06.841Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.lastMaintenanceDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-29T07:19:47.411Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-03T01:13:11.877Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.percentComplete",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.selectedBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        417555492
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.selectedFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1872
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.sendRateAverage",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.serverGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "838412345430677848"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.serverHostName",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://bga-iad.test.com"
+                    ],
+                    "contains": [
+                        "url",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.serverId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1009
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.serverName",
+                    "data_type": "string",
+                    "example_values": [
+                        "bga-iad"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.storePointId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1006
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.storePointName",
+                    "data_type": "string",
+                    "example_values": [
+                        "bga-iad-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "43"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        43
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Code42 Cloud USA East"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerOsName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerParentGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerParentId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.targetComputerType",
+                    "data_type": "string",
+                    "example_values": [
+                        "SERVER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.todoBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.todoFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.using",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.buildVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5616
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerExtRef",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Computer ID",
+                    "column_order": 0,
+                    "example_values": [
+                        3344
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-31T15:43:34.320Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850410562961825805"
+                    ],
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "column_name": "GUID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.javaVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.8.0_144"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastConnected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:16:40.174Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.loginDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:04:47.410Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modelInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-13T07:16:40.174Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP-C0A8FE32"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Device Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1393
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "848523477749092155"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osArch",
+                    "data_type": "string",
+                    "example_values": [
+                        "amd64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osHostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNKNOWN"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Hostname",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.osName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentComputerGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parentComputerId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ],
+                    "contains": [
+                        "code42 device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.productVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.7.2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remoteAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "52.24.242.108"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service",
+                    "data_type": "string",
+                    "example_values": [
+                        "CrashPlan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active, Deauthorized"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.timeZone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia/Calcutta"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPUTER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3628
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850411907993419780"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1512021600672
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total events: 2",
+                        "Device status not found",
+                        "Total devices: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2,
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "push restore",
+            "identifier": "push_restore",
+            "description": "Push a restore on a device",
+            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). If neither <b>files</b> nor <b>directories</b> params are supplied, the action will fail.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "src_device_guid": {
+                    "description": "GUID of the source device",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "order": 0
+                },
+                "accepting_device_guid": {
+                    "description": "GUID of the destination device",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "order": 1
+                },
+                "target_node_guid": {
+                    "description": "GUID of the target node (backup server)",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "order": 2
+                },
+                "restore_path": {
+                    "description": "Path on accepting device to restore",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ],
+                    "order": 3
+                },
+                "files": {
+                    "description": "Comma-separated list of file paths to restore",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ],
+                    "order": 4
+                },
+                "directories": {
+                    "description": "Comma-separated list of directory paths to restore",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ],
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.accepting_device_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.directories",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.files",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.restore_path",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.src_device_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.target_node_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.acceptingGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.canceled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.done",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.providerDestination",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.restoreId",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 restore id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.web_restore_session_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 web restore session id"
+                    ],
+                    "column_name": "WebRestoreSessionID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.sourceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetEndpointPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetEndpointVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.restore_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 restore id"
+                    ],
+                    "column_name": "Restore ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check restore status",
+            "identifier": "check_restore_status",
+            "description": "Check the status of a restore on a device",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "restore_id": {
+                    "description": "Unique ID for the restore record",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 restore id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.restore_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 restore id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.acceptingComputerGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.archiveGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.byteCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.canceled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.completedDate",
+                    "data_type": "string",
+                    "column_name": "Completed Date",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.destinationGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "column_name": "Destination Guid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.failedChecksumCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.planUid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.problemCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.requestingUserId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.restoreId",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 restore id"
+                    ],
+                    "column_name": "Restore ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.sourceComputerGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "column_name": "Src Guid",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.sourceOrgId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sourceUserId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.startDate",
+                    "data_type": "string",
+                    "column_name": "Start Date",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.targetComputerGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLIENT",
+                        "WEB",
+                        "PUSH"
+                    ],
+                    "column_name": "Restore Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total events: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user",
+            "identifier": "get_user",
+            "description": "Retrieves information for a specific user",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "user": {
+                    "description": "ID or username of the user to retrieve information",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser"
+                    ],
+                    "contains": [
+                        "code42 user id",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-19T11:32:07.889Z",
+                        "2018-05-29T22:23:17.017Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "ph_test@example.com",
+                        "user@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.emailPromo",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
+                    ],
+                    "column_name": "First Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.invited",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test",
+                        "User"
+                    ],
+                    "column_name": "Last Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.licenses",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin.securityTools"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.localAuthenticationOnly",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modificationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-26T12:27:10.712Z",
+                        "2018-05-29T22:23:17.237Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2,
+                        1393
+                    ],
+                    "contains": [
+                        "code42 org id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default"
+                    ],
+                    "contains": [
+                        "code42 org name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgType",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENTERPRISE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "DEFAULT_CUSTOMER_ORG_ID",
+                        "848523477749092155"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.passwordReset",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaInBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active",
+                        "Deactivated",
+                        "Deactivated, Blocked",
+                        "Active, Blocked"
+                    ],
+                    "column_name": "User Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.userExtRef",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3,
+                        3628
+                    ],
+                    "contains": [
+                        "code42 user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "835995801409314401",
+                        "850411907993419780"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "ph_test",
+                        "user@example.com"
+                    ],
+                    "contains": [
+                        "user name",
+                        "email"
+                    ],
+                    "column_name": "User Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.usernameIsAnEmail",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt file",
+            "identifier": "hunt_file",
+            "description": "Hunt file on a forensic search",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "file_hash": {
+                    "description": "MD5 hash of the file to search",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "9d26ba272b1088da91e59bc3d2ed3154"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.actor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cloudDriveId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cloudUserId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-07-02T01:05:49.035Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACTIVATED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850410562961825805"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceUserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0_90f20421-86db-4755-877f-63141a394b6b_850410562961825805_851786578038240875_6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-08T09:59:25.992Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventType",
+                    "data_type": "string",
+                    "example_values": [
+                        "CREATED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "$I12PJGV.tmp"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileOwner",
+                    "data_type": "string",
+                    "example_values": [
+                        "Administrators"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filePath",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:/$Recycle.Bin/S-1-5-21-1289979337-1594158562-2974945850-500/"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        84
+                    ],
+                    "contains": [
+                        "file size"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileType",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5Checksum",
+                    "data_type": "string",
+                    "example_values": [
+                        "71c853fcff7b63755afe622c9a171885"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modifyTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-07-02T01:05:49.037Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osHostName",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP-C0A8FE32"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentDriveId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.privateIpAddresses",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publicIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "52.24.242.108"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256Checksum",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.shared",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850411907993419780"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total events: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "code42_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Run query on a forensic search",
+            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are in logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If parameter <b>query</b> is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search API documentation for more details on query format.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "description": "Start time in epoch",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "end_time": {
+                    "description": "End time in epoch",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "file_event": {
+                    "description": "Type of file event",
+                    "data_type": "string",
+                    "order": 2,
+                    "value_list": [
+                        "",
+                        "New file",
+                        "Modified",
+                        "No longer observed"
+                    ]
+                },
+                "file_hash": {
+                    "description": "MD5 hash of the file to search",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "md5"
+                    ],
+                    "order": 3
+                },
+                "file_name": {
+                    "description": "File name",
+                    "data_type": "string",
+                    "order": 4,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                "file_path": {
+                    "description": "File path",
+                    "data_type": "string",
+                    "order": 5,
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                "hostname": {
+                    "description": "Hostname",
+                    "data_type": "string",
+                    "order": 6,
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                "username": {
+                    "description": "User name",
+                    "data_type": "string",
+                    "order": 7,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                "private_ip": {
+                    "description": "Private IPv4 or IPv6 address",
+                    "data_type": "string",
+                    "order": 8,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                "public_ip": {
+                    "description": "Public IPv4 or IPv6 address",
+                    "data_type": "string",
+                    "order": 9,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                "query": {
+                    "description": "Query in JSON format",
+                    "data_type": "string",
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1530684220
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_event",
+                    "data_type": "string",
+                    "example_values": [
+                        "New file",
+                        "Modified",
+                        "No longer observed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "9d26ba272b1088da91e59bc3d2ed3154"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file.txt"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:/ProgramData/test/SSM/Logs/"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP-C0A8FE3"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.private_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.public_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1530684120
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_user"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.actor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cloudDriveId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cloudUserId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-07-02T01:05:49.035Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACTIVATED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850410562961825805"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deviceUserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0_90f20421-86db-4755-877f-63141a394b6b_850410562961825805_851786578038240875_6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-08T09:59:25.992Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventType",
+                    "data_type": "string",
+                    "example_values": [
+                        "CREATED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "$I12PJGV.tmp"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileOwner",
+                    "data_type": "string",
+                    "example_values": [
+                        "Administrators"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filePath",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:/$Recycle.Bin/S-1-5-21-1289979337-1594158562-2974945850-500/"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        84
+                    ],
+                    "contains": [
+                        "file size"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileType",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5Checksum",
+                    "data_type": "string",
+                    "example_values": [
+                        "71c853fcff7b63755afe622c9a171885"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modifyTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-07-02T01:05:49.037Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osHostName",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP-C0A8FE32"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentDriveId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.privateIpAddresses",
+                    "data_type": "string",
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publicIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "52.24.242.108"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256Checksum",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.shared",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "string",
+                    "example_values": [
+                        "850411907993419780"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total events: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "code42_view.display_view"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
