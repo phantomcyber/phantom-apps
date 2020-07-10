@@ -819,7 +819,7 @@ if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=4))
+        print((json.dumps(in_json, indent=4)))
         connector = FortiGateConnector()
         connector.print_progress_message = True
         connector._handle_action(json.dumps(in_json), None)
