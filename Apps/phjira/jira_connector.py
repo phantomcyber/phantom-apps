@@ -2254,29 +2254,36 @@ class JiraConnector(phantom.BaseConnector):
         # Get time from last poll, save now as time for this poll
         last_time = state.get('last_time', 0)
 
-        if last_time:
-            try:
-                # Shifting the last_time by one minute to ensure that
-                # the tickets are not missed in the On Poll due to
-                # a minute's granularity of the Jira
-                last_time = int(last_time)
-                last_time = last_time - 60
+        # This is to handle the cases if the end-user has by-mistake kept the state file status as
+        # {'app_version': '<app_version>', 'last_time': ''} or {'app_version': '<app_version>', 'last_time': null} or
+        # there was an issue in storing the 'last_time' key-value into the state file during the first scheduled poll run.
+        # In such cases, we will continue similar to the scenario of first run of the scheduled poll.
+        # We never know what the end-user can change the value of the state file to. Hence, handling such edge cases here.
+        if not last_time:
+            last_time = 0
 
-                if last_time < 0:
-                    last_time = 0
+        try:
+            # Shifting the last_time by one minute to ensure that
+            # the tickets are not missed in the On Poll due to
+            # a minute's granularity of the Jira
+            last_time = int(last_time)
+            last_time = last_time - 60
 
-                # Updating the timestamp based on the timezone mentioned
-                # in the asset configuration parameters
-                ts_dt = datetime.fromtimestamp(last_time)
-                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
+            if last_time < 0:
+                last_time = 0
 
-                timez = pytz.timezone(self._timezone)
-                ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
-                last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
+            # Updating the timestamp based on the timezone mentioned
+            # in the asset configuration parameters
+            ts_dt = datetime.fromtimestamp(last_time)
+            ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
 
-            except:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
+            timez = pytz.timezone(self._timezone)
+            ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
+            last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
+
+        except:
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
 
         # Build the query for the issue search
         query = ""
