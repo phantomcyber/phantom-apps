@@ -5,10 +5,17 @@
 #
 # --
 
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+# Platform imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status
+    from phantom import utils
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status
+    import utils
 
 # Local imports
 from fortigate_consts import *
@@ -50,8 +57,8 @@ class FortiGateConnector(BaseConnector):
         """
         This is an optional function that can be implemented by the AppConnector derived class. Since the configuration
         dictionary is already validated by the time this function is called, it's a good place to do any extra
-        initialization of any internal modules. This function MUST return a value of either phantom.APP_SUCCESS or
-        phantom.APP_ERROR. If this function returns phantom.APP_ERROR, then AppConnector::handle_action will not get
+        initialization of any internal modules. This function MUST return a value of either status.APP_SUCCESS or
+        status.APP_ERROR. If this function returns status.APP_ERROR, then AppConnector::handle_action will not get
         called.
         """
 
@@ -61,7 +68,7 @@ class FortiGateConnector(BaseConnector):
         self._device = config[FORTIGATE_JSON_URL]
         self._verify_server_cert = config.get(FORTIGATE_JSON_VERIFY_SERVER_CERT, False)
         self.set_validator('ip', self._is_ip)
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     def _get_net_size(self, net_mask):
 
@@ -110,7 +117,7 @@ class FortiGateConnector(BaseConnector):
             return False
 
         # Validate ip address
-        if not phantom.is_ip(ip):
+        if not utils.is_ip(ip):
             return False
 
         # Regex to validate the subnet
@@ -159,7 +166,7 @@ class FortiGateConnector(BaseConnector):
             self.debug_print(FORTIGATE_ERR_API_UNSUPPORTED_METHOD.format(method=method))
             # set the action_result status to error, the handler function
             # will most probably return as is
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_ERR_API_UNSUPPORTED_METHOD,
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_ERR_API_UNSUPPORTED_METHOD,
                                             method=str(method)), rest_res
 
         url = host + FORTIGATE_BASE_URL + endpoint
@@ -173,7 +180,7 @@ class FortiGateConnector(BaseConnector):
             self.debug_print(FORTIGATE_ERR_SERVER_CONNECTION, e)
             # set the action_result status to error, the handler function
             # will most probably return as is
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_ERR_SERVER_CONNECTION, e), rest_res
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_ERR_SERVER_CONNECTION, e), rest_res
 
         # rest_res[FORTIGATE_STATUS_CODE] = response.status_code
         if response.status_code in self._error_resp_dict.keys():
@@ -181,11 +188,11 @@ class FortiGateConnector(BaseConnector):
                                                               detail=self._error_resp_dict[response.status_code]))
             # set the action_result status to error, the handler function
             # will most probably return as is
-            return (action_result.set_status(phantom.APP_ERROR, FORTIGATE_ERR_FROM_SERVER, status=response.status_code,
+            return (action_result.set_status(status.APP_ERROR, FORTIGATE_ERR_FROM_SERVER, status=response.status_code,
                                              detail=self._error_resp_dict[response.status_code]), rest_res)
 
         if response.status_code == FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND:
-            return phantom.APP_SUCCESS, {'resource_not_available': True}
+            return status.APP_SUCCESS, {'resource_not_available': True}
 
         if response.status_code == FORTIGATE_REST_RESP_SUCCESS:
             content_type = response.headers['content-type']
@@ -197,9 +204,9 @@ class FortiGateConnector(BaseConnector):
                     self.debug_print(msg_string)
                     # set the action_result status to error, the handler function
                     # will most probably return as is
-                    return action_result.set_status(phantom.APP_ERROR, msg_string, e), rest_res
+                    return action_result.set_status(status.APP_ERROR, msg_string, e), rest_res
 
-            return phantom.APP_SUCCESS, rest_res
+            return status.APP_SUCCESS, rest_res
 
         # All other response codes from Rest call are failures
         # The HTTP response does not return error message in case of unknown error code
@@ -208,7 +215,7 @@ class FortiGateConnector(BaseConnector):
 
         # set the action_result status to error, the handler function
         # will most probably return as is
-        return (action_result.set_status(phantom.APP_ERROR, FORTIGATE_ERR_FROM_SERVER,
+        return (action_result.set_status(status.APP_ERROR, FORTIGATE_ERR_FROM_SERVER,
                                          status=response.status_code, detail=FORTIGATE_REST_RESP_OTHER_ERROR_MSG
                                          ), rest_res)
 
@@ -222,20 +229,20 @@ class FortiGateConnector(BaseConnector):
         # Initiating login session
         ret_val = self._login(action_result)
 
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             return action_result.get_status()
 
         # get list of policies
         status, response = self._make_rest_call(FORTIGATE_LIST_POLICIES, action_result)
 
         # Something went wrong
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             return action_result.get_status()
 
         # If resource not found, its a failure
         if response.get('resource_not_available'):
             self.debug_print(FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG)
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG)
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG)
 
         # Adding each policy data to action_result
         for policy in response.get("results", []):
@@ -243,7 +250,7 @@ class FortiGateConnector(BaseConnector):
 
         summary_data['total_policies'] = len(response.get("results", []))
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status.APP_SUCCESS)
 
     def _test_connectivity(self, param):
 
@@ -258,15 +265,15 @@ class FortiGateConnector(BaseConnector):
 
         ret_val = self._login(action_result)
 
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             self.save_progress(action_result.get_message())
 
             # If SSL is enabled and URL configuration has IP address
-            if self._verify_server_cert and (phantom.is_ip(self._device) or self._is_ipv6(self._device)):
+            if self._verify_server_cert and (utils.is_ip(self._device) or self._is_ipv6(self._device)):
                 # The failure could be due to IP provided in URL instead of hostname
                 self.save_progress(FORTIGATE_TEST_WARN_MSG)
 
-            self.set_status(phantom.APP_ERROR, FORTIGATE_TEST_CONN_FAIL)
+            self.set_status(status.APP_ERROR, FORTIGATE_TEST_CONN_FAIL)
             return action_result.get_status()
 
         self.save_progress(FORTIGATE_TEST_ENDPOINT_MSG)
@@ -274,12 +281,12 @@ class FortiGateConnector(BaseConnector):
         # Querying endpoint to check connection to device
         status, response = self._make_rest_call(FORTIGATE_BLOCKED_IPS, action_result)
 
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, FORTIGATE_TEST_CONN_FAIL)
+            self.set_status(status.APP_ERROR, FORTIGATE_TEST_CONN_FAIL)
             return action_result.get_status()
 
-        self.set_status_save_progress(phantom.APP_SUCCESS, FORTIGATE_TEST_CONN_SUCC)
+        self.set_status_save_progress(status.APP_SUCCESS, FORTIGATE_TEST_CONN_SUCC)
         return action_result.get_status()
 
     # Block IP address
@@ -291,7 +298,7 @@ class FortiGateConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         # Something went wrong
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             return action_result.get_status()
 
         # To get parameters
@@ -300,7 +307,7 @@ class FortiGateConnector(BaseConnector):
         # Check if address exist
         addr_status, addr_availability = self._is_address_available(ip_addr_obj_name, action_result)
 
-        if phantom.is_fail(addr_status):
+        if status.is_fail(addr_status):
             return action_result.get_status()
 
         # Check if address does not exist
@@ -310,34 +317,34 @@ class FortiGateConnector(BaseConnector):
             add_addr_status, add_addr_response = self._make_rest_call(FORTIGATE_ADD_ADDRESS, action_result,
                                                                       data=repr(address_create_params), method="post")
             # Something went wrong
-            if phantom.is_fail(add_addr_status):
-                return action_result.set_status(phantom.APP_ERROR, "Unable to create Address object. {0}".format(action_result.get_message()))
+            if status.is_fail(add_addr_status):
+                return action_result.set_status(status.APP_ERROR, "Unable to create Address object. {0}".format(action_result.get_message()))
 
         # To get policy id from policy name
         ret_val, policy_id = self._get_policy_id(policy_name, action_result)
 
         # Something went wrong
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             return action_result.get_status()
 
         dstaddr_status, address_blocked = self._is_address_blocked(ip_addr_obj_name, policy_id, action_result)
 
-        if phantom.is_fail(dstaddr_status):
+        if status.is_fail(dstaddr_status):
             return action_result.get_status()
 
         # If address already blocked
         if address_blocked:
-            return action_result.set_status(phantom.APP_SUCCESS, FORTIGATE_IP_ALREADY_BLOCKED)
+            return action_result.set_status(status.APP_SUCCESS, FORTIGATE_IP_ALREADY_BLOCKED)
 
         # Block the address
         # Add the address entry to policy's destination
         status, response = self._make_rest_call(FORTIGATE_BLOCK_IP.format(policy_id=policy_id),
                                                 action_result, data=repr(block_params), method="post")
 
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, FORTIGATE_IP_BLOCKED)
+        return action_result.set_status(status.APP_SUCCESS, FORTIGATE_IP_BLOCKED)
 
     # Unblock IP address
     def _unblock_ip(self, param):
@@ -347,7 +354,7 @@ class FortiGateConnector(BaseConnector):
         # Initiating login session
         ret_val = self._login(action_result)
 
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             return action_result.get_status()
 
         # To get parameters
@@ -357,42 +364,42 @@ class FortiGateConnector(BaseConnector):
         ret_val, policy_id = self._get_policy_id(policy_name, action_result)
 
         # Something went wrong
-        if phantom.is_fail(ret_val):
+        if status.is_fail(ret_val):
             return action_result.get_status()
 
         # Check if address exist
         addr_status, addr_availability = self._is_address_available(ip_addr_obj_name, action_result)
 
-        if phantom.is_fail(addr_status):
+        if status.is_fail(addr_status):
             return action_result.get_status()
 
         # Check if address does not exist
         if not addr_availability:
             self.debug_print(FORTIGATE_ADDRESS_NOT_AVAILABLE)
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_ADDRESS_NOT_AVAILABLE)
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_ADDRESS_NOT_AVAILABLE)
 
         # Check if address entry is configured in destination of policy
         dstaddr_status, dstaddr_resp = self._make_rest_call(FORTIGATE_GET_BLOCKED_IP.format(policy_id=policy_id, ip=ip_addr_obj_name),
                                                             action_result)
 
-        if phantom.is_fail(dstaddr_status):
+        if status.is_fail(dstaddr_status):
             return action_result.get_status()
 
         # If resource not available, indicates that address entry is
         # not configured in policy as destination
         if dstaddr_resp.get('resource_not_available'):
             self.debug_print(FORTIGATE_IP_ALREADY_UNBLOCKED)
-            return action_result.set_status(phantom.APP_SUCCESS, FORTIGATE_IP_ALREADY_UNBLOCKED)
+            return action_result.set_status(status.APP_SUCCESS, FORTIGATE_IP_ALREADY_UNBLOCKED)
 
         # Unblock an IP
         status, response = self._make_rest_call(FORTIGATE_GET_BLOCKED_IP.format(policy_id=policy_id, ip=ip_addr_obj_name),
                                                 action_result, method="delete")
 
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             return action_result.get_status()
 
         # Blocked Successfully
-        return action_result.set_status(phantom.APP_SUCCESS, FORTIGATE_IP_UNBLOCKED)
+        return action_result.set_status(status.APP_SUCCESS, FORTIGATE_IP_UNBLOCKED)
 
     # Function used to Logging to FortiGate Device
     def _login(self, action_result):
@@ -408,12 +415,12 @@ class FortiGateConnector(BaseConnector):
         status, response = self._make_rest_call(FORTIGATE_LOGIN, action_result, data=credential_data, method="post")
 
         # Something went wrong
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             return action_result.get_status()
 
         # updating the CSRFTOKEN for authentication
         self._sess_obj.headers.update({'X-CSRFTOKEN': self._sess_obj.cookies['ccsrftoken'][1:-1]})
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     # Function used to logout from FortiGate Device
     # Called from finalize method at the end of each action
@@ -430,10 +437,10 @@ class FortiGateConnector(BaseConnector):
         status, response = self._make_rest_call(FORTIGATE_LOGOUT, action_result, data=credential_data, method="post")
 
         # Something went wrong
-        if phantom.is_fail(status):
+        if status.is_fail(status):
             return action_result.get_status()
 
-        return phantom.APP_SUCCESS
+        return status.APP_SUCCESS
 
     # To get input parameters
     def _get_params(self, param):
@@ -468,42 +475,42 @@ class FortiGateConnector(BaseConnector):
         ret_code, json_resp = self._make_rest_call(FORTIGATE_GET_POLICY.format(policy=policy), action_result)
 
         # Something went wrong
-        if phantom.is_fail(ret_code):
+        if status.is_fail(ret_code):
             return action_result.get_status(), policy_id
 
         # If resource not available its a failure
         if json_resp.get('resource_not_available'):
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG), policy_id
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG), policy_id
 
         # Get the list of policies
         # If result is blank or more than one policies exist with same name then return error
         if len(json_resp.get("results", [])) != 1:
             self.debug_print(FORTIGATE_INVALID_POLICIES)
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_INVALID_POLICIES), policy_id
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_INVALID_POLICIES), policy_id
 
         # Check if policy does not have action deny, return error
         # Sure that only one policy exist
         if json_resp["results"][0].get("action") != "deny":
             self.debug_print(FORTIGATE_INVALID_POLICY_DENY)
-            return action_result.set_status(phantom.APP_ERROR, FORTIGATE_INVALID_POLICY_DENY), policy_id
+            return action_result.set_status(status.APP_ERROR, FORTIGATE_INVALID_POLICY_DENY), policy_id
 
         # If policy action is deny, store policy id
-        return phantom.APP_SUCCESS, json_resp["results"][0].get("policyid")
+        return status.APP_SUCCESS, json_resp["results"][0].get("policyid")
 
     # To check if address exists or not
     def _is_address_available(self, ip_addr_obj_name, action_result):
 
         # Rest call to get the list of Addresses with name Phantom Addr {ip}
         ret_code, json_resp = self._make_rest_call(FORTIGATE_GET_ADDRESSES.format(ip=ip_addr_obj_name), action_result)
-        if phantom.is_fail(ret_code):
+        if status.is_fail(ret_code):
             return action_result.get_status(), None
 
         # Check is address is not available
         if json_resp.get('resource_not_available'):
-            return phantom.APP_SUCCESS, False
+            return status.APP_SUCCESS, False
 
         # Address Object is available
-        return phantom.APP_SUCCESS, True
+        return status.APP_SUCCESS, True
 
     # To check if address already blocked
     def _is_address_blocked(self, ip_addr_obj_name, policy_id, action_result):
@@ -514,29 +521,29 @@ class FortiGateConnector(BaseConnector):
                                                    action_result)
 
         # Something went wrong
-        if phantom.is_fail(ret_code):
+        if status.is_fail(ret_code):
             return action_result.get_status(), address_blocked
 
         # Check if resource not available, its an failure scenario
         if json_resp.get('resource_not_available'):
             if self.get_action_identifier() == 'unblock_ip':
                 self.debug_print(FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG)
-                return action_result.set_status(phantom.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG), \
+                return action_result.set_status(status.APP_ERROR, FORTIGATE_REST_RESP_RESOURCE_NOT_FOUND_MSG), \
                        address_blocked
 
             # For block ip, if resource not available indicates that address is not blocked
             address_blocked = False
-            return phantom.APP_SUCCESS, address_blocked
+            return status.APP_SUCCESS, address_blocked
 
         # Check if address entry is available in policy destination address
         if not json_resp.get('results'):
             # Address not configured as destination address
             address_blocked = False
-            return phantom.APP_SUCCESS, address_blocked
+            return status.APP_SUCCESS, address_blocked
 
         # if results exist, indicates that address is already configured in destination addresss
         address_blocked = True
-        return phantom.APP_SUCCESS, address_blocked
+        return status.APP_SUCCESS, address_blocked
 
     def handle_action(self, param):
 
