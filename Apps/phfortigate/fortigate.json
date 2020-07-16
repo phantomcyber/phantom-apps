@@ -1,5 +1,6 @@
 {
     "appid": "5722c7e9-489b-4416-9966-564055122a2a",
+    "connector_id": "5722c7e9-489b-4416-9966-564055122a2a",
     "name": "FortiGate",
     "description": "This app supports a variety of <b>containment</b> and <b>investigative</b> actions on the <b>FortiGate Firewall</b>.",
     "publisher": "Phantom",
@@ -8,6 +9,7 @@
     "license": "Copyright (c) 2016-2019 Splunk Inc.",
     "main_module": "fortigate_connector.pyc",
     "app_version": "1.0.18",
+    "connector_version": "1.0.18",
     "utctime_updated": "2018-12-07T01:28:53.000000Z",
     "product_vendor": "Fortinet",
     "product_name": "FortiGate",
