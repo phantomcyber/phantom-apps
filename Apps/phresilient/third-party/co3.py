@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# File: co3.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 """Simple client for Resilient REST API"""
 from __future__ import print_function
@@ -14,8 +19,9 @@ import datetime
 import unicodedata
 import requests
 import importlib
-from .patch import PatchStatus
+from patch import PatchStatus
 from argparse import Namespace
+from bs4 import UnicodeDammit
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -147,12 +153,14 @@ class SimpleHTTPException(Exception):
 
         self.response = response
 
+
 class PatchConflictException(SimpleHTTPException):
     """Exception for patch conflicts."""
     def __init__(self, response, patch_status):
         super(PatchConflictException, self).__init__(response)
 
         self.patch_status = patch_status
+
 
 class NoChange(Exception):
     """Exception that can be raised within a get/put handler to indicate 'no change'
@@ -172,15 +180,17 @@ def _raise_if_error(response):
     if response.status_code != 200:
         raise SimpleHTTPException(response)
 
+
 def ensure_unicode(input_value):
     """ if input_value is type str, convert to unicode with utf-8 encoding """
-    if sys.version_info.major >= 3:
+    if sys.version_info.major == 2:
+        if not isinstance(input_value, basestring):
+            return input_value
+    else:
         return input_value
 
-    if not isinstance(input_value, basestring):
-        return input_value
-    elif isinstance(input_value, str):
-        input_unicode = input_value.decode('utf-8')
+    if isinstance(input_value, str):
+        input_unicode = UnicodeDammit(input_value).unicode_markup.encode('utf-8').decode('utf-8')
     else:
         input_unicode = input_value
 
@@ -229,7 +239,7 @@ class SimpleClient(object):
         else:
             self.proxies = None
         if base_url:
-            self.base_url = ensure_unicode(base_url)
+            self.base_url = ensure_unicode(base_url.strip("/"))
         self.verify = verify
         self.verify = ensure_unicode(verify)
         if verify is None:
@@ -267,7 +277,7 @@ class SimpleClient(object):
                                      timeout=timeout)
         _raise_if_error(response)
         session = json.loads(response.text)
-        orgs = session['orgs']
+        orgs = session.get('orgs')
         selected_org = None
         if orgs is None or len(orgs) == 0:
             raise Exception("User is a member of no orgs")
@@ -800,7 +810,7 @@ class LoggingSimpleClient(SimpleClient):
             directory = os.path.expandvars(directory)
             assert(os.path.exists(directory))
             self.logging_directory = directory
-        except Exception as e:
+        except Exception:
             raise Exception("Response Logging Directory %s does not exist!",
                             logging_directory)
 

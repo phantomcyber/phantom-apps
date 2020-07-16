@@ -14,7 +14,7 @@
     "utctime_updated": "2018-05-03T22:31:37.122043",
     "package_name": "phantom_resilient",
     "main_module": "resilient_connector.pyc",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -431,7 +431,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -805,7 +805,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -1196,7 +1196,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -1997,7 +1997,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -2656,7 +2656,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "fullincidentdatadto": {
@@ -3060,7 +3060,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -4080,7 +4080,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2103
@@ -4483,7 +4483,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -4672,7 +4672,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -4808,7 +4808,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "artifact_id": {
@@ -5014,7 +5014,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -5150,7 +5150,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "incidentartifactdto": {
@@ -5159,9 +5159,14 @@
                     "order": 1
                 },
                 "type": {
-                    "description": "Type of artifact. Known values are; url(3), domain(2), file(13)",
+                    "description": "Type of artifact",
                     "data_type": "string",
-                    "order": 2
+                    "order": 2,
+                    "value_list": [
+                        "url(3)",
+                        "domain(2)",
+                        "file(13)"
+                    ]
                 },
                 "value": {
                     "description": "artifact value field",
@@ -5387,7 +5392,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -5530,7 +5535,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "artifact_id": {
@@ -5749,7 +5754,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -5891,7 +5896,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -5948,7 +5953,7 @@
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ],
                     "example_values": [
                         109
@@ -5960,7 +5965,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -6183,7 +6188,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "comment_id": {
@@ -6193,7 +6198,7 @@
                     "primary": true,
                     "order": 2,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ]
                 }
             },
@@ -6444,7 +6449,7 @@
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ],
                     "example_values": [
                         109
@@ -6456,7 +6461,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -6668,7 +6673,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "parent_id": {
@@ -6677,7 +6682,7 @@
                     "primary": true,
                     "order": 2,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ]
                 },
                 "text": {
@@ -6723,7 +6728,7 @@
                     "data_path": "action_result.parameter.parent_id",
                     "data_type": "string",
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ]
                 },
                 {
@@ -6762,7 +6767,7 @@
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ],
                     "example_values": [
                         109
@@ -6774,7 +6779,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -6986,7 +6991,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "comment_id": {
@@ -6996,7 +7001,7 @@
                     "primary": true,
                     "order": 2,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ]
                 },
                 "incidentcommentdto": {
@@ -7073,7 +7078,7 @@
                     "column_name": "Comment ID",
                     "column_order": 1,
                     "contains": [
-                        "commentid"
+                        "ibm resilient commentid"
                     ],
                     "example_values": [
                         109
@@ -7085,7 +7090,7 @@
                     "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         2101
@@ -7297,7 +7302,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -7394,7 +7399,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "table_id": {
@@ -7404,7 +7409,7 @@
                     "primary": true,
                     "order": 2,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -7431,7 +7436,7 @@
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "string",
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         "2104"
@@ -7443,7 +7448,7 @@
                     "data_path": "action_result.parameter.table_id",
                     "data_type": "string",
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "example_values": [
                         "1000"
@@ -7656,7 +7661,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "table_id": {
@@ -7997,7 +8002,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "table_id": {
@@ -8140,7 +8145,7 @@
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "string",
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "column_name": "Incident ID",
                     "column_order": 0
@@ -8210,7 +8215,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "table_id": {
@@ -8230,7 +8235,7 @@
                     "primary": true,
                     "order": 3,
                     "contains": [
-                        "keyid"
+                        "ibm resilient keyid"
                     ]
                 },
                 "value": {
@@ -8269,7 +8274,7 @@
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "string",
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ],
                     "column_name": "Incident ID",
                     "column_order": 0
@@ -8278,7 +8283,7 @@
                     "data_path": "action_result.parameter.key",
                     "data_type": "string",
                     "contains": [
-                        "keyid"
+                        "ibm resilient keyid"
                     ],
                     "column_name": "Key",
                     "column_order": 2
@@ -9963,7 +9968,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 }
             },
@@ -10158,7 +10163,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "attachment_id": {
@@ -10168,7 +10173,7 @@
                     "primary": true,
                     "order": 2,
                     "contains": [
-                        "attachmentid"
+                        "ibm resilient attachmentid"
                     ]
                 }
             },
@@ -10370,7 +10375,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "ticketid"
+                        "ibm resilient ticketid"
                     ]
                 },
                 "vault_id": {
