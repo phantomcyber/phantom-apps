@@ -36,7 +36,8 @@ import requests
 import tempfile
 from datetime import *
 # from datetime import datetime
-from dateutil.parser import parse, tz
+from dateutil.parser import parse
+from dateutil import tz
 
 from builtins import str
 from jira.client import JIRA
