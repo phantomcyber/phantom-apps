@@ -63,7 +63,7 @@ class IronnetConnector(BaseConnector):
         self._password = None
         self._verify_server_cert = None
         self._enable_alert_notifications = None
-        self._alert_notif_actions = None
+        self._alert_notification_actions = None
         self._alert_categories = None
         self._alert_subcategories = None
         self._alert_severity_lower = None
@@ -377,7 +377,7 @@ class IronnetConnector(BaseConnector):
                 self.save_progress("Fetching alert notifications was successful")
                 # Filter the response
                 for alert_notification in response['alert_notifications']:
-                    if alert_notification['alert_action'] in self._alert_notif_actions and alert_notification['alert']:
+                    if alert_notification['alert_action'] in self._alert_notification_actions and alert_notification['alert']:
                         alert = alert_notification['alert']
                         if alert['category'] not in self._alert_categories and alert['sub_category'] not in self._alert_subcategories:
                             if self._alert_severity_lower <= int(alert['severity']) <= self._alert_severity_upper:
@@ -487,7 +487,7 @@ class IronnetConnector(BaseConnector):
                 self.save_progress("Fetching event notifications was successful")
                 # Filter the response
                 for event_notification in response['event_notifications']:
-                    if event_notification['event_action'] in self._event_notif_actions and event_notification['event']:
+                    if event_notification['event_action'] in self._event_notification_actions and event_notification['event']:
                         event = event_notification['event']
                         if event['category'] not in self._event_categories and event['sub_category'] not in self._event_subcategories:
                             if self._event_severity_lower <= int(event['severity']) <= self._event_severity_upper:
@@ -702,12 +702,12 @@ class IronnetConnector(BaseConnector):
         # Alert Notification Configs
         self._enable_alert_notifications = config.get('enable_alert_notifications')
         if self._enable_alert_notifications:
-            alert_acts = config.get('alert_notif_actions')
+            alert_acts = config.get('alert_notification_actions')
             if alert_acts:
-                self._alert_notif_actions = ["ANA_" + str(act).strip().replace(" ", "_").upper() for act in
+                self._alert_notification_actions = ["ANA_" + str(act).strip().replace(" ", "_").upper() for act in
                                              alert_acts.split(',') if act.strip()]
             else:
-                self._alert_notif_actions = ["ANA_ALERT_CREATED"]
+                self._alert_notification_actions = ["ANA_ALERT_CREATED"]
             alert_cats = config.get('alert_categories')
             if alert_cats:
                 self._alert_categories = [str(cat).strip().replace(" ", "_").upper() for cat in alert_cats.split(',')
@@ -742,12 +742,12 @@ class IronnetConnector(BaseConnector):
         # Event Notification Configs
         self._enable_event_notifications = config.get('enable_event_notifications')
         if self._enable_event_notifications:
-            event_acts = config.get('event_notif_actions')
+            event_acts = config.get('event_notification_actions')
             if event_acts:
-                self._event_notif_actions = ["ENA_" + str(act).strip().replace(" ", "_").upper() for act in
+                self._event_notification_actions = ["ENA_" + str(act).strip().replace(" ", "_").upper() for act in
                                              event_acts.split(',') if act.strip()]
             else:
-                self._event_notif_actions = ["ENA_EVENT_CREATED"]
+                self._event_notification_actions = ["ENA_EVENT_CREATED"]
             event_cats = config.get('event_categories')
             if event_cats:
                 self._event_categories = [str(cat).strip().replace(" ", "_").upper() for cat in event_cats.split(',')

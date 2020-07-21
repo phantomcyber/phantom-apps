@@ -49,7 +49,7 @@
             "default": true,
             "order": 4
         },
-        "alert_notif_actions": {
+        "alert_notification_actions": {
             "description": "Alert Notification Actions to include for ingest (if ingest is enabled).  Enter in CSV format.",
             "data_type": "string",
             "required": false,
@@ -60,14 +60,12 @@
             "description": "Alert Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
             "data_type": "string",
             "required": false,
-            "default": "",
             "order": 6
         },
         "alert_subcategories": {
             "description": "Alert SubCategories to exclude from ingest (if ingest is enabled). Enter in CSV format.",
             "data_type": "string",
             "required": false,
-            "default": "",
             "order": 7
         },
         "alert_severity_lower": {
@@ -102,7 +100,6 @@
             "description": "Dome Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
             "data_type": "string",
             "required": false,
-            "default": "",
             "order": 12
         },
         "dome_limit": {
@@ -119,7 +116,7 @@
             "default": false,
             "order": 14
         },
-        "event_notif_actions": {
+        "event_notification_actions": {
             "description": "Event Notification Actions to include for ingest (if ingest is enabled).  Enter in CSV format.",
             "data_type": "string",
             "required": false,
@@ -130,14 +127,12 @@
             "description": "Event Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
             "data_type": "string",
             "required": false,
-            "default": "",
             "order": 16
         },
         "event_subcategories": {
             "description": "Event SubCategories to exclude from ingest (if ingest is enabled). Enter in CSV format.",
             "data_type": "string",
             "required": false,
-            "default": "",
             "order": 17
         },
         "event_severity_lower": {
@@ -638,9 +633,9 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get irondome info",
+            "action": "get community info",
             "identifier": "irondefense_get_alert_irondome_info",
-            "description": "Gets IronDome information related to an IronDefense alert",
+            "description": "Gets community information related to an IronDefense alert",
             "type": "generic",
             "read_only": false,
             "parameters": {
