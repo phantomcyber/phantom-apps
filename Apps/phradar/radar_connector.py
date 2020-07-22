@@ -43,11 +43,14 @@ class RadarConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    ##########################################
+    #       REQUEST/RESPONSE PROCESSES      #
+    #########################################
     def _process_empty_response(self, response, action_result):
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response, no information in header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response, no information in header."), None)
 
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
@@ -63,7 +66,7 @@ class RadarConnector(BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = "\n".join(split_lines)
         except Exception as ex:
-            self.debug_print(f"Process HTML error during action: {self.get_action_identifier()}. Error:", ex)
+            self.debug_print(f"action: {self.get_action_identifier()} - process HTML error: {ex}")
             error_text = "Cannot parse error details"
 
         message = f"HTML Response Status Code: {status_code}: {error_text}\n"
@@ -80,7 +83,7 @@ class RadarConnector(BaseConnector):
             if 200 <= response.status_code < 399:
                 return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
             else:
-                self.debug_print(f"Parse JSON error during action: {self.get_action_identifier()}. Error:", ex)
+                self.debug_print(f"action: {self.get_action_identifier()} - process JSON error: {ex}")
 
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
@@ -139,9 +142,22 @@ class RadarConnector(BaseConnector):
             # return standard error message
             return f"{status_message}. Message: {resp_json['message']}"
         except (ValueError, KeyError) as ex:
-            self.debug_print(f"Could not process error response json. Error: ", ex)
+            self.debug_print(f"action: {self.get_action_identifier()} - process error response error: {ex}")
 
         return f"{status_message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
+
+    def _get_system_settings(self):
+        self.save_progress("Get system settings")
+
+        url = f"{self.get_phantom_base_url()}rest/system_settings"
+        try:
+            resp = requests.get(url, verify=False)
+            resp_json = resp.json()
+        except Exception as ex:
+            self.debug_print(f"action: {self.get_action_identifier()} - get system settings error: {ex}")
+            return None
+
+        return resp_json
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         self.save_progress(f"Make rest call")
@@ -157,29 +173,64 @@ class RadarConnector(BaseConnector):
 
         self.save_progress(f"Send {method} request to {url}")
 
+        action = self.get_action_identifier()
         try:
             request_func = getattr(requests, method)
         except AttributeError as aex:
-            self.debug_print(f"Get request {method} attribute error during action: {self.get_action_identifier()}. Error:", aex)
+            self.debug_print(f"action: {action} - get {method} request attribute error: {aex}",)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
             return self._process_response(resp, action_result)
         except Exception as ex:
-            self.debug_print(f"Make REST call during action: {self.get_action_identifier()}. Error:", ex)
+            self.debug_print(f"action: {action} - make REST call error: {ex}")
             try:
                 return RetVal(
                     action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
             except Exception:
-                message = f'Unable to connect to the URL: {url}. Error Details: {ex}'
-                return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to connect to the URL: {url}. Error Details: {ex}"), resp_json)
 
     def _payload_err(self, ex, action_result, data):
         msg = f"Response payload is missing necessary fields: {ex}"
         self.debug_print((f"{msg}\nresponse data:", data))
         return action_result.set_status(phantom.APP_ERROR, msg)
 
+    ###########################
+    #       VALIDATION       #
+    ##########################
+    def _validate_incident_id_param(self, incident_id, action_result):
+        action = self.get_action_identifier()
+
+        if incident_id is None:
+            msg = "Required 'incident_id' param not present."
+            self.debug_print(f"{msg} action: {action}")
+            return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
+
+        try:
+            incident_id = int(incident_id)
+        except Exception as ex:
+            self.debug_print(f" action: {action} - incident_id to int error: {ex}")
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "The 'incident_id' param is not a valid integer."), None)
+
+        if incident_id <= 0:
+            self.debug_print(f" action: {action} - incident_id must be positive.")
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "The 'incident_id' param must be a positive integer."), None)
+
+        return RetVal(phantom.APP_SUCCESS, {})
+
+    ###############################
+    #       HELPER METHODS       #
+    ##############################
+    def _localize_time(self, time: str) -> datetime:
+        return parser.parse(time).astimezone(pytz.timezone(self._time_zone))
+
+    def _format_display_time(self, time: datetime) -> str:
+        return f"{time.strftime('%Y-%m-%d %H:%M:%S')} / {self._time_zone}"
+
+    ##############################
+    #       ACTION HANDLERS     #
+    #############################
     def _handle_test_connectivity(self, param):
         self.save_progress("Connect to Radar")
 
@@ -195,14 +246,15 @@ class RadarConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_privacy_incident(self, param):
-        self.save_progress(f"Run action {self.get_action_identifier()}")
+        action = self.get_action_identifier()
+        self.save_progress(f"Run action {action}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param.get("name")
         if not name:
-            self.debug_print(f"required 'name' param not present in action: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "incident name not specified")
+            self.debug_print(f"action: {action} - required 'name' param not present.")
+            return action_result.set_status(phantom.APP_ERROR, "Incident name not specified.")
 
         description = param.get("description", "Privacy incident created by Splunk Phantom")
 
@@ -213,7 +265,7 @@ class RadarConnector(BaseConnector):
         system_settings = self._get_system_settings()
         phantom_base_url = system_settings["company_info_settings"]["fqdn"] if system_settings else None
         if not phantom_base_url:
-            return action_result.set_status(phantom.APP_ERROR, "Base URL for phantom appliance must be configured")
+            return action_result.set_status(phantom.APP_ERROR, "Base URL for phantom appliance must be configured.")
         container_path = ""
         container_id = self.get_container_id()
         if container_id is not None:
@@ -258,29 +310,19 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created a privacy incident")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created a privacy incident.")
 
     def _handle_get_privacy_incident(self, param):
-        self.save_progress(f"Run action {self.get_action_identifier()}")
+        action = self.get_action_identifier()
+        self.save_progress(f"Run action {action}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-        incident_id = param.get("incident_id")
-        if incident_id is None:
-            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
-        try:
-            if isinstance(incident_id, float):
-                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
-            incident_id = int(incident_id)
-        except:
-            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
 
-        if incident_id < 0:
-            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
+        incident_id = param.get("incident_id")
+        result, _ = self._validate_incident_id_param(incident_id, action_result)
+        if phantom.is_fail(result):
+            return action_result.get_status()
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}", action_result, method="get")
 
@@ -316,54 +358,24 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(incident)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched privacy incident")
-
-    def _get_system_settings(self):
-        self.save_progress("Get system settings")
-
-        url = f"{self.get_phantom_base_url()}rest/system_settings"
-        try:
-            resp = requests.get(url, verify=False)
-            resp_json = resp.json()
-        except Exception as ex:
-            self.debug_print(f"Get system settings during action: {self.get_action_identifier()}. Error:", ex)
-            return None
-
-        return resp_json
-
-    def _localize_time(self, time: str) -> datetime:
-        return parser.parse(time).astimezone(pytz.timezone(self._time_zone))
-
-    def _format_display_time(self, time: datetime) -> str:
-        return f"{time.strftime('%Y-%m-%d %H:%M:%S')} / {self._time_zone}"
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched privacy incident.")
 
     def _handle_add_note(self, param):
-        self.save_progress(f"Run action {self.get_action_identifier()}")
+        action = self.get_action_identifier()
+        self.save_progress(f"Run action {action}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-        content = param.get("content", "")
-        category = "Splunk Phantom"
 
         incident_id = param.get("incident_id")
-        if incident_id is None:
-            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
-        try:
-            if isinstance(incident_id, float):
-                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
-            incident_id = int(incident_id)
-        except:
-            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
+        result, _ = self._validate_incident_id_param(incident_id, action_result)
+        if phantom.is_fail(result):
+            return action_result.get_status()
 
-        if incident_id < 0:
-            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
+        content = param.get("content", "")
         body = {
             "content": content,
-            "category": category,
+            "category": "Splunk Phantom",
         }
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="post", data=json.dumps(body))
@@ -377,8 +389,8 @@ class RadarConnector(BaseConnector):
             note["id"] = data["headers"]["Location"].split("/")[4]
         # return error for missing id from response headers
         except Exception:
-            self.debug_print("could not parse 'id' from response headers: ", data["headers"])
-            return action_result.set_status(phantom.APP_ERROR, "Response payload is missing necessary fields: 'id'")
+            self.debug_print(f" action: {action} - cannot parse 'id' from response headers: {data['headers']}.")
+            return action_result.set_status(phantom.APP_ERROR, "Response payload is missing necessary fields: 'id'.")
 
         note["incident_id"] = incident_id
         note["content"] = content
@@ -386,30 +398,19 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(note)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully added note")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully added note.")
 
     def _handle_get_notes(self, param):
-        self.save_progress(f"Run action {self.get_action_identifier()}")
+        action = self.get_action_identifier()
+        self.save_progress(f"Run action {action}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        if incident_id is None:
-            self.debug_print(f"required 'incident_id' param not present in action: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "incident id not specified")
-        try:
-            if isinstance(incident_id, float):
-                self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-                return action_result.set_status(phantom.APP_ERROR, " Please provide a valid integer value in the 'incident_id' parameter")
-            incident_id = int(incident_id)
-        except:
-            self.debug_print(f"Please provide a valid integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'incident_id' parameter")
-
-        if incident_id < 0:
-            self.debug_print(f"Please provide a valid non-negative integer value in the 'incident_id' parameter: {self.get_action_identifier()}")
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'incident_id' parameter")
+        result, _ = self._validate_incident_id_param(incident_id, action_result)
+        if phantom.is_fail(result):
+            return action_result.get_status()
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")
 
@@ -438,7 +439,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("Add data to action result")
         action_result.add_data(notes)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched notes")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched notes.")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
