@@ -1,0 +1,609 @@
+{
+    "appid": "cfeed12d-b40f-477a-b9f9-59c37d12ebfe",
+    "name": "Google People",
+    "description": "This app integrates with Google People to support various generic and investigative actions",
+    "type": "identity management",
+    "product_vendor": "Google",
+    "logo": "googlepeople.svg",
+    "logo_dark": "googlepeople_dark.svg",
+    "product_name": "Google People",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) Phantom, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-07-21T23:24:14.466184Z",
+    "package_name": "phantom_googlepeople",
+    "main_module": "googlepeople_connector.py",
+    "min_phantom_version": "4.9.33071",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/oauth2client_wheel/rsa-3.4.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/oauth2client_wheel/pyasn1_modules-0.1.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.9.2-py2-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google-auth/google_auth-1.1.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google-auth/google_auth_httplib2-0.0.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools/cachetools-2.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/googleapiclient_wheel/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate_wheel/uritemplate-3.0.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip3_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/oauth2client_wheel/rsa-3.4.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/oauth2client_wheel/pyasn1_modules-0.1.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2-0.17.3-py3-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google-auth/google_auth-1.1.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google-auth/google_auth_httplib2-0.0.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools/cachetools-2.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/googleapiclient_wheel/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate_wheel/uritemplate-3.0.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "base_uri": {
+            "data_type": "string",
+            "description": "Base URL to Google People service",
+            "required": true,
+            "order": 0,
+            "default": "https://people.googleapis.com"
+        },
+        "key_json": {
+            "description": "Contents of service account JSON file",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "login_email": {
+            "description": "Login email",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list other contacts",
+            "identifier": "list_other_contacts",
+            "description": "lists all contacts that are not in a contact group",
+            "verbose": "This action lists all \"Other contacts\" which are contacts that are not in another contact group. These contacts are typically automatically created from interactions",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "read_mask": {
+                    "description": "fields to be returned for each person, if empty default values will be used",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "default": "names,EmailAddresses",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "number of contacts to include in response",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": 500,
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.read_mask",
+                    "data_type": "string",
+                    "column_name": "read_mask",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "column_name": "page_token",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "column_name": "page_size",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "column_name": "request_sync_token",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string",
+                    "column_name": "sync_token",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "copy contact",
+            "identifier": "copy_contact",
+            "description": "copy 'Other contact' to 'myContacts' group",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_name": {
+                    "description": "resource name of the \"Other contact\" to copy",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "order": 0
+                },
+                "copy_mask": {
+                    "description": "fields to be copied into the new contact",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "resource_name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.copy_mask",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "copy_mask",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list directory",
+            "identifier": "list_directory",
+            "description": "lists all contacts and profiles in user's domain directory",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "read_mask": {
+                    "description": "fields to be returned for each person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "names,emailAddresses",
+                    "order": 0
+                },
+                "page_size": {
+                    "description": "number of responses to include",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": "",
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.read_mask",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "read_mask",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "page_size",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "page_token",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "request_sync_toekn",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sync_token",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user profile",
+            "identifier": "get_user_profile",
+            "description": "provides information about a person given account id",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_name": {
+                    "description": "resource name of the person to provide info about",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "person_fields": {
+                    "description": "fields to be returned for the person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "resource_name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.person_fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "person_fields",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list people",
+            "identifier": "list_people",
+            "description": "lists authenticated user's contacts",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "person_fields": {
+                    "description": "fields to be returned for each person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "names,emailAddresses",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "number of connections to include in response",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": "",
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.person_fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "person_fields",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "page_token",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "page_size",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "request_sync_token",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sync_token",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
