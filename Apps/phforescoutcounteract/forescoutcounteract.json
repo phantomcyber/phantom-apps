@@ -293,19 +293,39 @@
             "action": "get device info",
             "identifier": "list_host_properties",
             "description": "Get the properties of a host",
-            "verbose": "",
+            "verbose": "One of the parameters (host_id, host_ip, or host_mac) are required and the first to be provided is used (in that order).",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "host_id": {
-                    "description": "Host id of device",
+                    "description": "Host ID of device (Used first, if provided)",
                     "data_type": "numeric",
-                    "required": true,
+                    "required": false,
                     "primary": true,
                     "contains": [
                         "forescout host id"
                     ],
                     "order": 0
+                },
+                "host_ip": {
+                    "description": "Current local IP address of device (Used second, if provided)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 1
+                },
+                "host_mac": {
+                    "description": "Host MAC address of device (Used last, if provided)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "mac address"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -599,6 +619,26 @@
                     ],
                     "example_values": [
                         167841953
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "203.0.113.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_mac",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ],
+                    "example_values": [
+                        "0050568b0091"
                     ]
                 },
                 {

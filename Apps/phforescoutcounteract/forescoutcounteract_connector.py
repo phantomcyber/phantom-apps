@@ -329,13 +329,23 @@ class ForescoutCounteractConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        host_id = param['host_id']
-        url = FS_WEB_HOSTS + '/' + str(host_id)
+        host_id = param.get('host_id')
+        host_ip = param.get('host_ip')
+        host_mac = param.get('host_mac')
+
+        if host_id:
+            url = '{}/{}'.format(FS_WEB_HOSTS, host_id)
+        elif host_ip:
+            url = '{}/ip/{}'.format(FS_WEB_HOSTS, host_ip)
+        elif host_mac:
+            url = '{}/mac/{}'.format(FS_WEB_HOSTS, host_mac)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, 'One of the following need to be provided: host_id, host_ip, or host_mac')
 
         # make rest call
         ret_val, response = self._make_rest_call('web', url, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -344,6 +354,8 @@ class ForescoutCounteractConnector(BaseConnector):
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['host_ip'] = response['host']['ip']
+        summary['host_mac'] = response['host']['mac']
+        summary['host_id'] = response['links']['href'].split('/')[-1]
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
