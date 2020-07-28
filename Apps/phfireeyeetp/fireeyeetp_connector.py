@@ -238,23 +238,69 @@ class FireeyeEtpConnector(BaseConnector):
         return phantom.APP_ERROR, None
 
     def _paginator(self, endpoint, action_result, data, method="get", **kwargs):
+        """ This function is used to handle the gathering of alerts for the list alerts action.
+        :param endpoint: API endpoint to use to get the alerts
+        :param action results: Action results for Phantom
+        :param data: dict of parameters to send to the API endpoint
+        :param method: HTTP method to use when calling the API endpoint
+        :param **kwargs: Optional and additional arguments to use for calling the API endpoint. Note: these parameters need to be valid Python Requests parameters
+        :return: a list of alerts
+        """
+        items_list = list()
+
+        while True:
+            ret_val, items = self._make_rest_call(endpoint, action_result, json=data, method=method, **kwargs)
+
+            if (phantom.is_fail(ret_val)):
+                # the call to the 3rd party device or service failed, action result should contain all the error details
+                # for now the return is commented out, but after implementation, return from here
+                return action_result.get_status()
+            else:
+                limit = items.get('meta').get('total') - len(items_list)
+
+            for item in items.get("data"):
+                items_list.append(item)
+
+            if limit and items.get('meta').get('total') >= limit:
+                if endpoint == FIREETEETP_LIST_ALERTS_ENDPOINT:
+                    data['fromLastModifiedOn'] = items.get('meta').get('fromLastModifiedOn').get('end')
+                elif endpoint == FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT:
+                    data['attributes']['date']['to_date'] = items.get('meta').get('timestamp_quarantine')
+
+            if limit <= 0:
+                break
+
+        return items_list
+
+    def _paginator2(self, endpoint, action_result, data, limit=None, method="get", **kwargs):
+        """ This function is used to handle the gathering of alerts for the on_poll action.
+        :param endpoint: API endpoint to use to get the alerts
+        :param action results: Action results for Phantom
+        :param data: dict of parameters to send to the API endpoint
+        :param limit: The number of alerts to ingest
+        :param method: HTTP method to use when calling the API endpoint
+        :param **kwargs: Optional and additional arguments to use for calling the API endpoint. Note: these parameters need to be valid Python Requests parameters
+        :return: a list of alerts
+        """
 
         items_list = list()
 
-        limit = data['size']
+        while limit > 0:
+            ret_val, items = self._make_rest_call(endpoint, action_result, json=data, method=method, **kwargs)
 
-        while True:
-            ret_val, items = self._make_rest_call(action_result, endpoint, json=data, method=method, **kwargs)
+            if (phantom.is_fail(ret_val)):
+                # the call to the 3rd party device or service failed, action result should contain all the error details
+                # for now the return is commented out, but after implementation, return from here
+                return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                return None
-
-            items_list.extend(items.get('data').get('attributes'))
-
-            print("Total count: {}   Size: {} ".format(items.get('meta').get('total'), limit))
+            if items.get('data'):
+                for item in items.get("data"):
+                    items_list.append(item)
+            else:
+                break
 
             if limit and items.get('meta').get('total') >= limit:
-                #return items_list[:limit]
+                limit = limit - items.get('meta').get('total')
                 data['fromLastModifiedOn'] = items.get('meta').get('fromLastModifiedOn').get('end')
 
             if items.get('meta').get('total') < limit:
@@ -290,20 +336,15 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Return success
         self.save_progress("Test Connectivity Passed")
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_alerts(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         data = {}
+        data['attributes'] = {}
 
         # Check the limit paramter
         if param.get('size') > 200:
@@ -314,30 +355,21 @@ class FireeyeEtpConnector(BaseConnector):
         data['size'] = size
 
         # Check the legacy id parameter
-        if param.get('legacy_id') and data.get('attributes'):
-            data['attributes']['legacy_id'] = param.get('legacy_id')
-        else:
-            data['attributes'] = {}
+        if param.get('legacy_id'):
             data['attributes']['legacy_id'] = param.get('legacy_id')
 
         # Check the message id parameter
-        if param.get('message_id') and data.get('attributes'):
-            data['attributes']['etp_message_id'] = param.get('message_id')
-        else:
-            data['attributes'] = {}
+        if param.get('message_id'):
             data['attributes']['etp_message_id'] = param.get('message_id')
 
         # Check the email status parmater
-        if param.get('email_status') and data.get('attributes'):
-            data['attributes']['email_status'] = ",".join(param.get('email_status'))
-        else:
-            data['attributes'] = {}
+        if param.get('email_status'):
             data['attributes']['email_status'] = param.get('email_status')
 
         # Check and calculate the timestamp to filter by
         if param.get('num_days'):
-            timestamp = datetime.today() - timedelta(days=param.get('num_days'))
-            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")
+            timestamp = datetime.utcnow() - timedelta(days=param.get('num_days'))
+            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
             data['fromLastModifiedOn'] = date
 
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
@@ -356,13 +388,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_get_alert(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         endpoint = FIREETEETP_GET_ALERT_ENDPOINT.format(alertId=param.get('alert_id'))
 
@@ -385,13 +410,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_list_email_attributes(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         data = {}
 
@@ -425,13 +443,6 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         endpoint = FIREETEETP_GET_MESSAGE_ATTRIBUTES_ENDPOINT.format(etp_message_id=param.get('etp_message_id'))
 
         # make rest call
@@ -453,13 +464,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_trace_email(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         params = {}
 
@@ -493,13 +497,6 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         # Set the file name for the vault
         filename = "raw_email_{}.txt".format(param.get("etp_message_id"))
 
@@ -531,13 +528,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_get_pcap(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         data = {}
 
@@ -573,13 +563,6 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         data = {}
 
         # Set the file name for the vault
@@ -614,13 +597,6 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         data = {}
 
         # Set the file name for the vault
@@ -654,13 +630,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_remediate_emails(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         data = {}
 
@@ -697,13 +666,6 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         # Set the file name for the vault
         filename = "quarantined_email_{}.txt".format(param.get("etp_message_id"))
 
@@ -735,13 +697,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_unquarantine_email(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         data = {}
 
@@ -778,13 +733,6 @@ class FireeyeEtpConnector(BaseConnector):
     def _handle_delete_quarantined_email(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
 
         data = {}
 
@@ -833,14 +781,8 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
         data = {}
+        data['attributes'] = {}
 
         # Check the limit paramter
         if param.get('size') > 200:
@@ -850,17 +792,60 @@ class FireeyeEtpConnector(BaseConnector):
 
         data['size'] = size
 
+        # Check the from date
+        if param.get('from_date'):
+            data['attributes']['date'] = {}
+            data['attributes']['date']['from_date'] = param.get('from_date')
+
+            # Since the from_date and to_date need to be supplied together check it here
+            # Check the to date
+            if param.get('to_date'):
+                data['attributes']['date']['to_date'] = param.get('to_date')
+
+        # Check the domain
+        if param.get('domains'):
+            data['attributes']['domains'] = param.get('domains').split(',')
+
+        # Check the email server
+        if param.get('email_server'):
+            data['attributes']['email_server'] = param.get('email_server')
+
+        # Check the from email address
+        if param.get('from'):
+            data['attributes']['from'] = param.get('from')
+
+        # Check the reason
+        if param.get('reason'):
+            data['attributes']['reason'] = param.get('reason').split(',')
+
+        # Check the recipients
+        if param.get('recipients'):
+            data['attributes']['recipients'] = param.get('recipients').split(',')
+
+        # Check the sender domain
+        if param.get('sender_domain'):
+            data['attributes']['sender_domain'] = param.get('sender_domain')
+
+        # Check the subject
+        if param.get('subject'):
+            data['attributes']['subject'] = param.get('subject')
+
+        # Check the tags
+        if param.get('tags'):
+            data['attributes']['tags'] = {}
+            data['attributes']['tags']['value'] = param.get('tags').split(',')
+
         endpoint = FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT
 
         # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, json=data, method="post")
+        ret_val, response = self._paginator(endpoint, action_result, data, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
+        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -872,40 +857,73 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        # pudb.set_trace()
-
+        # Parameters for the API
         data = {}
 
+        # Get config
+        config = self.get_config()
+
+        # Get the ingestion interval
+        interval_mins = int(config.get('ingest').get('interval_mins'))
+
         # Check the limit paramter
-        if param.get('container_count') > 200:
+        limit = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
+
+        # Make sure we dont hit the maximum limit per request
+        if limit > 200:
             size = 200
-        elif param.get('container_count') > 0:
-            size = param.get('container_count')
+        else:
+            size = limit
 
         data['size'] = size
 
-        # Check and calculate the timestamp to filter by
-        if param.get('num_days'):
-            timestamp = datetime.today() - timedelta(days=param.get('num_days'))
-            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        # If it is a manual poll or first run
+        if self.is_poll_now() or self._state.get('first_run', True):
+            timestamp = datetime.utcnow() - timedelta(minutes=60)
+            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
             data['fromLastModifiedOn'] = date
+        # If it is a scheduled poll, ingest from last_ingestion_time
+        else:
+            date = self._state.get('last_ingestion_time', datetime.utcnow() - timedelta(minutes=interval_mins))
+            data['fromLastModifiedOn'] = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000")
 
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
         # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=data, method="post")
+        response = self._paginator2(endpoint, action_result, data, limit=limit, method="post")
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            return action_result.get_status()
+        # Start creating events and artifacts
+        if response:
 
-        # Now post process the data,  uncomment code as you deem fit
+            self.save_progress('Ingesting {} alerts'.format(len(response)))
+
+            for alert in response:
+                # Create a container for each alert
+                container_creation_status, container_id = self._create_container(alert)
+
+                if phantom.is_fail(container_creation_status) or not container_id:
+                    self.debug_print('Error while creating container with ID {container_id}. {error_msg}'.
+                                format(container_id=container_id, error_msg=container_creation_status))
+                    continue
+                else:
+                    # Create artifacts for specific alert
+                    artifacts_creation_status, artifacts_creation_msg = self._create_artifacts(alert=alert,
+                                                                                            container_id=container_id)
+
+                    if phantom.is_fail(artifacts_creation_status):
+                        self.debug_print('Error while creating artifacts for container with ID {container_id}. {error_msg}'.
+                                        format(container_id=container_id, error_msg=artifacts_creation_msg))
+        else:
+            self.save_progress('No alerts found')
+
+        # Mark the first_run as False once the scheduled or ingestion polling
+        # first run or every run has been successfully completed
+        if not self.is_poll_now():
+            self._state['first_run'] = False
+
+        self._state['last_ingestion_time'] = data['fromLastModifiedOn']
+
+        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -931,16 +949,26 @@ class FireeyeEtpConnector(BaseConnector):
         """
         container_dict = dict()
 
-        container_dict['name'] = '{alert_name}'.format(alert_name=alert['data']['entires']['assessment'])
-        container_dict['source_data_identifier'] = container_dict['name']
-        container_dict['description'] = alert['data']['entires']['assessment']
+        # Creating a description and name for the alert
+        # ETP does not provide good data to create a name or description so I am manually creating a stardized convention
+
+        description = "Fireeye ETP alert on the email with the subject {} due to {} going to the user {}.".format(
+                                                                                                                alert.get('attributes').get('email').get('headers').get('subject'),
+                                                                                                                alert.get('attributes').get('meta').get('last_malware'),
+                                                                                                                alert.get('attributes').get('email').get('headers').get('to'))
+
+        name = "Fireeye ETP Alert - {}".format(alert.get('attributes').get('meta').get('last_malware'))
+
+        container_dict['name'] = '{alert_name}'.format(alert_name=name)
+        container_dict['source_data_identifier'] = self._create_dict_hash(alert)
+        container_dict['description'] = description
 
         container_creation_status, container_creation_msg, container_id = self.save_container(container=container_dict)
 
         if phantom.is_fail(container_creation_status):
             self.debug_print(container_creation_msg)
             self.save_progress('Error while creating container for alert {alert_name}. '
-                               '{error_message}'.format(alert_name=alert['data']['entires']['assessment'], error_message=container_creation_msg))
+                               '{error_message}'.format(alert_name=name, error_message=container_creation_msg))
             return self.set_status(phantom.APP_ERROR)
 
         return self.set_status(phantom.APP_SUCCESS), container_id
@@ -955,30 +983,19 @@ class FireeyeEtpConnector(BaseConnector):
         temp_dict = {}
         cef = {}
 
-        # List to transform the data to CEF acceptable fields.
-        transforms = {'hostname': 'sourceHostName', 'primary_ip_address': 'sourceAddress', 'file-path': 'filePath', 'file_full_path': 'filePath',
-        'path': 'filePath', 'md5sum': 'fileHashMd5', 'sha1sum': 'fileHashSha1', 'sha256sum': 'fileHashSha256', 'original-file-name': 'fileName',
-        'creation-time': 'fileCreateTime', 'modification-time': 'fileModificationTime', 'size-in-bytes': 'fileSize'}
+        # Add the contains data to the artifact
+        cef_types = {"malware_md5": ["fileHashMd5"], "source_ip": ["sourceAddress"], "etp_message_id": ["fireeyeetp message id"],
+        "legacy_id": ["fireeyeetp legacy id"], "id": ["fireeyeetp alert id"], "rcpt_to": ["email"], "mail_from": ["email"],
+        "to": ["email"], "cc": ["email"], "from": ["email"]}
 
-        # Process the details section.
-        details = json.loads(alert['data']['entires'])
-        for detail in details['data']['entries'].items():
-            if detail[0] in transforms:
-                cef[transforms[detail[0]]] = detail[1]
-            else:
-                cef[detail[0]] = detail[1]
-
-        # Process the rest of the alert
-        for artifact_name, artifact_value in alert.items():
-            if artifact_name in transforms:
-                cef[transforms[artifact_name]] = artifact_value
-            else:
-                cef[artifact_name] = artifact_value
+        # Flatten the alert data
+        cef = self.flatten_json(alert)
 
         # Add into artifacts dictionary if it is available
         if cef:
             temp_dict['cef'] = cef
-            temp_dict['name'] = alert['data']['entires']['assessment']
+            temp_dict['cef_types'] = cef_types
+            temp_dict['name'] = alert.get('attributes').get('meta').get('last_malware')
             temp_dict['container_id'] = container_id
             temp_dict['source_data_identifier'] = self._create_dict_hash(temp_dict)
 
@@ -1006,6 +1023,28 @@ class FireeyeEtpConnector(BaseConnector):
             return None
 
         return hashlib.md5(input_dict_str).hexdigest()
+
+    def flatten_json(self, y):
+        """ This function is used to generate a new JSON dictionary so the data flattened to the top most values. Helps with readability of the artifacts in the GUI.
+        :param y: JSON Dictionary of the data to flatten
+        :return out: new JSON dictionary
+        """
+        out = {}
+
+        def flatten(x, name=''):
+            if type(x) is dict:
+                for a in x:
+                    flatten(x[a], a)
+            elif type(x) is list:
+                i = 0
+                for a in x:
+                    flatten(a, name)
+                    i += 1
+            else:
+                out[name] = x
+
+        flatten(y)
+        return out
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
@@ -1044,7 +1083,12 @@ class FireeyeEtpConnector(BaseConnector):
     def initialize(self):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
-        self._state = self.load_state()
+
+        # Check for load_state API, use it if it is present
+        if (hasattr(self, 'load_state')):
+            self._state = self.load_state()
+        else:
+            self._state = self._load_state()
 
         # get the asset config
         config = self.get_config()
