@@ -1,19 +1,19 @@
 # File: skypeforbusiness_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-from urlparse import urlparse
 import json
 import os
 import time
-import urllib
 import uuid
 import pwd
 import grp
 import requests
-from bs4 import BeautifulSoup
+import base64
+import sys
+from bs4 import UnicodeDammit, BeautifulSoup
 from django.http import HttpResponse
 
 import phantom.app as phantom
@@ -21,6 +21,13 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 from skypeforbusiness_consts import *
+
+try:
+    from urlparse import urlparse
+    import urllib
+except:
+    from urllib.parse import urlparse
+    import urllib.parse as urllib
 
 
 def _handle_login_redirect(request, key):
@@ -151,7 +158,7 @@ def _save_app_state(state, asset_id, app_connector):
         with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
-        print 'Unable to save state file: {0}'.format(str(e))
+        print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
@@ -246,8 +253,7 @@ class SkypeForBusinessConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
                       None)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: response data
@@ -260,14 +266,17 @@ class SkypeForBusinessConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text.encode('utf-8'))
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -279,8 +288,7 @@ class SkypeForBusinessConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _process_json_response(response, action_result):
+    def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: response data
@@ -292,8 +300,9 @@ class SkypeForBusinessConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(str(e))), None)
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Code: {0}. Error: {1}"
+                                                   .format(error_code, error_msg)), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -308,7 +317,7 @@ class SkypeForBusinessConnector(BaseConnector):
 
         if not message:
             message = "Error from server. Status Code: {0} Data from server: {1}"\
-                .format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+                .format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -348,10 +357,56 @@ class SkypeForBusinessConnector(BaseConnector):
             return self._process_empty_response(request_response, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}"\
-            .format(request_response.status_code, request_response.text.replace('{', '{{').replace('}', '}}'))
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".\
+            format(request_response.status_code, self._handle_py_ver_compat_for_input_str(request_response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param python_version: Python major version
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the GitHub server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        return error_code, error_msg
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, verify=True, method="get"):
         """ Function that makes the REST call to the app.
@@ -377,8 +432,9 @@ class SkypeForBusinessConnector(BaseConnector):
         try:
             request_response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
-                                                   format(str(e))), resp_json)
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Code: {0}. Details: {1}".
+                                                   format(error_code, error_msg)), resp_json)
 
         return self._process_response(request_response, action_result)
 
@@ -810,13 +866,17 @@ class SkypeForBusinessConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        contact_email = param[SKYPE4B_JSON_CONTACT]
+        contact_email = self._handle_py_ver_compat_for_input_str(param[SKYPE4B_JSON_CONTACT])
         message = param[SKYPE4B_JSON_MESSAGE]
 
         if not contact_email.startswith('sip:'):
             contact_email = "sip:{}".format(contact_email)
 
-        encoded_message = message.encode('base64', 'strict')
+        if self._python_version == 2:
+            encoded_message = message.encode('base64', 'strict')
+        else:
+            encoded_message = base64.b64encode(message.encode())
+            encoded_message = UnicodeDammit(encoded_message).unicode_markup
 
         # Get list of endpoints
         status, endpoint_data = self._get_api_endpoints(action_result)
@@ -970,7 +1030,7 @@ class SkypeForBusinessConnector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -989,7 +1049,12 @@ class SkypeForBusinessConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._client_id = config[SKYPE4B_CONFIG_CLIENT_ID].encode('utf-8')
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+
+        self._client_id = self._handle_py_ver_compat_for_input_str(config[SKYPE4B_CONFIG_CLIENT_ID])
         self._client_secret = config[SKYPE4B_CONFIG_CLIENT_SECRET]
         self._tenant = config.get(SKYPE4B_CONFIG_TENANT, SKYPE4B_DEFAULT_TENANT)
         self._access_token = self._state.get(SKYPE4B_TOKEN_STRING, {}).get(SKYPE4B_ACCESS_TOKEN)
@@ -1038,7 +1103,7 @@ if __name__ == '__main__':
     if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1051,11 +1116,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={0}'.format(csrftoken)
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1071,6 +1136,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
