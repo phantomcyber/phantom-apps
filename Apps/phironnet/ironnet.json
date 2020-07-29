@@ -1291,6 +1291,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.events.*.src_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.constraint.total",
                     "data_type": "string",
                     "example_values": [
@@ -1876,6 +1890,20 @@
                     ],
                     "contains": [
                         "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event.src_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
                     ]
                 },
                 {
