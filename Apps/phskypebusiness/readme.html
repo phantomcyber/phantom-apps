@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2019 Splunk Inc.
+  Copyright (c) 2019-2020 Splunk Inc.
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -14,7 +14,7 @@ This app requires creating an Azure Application. To do so, navigate to <a href="
 <ol>
 	<li>Go to Azure Active Directory → App Registrations and click on <b>+New Application Registration</b>.</li>
 	<li>Give a name, select type as <b>“Web App/API”</b> and provide a sign-on URL.</li>
-	<li>After saving the app, open Manifest and change the field <b>‘oauth2AllowImplicitFlow’</b> from <i>false</i> to <i>true</i> and Save Manifest.</li>
+	<li>After saving the app, open Manifest, and change the field <b>‘oauth2AllowImplicitFlow’</b> from <i>false</i> to <i>true</i> and Save Manifest.</li>
 	<li>Go to App Settings → Properties, change <b>‘Multi-tenanted’</b> to &quotYES&quot.</li>
 	<li>Go to App Settings → Required Permissions and click on <b>+Add</b> and select <b>&quotSkype for Business Online&quot</b></li>
 	<li>Add the following Delegated Permissions for your app</li>
@@ -28,7 +28,7 @@ This app requires creating an Azure Application. To do so, navigate to <a href="
 </ol>
 
 <h2>Phantom Skype Asset</h2>
-When creating an asset for <b>Skype for Business</b> app, place <b>Application Id/Client Id</b> of the app in the <b>Client ID</b> field and place the key/password generated in the <b>Client Secret</b> field. User can enter <b>Tenant</b> if he chooses, else &quotcommon&quot would be taken as default. click <b>SAVE</b>.
+When creating an asset for <b>Skype for Business</b> app, place <b>Application Id/Client Id</b> of the app in the <b>Client ID</b> field and place the key/password generated in the <b>Client Secret</b> field. User can enter <b>Tenant</b> if he chooses, else &quotcommon&quot would be taken as default. Click <b>SAVE</b>.
 <br><br>
 After saving, a new field will appear in the <b>Asset Settings</b> tab. Take the URL found in the <b>POST incoming for Skype for Business to this location</b> field and place it in the <b>App Settings -> Reply URLs</b> field of your registered app. To this URL, add <b>/result</b>. After doing so the URL should look something like:
 <br><br>
@@ -48,10 +48,10 @@ Once again, click save at the bottom of the screen.
     <li>After logging in, review the requested permissions listed, then click <b>Accept.</b></li>
     <li><b>Close that tab after authentication</b>.<br>
         <ul>
-            <li>NOTE:- User may be required to repeat <b>Step-3</b> and <b>Step-4</b> multiple times.</li>
+            <li>NOTE:- Users may be required to repeat <b>Step-3</b> and <b>Step-4</b> multiple times.</li>
         </ul>
     </li>
-    <li>The test connectivity window should show success.</li>
+    <li>The test connectivity window should show a success.</li>
 </ol>
 <br>
 The app should now be ready to use.
