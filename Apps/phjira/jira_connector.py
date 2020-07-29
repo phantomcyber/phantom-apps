@@ -27,6 +27,7 @@ from jira_consts import *
 
 # Other imports used by this connector
 import json
+from datetime import datetime
 import time
 import os
 import sys
@@ -34,8 +35,6 @@ import pytz
 import signal
 import requests
 import tempfile
-from datetime import *
-# from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 
