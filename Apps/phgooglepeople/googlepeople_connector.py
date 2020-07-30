@@ -143,7 +143,7 @@ class GooglePeopleConnector(BaseConnector):
             summary['next_sync_token'] = next_sync
 
         return action_result.set_status(
-            phantom.APP_SUCCESS, 'Successfully retrieved {} otherContacts{}'.format(
+            phantom.APP_SUCCESS, 'Successfully retrieved {} otherContact{}'.format(
                 num_otherContacts, '' if num_otherContacts == 1 else 's'
             )
         )
@@ -246,8 +246,8 @@ class GooglePeopleConnector(BaseConnector):
             summary['next_sync_token'] = next_sync_token
 
         return action_result.set_status(
-            phantom.APP_SUCCESS, 'Successfully retrieved {} people{}'.format(
-                num_directoryPeople, '' if num_directoryPeople == 1 else 's'
+            phantom.APP_SUCCESS, 'Successfully retrieved {} {}'.format(
+                num_directoryPeople, 'person' if num_directoryPeople == 1 else 'people'
             )
         )
 
@@ -281,7 +281,7 @@ class GooglePeopleConnector(BaseConnector):
         except Exception as e:
             error_message = str(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to user profile.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to get user profile.")
 
         action_result.add_data(response)
 
@@ -353,7 +353,7 @@ class GooglePeopleConnector(BaseConnector):
             summary['next_sync_token'] = next_sync_token
 
         return action_result.set_status(
-            phantom.APP_SUCCESS, 'Successfully retrieved {} users{}'.format(
+            phantom.APP_SUCCESS, 'Successfully retrieved {} user{}'.format(
                 num_people, '' if num_people == 1 else 's'
             )
         )
