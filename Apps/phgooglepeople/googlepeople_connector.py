@@ -334,7 +334,7 @@ class GooglePeopleConnector(BaseConnector):
         except Exception as e:
             error_message = str(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list files.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to list people.")
 
         people = response['connections']
 
