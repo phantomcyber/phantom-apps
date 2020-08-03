@@ -1971,8 +1971,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get email",
-            "identifier": "get_email",
+            "action": "download email",
+            "identifier": "download_email",
             "description": "Download the email text and add it to the vault",
             "verbose": "",
             "type": "investigate",
@@ -2037,8 +2037,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get pcap",
-            "identifier": "get_pcap",
+            "action": "download pcap",
+            "identifier": "download_pcap",
             "description": "Downloads all PCAP files of the alert specified by alert ID and adds the files to the vault",
             "verbose": "",
             "type": "investigate",
@@ -2103,8 +2103,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get malware files",
-            "identifier": "get_malware_files",
+            "action": "download malware files",
+            "identifier": "download_malware_files",
             "description": "Downloads all malware files of the alert specified by alert ID and adds the files to the vault",
             "verbose": "",
             "type": "investigate",
@@ -2169,8 +2169,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get case files",
-            "identifier": "get_case_files",
+            "action": "download case files",
+            "identifier": "download_case_files",
             "description": "Downloads all case files of the alert specified by alert ID and adds the files to the vault",
             "verbose": "",
             "type": "investigate",

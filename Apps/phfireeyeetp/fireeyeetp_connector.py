@@ -493,7 +493,7 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_email(self, param):
+    def _handle_download_email(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -525,7 +525,7 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_pcap(self, param):
+    def _handle_download_pcap(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -559,7 +559,7 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_malware_files(self, param):
+    def _handle_download_malware_files(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -593,7 +593,7 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_case_files(self, param):
+    def _handle_download_case_files(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1059,10 +1059,10 @@ class FireeyeEtpConnector(BaseConnector):
             'list_email_attributes': self._handle_list_email_attributes,
             'get_email_attributes': self._handle_get_email_attributes,
             'trace_email': self._handle_trace_email,
-            'get_email': self._handle_get_email,
-            'get_pcap': self._handle_get_pcap,
-            'get_malware_files': self._handle_get_malware_files,
-            'get_case_files': self._handle_get_case_files,
+            'download_email': self._handle_download_email,
+            'download_pcap': self._handle_download_pcap,
+            'download_malware_files': self._handle_download_malware_files,
+            'download_case_files': self._handle_download_case_files,
             'remediate_emails': self._handle_remediate_emails,
             'get_quarantined_email': self._handle_get_quarantined_email,
             'unquarantine_email': self._handle_unquarantine_email,
