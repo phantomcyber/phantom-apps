@@ -1525,7 +1525,7 @@ class JiraConnector(BaseConnector):
         artifact_json = {}
 
         artifact_json['container_id'] = container_id
-        artifact_json['source_data_identifier'] = issue.key
+        artifact_json['source_data_identifier'] = self._handle_py_ver_compat_for_input_str(issue.key)
 
         try:
             artifact_json['label'] = issue.fields.issuetype.name
@@ -1560,17 +1560,17 @@ class JiraConnector(BaseConnector):
             pass
 
         try:
-            artifact_cef[JIRA_JSON_PROJECT_KEY] = issue.fields.project.key
+            artifact_cef[JIRA_JSON_PROJECT_KEY] = self._handle_py_ver_compat_for_input_str(issue.fields.project.key)
         except:
             pass
 
         try:
-            artifact_cef[JIRA_JSON_SUMMARY] = issue.fields.summary
+            artifact_cef[JIRA_JSON_SUMMARY] = self._handle_py_ver_compat_for_input_str(issue.fields.summary)
         except:
             pass
 
         try:
-            artifact_cef[JIRA_JSON_DESCRIPTION] = issue.fields.description
+            artifact_cef[JIRA_JSON_DESCRIPTION] = self._handle_py_ver_compat_for_input_str(issue.fields.description)
         except:
             pass
 
@@ -1662,7 +1662,7 @@ class JiraConnector(BaseConnector):
 
         artifact_cef['size'] = attachment.size
         artifact_cef['created'] = attachment.created
-        artifact_cef['filename'] = attachment.filename
+        artifact_cef['filename'] = self._handle_py_ver_compat_for_input_str(attachment.filename)
         artifact_cef['mimeType'] = attachment.mimeType
         try:
             artifact_cef['author'] = attachment.author.name
@@ -1689,7 +1689,7 @@ class JiraConnector(BaseConnector):
                 updateAuthor_account_id = None
                 is_on_prem = True
             except:
-                self.debug_print("Error occurred while fetching author name as server is Jira cloud. So try to fetch author display name and account ID")
+                # self.debug_print("Error occurred while fetching author name as server is Jira cloud. So try to fetch author display name and account ID")
                 author = comment.author.displayName
                 updateAuthor = comment.updateAuthor.displayName
                 author_account_id = comment.author.accountId
@@ -1703,7 +1703,7 @@ class JiraConnector(BaseConnector):
 
             artifact_cef = {}
 
-            artifact_cef['body'] = comment.body
+            artifact_cef['body'] = self._handle_py_ver_compat_for_input_str(comment.body)
             artifact_cef['created'] = comment.created
             artifact_cef['updated'] = comment.updated
             artifact_cef['is_on_prem'] = is_on_prem
@@ -2005,8 +2005,8 @@ class JiraConnector(BaseConnector):
     def _update_container(self, issue, container_id, last_time, action_result):
 
         update_json = {}
-        update_json['data'] = issue.raw
-        update_json['description'] = issue.fields.summary
+        update_json['data'] = self._handle_py_ver_compat_for_input_str(issue.raw)
+        update_json['description'] = self._handle_py_ver_compat_for_input_str(issue.fields.summary)
 
         if hasattr(self, 'get_phantom_base_url'):
             url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
@@ -2123,10 +2123,10 @@ class JiraConnector(BaseConnector):
 
         # Build the container JSON
         container_json = {}
-        container_json['name'] = issue.key
-        container_json['data'] = issue.raw
-        container_json['description'] = issue.fields.summary
-        container_json['source_data_identifier'] = issue.key
+        container_json['name'] = self._handle_py_ver_compat_for_input_str(issue.key)
+        container_json['data'] = self._handle_py_ver_compat_for_input_str(issue.raw)
+        container_json['description'] = self._handle_py_ver_compat_for_input_str(issue.fields.summary)
+        container_json['source_data_identifier'] = self._handle_py_ver_compat_for_input_str(issue.key)
         container_json['label'] = self.get_config().get('ingest', {}).get('container_label')
 
         # Save the container
