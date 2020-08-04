@@ -1,3 +1,8 @@
+# File: googlepeople_connector.py
+# Copyright (c) 2018-2020 Splunk Inc.
+#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom App imports
 import phantom.app as phantom
@@ -20,9 +25,21 @@ except:  # noqa
     pass  # noqa
 
 import json # noqa
+import sys # noqa
 
 from google.oauth2 import service_account # noqa
-from googleapiclient.discovery import build # noqa
+
+
+# the following argv 'work around' is to keep apiclient happy
+# and _also_ debug the connector as a script via pudb
+try:
+    argv_temp = list(sys.argv)
+except:
+    pass
+sys.argv = ['']
+
+#from googleapiclient.discovery import build # noqa
+import apiclient # noqa
 
 
 class RetVal(tuple):
@@ -55,7 +72,7 @@ class GooglePeopleConnector(BaseConnector):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Failed to create delegated credentials", e), None)
 
         try:
-            client = build('people', 'v1', credentials=credentials)
+            client = apiclient.discovery.build('people', 'v1', credentials=credentials)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to create client", e), None)
 
