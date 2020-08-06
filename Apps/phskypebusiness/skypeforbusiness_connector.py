@@ -873,9 +873,12 @@ class SkypeForBusinessConnector(BaseConnector):
             contact_email = "sip:{}".format(contact_email)
 
         if self._python_version == 2:
-            encoded_message = message.encode('base64', 'strict')
+            try:
+                encoded_message = message.encode('base64', 'strict')
+            except:
+                encoded_message = base64.b64encode(UnicodeDammit(message).unicode_markup.encode("utf-8"))
         else:
-            encoded_message = base64.b64encode(message.encode())
+            encoded_message = base64.b64encode(UnicodeDammit(message).unicode_markup.encode("utf-8"))
             encoded_message = UnicodeDammit(encoded_message).unicode_markup
 
         # Get list of endpoints
