@@ -19,13 +19,13 @@
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
-            "description": "Select the location that your ETP instance resides in",
+            "description": "The URL to access your ETP instance",
             "data_type": "string",
             "required": true,
-            "value_list": [
-                "US Instance",
-                "EMEA Instance",
-                "APJ Instance"
+            "example_values": [
+                "https://etp.us.fireeye.com",
+                "https://etp.eu.fireeye.com",
+                "https://etp.ap.fireeye.com"
             ],
             "default": "",
             "order": 0
@@ -589,7 +589,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Phish.LIVE.DTI.URL"
-                    ]
+                    ],
+                    "column_order": 1,
+                    "column_name": "Alert Reason"
                 },
                 {
                     "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.origid",
@@ -855,7 +857,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.attributes.email.attachment",
                     "data_type": "string",
-                    "column_order": 5,
+                    "column_order": 6,
                     "column_name": "Attachment"
                 },
                 {
@@ -867,7 +869,7 @@
                     "contains": [
                         "fireeyeetp message id"
                     ],
-                    "column_order": 8,
+                    "column_order": 9,
                     "column_name": "ETP Message ID"
                 },
                 {
@@ -879,7 +881,7 @@
                     "contains": [
                         "email"
                     ],
-                    "column_order": 3,
+                    "column_order": 4,
                     "column_name": "CC"
                 },
                 {
@@ -895,7 +897,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.attributes.email.headers.subject",
                     "data_type": "string",
-                    "column_order": 4,
+                    "column_order": 5,
                     "column_name": "Subject"
                 },
                 {
@@ -917,7 +919,7 @@
                     "contains": [
                         "email"
                     ],
-                    "column_order": 2,
+                    "column_order": 3,
                     "column_name": "From"
                 },
                 {
@@ -929,7 +931,7 @@
                     "contains": [
                         "email"
                     ],
-                    "column_order": 1,
+                    "column_order": 2,
                     "column_name": "To"
                 },
                 {
@@ -941,7 +943,7 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_order": 7,
+                    "column_order": 8,
                     "column_name": "Source IP"
                 },
                 {
@@ -953,7 +955,7 @@
                         "quarantined",
                         "rejected"
                     ],
-                    "column_order": 6,
+                    "column_order": 7,
                     "column_name": "Status"
                 },
                 {
@@ -994,7 +996,7 @@
                     "contains": [
                         "fireeyeetp legacy id"
                     ],
-                    "column_order": 9,
+                    "column_order": 10,
                     "column_name": "Legacy ID"
                 },
                 {
@@ -1532,7 +1534,9 @@
                         "pass",
                         "fail",
                         "no match"
-                    ]
+                    ],
+                    "column_order": 9,
+                    "column_name": "Spam"
                 },
                 {
                     "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
@@ -1541,7 +1545,9 @@
                         "pass",
                         "fail",
                         "no match"
-                    ]
+                    ],
+                    "column_order": 10,
+                    "column_name": "Advanced Threat"
                 },
                 {
                     "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
@@ -1550,7 +1556,10 @@
                         "pass",
                         "fail",
                         "no match"
-                    ]
+                    ],
+                    "column_order": 11,
+                    "column_name": "Virus"
+                    
                 },
                 {
                     "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
@@ -1568,7 +1577,9 @@
                         "pass",
                         "fail",
                         "no match"
-                    ]
+                    ],
+                    "column_order": 12,
+                    "column_name": "Policy Violation"
                 },
                 {
                     "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
@@ -1577,7 +1588,9 @@
                         "pass",
                         "fail",
                         "no match"
-                    ]
+                    ],
+                    "column_order": 13,
+                    "column_name": "YARA"
                 },
                 {
                     "data_path": "action_result.data.*.data.*.id",
@@ -2237,10 +2250,10 @@
         {
             "action": "remediate emails",
             "identifier": "remediate_emails",
-            "description": "Enqueues the message IDs provided in the request for remediation from the user's o365 inbox",
+            "description": "Enqueues the message IDs provided in the request for remediation from the user's Office365 mailbox",
             "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these actions you will not be able to use this action.</p><p></p><p>Any ETP Messages that have a status in this list are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remedating an email. It is important to note that if you seleted Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mail box, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
             "type": "contain",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "etp_message_ids": {
                     "description": "A Comma seperated list of ETP Message IDs",
@@ -2262,6 +2275,11 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
+                    "example_values": [
+                        "Delete",
+                        "Quarantine",
+                        "Move"
+                    ],
                     "value_list": [
                         "Delete",
                         "Quarantine",
@@ -2288,7 +2306,12 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.action_override",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Delete",
+                        "Quarantine",
+                        "Move"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.etp_message_ids",
@@ -2433,7 +2456,7 @@
             "description": "Releases the email file(s) present in the quarantine within ETP",
             "verbose": "",
             "type": "correct",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "etp_message_id": {
                     "description": "The ID of the Email Security message to download. Allows for a comma seperated string of IDs",
@@ -2548,7 +2571,7 @@
             "description": "Deletes the email file present in quarantine for the given Email Security message ID",
             "verbose": "",
             "type": "correct",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "etp_message_id": {
                     "description": "The ID of the Email Security message to download. Allows for a comma seperated string of IDs",

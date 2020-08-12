@@ -857,33 +857,50 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # pudb.set_trace()
+
         # Parameters for the API
         data = {}
+
+        # This is the maximum results per request we can get
+        data['size'] = 200
 
         # Get config
         config = self.get_config()
 
-        # Get the ingestion interval
-        interval_mins = int(config.get('ingest').get('interval_mins'))
-
-        # Check the limit paramter
-        limit = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
-
-        # Make sure we dont hit the maximum limit per request
-        if limit > 200:
-            size = 200
+        try:
+            # Get the endtime from Phantom which is when the action was ran
+            timestamp = datetime.utcfromtimestamp(param.get(phantom.APP_JSON_END_TIME) / 1000.0)
+        except:
+            self.debug_print("end_time in Phantom could not be converted correctly. Use alternative time equal to datetime.utcnow().")
         else:
-            size = limit
-
-        data['size'] = size
+            timestamp = datetime.utcnow()
 
         # If it is a manual poll or first run
         if self.is_poll_now() or self._state.get('first_run', True):
-            timestamp = datetime.utcnow() - timedelta(minutes=60)
-            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
+
+            try:
+                # Check the limit paramter
+                # If container count is not present just get 1
+                limit = param.get(phantom.APP_JSON_CONTAINER_COUNT, 1)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "The maximum containers is invalid.")
+
+            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000") - timedelta(minutes=15)
             data['fromLastModifiedOn'] = date
+
         # If it is a scheduled poll, ingest from last_ingestion_time
         else:
+
+            try:
+                # Get the ingestion interval
+                # If interval is not present just get the last 15 minutes
+                interval_mins = int(config.get('ingest').get('interval_mins', 15))
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Ingestion interval is invalid.")
+
+            # Try to get the last_ingestion_time from the state file
+            # If not get the last x minutes which is determined by the interval
             date = self._state.get('last_ingestion_time', datetime.utcnow() - timedelta(minutes=interval_mins))
             data['fromLastModifiedOn'] = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.000")
 
@@ -894,6 +911,10 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Start creating events and artifacts
         if response:
+
+            if self.is_poll_now() or self._state.get('first_run', True):
+                # If we want to get a limited of alerts then just return the list with that number of items
+                response = response[-limit:]
 
             self.save_progress('Ingesting {} alerts'.format(len(response)))
 
@@ -1111,16 +1132,9 @@ class FireeyeEtpConnector(BaseConnector):
         base_url = ""
 
         # Check to see which instance the user selected. Use the appropate URL.
-        instance = config.get('base_url')
+        base_url = config.get('base_url')
 
-        if instance == "US Instance":
-            base_url = FIREEYEETP_US_BASE_PATH
-        elif instance == "EMEA Instance":
-            base_url = FIREEYEETP_EU_BASE_PATH
-        elif instance == "APJ Instance":
-            base_url = FIREEYEETP_AP_BASE_PATH
-
-        self._base_url = base_url + FIREETEETP_API_PATH
+        self._base_url = "{}/{}".format(base_url, FIREETEETP_API_PATH)
 
         return phantom.APP_SUCCESS
 
