@@ -55,6 +55,8 @@ CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND = "Session token, not found"
 PAYLOAD_SECURITY_MSG_SUBMITTING_FILE = 'Submitting file/url to Falcon Sandbox'
 CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
 CROWDSTRIKE_ERR_EVENTS_FETCH = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
+CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
+CROWDSTRIKE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\

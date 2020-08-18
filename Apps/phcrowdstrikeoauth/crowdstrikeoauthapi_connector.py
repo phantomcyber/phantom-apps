@@ -201,13 +201,9 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _check_data(self, action_result, param, max_limit=None, sort_data=None):
 
-        limit = param.get('limit', 50)
-        try:
-            if not float(limit).is_integer() or limit <= 0:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero non-negative integer value in the 'limit' parameter")
-            limit = int(limit)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero integer value in the 'limit' parameter")
+        limit = self._validate_integers(action_result, param.get('limit', 50), 'limit')
+        if limit is None:
+            return action_result.get_status()
 
         if max_limit is not None:
             if limit > max_limit:
@@ -456,7 +452,8 @@ class CrowdstrikeConnector(BaseConnector):
         detection_id = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_JSON_ID])
         to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
 
-        detection_id = [x.strip() for x in detection_id.split(",")]
+        detection_id = [x.strip() for x in detection_id.split(',')]
+        detection_id = list(filter(None, detection_id))
 
         api_data = {
             "ids": detection_id,
@@ -599,7 +596,9 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids")).split(",")
+        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
 
         data = {"ids": ids}
 
@@ -613,7 +612,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add the response into the data section
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Incidents fetched: {}".format(len(response['resources'])))
+        return action_result.set_status(phantom.APP_SUCCESS, "Incidents fetched: {}".format(len(response.get('resources', []))))
 
     def _handle_get_incident_behaviors(self, param):
 
@@ -622,7 +621,9 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids")).split(",")
+        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
 
         data = {"ids": ids}
 
@@ -634,8 +635,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        data = dict(response["resources"][0])
-        action_result.add_data(data)
+        action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS, "Incident behavior fetched successfully")
 
     def _handle_list_crowdscores(self, param):
@@ -675,18 +675,24 @@ class CrowdstrikeConnector(BaseConnector):
         # Hold the values for the status
         statuses = {"new": 20, "reopened": 25, "in progress": 30, "closed": 40}
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids")).split(",")
+        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
 
         # Default data we will send
         data = {"action_parameters": [], "ids": ids}
 
         if param.get("add_tag"):
-            add_tags = self._handle_py_ver_compat_for_input_str(param.get("add_tag")).split(",")
+            add_tags = self._handle_py_ver_compat_for_input_str(param.get("add_tag"))
+            add_tags = [x.strip() for x in add_tags.split(',')]
+            add_tags = list(filter(None, add_tags))
             for tag in add_tags:
                 data["action_parameters"].append({"name": "add_tag", "value": tag})
 
         if param.get("delete_tag"):
-            delete_tags = self._handle_py_ver_compat_for_input_str(param.get("delete_tag")).split(",")
+            delete_tags = self._handle_py_ver_compat_for_input_str(param.get("delete_tag"))
+            delete_tags = [x.strip() for x in delete_tags.split(',')]
+            delete_tags = list(filter(None, delete_tags))
             for tag in delete_tags:
                 data["action_parameters"].append({"name": "delete_tag", "value": tag})
 
@@ -773,8 +779,12 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        ids = self._handle_py_ver_compat_for_input_str(param.get("role_id"))
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
+
         # Create the param variable to send
-        params = {'ids': self._handle_py_ver_compat_for_input_str(param.get("role_id")).split(',')}
+        params = {'ids': ids}
 
         endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
 
@@ -1324,19 +1334,10 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        timeout = param.get('timeout_seconds', 60)
-        try:
-            if not float(timeout).is_integer() and not None:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'timeout' parameter")
-            timeout = int(timeout)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the 'timeout' parameter")
-
-        if timeout >= 0:
-            param['timeout'] = timeout
-        elif timeout < 0:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the 'timeout' parameter")
-
+        timeout = self._validate_integers(action_result, param.get('timeout_seconds', 60), "timeout_seconds")
+        if timeout is None:
+            return action_result.get_status()
+        param['timeout'] = timeout
         summary = action_result.update_summary({})
         summary['results'] = 'Successfully executed command'
 
@@ -1524,35 +1525,55 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_BASE_ENDPOINT, params=self._parameters)
 
         if (phantom.is_fail(ret_val)):
-            return self.get_status()
+            return action_result.get_status()
 
         meta = resp.get('meta')
         if (not meta):
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_META_KEY_EMPTY)
-
-        # try:
-        #     if (int(meta['pagination']['count']) == 0):
-        #         self.debug_print("COUNT is ZERO")
-        #         return phantom.APP_SUCCESS
-        # except:
-        #     return phantom.APP_ERROR
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_META_KEY_EMPTY)
 
         # Extract values that we require for other calls
         resources = resp.get('resources')
         if (not resources):
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
         if (not self._data_feed_url):
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_DATAFEED_EMPTY)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_DATAFEED_EMPTY)
 
         session_token = resources[0].get('sessionToken')
         if (not session_token):
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND)
 
         self._token = session_token['token']
 
         return phantom.APP_SUCCESS
+
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        try:
+            if not float(parameter).is_integer():
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+                return None
+            parameter = int(parameter)
+
+            if not allow_zero and parameter <= 0:
+                action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_LIMIT_VALIDATION_MSG.format(parameter=key))
+                return None
+            elif allow_zero and parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key))
+                return None
+        except:
+            error_text = CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key) if allow_zero else CROWDSTRIKE_LIMIT_VALIDATION_MSG.format(parameter=key)
+            action_result.set_status(phantom.APP_ERROR, error_text)
+            return None
+
+        return parameter
 
     def _on_poll(self, param):
 
@@ -1560,37 +1581,36 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         # Connect to the server
         if (phantom.is_fail(self._get_stream(action_result))):
-            return self.get_status()
+            return action_result.get_status()
 
         if (self._data_feed_url is None):
-            return self.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
 
         config = self.get_config()
 
-        max_crlf = int(config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT))
-        merge_time_interval = int(config.get('merge_time_interval', 0))
+        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT), "max_crlf")
+        if max_crlf is None:
+            return action_result.get_status()
+        merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0), "merge_time_interval", allow_zero=True)
+        if merge_time_interval is None:
+            return action_result.get_status()
 
         if (self.is_poll_now()):
             # Manual Poll Now
             try:
-                max_events = int(config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT))
+                max_events = self._validate_integers(action_result, config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT), "max_events_poll_now")
+                if max_events is None:
+                    return action_result.get_status()
             except:
                 max_events = DEFAULT_POLLNOW_EVENTS_COUNT
         else:
             # Scheduled and Interval Polling
             try:
-                max_events = int(config.get('max_events', DEFAULT_EVENTS_COUNT))
+                max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT), "max_events")
+                if max_events is None:
+                    return action_result.get_status()
             except:
                 max_events = DEFAULT_EVENTS_COUNT
-
-        if max_events <= 0:
-            return self.set_status(phantom.APP_ERROR, 'Please provide non-zero positive integer in the "max_events" configuration parameter')
-
-        if max_crlf < 0:
-            return self.set_status(phantom.APP_ERROR, 'Please provide non-zero positive integer in the "Maximum allowed continuous blank lines" configuration parameter')
-
-        if merge_time_interval < 0:
-            return self.set_status(phantom.APP_ERROR, 'Please provide non-zero positive integer in the "merge_time_interval" configuration parameter')
 
         lower_id = 0
         if (not self.is_poll_now()):
@@ -1613,7 +1633,7 @@ class CrowdstrikeConnector(BaseConnector):
             self._data_feed_url = self._data_feed_url + '&offset={0}&eventType=DetectionSummaryEvent'.format(lower_id)
             r = requests.get(self._data_feed_url, headers={'Authorization': 'Token {0}'.format(self._token), 'Connection': 'Keep-Alive'}, stream=True)
         except Exception as e:
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, e)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, e)
 
         # Handle any errors
         if (r.status_code != requests.codes.ok):  # pylint: disable=E1101
@@ -1622,7 +1642,7 @@ class CrowdstrikeConnector(BaseConnector):
                 err_message = resp_json['errors'][0]['message']
             except:
                 err_message = 'None'
-            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
 
         # Parse the events
         resp_data = ''
@@ -1660,7 +1680,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if (phantom.is_fail(ret_val)):
                     self.debug_print("On Poll failed for the chunk: ", chunk)
                     self.save_progress("On Poll failed for the chunk: ", chunk)
-                    return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNABLE_TO_PARSE_DATA)
+                    return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNABLE_TO_PARSE_DATA)
 
                 if resp_data and resp_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
                     self._events.append(resp_data)
@@ -1680,7 +1700,7 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             # err_msg = e.message if e.message else "Unknown error occurred."
             err_msg = "Unknown error occured"
-            return self.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+            return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
                                         CROWDSTRIKE_ERR_EVENTS_FETCH, UnicodeDammit(err_msg).unicode_markup.encode('utf-8')))
 
         # Check if to collate the data or not
@@ -1706,7 +1726,7 @@ class CrowdstrikeConnector(BaseConnector):
                 last_offset_id = last_event['metadata']['offset']
                 self._state['last_offset_id'] = last_offset_id + 1
 
-        return self.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_file_dict(self, param, action_result):
         vault_id = self._handle_py_ver_compat_for_input_str( param['vault_id'])
@@ -1752,15 +1772,6 @@ class CrowdstrikeConnector(BaseConnector):
         action_result.set_summary({"process_count": len(response["resources"])})
 
         return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_detonate_file(self, param):
-
-        # config = self.get_config()
-        # api_submit_file_object = ApiSubmitFile(config[PAYLOAD_SECURITY_API_KEY], self._base_url_oauth, self)
-        self.save_progress(PAYLOAD_SECURITY_MSG_SUBMITTING_FILE)
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-        return_value, files = self._get_file_dict(param, action_result)
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.

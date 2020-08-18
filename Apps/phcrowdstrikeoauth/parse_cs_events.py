@@ -147,8 +147,12 @@ def _collate_results(detection_events):
             container = dict()
             ingest_event['container'] = container
             container.update(_container_common)
-            container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), 'at {0}'.format(creation_time) if (not machine_name)
-                else 'on {0} at {1}'.format(UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
+            if sys.version_info[0] == 2:
+                container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), 'at {0}'.format(creation_time) if (not machine_name)
+                    else 'on {0} at {1}'.format(UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
+            else:
+                container['name'] = "{0} {1}".format(detection_name, 'at {0}'.format(creation_time) if (not machine_name)
+                    else 'on {0} at {1}'.format(machine_name, creation_time))
 
             # now the artifacts
             ingest_event['artifacts'] = artifacts = []
@@ -256,7 +260,7 @@ def _get_artifact_name(key_name):
     return artifact_name
 
 
-def _create_dict_hash( input_dict):
+def _create_dict_hash(input_dict):
 
     input_dict_str = None
 
@@ -269,7 +273,7 @@ def _create_dict_hash( input_dict):
         return None
 
     if sys.version_info[0] == 3:
-        input_dict_str = input_dict_str.encode('utf-8')
+        input_dict_str = UnicodeDammit(input_dict_str).unicode_markup.encode('utf-8')
 
     return hashlib.md5(input_dict_str).hexdigest()
 
@@ -403,8 +407,11 @@ def parse_events(events, base_connector, collate):
         container = dict()
         ingest_event['container'] = container
         container.update(_container_common)
-        container['name'] = "{0} on {1} at {2}".format(
-                                UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
+        if sys.version_info[0] == 2:
+            container['name'] = "{0} on {1} at {2}".format(
+                                    UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
+        else:
+            container['name'] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
         container['severity'] = _severity_map.get(str(event_details.get('Severity', 3)), 'medium')
 
         # now the artifacts, will just be one

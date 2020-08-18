@@ -1554,7 +1554,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-c                        "Host removed successfully"
+                        "Host removed successfully"
                     ]
                 },
                 {
@@ -3133,6 +3133,9 @@ c                        "Host removed successfully"
                         "db042339-9c9e-4515-902a-af1b75aae64a",
                         "b2403653-1294-488e-be81-7aadb69b52f1"
                     ],
+                    "contains": [
+                        "crowdstrike rtr session id"
+                    ],
                     "column_name": "session id",
                     "column_order": 2
                 },
@@ -3239,7 +3242,7 @@ c                        "Host removed successfully"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.behavior_id",
+                    "data_path": "action_result.data.*.resources.*.behavior_id",
                     "data_type": "string",
                     "example_values": [
                         "ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d"
@@ -3293,7 +3296,7 @@ c                        "Host removed successfully"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.cmdline",
+                    "data_path": "action_result.data.*.resources.*.cmdline",
                     "data_type": "string",
                     "column_name": "Command Line",
                     "column_order": 5
@@ -3303,7 +3306,7 @@ c                        "Host removed successfully"
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.filepath",
+                    "data_path": "action_result.data.*.resources.*.filepath",
                     "data_type": "string",
                     "example_values": [
                         "C:\\user\\somefile.txt"
@@ -3332,7 +3335,7 @@ c                        "Host removed successfully"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.objective",
+                    "data_path": "action_result.data.*.resources.*.objective",
                     "data_type": "string",
                     "example_values": [
                         "Keep Access"
@@ -3460,7 +3463,7 @@ c                        "Host removed successfully"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.tactic",
+                    "data_path": "action_result.data.*.resources.*.tactic",
                     "data_type": "string",
                     "example_values": [
                         "Persistance"
@@ -3469,7 +3472,7 @@ c                        "Host removed successfully"
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.technique",
+                    "data_path": "action_result.data.*.resources.*.technique",
                     "data_type": "string",
                     "example_values": [
                         "Hidden Files and Directories"
@@ -3485,7 +3488,7 @@ c                        "Host removed successfully"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.timestamp",
+                    "data_path": "action_result.data.*.resources.*.timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
