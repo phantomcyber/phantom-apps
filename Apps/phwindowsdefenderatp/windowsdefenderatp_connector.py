@@ -1078,6 +1078,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         input_type = param[DEFENDERATP_JSON_INPUT_TYPE]
         input = param.get(DEFENDERATP_JSON_INPUT)
+        query = self._handle_py_ver_compat_for_input_str(param.get(DEFENDERATP_JSON_QUERY, ""))
+
         if input:
             input = self._handle_py_ver_compat_for_input_str(input)
 
@@ -1125,7 +1127,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     self.debug_print(
                         "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit)
+        url = "{0}{1}?$top={2}&{3}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit, query)
 
         # make rest call
         ret_val, response = self._update_request(endpoint=url, action_result=action_result)

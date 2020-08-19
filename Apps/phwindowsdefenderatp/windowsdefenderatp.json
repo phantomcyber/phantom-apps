@@ -1398,11 +1398,17 @@
                         "domain"
                     ]
                 },
+                "query": {
+                    "description": "Additional OData V4 filters to apply",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                },
                 "limit": {
                     "description": "Maximum number of devices to return (Maximum: 10,000)",
                     "data_type": "numeric",
                     "default": 100,
-                    "order": 2
+                    "order": 3
                 }
             },
             "output": [
@@ -1432,6 +1438,13 @@
                     "data_type": "string",
                     "example_values": [
                         "All"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "$filter=riskScore+eq+'High'"
                     ]
                 },
                 {
