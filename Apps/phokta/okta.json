@@ -2884,13 +2884,6 @@
             "description": "Your organization's url. Example: https://your-org.okta.com",
             "data_type": "string",
             "order": 0
-        },
-        "verify_server_cert": {
-            "default": false,
-            "required": true,
-            "description": "Verify server certificate",
-            "data_type": "boolean",
-            "order": 2
         }
     }
 }

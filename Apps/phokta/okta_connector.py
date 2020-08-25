@@ -176,7 +176,7 @@ class OktaConnector(BaseConnector):
                             data=data,
                             headers=headers,
                             params=params,
-                            verify=config.get('verify_server_cert', False))
+                            verify=self._verify)
         except Exception as e:
             return RetVal(action_result.set_status( status_strings.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
@@ -807,6 +807,8 @@ class OktaConnector(BaseConnector):
 
         # The current verison of this app as defined in the app json
         self._app_version = self.get_app_json().get('app_version', '')
+
+        self._verify = True
 
         return status_strings.APP_SUCCESS
 
