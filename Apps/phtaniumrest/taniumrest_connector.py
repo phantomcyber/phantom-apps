@@ -798,7 +798,11 @@ class TaniumRestConnector(BaseConnector):
                 return
 
             self.save_progress("Parameter Definition:\n" + resp_data.get("parameter_definition", ""))
-            parameter_definition = json.loads(resp_data.get("parameter_definition", ""))
+
+            raw_parameter_definition = resp_data.get("parameter_definition", "")
+            parameter_definition = None
+            if raw_parameter_definition != "":
+                parameter_definition = json.loads(raw_parameter_definition)
 
             if parameter_definition:
                 # Parameterized Sensor
