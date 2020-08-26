@@ -361,7 +361,7 @@ class TaniumRestConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, "Unexpected API response")
             return None
 
-    def _execute_action_support(self, param, action_result):
+    def _execute_action_support(self, param, action_result): # noqa: 901
         action_grp = self._handle_py_ver_compat_for_input_str(self._python_version, param['action_group'])
         package_name = self._handle_py_ver_compat_for_input_str(self._python_version, param['package_name'])
         action_name = param['action_name']
