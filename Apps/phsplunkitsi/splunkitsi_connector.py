@@ -410,7 +410,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             self.save_progress("Add Episode Comment Failed")
             return action_result.get_status()
 
-
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -589,7 +588,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Required values can be accessed directly
         itsi_service_id = param['itsi_service_id']
 
-
         # Create params for GET request
         q_params = {'filter': json.dumps({ 'services._key': itsi_service_id })}
 
@@ -604,7 +602,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             self.save_progress("Get Service Entities Failed")
             return action_result.get_status()
-
 
         # Return only the entity information
         # Add the response into the data section
@@ -928,7 +925,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Create payload for POST request
         # end_time is now in seconds since the epoch (which mean UTC)
-        payload = { 'start_time': time.time(), 'end_time': time.time() + 1 }
+        payload = { 'end_time': time.time() + 1 }
         if comment is not None:
             payload['comment'] = comment
 
