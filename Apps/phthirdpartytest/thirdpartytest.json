@@ -1,0 +1,111 @@
+{
+    "appid": "47a72276-c00d-47c5-9064-565ca3262c1a",
+    "name": "thirdpartytest",
+    "description": "Test app for external dev automated testing pipeline.",
+    "type": "endpoint",
+    "product_vendor": "Splunk-Test",
+    "logo": "thirdpartytest.svg",
+    "logo_dark": "thirdpartytest_dark.svg",
+    "product_name": "thirdpartytest",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk-Test",
+    "license": "Copyright (c) Splunk-Test, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-08-26T17:29:57.572252Z",
+    "package_name": "phantom_thirdpartytest",
+    "main_module": "thirdpartytest_connector.pyc",
+    "min_phantom_version": "4.8.24303",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "config1": {
+            "description": "test",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "Splunk-test test_action",
+            "identifier": "test_action",
+            "description": "Used to test apps",
+            "verbose": "function used to test automated testing pipeline.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "reqparam1": {
+                    "description": "required param 1",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "optparam1": {
+                    "description": "optional param 1",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.reqparam1",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "reqparam1",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.optparam1",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "optparam1",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
