@@ -9,6 +9,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from taniumrest_consts import *
 
+import ast
 import os
 import sys
 import requests
@@ -471,26 +472,37 @@ class TaniumRestConnector(BaseConnector):
             package_spec.update({"parameters": [package_param]})
 
         if group_name:
-            endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
-            ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
+            group_as_obj = None
+            try:
+                # Check to see if we are getting a group from a previous parse call. It
+                # is passed in as an str repreeentation of the python object
+                group_as_obj = ast.literal_eval(group_name)
+            except SyntaxError:
+                pass
 
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
+            if group_as_obj:
+                data["target_group"] = group_as_obj
+            else:
+                endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
+                ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
 
-            response_data = response.get("data")
+                if (phantom.is_fail(ret_val)):
+                    return action_result.get_status()
 
-            if not response_data:
-                return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                        Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
+                response_data = response.get("data")
 
-            resp_data = self._get_response_data(response_data, action_result, "group")
+                if not response_data:
+                    return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
+                            Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
-            if resp_data is None:
-                return action_result.get_status()
+                resp_data = self._get_response_data(response_data, action_result, "group")
 
-            group_id = resp_data.get("id")
-            group_name = resp_data.get("name")
-            data["target_group"] = {"source_id": group_id, "name": str(group_name)}
+                if resp_data is None:
+                    return action_result.get_status()
+
+                group_id = resp_data.get("id")
+                group_name = resp_data.get("name")
+                data["target_group"] = {"source_id": group_id, "name": str(group_name)}
 
         # Get the action group details
         endpoint = TANIUMREST_GET_ACTION_GROUP.format(action_group=action_grp)
