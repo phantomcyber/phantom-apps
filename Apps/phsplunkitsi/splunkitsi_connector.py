@@ -274,7 +274,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             payload['status'] = self.itsi_episode_status_values.get(status, '1')
 
         # Create params for POST request
-        q_params = { 'is_partial_update': '1' }
+        q_params = { 'is_partial_data': '1' }
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/notable_event_group/{0}'.format(itsi_group_id),
@@ -322,7 +322,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Create params for POST request
         q_params = {
             'break_group_policy_id': itsi_policy_id,
-            'is_partial_update': '1'
+            'is_partial_data': '1'
         }
 
         # make rest call
