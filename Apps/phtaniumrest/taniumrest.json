@@ -14,7 +14,7 @@
     "latest_tested_versions": [
         "Build (Windows): 7.3.314.4269 | Console: 1.3.3.0150"
     ],
-    "app_version": "2.0.0",
+    "app_version": "2.0.0-187",
     "utctime_updated": "2020-04-17T09:06:28.000000Z",
     "package_name": "phantom_taniumrest",
     "main_module": "taniumrest_connector.py",
@@ -431,6 +431,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group",
+                    "data_type": "string",
+                    "example_values": [
+                        "{ group id object }"
+                    ],
+                    "contains": [
+                        "taniumrest group definition"
                     ]
                 },
                 {
@@ -1395,7 +1405,11 @@
                 "group_name": {
                     "description": "The Tanium Computer Group name on which the action will be executed. If left blank, will execute on all registered IP addresses/hostnames in your Tanium instance",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "taniumrest group definition",
+                        "string"
+                     ]
                 },
                 "distribute_seconds": {
                     "description": "The number of seconds over which to deploy the action",
