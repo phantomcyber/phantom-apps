@@ -92,7 +92,7 @@ class JiraConnector(BaseConnector):
         self._host = self._base_url[self._base_url.find('//') + 2:]
         self._timezone = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_TIMEZONE, JIRA_JSON_DEFAULT_TIMEZONE))
 
-        self._verify_cert = config[json_keys.APP_JSON_VERIFY]
+        self._verify_cert = True
         self._username = self._handle_py_ver_compat_for_input_str(config[json_keys.APP_JSON_USERNAME])
         self._password = config[json_keys.APP_JSON_PASSWORD]
         self._custom_fields_list = None
@@ -1427,7 +1427,7 @@ class JiraConnector(BaseConnector):
             url = '{0}/notable?source_data_identifier={1}&ingest_asset={2}&earliest=0'.format(self.get_ims_base_url(), issue_key, self.get_asset_id())
 
         try:
-            r = requests.get(url, verify=False)
+            r = requests.get(url, verify=self._verify_cert)
             resp_json = r.json()
         except Exception as e:
             self.debug_print("Unable to query JIRA ticket container: ", e)
@@ -1456,7 +1456,7 @@ class JiraConnector(BaseConnector):
                                                                                                       container_id)
 
         try:
-            r = requests.get(url, verify=False)
+            r = requests.get(url, verify=self._verify_cert)
             resp_json = r.json()
         except Exception as e:
             self.debug_print("Unable to query JIRA artifact: ", e)
@@ -1603,7 +1603,7 @@ class JiraConnector(BaseConnector):
         auth = (config[json_keys.APP_JSON_USERNAME], config[json_keys.APP_JSON_PASSWORD])
 
         try:
-            r = requests.get(url, verify=self.get_config().get("verify_server_cert"), stream=True, auth=auth)
+            r = requests.get(url, verify=self._verify_cert, stream=True, auth=auth)
         except Exception as e:
             self.debug_print("Could not connect to url to download attachment: ", e)
             return status.APP_ERROR
@@ -2014,7 +2014,7 @@ class JiraConnector(BaseConnector):
             url = '{0}/notable/{1}'.format(self.get_ims_base_url(),
                                            container_id)
         try:
-            r = requests.post(url, data=json.dumps(update_json), verify=False)
+            r = requests.post(url, data=json.dumps(update_json), verify=self._verify_cert)
             resp_json = r.json()
         except Exception as e:
             self.debug_print("Error while updating the container. Error is: ", e)
