@@ -1,7 +1,7 @@
 {
     "appid": "47a72276-c00d-47c5-9064-565ca3262c1a",
     "name": "thirdpartytest",
-    "description": "Test app for external dev automated testing pipeline.",
+    "description": "Test app for external dev automated testing pipeline",
     "type": "endpoint",
     "product_vendor": "Splunk-Test",
     "logo": "thirdpartytest.svg",
@@ -33,39 +33,39 @@
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "verbose": "",
-            "type": "test",
+            "type": "Test",
             "read_only": true,
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
         },
         {
-            "action": "Splunk-test test_action",
+            "action": "Splunk-Test test_action",
             "identifier": "test_action",
             "description": "Used to test apps",
-            "verbose": "Function used to test automated testing pipeline",
+            "verbose": "Function used to test automated testing pipeline.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "reqparam1": {
-                    "description": "required param 1",
+                    "description": "Required param 1",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 1
+                    "order": 0
                 },
                 "optparam1": {
-                    "description": "optional param 1",
+                    "description": "Optional param 1",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
