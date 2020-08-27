@@ -3605,26 +3605,6 @@
                     "data_type": "string",
                     "description": "Adds a comment for all the incident(s) in the ids list",
                     "order": 6
-                },
-                "update_assigned_to": {
-                    "data_type": "string",
-                    "description": "Assign all incident(s) to a user for all the incidents in the ids list by CrowdStrike User id",
-                    "primary": true,
-                    "order": 7,
-                    "example_values": [
-                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
-                    ],
-                    "contains": [
-                        "crowdstrike unique user id"
-                    ]
-                },
-                "update_assigned_to_name": {
-                    "data_type": "string",
-                    "description": "Assign all incident(s) to a user for all the incidents in the ids list by Name",
-                    "example_values": [
-                        "Jon Doe"
-                    ],
-                    "order": 8
                 }
             },
             "output": [
