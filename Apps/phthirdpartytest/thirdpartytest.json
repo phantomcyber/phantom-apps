@@ -19,7 +19,7 @@
     "app_wizard_version": "1.0.0",
     "configuration": {
         "config1": {
-            "description": "test",
+            "description": "Test",
             "data_type": "string",
             "required": true,
             "value_list": [],
@@ -32,7 +32,7 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
+            "verbose": "Test connectivity.",
             "type": "Test",
             "read_only": true,
             "parameters": {},
