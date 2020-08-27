@@ -187,7 +187,7 @@ class ThirdpartytestConnector(BaseConnector):
     def _handle_test_action(self, param):
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
-        x = param['optparam1']
+        # x = param['optparam1']
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
