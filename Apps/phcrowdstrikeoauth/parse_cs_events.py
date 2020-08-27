@@ -153,6 +153,7 @@ def _collate_results(detection_events):
             else:
                 container['name'] = "{0} {1}".format(detection_name, 'at {0}'.format(creation_time) if (not machine_name)
                     else 'on {0} at {1}'.format(machine_name, creation_time))
+            container['source_data_identifier'] = _create_dict_hash(container)
 
             # now the artifacts
             ingest_event['artifacts'] = artifacts = []
@@ -413,6 +414,7 @@ def parse_events(events, base_connector, collate):
         else:
             container['name'] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
         container['severity'] = _severity_map.get(str(event_details.get('Severity', 3)), 'medium')
+        container['source_data_identifier'] = _create_dict_hash(container)
 
         # now the artifacts, will just be one
         ingest_event['artifacts'] = artifacts = []

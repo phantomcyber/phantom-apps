@@ -192,6 +192,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'create session':
         return 'crowdstrike_create_session.html'
 
+    if provides == 'get indicator':
+        return 'crowdstrike_get_indicator.html'
+
     if provides == 'list incidents':
         return 'crowdstrike_list_incidents.html'
 

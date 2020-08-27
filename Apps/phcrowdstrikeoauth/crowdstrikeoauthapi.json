@@ -4,15 +4,15 @@
     "description": "This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data",
     "type": "endpoint",
     "product_vendor": "CrowdStrike",
-    "logo": "crowdstrikeoauthapi.svg",
-    "logo_dark": "crowdstrikeoauthapi_dark.svg",
+    "logo": "logo_crowdstrikeoauthapi.svg",
+    "logo_dark": "logo_crowdstrikeoauthapi_dark.svg",
     "product_name": "CrowdStrike",
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
     "app_version": "2.0.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, May 26 2020"
+        "Cloud, API api.crowdstrike.com, August 24 2020"
     ],
     "utctime_updated": "2020-02-03T19:42:48.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -79,8 +79,7 @@
             "data_type": "numeric",
             "order": 9,
             "default": 50,
-            "description": "Maximum allowed continuous blank lines",
-            "required": false
+            "description": "Maximum allowed continuous blank lines"
         },
         "preprocess_script": {
             "data_type": "file",
@@ -152,6 +151,27 @@
                     "data_type": "string",
                     "example_values": [
                         "hostname.desc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.instance_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-058fca45cda978e00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service_provider",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service_provider_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "427749959855"
                     ]
                 },
                 {
@@ -786,7 +806,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total devices: 2"
+                        "Device fetched successfully"
                     ]
                 },
                 {
@@ -2047,7 +2067,10 @@
                         "crowdstrike rtr session id"
                     ],
                     "column_name": "session id",
-                    "column_order": "0"
+                    "column_order": "0",
+                    "example_values": [
+                        "cdc3b485-6d71-4417-b091-939336154e83"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2094,7 +2117,7 @@
             "action": "list sessions",
             "description": "Lists Real Time Response sessions",
             "verbose": "This action supports filtering in order to retrieve a particular session.",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "list_sessions",
             "read_only": true,
             "parameters": {
@@ -2185,7 +2208,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.platform_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
                         0
                     ]
@@ -2860,7 +2883,7 @@
         {
             "action": "get command details",
             "description": "Retrieve results of a active responder command executed on a single host",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_command_details",
             "read_only": true,
             "parameters": {
@@ -2899,7 +2922,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Results: Successfully executed command"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2929,7 +2955,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.timeout_seconds",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        60
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.query_time",
@@ -3013,7 +3042,7 @@
         {
             "action": "list session files",
             "description": "Get a list of files for the specified RTR session",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "list_session_files",
             "read_only": true,
             "parameters": {
@@ -3235,14 +3264,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.aid",
+                    "data_path": "action_result.data.*.aid",
                     "data_type": "string",
                     "example_values": [
                         "w6h79wgbzy4ofsa093dp2s808qe8gswr"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.behavior_id",
+                    "data_path": "action_result.data.*.behavior_id",
                     "data_type": "string",
                     "example_values": [
                         "ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d"
@@ -3289,24 +3318,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_path": "action_result.data.*.cid",
                     "data_type": "string",
                     "example_values": [
                         "e6m35yiizlefbv6o4az6b46sgjipx6lg"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.cmdline",
+                    "data_path": "action_result.data.*.cmdline",
                     "data_type": "string",
                     "column_name": "Command Line",
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.compound_tto",
+                    "data_path": "action_result.data.*.compound_tto",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.filepath",
+                    "data_path": "action_result.data.*.filepath",
                     "data_type": "string",
                     "example_values": [
                         "C:\\user\\somefile.txt"
@@ -3315,7 +3344,7 @@
                     "column_order": 6
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.incident_id",
+                    "data_path": "action_result.data.*.incident_id",
                     "data_type": "string",
                     "example_values": [
                         "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
@@ -3325,17 +3354,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.incident_ids",
+                    "data_path": "action_result.data.*.detection_ids",
                     "data_type": "string",
                     "example_values": [
-                        "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
+                        "ldt:07c312fabcb8473454d0a16f118928ab:10548439893000"
                     ],
                     "contains": [
-                        "crowdstrike incident id"
+                        "crowdstrike detection id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.objective",
+                    "data_path": "action_result.data.*.objective",
                     "data_type": "string",
                     "example_values": [
                         "Keep Access"
@@ -3344,126 +3373,126 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition",
+                    "data_path": "action_result.data.*.pattern_disposition",
                     "data_type": "numeric",
                     "example_values": [
                         "2048"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.detect",
+                    "data_path": "action_result.data.*.pattern_disposition_details.detect",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.inddet_mask",
+                    "data_path": "action_result.data.*.pattern_disposition_details.inddet_mask",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.indicator",
+                    "data_path": "action_result.data.*.pattern_disposition_details.indicator",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_parent",
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_process",
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_process",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.kill_subprocess",
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_subprocess",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.operation_blocked",
+                    "data_path": "action_result.data.*.pattern_disposition_details.operation_blocked",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.policy_disabled",
+                    "data_path": "action_result.data.*.pattern_disposition_details.policy_disabled",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.process_blocked",
+                    "data_path": "action_result.data.*.pattern_disposition_details.process_blocked",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.quarantine_file",
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_file",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.quarantine_machine",
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_machine",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.registry_operation_blocked",
+                    "data_path": "action_result.data.*.pattern_disposition_details.registry_operation_blocked",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.rooting",
+                    "data_path": "action_result.data.*.pattern_disposition_details.rooting",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_disposition_details.sensor_only",
+                    "data_path": "action_result.data.*.pattern_disposition_details.sensor_only",
                     "data_type": "boolean",
                     "example_values": [
                         true, false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_id",
+                    "data_path": "action_result.data.*.pattern_id",
                     "data_type": "numeric",
                     "example_values": [
                         "1024"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.sha256",
+                    "data_path": "action_result.data.*.sha256",
                     "data_type": "string",
                     "example_values": [
                         "ln3g11yf8r40be90ups2q1435ybhzdopbkt103wce5ligiuhww2b4l1f7tmp1vhi"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.tactic",
+                    "data_path": "action_result.data.*.tactic",
                     "data_type": "string",
                     "example_values": [
                         "Persistance"
@@ -3472,7 +3501,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.technique",
+                    "data_path": "action_result.data.*.technique",
                     "data_type": "string",
                     "example_values": [
                         "Hidden Files and Directories"
@@ -3481,14 +3510,14 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.template_instance_id",
+                    "data_path": "action_result.data.*.template_instance_id",
                     "data_type": "numeric",
                     "example_values": [
                         "102"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.timestamp",
+                    "data_path": "action_result.data.*.timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
@@ -3623,50 +3652,83 @@
                 },
                 {
                     "data_path": "action_result.parameter.add_tag",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test1"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.delete_tag",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test2"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "IOC at 2020-07-22T23:54:41Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update_description",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "IOC found at 2020-07-22T23:54:41Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update_status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.add_comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Minor Incident"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update_assigned_to",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike unique user id"
+                    ],
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5cc"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.update_assigned_to_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Testname"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.026572641
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.trace_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "50f7477e-587f-4175-ad0d-bdbbd8d3b1ec"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.powered_by",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "incident-api"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -3702,7 +3764,7 @@
         {
             "action": "list users",
             "description": "Get information about all users in your Customer ID",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "list_users",
             "read_only": true,
             "parameters": {},
@@ -3719,13 +3781,19 @@
                     "data_path": "action_result.data.*.resources.*.firstName",
                     "data_type": "string",
                     "column_name": "First Name",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "Test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.lastName",
                     "data_type": "string",
                     "column_name": "Last Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.uid",
@@ -3734,7 +3802,10 @@
                         "crowdstrike user id"
                     ],
                     "column_name": "User ID",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "test@user.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.uuid",
@@ -3743,7 +3814,10 @@
                         "crowdstrike unique user id"
                     ],
                     "column_name": "Unique User ID",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "bb777249-c782-4434-b57a-f15ac742926c"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.customer",
@@ -3752,7 +3826,10 @@
                         "crowdstrike customer id"
                     ],
                     "column_name": "Customer ID",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "4061c7ff3b634e22b38274d4b586554r"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -3809,7 +3886,7 @@
         {
             "action": "get user roles",
             "description": "Gets the roles that are assigned to the user",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_user_roles",
             "read_only": true,
             "parameters": {
@@ -3843,7 +3920,10 @@
                         "crowdstrike unique user id"
                     ],
                     "column_name": "User ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "bb777249-c782-4434-b57a-f15ac742926c"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources",
@@ -3852,7 +3932,10 @@
                         "crowdstrike user role id"
                     ],
                     "column_name": "Roles",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "remote_responder"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -3911,7 +3994,7 @@
         {
             "action": "list roles",
             "description": "Get information about all user roles from your Customer ID",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "list_roles",
             "read_only": true,
             "parameters": {},
@@ -3952,19 +4035,28 @@
                         "crowdstrike user role id"
                     ],
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "custom_ioas_manager"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.display_name",
                     "data_type": "string",
                     "column_name": "Display Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Custom IOAs Manager"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "Custom IOAs Manager"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -4000,7 +4092,7 @@
         {
             "action": "get role",
             "description": "Get information about all user roles from your Customer ID",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_role",
             "read_only": true,
             "parameters": {
@@ -4067,28 +4159,40 @@
                     "data_type": "string",
                     "contains": [
                         "crowdstrike user role id"
+                    ],
+                    "example_values": [
+                        "dashboard_admin"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike user role id"
                     ],
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "dashboard_admin"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.display_name",
+                    "data_path": "action_result.data.*.display_name",
                     "data_type": "string",
                     "column_name": "Display Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Dashboard Admin"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "Can manage, create, update, and delete dashboards"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -4124,7 +4228,8 @@
         {
             "action": "list crowdscores",
             "description": "Query environment wide CrowdScore and return the entity data",
-            "type": "generic",
+            "verbose": "This action fetches crowdscores using pagination logic.",
+            "type": "investigate",
             "identifier": "list_crowdscores",
             "read_only": false,
             "parameters": {
@@ -4258,7 +4363,7 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
                         "99ff72e8c9c14955ba33cbcbd4112345_2020-05-18 07:38:05.219 +0000 UTC"
@@ -4270,7 +4375,14 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.score",
+                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b5865500"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.score",
                     "data_type": "numeric",
                     "example_values": [
                         "0"
@@ -4279,7 +4391,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.timestamp",
+                    "data_path": "action_result.data.*.timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
@@ -4391,48 +4503,69 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.incident_type",
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-08-17T09:35:50.888512834Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Testname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5cc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident_type",
                     "data_type": "numeric",
                     "example_values": [
                         1
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_path": "action_result.data.*.cid",
                     "data_type": "string",
                     "example_values": [
                         "ctw6caruad3lkbnnt22qzeyoxgf38zap"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created",
+                    "data_path": "action_result.data.*.created",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "column_name": "Description",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.end",
+                    "data_path": "action_result.data.*.end",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.fine_score",
+                    "data_path": "action_result.data.*.fine_score",
                     "data_type": "numeric",
                     "example_values": [
                         "1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.host_ids",
+                    "data_path": "action_result.data.*.host_ids",
                     "data_type": "string",
                     "example_values": [
                         "c9vnt7jbugw32626p9qsq3f9dx13sdnn"
@@ -4442,70 +4575,70 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_load_flags",
+                    "data_path": "action_result.data.*.hosts.*.agent_load_flags",
                     "data_type": "string",
                     "example_values": [
                         "1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_local_time",
+                    "data_path": "action_result.data.*.hosts.*.agent_local_time",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.agent_version",
+                    "data_path": "action_result.data.*.hosts.*.agent_version",
                     "data_type": "string",
                     "example_values": [
                         "5.23.10503.0"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.bios_manufacturer",
+                    "data_path": "action_result.data.*.hosts.*.bios_manufacturer",
                     "data_type": "string",
                     "example_values": [
                         "Phoenix Technologies LTD"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.bios_version",
+                    "data_path": "action_result.data.*.hosts.*.bios_version",
                     "data_type": "string",
                     "example_values": [
                         "6.00"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.cid",
+                    "data_path": "action_result.data.*.hosts.*.cid",
                     "data_type": "string",
                     "example_values": [
                         "ctw6caruad3lkbnnt22qzeyoxgf38zap"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_base",
+                    "data_path": "action_result.data.*.hosts.*.config_id_base",
                     "data_type": "string",
                     "example_values": [
                         "65994753"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_build",
+                    "data_path": "action_result.data.*.hosts.*.config_id_build",
                     "data_type": "string",
                     "example_values": [
                         "10503"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.config_id_platform",
+                    "data_path": "action_result.data.*.hosts.*.config_id_platform",
                     "data_type": "string",
                     "example_values": [
                         "3"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.device_id",
+                    "data_path": "action_result.data.*.hosts.*.device_id",
                     "data_type": "string",
                     "example_values": [
                         "c9vnt7jbugw32626p9qsq3f9dx13sdnn"
@@ -4517,21 +4650,21 @@
                     "column_order": 6
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.external_ip",
+                    "data_path": "action_result.data.*.hosts.*.external_ip",
                     "data_type": "string",
                     "example_values": [
                         "1.1.1.1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.first_seen",
+                    "data_path": "action_result.data.*.hosts.*.first_seen",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.hostname",
+                    "data_path": "action_result.data.*.hosts.*.hostname",
                     "data_type": "string",
                     "example_values": [
                         "Sever01"
@@ -4540,123 +4673,123 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.last_seen",
+                    "data_path": "action_result.data.*.hosts.*.last_seen",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.local_ip",
+                    "data_path": "action_result.data.*.hosts.*.local_ip",
                     "data_type": "string",
                     "example_values": [
                         "192.168.0.0"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.mac_address",
+                    "data_path": "action_result.data.*.hosts.*.mac_address",
                     "data_type": "string",
                     "example_values": [
                         "00-00-00-00-00-00"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.machine_domain",
+                    "data_path": "action_result.data.*.hosts.*.machine_domain",
                     "data_type": "string",
                     "example_values": [
                         "domain.local"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.major_version",
+                    "data_path": "action_result.data.*.hosts.*.major_version",
                     "data_type": "string",
                     "example_values": [
                         "10"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.minor_version",
+                    "data_path": "action_result.data.*.hosts.*.minor_version",
                     "data_type": "string",
                     "example_values": [
                         "0"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.modified_timestamp",
+                    "data_path": "action_result.data.*.hosts.*.modified_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.os_version",
+                    "data_path": "action_result.data.*.hosts.*.os_version",
                     "data_type": "string",
                     "example_values": [
                         "Windows 7"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.ou",
+                    "data_path": "action_result.data.*.hosts.*.ou",
                     "data_type": "string",
                     "example_values": [
                         "DOMAIN", "LOCAL"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.platform_id",
+                    "data_path": "action_result.data.*.hosts.*.platform_id",
                     "data_type": "numeric",
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.platform_name",
+                    "data_path": "action_result.data.*.hosts.*.platform_name",
                     "data_type": "string",
                     "example_values": [
                         "Windows"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.product_type",
+                    "data_path": "action_result.data.*.hosts.*.product_type",
                     "data_type": "string",
                     "example_values": [
                         "1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.product_type_desc",
+                    "data_path": "action_result.data.*.hosts.*.product_type_desc",
                     "data_type": "string",
                     "example_values": [
                         "Workstation"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.site_name",
+                    "data_path": "action_result.data.*.hosts.*.site_name",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.status",
+                    "data_path": "action_result.data.*.hosts.*.status",
                     "data_type": "string",
                     "example_values": [
                         "noraml"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.system_manufacturer",
+                    "data_path": "action_result.data.*.hosts.*.system_manufacturer",
                     "data_type": "string",
                     "example_values": [
                         "VMware, Inc."
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.hosts.*.system_product_name",
+                    "data_path": "action_result.data.*.hosts.*.system_product_name",
                     "data_type": "string",
                     "example_values": [
                         "VMware Virtual Platform"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.incident_id",
+                    "data_path": "action_result.data.*.incident_id",
                     "data_type": "string",
                     "example_values": [
                         "inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d"
@@ -4668,13 +4801,13 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Name",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.start",
+                    "data_path": "action_result.data.*.start",
                     "data_type": "string",
                     "example_values": [
                         "2020-03-04T10:00:00Z"
@@ -4683,7 +4816,7 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.state",
+                    "data_path": "action_result.data.*.state",
                     "data_type": "string",
                     "example_values": [
                         "open", "closed"
@@ -4692,18 +4825,18 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.status",
+                    "data_path": "action_result.data.*.status",
                     "data_type": "numeric",
                     "example_values": [
                         "20"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_path": "action_result.data.*.tags",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.users",
+                    "data_path": "action_result.data.*.users",
                     "data_type": "string"
                 },
                 {
@@ -4740,7 +4873,8 @@
         {
             "action": "list incident behaviors",
             "description": "Search for behaviors by providing an FQL filter, sorting, and paging details",
-            "type": "generic",
+            "verbose": "This action fetches incident behaviors using pagination logic.",
+            "type": "investigate",
             "identifier": "list_incident_behaviors",
             "read_only": false,
             "parameters": {
@@ -4874,16 +5008,14 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.resources",
+                    "data_path": "action_result.data.*",
                     "data_type": "string",
                     "example_values": [
                         "ind:9e262c70027a46916beeaef04e45bc6a:45890386125841-10264-352683776"
                     ],
                     "contains": [
                         "crowdstrike incidentbehavior id"
-                    ],
-                    "column_name": "Incident ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -4893,7 +5025,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total removed device: 1"
+                        "Incident behaviors listed successfully"
                     ]
                 },
                 {
@@ -4921,7 +5053,8 @@
         {
             "action": "list incidents",
             "description": "Search for incidents by providing an FQL filter, sorting, and paging details",
-            "type": "generic",
+            "verbose": "This action fetches incidents using pagination logic.",
+            "type": "investigate",
             "identifier": "list_incidents",
             "read_only": false,
             "parameters": {
@@ -5055,7 +5188,7 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.resources",
+                    "data_path": "action_result.data.*",
                     "data_type": "string",
                     "example_values": [
                         "incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d']"
@@ -5065,7 +5198,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.incident_id",
+                    "data_path": "action_result.data.*",
                     "data_type": "string",
                     "example_values": [
                         "incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d']"
@@ -5182,6 +5315,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
+                    "example_values": [
+                        "automation"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.succeeded",
                     "data_type": "boolean",
                     "example_values": [
@@ -5250,6 +5390,9 @@
                     "data_type": "string",
                     "contains": [
                         "filename"
+                    ],
+                    "example_values": [
+                        "test"
                     ]
                 },
                 {
@@ -5323,18 +5466,28 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike detection id"
+                    ],
+                    "example_values": [
+                        "ldt:07c312fabcb8473454d0a16f118928fg:10548439893999"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.state",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "in_progress"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -5346,7 +5499,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Status set successfully"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -5387,7 +5543,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },{
                     "data_path": "action_result.data.*.service_pack_minor",
@@ -6009,10 +6166,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.device_count",
-                    "data_type": "numeric"
-                },
-                {
                     "data_path": "action_result.summary.hostname",
                     "data_type": "string",
                     "example_values": [
@@ -6026,7 +6179,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Hostname: TheNarrowSea"
+                        "Device details fetched successfully"
                     ]
                 },
                 {
@@ -6075,7 +6228,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_order": 1,
-                    "column_name": "Status"
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.falcon_process_id",
@@ -6084,6 +6241,9 @@
                     "column_name": "Falcon Process ID",
                     "contains": [
                         "falcon process id"
+                    ],
+                    "example_values": [
+                        "pid:07c312fabcb8473454d0a16f118928fg:16716090292999"
                     ]
                 },{
                     "data_path": "summary.total_objects",
@@ -6100,24 +6260,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.file_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "\\Device\\HarddiskVolume2\\Windows\\CarbonBlack\\cb.exe"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.device_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "07c312fabcb8473454d0a16f118928ab"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.command_line",
                     "data_type": "string",
                     "column_order": 2,
-                    "column_name": "Command Line"
+                    "column_name": "Command Line",
+                    "example_values": [
+                        "C:\test\test.exe"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.device_id",
@@ -6126,6 +6275,9 @@
                     "column_name": "Crowdstrike Device ID",
                     "contains": [
                         "crowdstrike device id"
+                    ],
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928fg"
                     ]
                 },
                 {
@@ -6135,6 +6287,9 @@
                     "column_name": "File Name",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "\testdata\test\test\test.exe"
                     ]
                 },
                 {
@@ -6142,6 +6297,9 @@
                     "data_type": "string",
                     "contains": [
                         "pid"
+                    ],
+                    "example_values": [
+                        "pid:07c312fabcb8473454d0a16f118928fg:16716090292999"
                     ]
                 },
                 {
@@ -6149,19 +6307,28 @@
                     "data_type": "string",
                     "contains": [
                         "pid"
+                    ],
+                    "example_values": [
+                        "16716090292999"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.start_timestamp",
                     "data_type": "string",
                     "column_order": 4,
-                    "column_name": "Start Timestamp"
+                    "column_name": "Start Timestamp",
+                    "example_values": [
+                        "2020-02-14T01:41:11Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.start_timestamp_raw",
                     "data_type": "string",
                     "column_name": "Start Timestamp Raw",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values": [
+                        "132261180718697221"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.stop_timestamp",
@@ -6181,7 +6348,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Process details fetched successfully"
+                    ]
                 }
             ]
         },
@@ -6219,11 +6389,19 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.count_only",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -6247,6 +6425,9 @@
                         "sha256",
                         "sha1",
                         "md5"
+                    ],
+                    "example_values": [
+                        "eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf44t"
                     ]
                 },
                 {
@@ -6256,15 +6437,24 @@
                         "crowdstrike device id"
                     ],
                     "column_order": 0,
-                    "column_name": "Crowdstrike Device ID"
+                    "column_name": "Crowdstrike Device ID",
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928fg"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.device_count",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Device count: 1"
+                    ]
                 }
             ]
         },
@@ -6299,17 +6489,28 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.count_only",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "www.example.com"
                     ]
                 },
                 {
@@ -6332,16 +6533,25 @@
                     "contains": [
                         "crowdstrike device id"
                     ],
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928fg"
+                    ],
                     "column_order": 0,
                     "column_name": "Crowdstrike Device ID"
                 },
                 {
                     "data_path": "action_result.summary.device_count",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Device count: 3"
+                    ]
                 }
             ]
         },
@@ -6401,6 +6611,10 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -6449,7 +6663,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test comment"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.writes.resources_affected",
@@ -6531,7 +6748,105 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Indicator fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "xyz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.002269266
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6a4b970e-93a9-4151-bac4-e721ff3925a8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "C16JJOUVVY125J3O50FF"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.share_level",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "C16JJOUVVY125J3O50FF"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "xyz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.policy",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -6550,10 +6865,11 @@
             ],
             "versions": "EQ(*)",
             "render": {
+                "width": 12,
                 "title": "Get IOC",
-                "type": "table",
+                "type": "custom",
                 "height": 5,
-                "width": 12
+                "view": "crowdstrike_view.display_view"
             }
         },
         {
@@ -6599,11 +6915,17 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Indicators listed successfully"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "domain:test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.pagination.total",
@@ -6941,7 +7263,7 @@
         {
             "action": "list processes",
             "description": "List processes that have recently used the IOC on a particular device",
-            "verbose": "Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>list endpoints</b> actions to get the device id to run the action on.",
+            "verbose": "Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>query device</b> actions to get the device id to run the action on.",
             "type": "investigate",
             "identifier": "list_processes",
             "read_only": true,
@@ -6980,7 +7302,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_order": 2,
-                    "column_name": "Status"
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
@@ -6989,6 +7315,9 @@
                     "column_name": "Crowdstrike Device ID",
                     "contains": [
                         "crowdstrike device id"
+                    ],
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928ab"
                     ]
                 },
                 {
@@ -7002,6 +7331,9 @@
                         "sha1",
                         "md5",
                         "domain"
+                    ],
+                    "example_values": [
+                        "eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf33d"
                     ]
                 },
                 {
@@ -7011,15 +7343,17 @@
                         "falcon process id"
                     ],
                     "column_order": 3,
-                    "column_name": "Falcon Process ID"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "column_name": "Falcon Process ID",
+                    "example_values": [
+                        "pid:07c312fabcb8473454d0a16f118928fg:16716090292999"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Process count: 1"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
