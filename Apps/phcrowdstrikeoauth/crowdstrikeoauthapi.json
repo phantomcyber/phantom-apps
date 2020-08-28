@@ -2546,8 +2546,7 @@
                         "07c312fabcb8473454d0a16f118928ab"
                     ],
                     "contains": [
-                        "crowdstrike device id",
-                        "md5"
+                        "crowdstrike device id"
                     ]
                 },
                 {
@@ -2784,8 +2783,7 @@
                         "07c312fabcb8473454d0a16f118928ab"
                     ],
                     "contains": [
-                        "crowdstrike device id",
-                        "md5"
+                        "crowdstrike device id"
                     ]
                 },
                 {
@@ -3670,23 +3668,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Minor Incident"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.update_assigned_to",
-                    "data_type": "string",
-                    "contains": [
-                        "crowdstrike unique user id"
-                    ],
-                    "example_values": [
-                        "b6330292-28e6-4198-994d-96f327c5b5cc"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.update_assigned_to_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Testname"
                     ]
                 },
                 {
@@ -6616,8 +6597,7 @@
                         "3625d01958241505e11605ea7b89b81df54b7638"
                     ],
                     "contains": [
-                        "vault id",
-                        "sha1"
+                        "vault id"
                     ],
                     "column_name": "Vault ID",
                     "column_order": 0
@@ -6749,6 +6729,12 @@
                     "data_type": "string",
                     "example_values": [
                         "xyz"
+                    ],
+                    "contains": [
+                        "domain",
+                        "md5",
+                        "sha256",
+                        "ip"
                     ]
                 },
                 {
@@ -6961,6 +6947,12 @@
                     "data_type": "string",
                     "example_values": [
                         "test"
+                    ],
+                    "contains": [
+                        "domain",
+                        "md5",
+                        "sha256",
+                        "ip"
                     ]
                 },
                 {
