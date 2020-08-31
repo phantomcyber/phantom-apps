@@ -114,6 +114,14 @@
                         "file name"
                     ],
                     "order": 1
+                },
+                "zip_and_encrypt": {
+                    "description": "option to zip and encrypt file, warning: password visible as zip command line argument.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 2
                 }
             },
             "output": [
@@ -145,6 +153,12 @@
                     "example_values": [
                         "ac8682258ec2a9556c5b06dac4b70aa7f408146b"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.zip_and_encrypt",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "zipped file"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.apistats.984.CopyFileA",
@@ -8808,6 +8822,325 @@
                 "type": "custom",
                 "view": "cuckoo_view.all_results",
                 "title": "DETONATE URL"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "submit strings",
+            "identifier": "submit_strings",
+            "description": "Add VirtualTotal compatible hash to the list of pending tasks.",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "hash": {
+                    "description": "Single VirtualTotal compatible hash",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "url",
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.started_on",
+                    "data_type": "string",
+                    "column_name": "started_on",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "923c2f90bc6724529f9839c7ff22b75863bfb84d"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.file_type",
+                    "data_type": "string",
+                    "column_name": "file_type",
+                    "column_order": 5,
+                    "example_values": [
+                        "PE32 executable (GUI) Intel 80386, for MS Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.file_size",
+                    "data_type": "numeric",
+                    "column_name": "file_size",
+                    "column_order": 6,
+                    "example_values": [
+                        2545000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.crc32",
+                    "data_type": "string",
+                    "example_values": [
+                        "062A9292"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.ssdeep",
+                    "data_type": "string",
+                    "example_values": [
+                        "49152:VbAc4crr5oZ5iclHlYLtZp3TRIQL2LWX7M7j3JbTe2IqVo/:Bx4cJodFYpPDRIs2WCj3le2HVo/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.sha256",
+                    "data_type": "string",
+                    "column_name": "sha256",
+                    "column_order": 4,
+                    "example_values": [
+                        "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "267a168f6b8cc90fbf71bf1e7bee55ea778a69d5137fb591305339ae817b985b50148848605ea2efcb3a1549f5e49be3ec801511f7d43cb6a6c593adc2d82138"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "653222ac6b246b20eb2aee1f2952e8c5"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.owner",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.sample_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.duration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.id",
+                    "data_type": "numeric",
+                    "column_name": "task id",
+                    "column_order": 1,
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.machine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.clock",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sun, 07 Jun 2020 00:18:07 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.custom",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.priority",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.memory",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "pending"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.processing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.enforce_timeout",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.target",
+                    "data_type": "string",
+                    "example_values": [
+                        "/tmp/cuckoo-tmp/tmpwwgL_J/eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.completed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.package",
+                    "data_type": "string",
+                    "example_values": [
+                        "exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.route",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.submit_id",
+                    "data_type": "numeric",
+                    "column_name": "submit id",
+                    "column_order": 2,
+                    "example_values": [
+                        58
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.options.procmemdump",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_status.added_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sun, 07 Jun 2020 00:18:07 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "16: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03, 17: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.17",
+                    "data_type": "string",
+                    "example_values": [
+                        "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.16",
+                    "data_type": "string",
+                    "example_values": [
+                        "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Submit String"
             },
             "versions": "EQ(*)"
         }

@@ -175,6 +175,7 @@ class CuckooConnector(BaseConnector):
         # Create a URL to connect to
         url = self._base_url + endpoint
 
+        print("auth", self._auth, "headers", headers, "data", data, "json", json, "files", files)
         try:
             r = request_func(
                 url,
@@ -188,6 +189,9 @@ class CuckooConnector(BaseConnector):
             )
         except Exception as e:
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+
+        print("request", r.request.headers)
+        print("response", r.text)
 
         return self._process_response(r, action_result)
 
@@ -217,6 +221,14 @@ class CuckooConnector(BaseConnector):
         )
         if phantom.is_fail(ret_val):
             return ret_val, None
+
+        task_ids = response.get('task_ids')
+        if type(task_ids) == list:
+            if len(task_ids) > 0:
+                return phantom.APP_SUCCESS, task_ids
+            
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Retrieved zero length task id list"), []
 
         try:
             return phantom.APP_SUCCESS, response['task_id']
@@ -281,6 +293,8 @@ class CuckooConnector(BaseConnector):
 
         vault_id = param['vault_id']
         file_name = param.get('file_name')
+        dozip = param.get("zip_and_encrypt")
+        zip_password = param.get( "zip_password") or "infected"
 
         vault_info = Vault.get_file_info(vault_id=vault_id)
         if not vault_info:
@@ -299,6 +313,16 @@ class CuckooConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR, "Error opening file", e
             )
+
+        if dozip:
+            try:
+                import zip_and_encrypt as z
+                zae = z.zip_and_encrypt("/tmp/phcuckoo_app_", zip_password)
+                zae.add(file_path)
+                payload = zae.archive_fp
+
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, f"Error: {e}")
 
         files = {
             'file': (file_name, payload)
@@ -327,6 +351,44 @@ class CuckooConnector(BaseConnector):
             return ret_val
 
         return self._poll_for_task(action_result, task_id, key=url)
+
+    def _handle_submit_strings(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_version(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        strings = "\n".join(map(lambda x:x.strip(), param['hash'].split()))
+        strings = "\n".join(map(lambda x:x.strip(), strings.split(",")))
+        strings = list(map(lambda x:x.strip(), strings.split("\n")))
+        
+        if len(strings) == 0:
+            return action_result.set_status(phantom.APP_ERROR, "Empty hash parameter")
+
+        if len(strings[0]) == 0:
+            return action_result.set_status(phantom.APP_ERROR, "Empty hash parameter")
+
+        files = { 'strings': (None, strings[0]) }
+        ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)
+        if phantom.is_fail(ret_val):
+            return ret_val
+        return self._poll_for_task(action_result, task_ids[0], key=strings[0])
+
+        """
+        summary = {}
+        action_ret_val = phantom.APP_ERROR
+        for x in strings:
+            files = { 'strings': (None, x) }
+            ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)
+            if phantom.is_fail(ret_val):
+                continue
+            action_ret_val = phantom.APP_SUCCESS
+            self._poll_for_task(action_result, task_ids[0], key=x)
+            summary.update({str(task_ids[0]): x})
+
+        action_result.set_summary(summary)
+        return action_result.set_status(action_ret_val)
+        """
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -357,6 +419,9 @@ class CuckooConnector(BaseConnector):
 
         elif action_id == 'detonate_url':
             ret_val = self._handle_detonate_url(param)
+
+        elif action_id == 'submit_strings':
+            ret_val = self._handle_submit_strings(param)
 
         return ret_val
 
