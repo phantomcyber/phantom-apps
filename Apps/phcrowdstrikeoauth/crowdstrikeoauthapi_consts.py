@@ -79,6 +79,7 @@ CROWDSTRIKE_COMMAND_ACTION_ENDPOINT = "/real-time-response/entities/active-respo
 CROWDSTRIKE_RTR_ADMIN_GET_PUT_FILES = "/real-time-response/queries/put-files/v1"
 CROWDSTRIKE_RTR_ADMIN_PUT_FILES = "/real-time-response/entities/put-files/v1"
 CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT = "/real-time-response/entities/admin-command/v1"
+CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"

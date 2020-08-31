@@ -1394,7 +1394,7 @@ class CrowdstrikeConnector(BaseConnector):
             'command_string': param['command'] + " " + param.get('data', '')
         }
 
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT, json=params, method='post')
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RUN_COMMAND_ENDPOINT, json=params, method='post')
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -1407,7 +1407,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['cloud_request_id'] = cloud_request_id
 
-        self._poll_for_command_results(action_result, cloud_request_id, endpoint=CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT)
+        self._poll_for_command_results(action_result, cloud_request_id, endpoint=CROWDSTRIKE_RUN_COMMAND_ENDPOINT)
 
         return action_result.get_status()
 
