@@ -1965,7 +1965,7 @@ class CrowdstrikeConnector(BaseConnector):
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
                     if len(resp_json["resources"]) == 0 and len(resp_json["errors"]) != 0:
-                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Status code:\
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
                             {0} Data from server: {1}".format(resp_json["errors"][0]["code"], self._handle_py_ver_compat_for_input_str(resp_json["errors"][0]["message"]))), None)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server")), None
