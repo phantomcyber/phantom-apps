@@ -3229,7 +3229,7 @@
             "description": "Get details on behaviors by providing behavior IDs",
             "type": "investigate",
             "identifier": "get_incident_behaviors",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "ids": {
                     "data_type": "string",
@@ -4192,7 +4192,7 @@
             "verbose": "This action fetches crowdscores using pagination logic. The offset or limit parameter should have value less than 10000 and a combination of offset and limit parameter should have data such that it reads records(summation of offset and limit parameter) less than or equal to 10000.",
             "type": "investigate",
             "identifier": "list_crowdscores",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "filter": {
                     "data_type": "string",
@@ -4396,7 +4396,7 @@
             "description": "Get details on incidents by providing incident IDs",
             "type": "investigate",
             "identifier": "get_incident_details",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "ids": {
                     "data_type": "string",
@@ -4837,7 +4837,7 @@
             "verbose": "This action fetches incident behaviors using pagination logic.",
             "type": "investigate",
             "identifier": "list_incident_behaviors",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "filter": {
                     "data_type": "string",
@@ -5017,7 +5017,7 @@
             "verbose": "This action fetches incidents using pagination logic.",
             "type": "investigate",
             "identifier": "list_incidents",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "filter": {
                     "data_type": "string",
@@ -6668,7 +6668,7 @@
             "description": "Get an IOC by providing a type and value",
             "type": "investigate",
             "identifier": "get_indicator",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "indicator_value": {
                     "data_type": "string",
@@ -6843,7 +6843,7 @@
             "description": "Queries for custom indicators in your customer account",
             "type": "investigate",
             "identifier": "list_custom_indicators",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "indicator_value": {
                     "data_type": "string",
