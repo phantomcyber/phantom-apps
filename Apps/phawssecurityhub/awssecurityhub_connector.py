@@ -310,7 +310,10 @@ class AwsSecurityHubConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        container_count = int(param.get(json_keys.APP_JSON_CONTAINER_COUNT))
+        try:
+            container_count = int(param.get(json_keys.APP_JSON_CONTAINER_COUNT))
+        except Exception as e:
+            return action_result.set_status(status.APP_ERROR, "Failed to get container count", error=str(e))
 
         try:
             poll_now_days = int(config['poll_now_days'])
