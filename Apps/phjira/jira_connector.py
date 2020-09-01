@@ -830,7 +830,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_DELETED)
 
-    def _create_ticket(self, param):
+    def _create_ticket(self, param):  # noqa: C901
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
