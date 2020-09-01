@@ -3214,7 +3214,7 @@
             "parameters": {
                 "ids": {
                     "data_type": "string",
-                    "description": "List of behavior IDs. Comma seperated list allowed",
+                    "description": "List of behavior IDs. Comma separated list allowed",
                     "required": true,
                     "primary": true,
                     "order": 0,
@@ -3544,7 +3544,7 @@
             "parameters": {
                 "ids": {
                     "data_type": "string",
-                    "description": "List of incident IDs. Comma seperated list allowed",
+                    "description": "List of incident IDs. Comma separated list allowed",
                     "required": true,
                     "primary": true,
                     "order": 0,
@@ -3554,13 +3554,13 @@
                 },
                 "add_tag": {
                     "data_type": "string",
-                    "description": "Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list.",
+                    "description": "Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list",
                     "order": 1,
                     "example_values": ["False Positive", "Ignored", "Testing", "True Positive"]
                 },
                 "delete_tag": {
                     "data_type": "string",
-                    "description": "Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list.",
+                    "description": "Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list",
                     "order": 2,
                     "example_values": ["False Positive", "Ignored", "Testing", "True Positive"]
                 },
@@ -4040,7 +4040,7 @@
             "parameters": {
                 "role_id": {
                     "data_type": "string",
-                    "description": "Role ID to get information about. Comma seperated list allowed.",
+                    "description": "Role ID to get information about. Comma separated list allowed",
                     "required": true,
                     "primary": true,
                     "order": 0,
@@ -4381,7 +4381,7 @@
             "parameters": {
                 "ids": {
                     "data_type": "string",
-                    "description": "List of incident IDs. Comma seperated list allowed",
+                    "description": "List of incident IDs. Comma separated list allowed",
                     "required": true,
                     "primary": true,
                     "order": 0,
@@ -5370,7 +5370,7 @@
         {
             "action": "set status",
             "description": "Set the state of a detection in Crowdstrike Host",
-            "verbose": "The detection <b>id</b> can be obtained from the Crowdstrike UI.<br>Valid values for the <b>state</b> parameter are <i>new</i>, <i>in_progress</i>, <i>true_positive</i>, <i>false_positive</i> and <i>ignored</i>.",
+            "verbose": "The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set.",
             "type": "generic",
             "identifier": "resolve_detection",
             "read_only": false,
@@ -6968,7 +6968,7 @@
         {
             "action": "list put files",
             "description": "Queries for files uploaded to Crowdstrike for use with the RTR `put` command",
-            "verbose": "For additional information on FQL syntax see: https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-feature-guide",
+            "verbose": "For additional information on FQL syntax see: https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-feature-guide.",
             "type": "investigate",
             "identifier": "list_put_files",
             "read_only": true,
