@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_assign_hosts.html
+<!-- File: crowdstrike_get_indicator.html
   Copyright (c) 2019-2020 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -17,9 +17,11 @@
 
 <style>
 
+
     .crowdstrike a:hover {
         text-decoration:underline;
     }
+
 
     .crowdstrike .wf-table-vertical {
     width: initial;
@@ -85,47 +87,21 @@
 
     <!------------------- For each Result ---------------------->
     {% if not result.data %}
-    <h4 class="wf-h4-style">No data found</h4>
+        <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
     <h3 class="wf-h3-style">Info</h3>
     <table class="wf-table-vertical">
         <tr>
-            <td>Host Group ID</td>
-            <td><a href="javascript:;"
-                onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ result.param.host_group_id }}' }], 0, {{ container.id }}, null, false);">
-                {{ result.param.host_group_id }}
-                &nbsp;
-                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-            </td>
+            <td>Indicator type</td>
+            <td>{{ result.param.indicator_type }}</td>
         </tr>
-        {% if result.param.hostname %}
-            <tr>
-                <td>Hostname</td>
-                <td><a href="javascript:;"
-                    onclick="context_menu(this, [{'contains': ['host name'], 'value': '{{ result.param.hostname }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.param.hostname }}
-                    &nbsp;
-                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                    </a>
-                </td>
-            </tr>
-        {%endif%}
-        {% if result.param.device_id %}
-            <tr>
-                <td>Device ID</td>
-                <td><a href="javascript:;"
-                    onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.param.device_id }}
-                    &nbsp;
-                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                    </a>
-                </td>
-            </tr>
-        {%endif%}
+        <tr>
+            <td>Indicator value</td>
+            <td>{{ result.param.indicator_value }}</td>
+        </tr>
     </table>
-    <h3 class="wf-h3-style">Group Info</h3>
+    <h3 class="wf-h3-style">Indicator Info</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="server-information">
@@ -134,31 +110,24 @@
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
-                                <th>Host Group ID</th>
-                                <th>Host Group Name</th>
-                                <th>Host Group Description</th>
-                                <th>Host Group Type</th>
-                                <th>Assignment Rule</th>
-                                <th>Created Timestamp</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Policy</th>
+                                <th>Share Level</th>
+                                <th>Created By</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for group in result.data %}
-                                <tr>
-                                    <td>
-                                        <a href="javascript:;"
-                                           onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ group.id }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ group.id }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>{{ group.name }}</td>
-                                    <td>{{ group.description }}</td>
-                                    <td>{{ group.group_type }}</td>
-                                    <td>{{ group.assignment_rule }}</td>
-                                    <td>{{ group.created_timestamp }}</td>
-                                </tr>
+                            {% for indicator in result.data %}
+                                {% for resource in indicator.resources %}
+                                    <tr>
+                                        <td>{{ resource.type }}</td>
+                                        <td>{{ resource.value }}</td>
+                                        <td>{{ resource.policy }}</td>
+                                        <td>{{ resource.share_level }}</td>
+                                        <td>{{ resource.created_by }}</td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
