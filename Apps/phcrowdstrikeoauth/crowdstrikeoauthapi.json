@@ -4164,7 +4164,7 @@
         {
             "action": "list crowdscores",
             "description": "Query environment wide CrowdScore and return the entity data",
-            "verbose": "This action fetches crowdscores using pagination logic. The offset or limit parameter should have value less than 10000 and a combination of offset and limit parameter should have data such that it reads records(summation of offset and limit parameter) less than or equal to 10000.",
+            "verbose": "This action fetches crowdscores using pagination logic.",
             "type": "investigate",
             "identifier": "list_crowdscores",
             "read_only": true,
