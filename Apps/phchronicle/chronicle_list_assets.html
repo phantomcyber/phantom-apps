@@ -1,0 +1,328 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: chronicle_list_assets.html
+
+    Copyright (c) Google Cloud, 2020
+
+    This unpublished material is proprietary to Google Cloud.
+    All rights reserved. The methods and
+    techniques described herein are considered trade secrets
+    and/or confidential. Reproduction or distribution, in whole
+    or in part, is forbidden except by express written permission
+    of Google Cloud.
+
+-->
+
+<style>
+
+
+    .gc a:hover {
+        text-decoration:underline;
+    }
+
+
+    .gc .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .gc .wf-table-vertical td{
+    padding: 8px 10px;
+    border: 1px solid;
+    }
+
+    .gc .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+    }
+
+    .gc .wf-table-horizontal {
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .gc .no-word-wrap {
+        white-space: nowrap;
+    }
+
+    .gc .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .gc .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .gc .wf-h3-style {
+        font-size : 20px
+    }
+
+    .gc .wf-h4-style {
+        font-size : 16px
+    }
+
+    .gc .collapse.in {
+        display: block !important;
+    }
+
+    .gc .panel-collapse {
+        overflow-x: auto;
+    }
+
+    .gc .glyphicon.glyphicon-dot:before {
+        content: "\25cf"; font-size: 10px;
+    }
+
+    .gc a.nowrap {
+        white-space:nowrap;
+    }
+
+</style>
+<div class="gc" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    {% for result in results %} <!-- loop for each result -->
+    <br>
+
+    <!------------------- For each Result ---------------------->
+    {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+
+    {% else %}
+        <h4 class="wf-h4-style">Action Parameters</h4>
+        <table class="wf-table-vertical">
+            <tr>
+                <td>Artifact Indicator</td>
+                <td>{{ result.param.artifact_indicator }}</td>
+            </tr>
+            <tr>
+                <td>Artifact Indicator Value</td>
+                <td>
+                    <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain'], 'value':'{{ result.param.value }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.value }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+            </tr>
+            {% if result.param.time_range %}
+                <tr>
+                    <td>Time Range</td>
+                    <td>
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['gc time range'], 'value':'{{ result.param.time_range }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.time_range }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.start_time %}
+                <tr>
+                    <td>Start Time</td>
+                    <td>
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['gc time'], 'value':'{{ result.param.start_time }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.start_time }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.end_time %}
+                <tr>
+                    <td>End Time</td>
+                    <td>
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['gc time'], 'value':'{{ result.param.end_time }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.end_time }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.limit %}
+                <tr>
+                    <td>Limit (Page Size)</td>
+                    <td>{{ result.param.limit }}</td>
+                </tr>
+            {% endif %}
+        </table>
+
+        <!-- Output view -->
+        <div class="results">
+            {% with result.data|first as asset %}
+            <h3 class="wf-h3-style">Assets Details</h3>
+            {% if asset.assets %}
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>First Seen Artifact Info</th>
+                        <th>Last Seen Artifact Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in asset.assets %}
+                    <tr>
+                        <td>
+                            <table class="wf-table-vertical">
+                                {% for key, value in a.asset.items %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>
+                                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'host name', 'gc mac', 'gc product id'], 'value':'{{ value }}' }], 0, {{ container.id }}, null, false);">
+                                            {{ value }}
+                                            &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                        <td>
+                            <table class="wf-table-horizontal">
+                                <thead>
+                                    <tr>
+                                        <th>Seen Time</th>
+                                        <th>Artifact Indicator</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['gc time'], 'value':'{{ a.firstSeenArtifactInfo.seenTime }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ a.firstSeenArtifactInfo.seenTime }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <table class="wf-table-vertical">
+                                                {% for key, value in a.firstSeenArtifactInfo.artifactIndicator.items %}
+                                                <tr>
+                                                    <td>{{ key }}</td>
+                                                    <td>
+                                                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain', 'md5', 'sha1', 'sha256'], 'value':'{{ value }}' }], 0, {{ container.id }}, null, false);">
+                                                            {{ value }}
+                                                            &nbsp;
+                                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="wf-table-horizontal">
+                                <thead>
+                                    <tr>
+                                        <th>Seen Time</th>
+                                        <th>Artifact Indicator</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['gc time'], 'value':'{{ a.lastSeenArtifactInfo.seenTime }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ a.lastSeenArtifactInfo.seenTime }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <table class="wf-table-vertical">
+                                                {% for key, value in a.lastSeenArtifactInfo.artifactIndicator.items %}
+                                                <tr>
+                                                    <td>{{ key }}</td>
+                                                    <td>
+                                                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain', 'md5', 'sha1', 'sha256'], 'value':'{{ value }}' }], 0, {{ container.id }}, null, false);">
+                                                            {{ value }}
+                                                            &nbsp;
+                                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            No data found
+            {% endif %}
+
+            {% if asset.moreDataAvailable %}
+                <h4 class="wf-h4-style">Is more data available?</h4>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <td>moreDataAvailable</td>
+                        <td>{{ ioc.response.moreDataAvailable }}</td>
+                    </tr>
+                </table>
+            {% endif %}
+
+            {% if asset.uri %}
+                <h4 class="wf-h4-style">Search URI</h4>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <td>URI</td>
+                        <td>
+                            <a href="{{ asset.uri|first }}" target="_blank">
+                                {{ asset.uri|first }}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
+            {% endwith %}
+
+        </div>
+    {% endif %}
+    {% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": false,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top">rt<"bottom"p><"clear">',
+        drawCallback: function(settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable();
+</script>
+{% endblock %} <!-- Main Start Block -->

@@ -1,0 +1,1827 @@
+{
+    "appid": "8925dbb5-abe1-4e5d-b053-326e35e1e194",
+    "name":  "Chronicle",
+    "description": "This app enables the end-user to search, analyze, and ingest the enterprise security data stored in the Chronicle using investigative, reputation, and ingestion actions",
+    "type": "investigative",
+    "product_vendor": "Google Cloud",
+    "logo": "logo_chronicle.svg",
+    "logo_dark": "logo_chronicle_dark.svg",
+    "product_name": "Chronicle",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Google",
+    "license": "Copyright (c) Google Cloud, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-22T14:30:17.171269Z",
+    "package_name": "phantom_chronicle",
+    "main_module": "chronicle_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "latest_tested_versions": [
+        "v1.7.1"
+    ],
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "google_api_python_client",
+                "input_file": "wheels/google_api_python_client/google_api_python_client-1.9.3-py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools/cachetools-4.1.1-py3-none-any.whl"
+            },
+            {
+                "module": "pyasn",
+                "input_file": "wheels/pyasn/pyasn1-0.4.6-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn_modules",
+                "input_file": "wheels/pyasn_modules/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa_wheel/rsa-4.6-py3-none-any.whl"
+            },
+            {
+                "module": "google_auth",
+                "input_file": "wheels/google_auth/google_auth-1.18.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate_wheel/uritemplate-3.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.18.1-py3-none-any.whl"
+            },
+            {
+                "module": "oauthclient",
+                "input_file": "wheels/oauthclient/oauth2client-4.1.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google-auth-httplib2/google_auth_httplib2-0.0.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-oauthlib",
+                "input_file": "wheels/google-auth-oauthlib/google_auth_oauthlib-0.4.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "key_json": {
+            "description": "Contents Of Service Account JSON File",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "base_url": {
+            "description": "A Base URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://backstory.googleapis.com/v1",
+            "order": 1
+        },
+        "scopes": {
+            "description": "Chronicle API Scope (JSON formatted list)",
+            "data_type": "string",
+            "required": true,
+            "default": "[\"https://www.googleapis.com/auth/chronicle-backstory\"]",
+            "order": 2
+        },
+        "wait_timeout_period": {
+            "description": "Retry Wait Period (in seconds)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 3,
+            "order": 3
+        },
+        "no_of_retries": {
+            "description": "Number Of Retries",
+            "data_type": "numeric",
+            "required": false,
+            "default": 3,
+            "order": 4
+        },
+        "ph": {
+            "data_type": "ph",
+            "order": 5
+        },
+        "malicious_category": {
+            "description": "Malicious Categories for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 6
+        },
+        "malicious_severity": {
+            "description": "Malicious Severity for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 7
+        },
+        "malicious_str_confidence_score": {
+            "description": "Malicious Str Confidence Score for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 8
+        },
+        "malicious_int_confidence_score": {
+            "description": "Malicious Int Score Range for Reputation (Use this format 'min_score,max_score')",
+            "data_type": "string",
+            "required": false,
+            "order": 9
+        },
+        "suspicious_category": {
+            "description": "Suspicious Categories for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 10
+        },
+        "suspicious_severity": {
+            "description": "Suspicious Severity for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 11
+        },
+        "suspicious_str_confidence_score": {
+            "description": "Suspicious Str Confidence Score for Reputation (JSON formatted list)",
+            "data_type": "string",
+            "required": false,
+            "order": 12
+        },
+        "suspicious_int_confidence_score": {
+            "description": "Suspicious Int Confidence Score Range for Reputation (Use this format 'min_score,max_score')",
+            "data_type": "string",
+            "required": false,
+            "order": 13
+        },
+        "run_mode": {
+            "description": "Ingestion Run Mode for ON POLL",
+            "data_type": "string",
+            "required": false,
+            "default": "Both",
+            "value_list": [
+                "Both",
+                "IoC Domain Matches",
+                "Assets with Alerts"
+            ],
+            "order": 14
+        },
+        "max_artifacts": {
+            "description": "Max Allowed Artifacts in a Single Container",
+            "data_type": "numeric",
+            "required": false,
+            "default": 10000,
+            "order": 15
+        },
+        "alerts_severity": {
+            "description": "Alert Severity to Ingest Alerts (JSON formatted list) (If not given ingest all the alerts)",
+            "data_type": "string",
+            "required": false,
+            "default": "[\"High\",\"Medium\",\"Low\",\"Unspecified\"]",
+            "order": 16
+        },
+        "run_automation": {
+            "description": "Flag to Trigger Active Playbooks upon Completion of the Ingestion Action",
+            "data_type": "boolean",
+            "order": 17
+        },
+        "time_range_poll_now": {
+            "description": "Time Range for POLL NOW (Use this format: 'start_time, end_time' or '<digit><d/h/m/s>' or 'start_time')",
+            "data_type": "string",
+            "required": false,
+            "default": "3d",
+            "order": 18
+        },
+        "start_time_scheduled_poll": {
+            "description": "Start Time for Scheduled/Interval POLL (Use this format: '<digit><d/h/m/s>' or 'start_time')",
+            "data_type": "string",
+            "required": false,
+            "default": "1970-01-01T00:00:00Z",
+            "order": 19
+        },
+        "max_results_poll_now": {
+            "description": "Max Results for POLL NOW (Page Size)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 10000,
+            "order": 20
+        },
+        "max_results_scheduled_poll": {
+            "description": "Max Results for Scheduled/Interval POLL (Page Size)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 10000,
+            "order": 21
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list ioc details",
+            "identifier": "list_ioc_details",
+            "description": "Return any threat intelligence associated with the specified artifact",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "artifact_indicator": {
+                    "description": "Specify the artifact indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Domain Name",
+                        "Destination IP Address"
+                    ],
+                    "order": 0
+                },
+                "value": {
+                    "description": "Specify the artifact indicator value",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "domain"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_indicator",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Name",
+                        "Destination IP Address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "wp.com",
+                        "45.64.104.167"
+                    ],
+                    "contains": [
+                        "ip",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Drop site for logs or stolen credentials"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.rawSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.sourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://tools.emergingthreats.net/docs/ET%20Intelligence%20Rep%20List%20Tech%20Description.pdf"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.64.104.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.lastActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-04T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.confidenceScore.strRawConfidenceScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "24",
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.firstActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-12-26T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "psoftdevserver.in"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/destinationIpResults?ip=45.64.104.167&referenceTime=2020-06-30T14%3A47%3A32.985603Z&selectedList=IpViewDistinctAssets"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_sources",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total sources: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List IoC Details",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list iocs",
+            "identifier": "list_iocs",
+            "description": "List all of the IoCs discovered within the enterprise within the specified time period",
+            "verbose" : "The action will fetch the list of all of the IoCs discovered within the enterprise within the specified time. If the user receives ‘moreDataAvailable’ as a true value in the action output datapaths, there might still be more IoCs within the user’s Chronicle account. The user can narrow the time range and run the action again to ensure visibility into all possible IoCs. If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "time_range": {
+                    "description": "Specify the time range of the search (Use this format <digit><d/h/m/s> where d=Days, h=Hours, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time range"
+                    ],
+                    "order": 0
+                },
+                "start_time": {
+                    "description": "Specify the start time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 1
+                },
+                "limit": {
+                    "description": "Specify the maximum number of IoCs results to return. You can specify between 1 and 10,000. (Default is 10,000)",
+                    "data_type": "numeric",
+                    "default": 10000,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_range",
+                    "data_type": "string",
+                    "example_values": [
+                        "10d"
+                    ],
+                    "contains": [
+                        "gc time range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-12-26T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.done",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.firstSeenTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-03T01:26:38Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.iocIngestTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-06-29T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/domainResults?domain=aa.online-metrix.net&selectedList=DomainViewDistinctAssets&whoIsTimestamp=2020-07-06T10%3A57%3A54.946836093Z"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.artifact.domainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "connect.ok.ru"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.sources.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Drop site for logs or stolen credentials"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.sources.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "ET Intelligence Rep List"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.sources.*.rawSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.sources.*.confidenceScore.normalizedConfidenceScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.sources.*.confidenceScore.intRawConfidenceScore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.matches.*.lastSeenTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-06T09:30:29Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.@type",
+                    "data_type": "string",
+                    "example_values": [
+                        "type.googleapis.com/chronicle.backstory.v1.ListIoCsResponse"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.moreDataAvailable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total IoCs: 32"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_iocs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List IoCs",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list assets",
+            "identifier": "list_assets",
+            "description": "List all of the assets that accessed the specified artifact within the specified time period",
+            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "artifact_indicator": {
+                    "description": "Specify the artifact indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Domain Name",
+                        "Destination IP Address",
+                        "MD5",
+                        "SHA1",
+                        "SHA256"
+                    ],
+                    "order": 0
+                },
+                "value": {
+                    "description": "Specify the artifact indicator value",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "order": 1
+                },
+                "time_range": {
+                    "description": "Specify the time range of the search (Use this format <digit><d/h/m/s> where d=Days, h=Hours, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time range"
+                    ],
+                    "order": 2
+                },
+                "start_time": {
+                    "description": "Specify the start time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 3
+                },
+                "end_time": {
+                    "description": "Specify the end time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 4
+                },
+                "limit": {
+                    "description": "Specify the maximum number of assets to return. You can specify between 1 and 10,000. (Default is 10,000)",
+                    "data_type": "numeric",
+                    "default": 10000,
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "wp.com"
+                    ],
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10000
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_indicator",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_range",
+                    "data_type": "string",
+                    "example_values": [
+                        "3d"
+                    ],
+                    "contains": [
+                        "gc time range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-01T06:19:46Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-06T06:19:46Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/domainResults?domain=wp.com&selectedList=DomainViewDistinctAssets&whoIsTimestamp=2020-07-06T08%3A01%3A43.935834040Z"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.firstSeenArtifactInfo.seenTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-18T01:40:32Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.firstSeenArtifactInfo.artifactIndicator.domainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "i2.wp.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.asset.assetIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.28.233"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.asset.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "user-hostname"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.lastSeenArtifactInfo.seenTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-06T06:19:46Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assets.*.lastSeenArtifactInfo.artifactIndicator.domainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "i0.wp.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total assets: 100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_assets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List Assets",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list events",
+            "identifier": "list_events",
+            "description": "List all of the events discovered within the enterprise on a particular device within the specified time period",
+            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the ‘Reference Time’ action parameter is not given, the action will consider start time as reference time. And if the value is given for it, the value will be validated and used in the search request. If the user provides ‘Time Range’ and other time-related action parameters, the priority will be given to the ‘Time Range’ action parameter and the search will be performed according to its given value.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "asset_indicator": {
+                    "description": "Specify the asset indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Hostname",
+                        "Asset IP Address",
+                        "MAC Address",
+                        "Product ID"
+                    ],
+                    "order": 0
+                },
+                "value": {
+                    "description": "Specify the asset indicator value",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "gc mac",
+                        "gc product id",
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 1
+                },
+                "time_range": {
+                    "description": "Specify the time range of the search (Use this format <digit><d/h/m/s> where d=Days, h=Hours, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time range"
+                    ],
+                    "order": 2
+                },
+                "start_time": {
+                    "description": "Specify the start time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 3
+                },
+                "end_time": {
+                    "description": "Specify the end time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 4
+                },
+                "reference_time": {
+                    "description": "Specify the time for the asset you are investigating (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 5
+                },
+                "limit": {
+                    "description": "Specify the maximum number of events results to return (Default is 10,000)",
+                    "data_type": "numeric",
+                    "default": 10000,
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_range",
+                    "data_type": "string",
+                    "example_values": [
+                        "24h"
+                    ],
+                    "contains": [
+                        "gc time range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-01T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.reference_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-01T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.asset_indicator",
+                    "data_type": "string",
+                    "example_values": [
+                        "Hostname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "franklin-guzman-laptop"
+                    ],
+                    "contains": [
+                        "gc mac",
+                        "gc product id",
+                        "host name",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3000
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-02T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/assetResults?assetIdentifier=10.5.29.232&referenceTime=2020-06-30T16%3A59%3A40Z&selectedList=AssetViewTimeline&startTime=2020-07-07T09%3A59%3A54Z&endTime=2020-07-22T09%3A59%3A54Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventsSummary.*.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.eventsSummary.*.eventType",
+                    "data_type": "string",
+                    "example_values": [
+                        "NETWORK_DNS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.applicationProtocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "DNS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.http.responseCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.questions.*.type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.questions.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "gateway.answerscloud.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.metadata.eventType",
+                    "data_type": "string",
+                    "example_values": [
+                        "NETWORK_DNS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.metadata.productName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ExtraHop"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.metadata.eventTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-01T23:57:46Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.metadata.collectedTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-02T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.target.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.principal.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.29.236"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.principal.mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae:7d:81:1f:79:a0"
+                    ],
+                    "contains": [
+                        "gc mac"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.principal.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "franklin-guzman-laptop"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.answers.*.data",
+                    "data_type": "string",
+                    "example_values": [
+                        "151.101.32.203"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.answers.*.type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.answers.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "gateway.answerscloud.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.answers.*.ttl",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11111
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.network.dns.response",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total events: 3000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3000
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "json"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "identifier": "domain_reputation",
+            "description": "Derive the reputation of the specified domain artifact (The reputation can be either of 'Malicious', 'Suspicious', and 'Unknown')",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain_name": {
+                    "description": "Specify a domain name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "wp.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malware Command and Control Server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.rawSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.sourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://tools.emergingthreats.net/docs/ET%20Intelligence%20Rep%20List%20Tech%20Description.pdf"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "wp.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.lastActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-07T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.confidenceScore.strRawConfidenceScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.firstActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-07T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/domainResults?domain=wp.com&selectedList=DomainViewDistinctAssets&whoIsTimestamp=2020-07-06T19%3A09%3A01.099580930Z"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reputation: Malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "identifier": "ip_reputation",
+            "description": "Derive the reputation of the specified destination IP address artifact (The reputation can be either of 'Malicious', 'Suspicious', and 'Unknown')",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "destination_ip_address": {
+                    "description": "Specify a destination IP address",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination_ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.64.104.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Drop site for logs or stolen credentials"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.rawSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.sourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://tools.emergingthreats.net/docs/ET%20Intelligence%20Rep%20List%20Tech%20Description.pdf"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.64.104.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.lastActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-04T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.confidenceScore.strRawConfidenceScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.firstActiveTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-12-26T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.addresses.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "psoftdevserver.in"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suspicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/destinationIpResults?ip=45.64.104.167&referenceTime=2020-07-06T19%3A10%3A22.181506788Z&selectedList=IpViewDistinctAssets"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reputation: Suspicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suspicious"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "identifier": "list_alerts",
+            "description": "List all of the security alerts tracked within the enterprise on particular assets for the specified time period",
+            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "time_range": {
+                    "description": "Specify the time range of the search (Use this format <digit><d/h/m/s> where d=Days, h=Hours, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time range"
+                    ],
+                    "order": 0
+                },
+                "start_time": {
+                    "description": "Specify the start time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "Specify the end time of the search (Use this format yyyy-MM-ddTHH:mm:ssZ where y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gc time"
+                    ],
+                    "order": 2
+                },
+                "limit": {
+                    "description": "Specify the maximum number of results to return. You can specify between 1 and 100,000. (Default is 10,000)",
+                    "data_type": "numeric",
+                    "default": 10000,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10000
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_range",
+                    "data_type": "string",
+                    "example_values": [
+                        "30d"
+                    ],
+                    "contains": [
+                        "gc time range"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-01T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-10T00:00:00Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertSummary.*.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertSummary.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suspicious download by Office Application"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertSummary.*.occurrences",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-06-29T16:00:01Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.asset.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "betty-decaro-pc"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.rawLog",
+                    "data_type": "string",
+                    "example_values": [
+                        "SnVuIDIyIDE0OjU5OjU3IDEwLjAuMzAuNzMgam9fYzdmY2E5ODItNGFkOC00MzkyLTliMTktYTM2ODQ5MmY1ZDE0IGJldHR5LWRlY2Fyby1wYyBIaWdoIFN1c3BpY2lvdXMgZG93bmxvYWQgYnkgT2ZmaWNlIEFwcGxpY2F0aW9u"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-06-22T14:59:57Z"
+                    ],
+                    "contains": [
+                        "gc time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://demodev.backstory.chronicle.security/assetResults?assetIdentifier=david-lee-laptop&referenceTime=2020-06-29T16%3A00%3A01Z&selectedList=AssetViewTimeline&startTime=2020-06-29T15%3A55%3A01Z&endTime=2020-06-29T16%3A05%3A01Z&selectedAlert=1998215878&selectedEventTimestamp=2020-06-29T16%3A00%3A01Z"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.sourceProduct",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rule Generated Alert [jo_c7fca982-4ad8-4392-9b19-a368492f5d14]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.alertInfos.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suspicious download by Office Application"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.asset.assetIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.29.109"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts_assets_association.*.alert_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suspicious download by Office Application"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts_assets_association.*.affected_assets.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "shannon-pc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts_assets_association.*.asset_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alerts_assets_association.*.affected_assets.assetIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.29.109"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total assets with alerts: 7, Total alerts: 728"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_assets_with_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        728
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List Alerts",
+                "type": "custom",
+                "height": 5,
+                "view": "chronicle_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Action handler for the on poll ingest functionality",
+            "verbose": "The action will ingest all of the 3rd party security alerts tracked within the enterprise and domain IoCs matches discovered within the enterprise as per the selected ingestion run mode.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
