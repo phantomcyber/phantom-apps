@@ -10,11 +10,11 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.0",
+    "app_version": "2.0.2",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, August 24 2020, API version: v1, v2"
     ],
-    "utctime_updated": "2020-02-03T19:42:48.000000Z",
+    "utctime_updated": "2020-09-09T20:15:32.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
@@ -854,7 +854,21 @@
                     "data_type": "string",
                     "description": "Property to sort by",
                     "order": 2,
-                    "value_list": ["--", "created_by.asc", "created_by.desc", "created_timestamp.asc", "created_timestamp.desc", "group_type.asc", "group_type.desc", "modified_by.asc", "modified_by.desc", "modified_timestamp.asc", "modified_timestamp.desc", "name.asc", "name.desc"]                    
+                    "value_list": [
+                        "--",
+                        "created_by.asc",
+                        "created_by.desc",
+                        "created_timestamp.asc",
+                        "created_timestamp.desc",
+                        "group_type.asc",
+                        "group_type.desc",
+                        "modified_by.asc",
+                        "modified_by.desc",
+                        "modified_timestamp.asc",
+                        "modified_timestamp.desc",
+                        "name.asc",
+                        "name.desc"
+                    ]
                 }
             },
             "output": [
@@ -3356,98 +3370,112 @@
                     "data_path": "action_result.data.*.pattern_disposition_details.detect",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.inddet_mask",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.indicator",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_process",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_subprocess",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.operation_blocked",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.policy_disabled",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.process_blocked",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.quarantine_file",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.quarantine_machine",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.registry_operation_blocked",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.rooting",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.sensor_only",
                     "data_type": "boolean",
                     "example_values": [
-                        true, false
+                        true,
+                        false
                     ]
                 },
                 {
@@ -3550,13 +3578,23 @@
                     "data_type": "string",
                     "description": "Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list",
                     "order": 1,
-                    "example_values": ["False Positive", "Ignored", "Testing", "True Positive"]
+                    "example_values": [
+                        "False Positive",
+                        "Ignored",
+                        "Testing",
+                        "True Positive"
+                    ]
                 },
                 "delete_tag": {
                     "data_type": "string",
                     "description": "Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list",
                     "order": 2,
-                    "example_values": ["False Positive", "Ignored", "Testing", "True Positive"]
+                    "example_values": [
+                        "False Positive",
+                        "Ignored",
+                        "Testing",
+                        "True Positive"
+                    ]
                 },
                 "update_name": {
                     "data_type": "string",
@@ -3572,7 +3610,12 @@
                     "data_type": "string",
                     "description": "Updates the status of all the incident(s) in the ids list",
                     "order": 5,
-                    "value_list": ["New", "Reopened", "In Progress", "Closed"]
+                    "value_list": [
+                        "New",
+                        "Reopened",
+                        "In Progress",
+                        "Closed"
+                    ]
                 },
                 "add_comment": {
                     "data_type": "string",
@@ -4178,7 +4221,13 @@
                     "data_type": "string",
                     "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
                     "order": 1,
-                    "value_list": ["--", "score.asc", "score.desc", "timestamp.asc", "timestamp.desc"]
+                    "value_list": [
+                        "--",
+                        "score.asc",
+                        "score.desc",
+                        "timestamp.asc",
+                        "timestamp.desc"
+                    ]
                 },
                 "offset": {
                     "data_type": "numeric",
@@ -4668,7 +4717,8 @@
                     "data_path": "action_result.data.*.hosts.*.ou",
                     "data_type": "string",
                     "example_values": [
-                        "DOMAIN", "LOCAL"
+                        "DOMAIN",
+                        "LOCAL"
                     ]
                 },
                 {
@@ -4755,7 +4805,8 @@
                     "data_path": "action_result.data.*.state",
                     "data_type": "string",
                     "example_values": [
-                        "open", "closed"
+                        "open",
+                        "closed"
                     ],
                     "column_name": "State",
                     "column_order": 4
@@ -4823,7 +4874,11 @@
                     "data_type": "string",
                     "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
                     "order": 1,
-                    "value_list": ["--", "timestamp.asc", "timestamp.desc"]
+                    "value_list": [
+                        "--",
+                        "timestamp.asc",
+                        "timestamp.desc"
+                    ]
                 },
                 "offset": {
                     "data_type": "numeric",
@@ -5003,7 +5058,27 @@
                     "data_type": "string",
                     "description": "Sort the results by a specific field and direction. (Example: assigned_to.asc)",
                     "order": 1,
-                    "value_list": ["--", "assigned_to.asc", "assigned_to.desc", "assigned_to_name.asc", "assigned_to_name.desc", "end.asc", "end.desc", "modified_timestamp.asc", "modified_timestamp.desc", "name.asc", "name.desc", "sort_score.asc", "sort_score.desc", "start.asc", "start.desc", "state.asc", "state.desc", "status.asc", "status.desc"]
+                    "value_list": [
+                        "--",
+                        "assigned_to.asc",
+                        "assigned_to.desc",
+                        "assigned_to_name.asc",
+                        "assigned_to_name.desc",
+                        "end.asc",
+                        "end.desc",
+                        "modified_timestamp.asc",
+                        "modified_timestamp.desc",
+                        "name.asc",
+                        "name.desc",
+                        "sort_score.asc",
+                        "sort_score.desc",
+                        "start.asc",
+                        "start.desc",
+                        "state.asc",
+                        "state.desc",
+                        "status.asc",
+                        "status.desc"
+                    ]
                 },
                 "offset": {
                     "data_type": "numeric",
@@ -5482,7 +5557,8 @@
                         "success",
                         "failed"
                     ]
-                },{
+                },
+                {
                     "data_path": "action_result.data.*.service_pack_minor",
                     "data_type": "string",
                     "example_values": [
@@ -6181,7 +6257,8 @@
                     "example_values": [
                         "pid:07c312fabcb8473454d0a16f118928fg:16716090292999"
                     ]
-                },{
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
