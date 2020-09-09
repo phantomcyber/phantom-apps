@@ -1654,7 +1654,435 @@
         {
             "action": "trace email",
             "identifier": "trace_email",
-            "description": "Search for Email Message by specifying the Queue/Message ID of the Downstream MTA or the Original Message ID. One or the other parameter must be filled out",
+            "description": "Search for Email Message by specifying. ",
+            "verbose": "<p>One or the other parameter must be filled out. All fields are filtered by the IN clause where applicable making the search always an AND.</p><p>The modified date always uses the greater than or equal to. For example if you want to search the last 7 days, put a timestamp from 7 days ago.</p><p>The status field values are <ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags allows for the values <ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "modified_date": {
+                    "description": "Datetime stamp to limit the search period",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "example_values": [
+                        "2017-10-03T00:00:00.000Z"
+                    ],
+                    "default": "",
+                    "order": 0
+                },
+                "recipients": {
+                    "description": "The recipients of the email. Maxmium allowed per request is 10. Comma seperated list allowed",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "default": "",
+                    "order": 1
+                },
+                "sender": {
+                    "description": "The sender of the email. Maxmium allowed per request is 10. Comma seperated list allowed",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "default": "",
+                    "order": 2
+                },
+                "status": {
+                    "description": "ETP status to search by. Comma seperated list allowed",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "example_values": [
+                        "accepted",
+                        "deleted",
+                        "delivered",
+                        "delivered (retroactive)",
+                        "dropped",
+                        "dropped oob",
+                        "dropped (oob retroactive)",
+                        "permanent failure",
+                        "processing",
+                        "quarantined",
+                        "rejected",
+                        "temporary failure"
+                    ],
+                    "allow_list": true,
+                    "default": "",
+                    "order": 3
+                },
+                "subject": {
+                    "description": "The subject of the email to search for",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 4
+                },
+                "tags": {
+                    "description": "Tags from ETP that are assocaited with an email",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "example_values": [
+                        "auto_remediation",
+                        "impersonation",
+                        "manual_remediation"
+                    ],
+                    "allow_list": true,
+                    "default": "",
+                    "order": 5
+                },
+                "size": {
+                    "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": 20,
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.modified_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-10-03T00:00:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "accepted",
+                        "deleted",
+                        "delivered",
+                        "delivered (retroactive)",
+                        "dropped",
+                        "dropped oob",
+                        "dropped (oob retroactive)",
+                        "permanent failure",
+                        "processing",
+                        "quarantined",
+                        "rejected",
+                        "temporary failure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "auto_remediation",
+                        "impersonation",
+                        "manual_remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.acceptedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.downStreamMsgID",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Downstream Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.emailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "9.21"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.lastModifiedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.originalMessageID",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Original Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "recipient rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Senders IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AS",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.PV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.attributes.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "trace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "trace message",
+            "identifier": "trace_message",
+            "description": "Search for Email Message by specifying the Queue/Message ID of the Downstream MTA or the Original Message ID. One or the other parameter must be filled out. All fields are filtered by the IN clause where applicable.",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -1687,13 +2115,28 @@
                     "default": "",
                     "order": 1
                 },
+                "etp_message_ids": {
+                    "description": "A Comma seperated list of ETP Message IDs",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "allow_list": true,
+                    "default": "",
+                    "order": 0
+                },
                 "size": {
                     "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
                     "default": 20,
-                    "order": 2
+                    "order": 3
                 }
             },
             "output": [
@@ -1715,6 +2158,16 @@
                     ],
                     "contains": [
                         "fireeyeetp downstream message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.etp_message_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
                     ]
                 },
                 {

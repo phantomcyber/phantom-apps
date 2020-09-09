@@ -1,7 +1,4 @@
 # Define your constants here
-FIREEYEETP_US_BASE_PATH = "https://etp.us.fireeye.com/"
-FIREEYEETP_EU_BASE_PATH = "https://etp.eu.fireeye.com/"
-FIREEYEETP_AP_BASE_PATH = "https://etp.ap.fireeye.com/"
 FIREETEETP_API_PATH = "api/v1/"
 FIREETEETP_LIST_ALERTS_ENDPOINT = "alerts"
 FIREETEETP_GET_ALERT_ENDPOINT = "alerts/{alertId}"

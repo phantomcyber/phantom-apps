@@ -461,7 +461,7 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_trace_email(self, param):
+    def _handle_trace_message(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -479,6 +479,74 @@ class FireeyeEtpConnector(BaseConnector):
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
+
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_trace_email(self, param):
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {"attributes": {}}
+
+        if param.get("modified_date"):
+            lastModifiedDateTime = param.get("modified_date").strip()
+            # Make sure the datetime supplied is a valid
+            try:
+                lastModifiedDateTime = datetime.strptime(lastModifiedDateTime, "%Y-%m-%dT%H:%M:%S")
+                params['attributes']['lastModifiedDateTime'] = {"value": lastModifiedDateTime.strftime("%Y-%m-%dT%H:%M:%S"), "filter": ">="}
+            except:
+                return self.set_status(phantom.APP_ERROR, "Date supplied in the modified_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
+
+        if param.get("recipients"):
+            recipients = param.get("recipients")
+            recipients = [x.strip() for x in recipients.split(',')]
+            recipients = list(filter(None, recipients))
+
+            params['attributes']['recipients'] = {"value": recipients, "filter": "in", "includes": ["SMTP", "HEADER"]}
+
+        if param.get("sender"):
+            sender = param.get("sender")
+            sender = [x.strip() for x in sender.split(',')]
+            sender = list(filter(None, sender))
+
+            params['attributes']['fromEmail'] = {"value": sender, "filter": "in", "includes": ["SMTP", "HEADER"]}
+
+        if param.get("status"):
+            status = param.get("status")
+            status = [x.strip() for x in status.split(',')]
+            status = list(filter(None, status))
+
+            params['attributes']['status'] = {"value": status, "filter": "in"}
+
+        if param.get("tags"):
+            tags = param.get("tags")
+            tags = [x.strip() for x in tags.split(',')]
+            tags = list(filter(None, tags))
+
+            params['attributes']['tags'] = {"value": tags, "filter": "in"}
+
+        if param.get("subject"):
+            subject = param.get("subject").strip()
+
+            params['attributes']['subject'] = {"value": [subject], "filter": "in"}
+
+        params['size'] = int(param.get("size"))
+
+        endpoint = FIREETEETP_LIST_MESSAGE_ATTRIBUTES_ENDPOINT
+
+        # make rest call
+        ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=params)
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -1079,6 +1147,7 @@ class FireeyeEtpConnector(BaseConnector):
             'get_alert': self._handle_get_alert,
             'list_email_attributes': self._handle_list_email_attributes,
             'get_email_attributes': self._handle_get_email_attributes,
+            'trace_message': self._handle_trace_message,
             'trace_email': self._handle_trace_email,
             'download_email': self._handle_download_email,
             'download_pcap': self._handle_download_pcap,
@@ -1123,6 +1192,7 @@ class FireeyeEtpConnector(BaseConnector):
         # Optional values should use the .get() function
         optional_config_name = config.get('optional_config_name')
         """
+
         self._header = {
             'x-fireeye-api-key': config.get('api_key', '')
         }
