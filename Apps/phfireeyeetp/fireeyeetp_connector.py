@@ -768,10 +768,12 @@ class FireeyeEtpConnector(BaseConnector):
 
         data = {}
 
-        ids = param.get("etp_message_ids", None).split(',')
+        ids = param.get("etp_message_ids")
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
 
         if len(ids) > 1:
-            data['message_ids'] = ",".join(param.get('etp_message_ids'))
+            data['message_ids'] = ",".join(ids)
             endpoint = FIREEYEETP_BULK_RELEASE_QUARANTINE_EMAILS_ENDPOINT
         else:
             endpoint = FIREEYEETP_RELEASE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
@@ -804,10 +806,12 @@ class FireeyeEtpConnector(BaseConnector):
 
         data = {}
 
-        ids = param.get("etp_message_ids", None).split(',')
+        ids = param.get("etp_message_ids")
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
 
         if len(ids) > 1:
-            data['message_ids'] = ",".join(param.get('etp_message_ids'))
+            data['message_ids'] = ",".join(ids)
             endpoint = FIREEYEETP_BULK_DELETE_QUARANTINE_EMAILS_ENDPOINT
         else:
             endpoint = FIREEYEETP_DELETE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
@@ -872,7 +876,11 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the domain
         if param.get('domains'):
-            data['attributes']['domains'] = param.get('domains').split(',')
+            domains = param.get("domains")
+            domains = [x.strip() for x in domains.split(',')]
+            domains = list(filter(None, domains))
+
+            data['attributes']['domains'] = domains
 
         # Check the email server
         if param.get('email_server'):
@@ -884,11 +892,19 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the reason
         if param.get('reason'):
-            data['attributes']['reason'] = param.get('reason').split(',')
+            reason = param.get("reason")
+            reason = [x.strip() for x in reason.split(',')]
+            reason = list(filter(None, reason))
+            
+            data['attributes']['reason'] = reason
 
         # Check the recipients
         if param.get('recipients'):
-            data['attributes']['recipients'] = param.get('recipients').split(',')
+            recipients = param.get("recipients")
+            recipients = [x.strip() for x in recipients.split(',')]
+            recipients = list(filter(None, recipients))
+
+            data['attributes']['recipients'] = recipients
 
         # Check the sender domain
         if param.get('sender_domain'):
@@ -900,8 +916,12 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the tags
         if param.get('tags'):
+            tags = param.get("tags")
+            tags = [x.strip() for x in tags.split(',')]
+            tags = list(filter(None, tags))
+
             data['attributes']['tags'] = {}
-            data['attributes']['tags']['value'] = param.get('tags').split(',')
+            data['attributes']['tags']['value'] = tags
 
         endpoint = FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT
 
