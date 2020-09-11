@@ -17,7 +17,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
 
 <h2 id="appid">On Poll</h2>
  <ul>
-     <li>Common points for both Manual and Scheduled | Interval polling
+     <li>Common points for both manual and scheduled interval polling
          <ul>
              <li>
                  Default parameters of the On Poll action are ignored in the app. i.e. start_time, end_time, container_count, artifact_count
@@ -42,7 +42,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
      <li>Manual Polling
          <ul>
              <li>
-                 During manual poll now, the app starts from the 1st event that it can query up to the value configured in the configuration parameter [Maximum events to get while POLL NOW] and creates artifacts for all the fetched DetectionSummaryEvents. The last queried event's offset ID will not be remembered in Manual POLL NOW and it fetches everything every time from the beginning.
+                 During manual poll now, the app starts from the first event that it can query up to the value configured in the configuration parameter [Maximum events to get while POLL NOW] and creates artifacts for all the fetched DetectionSummaryEvents. The last queried event's offset ID will not be remembered in Manual POLL NOW and it fetches everything every time from the beginning.
              </li>
          </ul>
      </li>
@@ -50,7 +50,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
      <li>Scheduled | Interval Polling
          <ul>
              <li>
-                 During scheduled | interval polling, the app starts from the 1st event that it can query up to the value configured in the configuration parameter [Maximum events to get while scheduled and interval polling] and creates artifacts for all the fetched DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores in the state file against the key [last_offset_id]. In the next scheduled poll run, it will start from the stored offset ID in the state file and will fetch the maximum events as configured in the [Maximum events to get while scheduled and interval polling] parameter.
+                 During scheduled | interval polling, the app starts from the first event that it can query up to the value configured in the configuration parameter [Maximum events to get while scheduled and interval polling] and creates artifacts for all the fetched DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores in the state file against the key [last_offset_id]. In the next scheduled poll run, it will start from the stored offset ID in the state file and will fetch the maximum events as configured in the [Maximum events to get while scheduled and interval polling] parameter.
              </li>
          </ul>
      </li>
