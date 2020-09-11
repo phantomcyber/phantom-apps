@@ -1659,6 +1659,18 @@
             "type": "investigate",
             "read_only": true,
             "parameters": {
+                "domains": {
+                    "description": "Specific domain(s) to search by. Comma seperated list allowed",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "exmaple_values": [
+                        "domain.local"
+                    ],
+                    "default": "",
+                    "allow_list": true,
+                    "order": 0
+                },
                 "modified_date": {
                     "description": "Datetime stamp to limit the search period",
                     "data_type": "string",
@@ -1668,7 +1680,7 @@
                         "2017-10-03T00:00:00.000Z"
                     ],
                     "default": "",
-                    "order": 0
+                    "order": 1
                 },
                 "recipients": {
                     "description": "The recipients of the email. Maxmium allowed per request is 10. Comma seperated list allowed",
@@ -1683,7 +1695,7 @@
                     ],
                     "allow_list": true,
                     "default": "",
-                    "order": 1
+                    "order": 2
                 },
                 "sender": {
                     "description": "The sender of the email. Maxmium allowed per request is 10. Comma seperated list allowed",
@@ -1698,7 +1710,7 @@
                     ],
                     "allow_list": true,
                     "default": "",
-                    "order": 2
+                    "order": 3
                 },
                 "status": {
                     "description": "ETP status to search by. Comma seperated list allowed",
@@ -1721,7 +1733,7 @@
                     ],
                     "allow_list": true,
                     "default": "",
-                    "order": 3
+                    "order": 4
                 },
                 "subject": {
                     "description": "The subject of the email to search for",
@@ -1729,7 +1741,7 @@
                     "required": false,
                     "primary": false,
                     "default": "",
-                    "order": 4
+                    "order": 5
                 },
                 "tags": {
                     "description": "Tags from ETP that are assocaited with an email",
@@ -1743,7 +1755,7 @@
                     ],
                     "allow_list": true,
                     "default": "",
-                    "order": 5
+                    "order": 6
                 },
                 "size": {
                     "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
@@ -1751,10 +1763,17 @@
                     "required": false,
                     "primary": false,
                     "default": 20,
-                    "order": 6
+                    "order": 7
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.domains",
+                    "data_type": "string",
+                    "exmaple_values": [
+                        "domain.local"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.modified_date",
                     "data_type": "string",

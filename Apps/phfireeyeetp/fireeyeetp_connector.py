@@ -541,6 +541,14 @@ class FireeyeEtpConnector(BaseConnector):
 
             params['attributes']['subject'] = {"value": [subject], "filter": "in"}
 
+        # Check the domain
+        if param.get('domains'):
+            domains = param.get("domains")
+            domains = [x.strip() for x in domains.split(',')]
+            domains = list(filter(None, domains))
+
+            data['attributes']['domains'] = domains
+
         params['size'] = int(param.get("size"))
 
         endpoint = FIREETEETP_LIST_MESSAGE_ATTRIBUTES_ENDPOINT
@@ -866,13 +874,31 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the from date
         if param.get('from_date'):
-            data['attributes']['date'] = {}
-            data['attributes']['date']['from_date'] = param.get('from_date')
+            from_date = param.get("from_date").strip()
+
+            # Make sure the datetime supplied is a valid. Should be ISO8601 compliant
+            try:
+                from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S")
+                from_date = from_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+                data['attributes']['date'] = {}
+                data['attributes']['date']['from_date'] = from_date
+            except:
+                return self.set_status(phantom.APP_ERROR, "Date supplied in the from_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
 
             # Since the from_date and to_date need to be supplied together check it here
             # Check the to date
             if param.get('to_date'):
-                data['attributes']['date']['to_date'] = param.get('to_date')
+                to_date = param.get('to_date').strip()
+                # Make sure the datetime supplied is a valid. Should be ISO8601 compliant
+                try:
+                    to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S")
+                    to_date = to_date.strftime("%Y-%m-%dT%H:%M:%S")
+                    
+                    data['attributes']['date'] = {}
+                    data['attributes']['date']['to_date'] = to_date
+                except:
+                    return self.set_status(phantom.APP_ERROR, "Date supplied in the to_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
 
         # Check the domain
         if param.get('domains'):
