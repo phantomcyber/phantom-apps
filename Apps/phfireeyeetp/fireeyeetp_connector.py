@@ -894,7 +894,7 @@ class FireeyeEtpConnector(BaseConnector):
                 try:
                     to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S")
                     to_date = to_date.strftime("%Y-%m-%dT%H:%M:%S")
-                    
+
                     data['attributes']['date'] = {}
                     data['attributes']['date']['to_date'] = to_date
                 except:
@@ -921,7 +921,7 @@ class FireeyeEtpConnector(BaseConnector):
             reason = param.get("reason")
             reason = [x.strip() for x in reason.split(',')]
             reason = list(filter(None, reason))
-            
+
             data['attributes']['reason'] = reason
 
         # Check the recipients
