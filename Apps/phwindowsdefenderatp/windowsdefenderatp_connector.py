@@ -5,6 +5,16 @@
 #
 
 # Phantom App imports
+try:
+    from phantom.base_connector import BaseConnector
+    from phantom.action_result import ActionResult
+    from phantom import status as status_strings
+    from phantom import utils
+except:
+    from base_connector import BaseConnector
+    from action_result import ActionResult
+    import status as status_strings
+    import utils
 import json
 import os
 import sys
@@ -20,9 +30,6 @@ import requests
 from bs4 import BeautifulSoup, UnicodeDammit
 from django.http import HttpResponse
 
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
 
 from windowsdefenderatp_consts import *
 
@@ -92,7 +99,7 @@ def _save_app_state(state, asset_id, app_connector):
     :param state: Dictionary which contains data to write in state file
     :param asset_id: asset_id
     :param app_connector: Object of app_connector class
-    :return: status: phantom.APP_SUCCESS
+    :return: status: status_strings.APP_SUCCESS
     """
 
     asset_id = str(asset_id)
@@ -119,7 +126,7 @@ def _save_app_state(state, asset_id, app_connector):
     except Exception as e:
         print('Unable to save state file: {0}'.format(str(e)))
 
-    return phantom.APP_SUCCESS
+    return status_strings.APP_SUCCESS
 
 
 def _handle_login_response(request):
@@ -235,13 +242,13 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         if response.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {})
+            return RetVal(status_strings.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)),
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)),
                       None)
 
     def _process_html_response(self, response, action_result):
@@ -249,7 +256,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         # An html response, treat it like an error
@@ -274,26 +281,26 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         message = message.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         try:
             # Process a json response
             resp_json = response.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Unable to parse JSON response. Error: {0}"
                                                    .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
+            return RetVal(status_strings.APP_SUCCESS, resp_json)
 
         message = None
 
@@ -314,14 +321,14 @@ class WindowsDefenderAtpConnector(BaseConnector):
             message = "Error from server. Status Code: {0} Data from server: {1}"\
                 .format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _process_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: response data
         :param action_result: object of Action Result
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message)
         """
 
         # store the response_text in debug data, it will get dumped in the logs if the action fails
@@ -353,7 +360,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return RetVal(action_result.set_status(status_strings.APP_ERROR, message), None)
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -409,7 +416,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :param params: request parameters
         :param data: request body
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
 
@@ -427,13 +434,13 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if not self._access_token:
             if not self._refresh_token:
                 # If none of the access_token and refresh_token is available
-                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
+                return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
                        None
 
             # If refresh_token is available and access_token is not available, generate new access_token
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
 
-            if phantom.is_fail(status):
+            if status_strings.is_fail(status):
                 return action_result.get_status(), None
 
         headers.update({'Authorization': 'Bearer {0}'.format(self._access_token),
@@ -447,7 +454,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if DEFENDERATP_TOKEN_EXPIRED in action_result.get_message():
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
 
-            if phantom.is_fail(status):
+            if status_strings.is_fail(status):
                 return action_result.get_status(), None
 
             headers.update({'Authorization': 'Bearer {0}'.format(self._access_token)})
@@ -455,10 +462,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
             ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=endpoint, headers=headers,
                                                       params=params, data=data, method=method)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
-        return phantom.APP_SUCCESS, resp_json
+        return status_strings.APP_SUCCESS, resp_json
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", verify=True):
         """ Function that makes the REST call to the app.
@@ -470,7 +477,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :param data: request body
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
         :param verify: verify server certificate (Default True)
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
 
@@ -479,7 +486,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
             response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
@@ -491,7 +498,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             except:
                 self.debug_print("Error occurred while logging the make_rest_call exception message")
 
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
+            return RetVal(action_result.set_status(status_strings.APP_ERROR, "Error Connecting to server. Details: {0}"
                                                    .format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(response, action_result)
@@ -500,7 +507,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         """ Get name of the asset using Phantom URL.
 
         :param action_result: object of ActionResult class
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message), asset name
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message), asset name
         """
 
         asset_id = self.get_asset_id()
@@ -508,47 +515,47 @@ class WindowsDefenderAtpConnector(BaseConnector):
         url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self.get_phantom_base_url()), rest_endpoint)
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val, None
 
         asset_name = resp_json.get('name')
         if not asset_name:
-            return action_result.set_status(phantom.APP_ERROR, 'Asset Name for id: {0} not found.'.format(asset_id),
+            return action_result.set_status(status_strings.APP_ERROR, 'Asset Name for id: {0} not found.'.format(asset_id),
                                             None)
-        return phantom.APP_SUCCESS, asset_name
+        return status_strings.APP_SUCCESS, asset_name
 
     def _get_phantom_base_url_defenderatp(self, action_result):
         """ Get base url of phantom.
 
         :param action_result: object of ActionResult class
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         base url of phantom
         """
 
         url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self.get_phantom_base_url()), DEFENDERATP_PHANTOM_SYS_INFO_URL)
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return ret_val, None
 
         phantom_base_url = resp_json.get('base_url')
         if not phantom_base_url:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_BASE_URL_NOT_FOUND_MSG), None
-        return phantom.APP_SUCCESS, phantom_base_url
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_BASE_URL_NOT_FOUND_MSG), None
+        return status_strings.APP_SUCCESS, phantom_base_url
 
     def _get_app_rest_url(self, action_result):
         """ Get URL for making rest calls.
 
         :param action_result: object of ActionResult class
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
         URL to make rest calls
         """
 
         ret_val, phantom_base_url = self._get_phantom_base_url_defenderatp(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
         ret_val, asset_name = self._get_asset_name(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
         self.save_progress('Using Phantom base URL as: {0}'.format(phantom_base_url))
@@ -558,14 +565,14 @@ class WindowsDefenderAtpConnector(BaseConnector):
         app_dir_name = _get_dir_name_from_app_name(app_name)
         url_to_app_rest = '{0}/rest/handler/{1}_{2}/{3}'.format(phantom_base_url, app_dir_name, app_json['appid'],
                                                                 asset_name)
-        return phantom.APP_SUCCESS, url_to_app_rest
+        return status_strings.APP_SUCCESS, url_to_app_rest
 
     def _generate_new_access_token(self, action_result, data):
         """ This function is used to generate new access token using the code obtained on authorization.
 
         :param action_result: object of ActionResult class
         :param data: Data to send in REST call
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS
+        :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS
         """
 
         req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
@@ -573,7 +580,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
                                                   data=urlencode(data), method="post")
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[DEFENDERATP_TOKEN_STRING] = resp_json
@@ -595,9 +602,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             message = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."
             message += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
             message += "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)."
-            return action_result.set_status(phantom.APP_ERROR, message)
+            return action_result.set_status(status_strings.APP_ERROR, message)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _wait(self, action_result):
         """ This function is used to hold the action till user login for 105 seconds.
@@ -623,15 +630,15 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if not time_out:
             self.send_progress('')
-            return action_result.set_status(phantom.APP_ERROR, "Timeout. Please try again later.")
+            return action_result.set_status(status_strings.APP_ERROR, "Timeout. Please try again later.")
         self.send_progress('Authenticated')
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _handle_test_connectivity(self, param):
         """ Testing of given credentials and obtaining authorization for all other actions.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -642,7 +649,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # Get initial REST URL
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
@@ -676,7 +683,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # Empty message to override last message of waiting
         self.send_progress('')
-        if phantom.is_fail(status):
+        if status_strings.is_fail(status):
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
@@ -685,7 +692,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # if code is not available in the state file
         if not self._state or not self._state.get('code'):
-            return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
 
         current_code = self._state['code']
         self.save_state(self._state)
@@ -704,7 +711,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # for first time access, new access token is generated
         ret_val = self._generate_new_access_token(action_result=action_result, data=data)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             self.send_progress('')
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
@@ -716,14 +723,14 @@ class WindowsDefenderAtpConnector(BaseConnector):
             '$top': 1
         }
         ret_val, response = self._update_request(action_result=action_result, endpoint=url, params=params)
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             self.send_progress('')
             self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
             return action_result.get_status()
 
         self.save_progress(DEFENDERATP_RECEIVED_ALERT_INFO_MSG)
         self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_PASSED_MSG)
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _status_wait(self, action_result, action_id, timeout):
         """ This function is used to check status of action on device every 5 seconds for specified timeout period.
@@ -746,18 +753,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
             # make rest call
             ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
-            if phantom.is_fail(ret_val):
+            if status_strings.is_fail(ret_val):
                 return action_result.get_status(), None
             if not response['status'] == DEFENDERATP_STATUS_PROGRESS:
-                return phantom.APP_SUCCESS, response
+                return status_strings.APP_SUCCESS, response
 
-        return phantom.APP_SUCCESS, response
+        return status_strings.APP_SUCCESS, response
 
     def _handle_quarantine_device(self, param):
         """ This function is used to handle the quarantine device action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -772,9 +779,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             timeout = int(timeout)
 
             if timeout <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
             timeout = DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT
@@ -791,11 +798,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
                                                  data=json.dumps(data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response.get('id', ""):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
 
         summary = action_result.update_summary({})
         summary['event_id'] = response['id']
@@ -803,18 +810,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_id = response['id']
         # Wait for some while the status of the action updates
         status, response_status = self._status_wait(action_result, action_id, timeout)
-        if phantom.is_fail(status):
+        if status_strings.is_fail(status):
             return action_result.get_status()
 
         action_result.add_data(response_status)
         summary['quarantine_status'] = response_status['status']
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_unquarantine_device(self, param):
         """ This function is used to handle the unquarantine device action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -828,9 +835,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             timeout = int(timeout)
 
             if timeout <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
             timeout = DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT
@@ -846,11 +853,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
                                                  data=json.dumps(data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response.get('id', ""):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
 
         summary = action_result.update_summary({})
         summary['event_id'] = response['id']
@@ -858,18 +865,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_id = response['id']
         # Wait for some while the status of the action updates
         status, response_status = self._status_wait(action_result, action_id, timeout)
-        if phantom.is_fail(status):
+        if status_strings.is_fail(status):
             return action_result.get_status()
 
         action_result.add_data(response_status)
         summary['unquarantine_status'] = response_status['status']
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_get_status(self, param):
         """ This function is used to handle the get status action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -883,7 +890,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # make rest call
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -891,7 +898,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['event_status'] = response['status']
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_scan_device(self, param):
         """ This function is used to handle the scan device action.
@@ -912,9 +919,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             timeout = int(timeout)
 
             if timeout <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT:
             timeout = DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT
@@ -932,11 +939,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=url, action_result=action_result, method='post',
                                                  data=json.dumps(request_data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response.get('id', ""):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
 
         summary = action_result.update_summary({})
         summary['event_id'] = response['id']
@@ -944,18 +951,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_id = response['id']
         # Wait for some while the status of the action updates
         status, response_status = self._status_wait(action_result, action_id, timeout)
-        if phantom.is_fail(status):
+        if status_strings.is_fail(status):
             return action_result.get_status()
 
         action_result.add_data(response_status)
         summary['scan_status'] = response_status['status']
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_quarantine_file(self, param):
         """ This function is used to handle the quarantine file action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -970,9 +977,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             timeout = int(timeout)
 
             if timeout <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
             timeout = DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT
@@ -989,11 +996,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
                                                  data=json.dumps(data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response.get('id', ""):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
 
         summary = action_result.update_summary({})
         summary['event_id'] = response['id']
@@ -1001,12 +1008,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_id = response['id']
         # Wait for some while the status of the action updates
         status, response_status = self._status_wait(action_result, action_id, timeout)
-        if phantom.is_fail(status):
+        if status_strings.is_fail(status):
             return action_result.get_status()
 
         action_result.add_data(response_status)
         summary['quarantine_status'] = response_status['status']
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_unblock_hash(self, param):
         """ This function is used to handle the unblock hash action.
@@ -1032,16 +1039,16 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, _ = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
                                           data=json.dumps(request_data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_FILE_HASH_UNBLOCKED_SUCCESS_MSG)
+        return action_result.set_status(status_strings.APP_SUCCESS, DEFENDERATP_FILE_HASH_UNBLOCKED_SUCCESS_MSG)
 
     def _handle_block_hash(self, param):
         """ This function is used to handle the block hash action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1061,16 +1068,16 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
                                                  data=json.dumps(data))
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_FILE_BLOCKED_MSG)
+        return action_result.set_status(status_strings.APP_SUCCESS, DEFENDERATP_FILE_BLOCKED_MSG)
 
     def _handle_list_devices(self, param):
         """ This function is used to handle the list device action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1086,9 +1093,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             limit = int(limit)
             if limit <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
 
         endpoint = ""
         # Check if input type is All
@@ -1097,16 +1104,16 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # If input not given
         elif input_type and not input:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
 
         elif input and input_type:
             # Check for valid domain
             if input_type == DEFENDERATP_DOMAIN_CONST:
                 try:
-                    if phantom.is_domain(input):
+                    if utils.is_domain(input):
                         endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
                     else:
-                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                        return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                         .format(DEFENDERATP_DOMAIN_CONST))
                 except:
                     endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
@@ -1115,10 +1122,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
                 try:
-                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                    if utils.is_sha1(input) or utils.is_sha256(input) or utils.is_md5(input):
                         endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
                     else:
-                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                        return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                         .format(DEFENDERATP_FILE_HASH_CONST))
                 except:
                     endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
@@ -1130,28 +1137,28 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # make rest call
         ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response:
-            return action_result.set_status(phantom.APP_ERROR, "No data found")
+            return action_result.set_status(status_strings.APP_ERROR, "No data found")
 
         for machine in response.get('value', []):
             action_result.add_data(machine)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No device found")
+            return action_result.set_status(status_strings.APP_ERROR, "No device found")
 
         summary = action_result.update_summary({})
         summary['total_devices'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_alerts(self, param):
         """ This function is used to handle the list alerts action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1167,9 +1174,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             limit = int(limit)
             if limit <= 0:
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+                return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
         except:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
 
         endpoint = ""
 
@@ -1179,7 +1186,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # Check if input is not present
         elif input_type and not input:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
+            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
 
         elif input and input_type:
             # Check for valid IP
@@ -1187,16 +1194,16 @@ class WindowsDefenderAtpConnector(BaseConnector):
                 try:
                     ipaddress.ip_address(UnicodeDammit(input).unicode_markup)
                 except:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                    return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                     .format(DEFENDERATP_IP_CONST))
                 endpoint = DEFENDERATP_IP_ALERTS_ENDPOINT.format(input=input)
             # Check for valid domain
             elif input_type == DEFENDERATP_DOMAIN_CONST:
                 try:
-                    if phantom.is_domain(input):
+                    if utils.is_domain(input):
                         endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
                     else:
-                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                        return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                         .format(DEFENDERATP_DOMAIN_CONST))
                 except:
                     endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
@@ -1205,10 +1212,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
                 try:
-                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                    if utils.is_sha1(input) or utils.is_sha256(input) or utils.is_md5(input):
                         endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
                     else:
-                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                        return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                         .format(DEFENDERATP_FILE_HASH_CONST))
                 except:
                     endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
@@ -1220,28 +1227,28 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # make rest call
         ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         if not response:
-            return action_result.set_status(phantom.APP_ERROR, "No data found")
+            return action_result.set_status(status_strings.APP_ERROR, "No data found")
 
         for alert in response.get('value', []):
             action_result.add_data(alert)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+            return action_result.set_status(status_strings.APP_ERROR, "No alerts found")
 
         summary = action_result.update_summary({})
         summary['total_alerts'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def _handle_list_sessions(self, param):
         """ This function is used to handle the list sessions action.
 
         :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        :return: status(status_strings.APP_SUCCESS/status_strings.APP_ERROR)
         """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1254,18 +1261,18 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # make rest call
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
 
-        if phantom.is_fail(ret_val):
+        if status_strings.is_fail(ret_val):
             return action_result.get_status()
 
         for session in response.get('value', []):
             action_result.add_data(session)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No sessions found for the given device")
+            return action_result.set_status(status_strings.APP_ERROR, "No sessions found for the given device")
         summary = action_result.update_summary({})
         summary['total_sessions'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS)
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
@@ -1288,7 +1295,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         }
 
         action = self.get_action_identifier()
-        action_execution_status = phantom.APP_SUCCESS
+        action_execution_status = status_strings.APP_SUCCESS
 
         if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
@@ -1299,8 +1306,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
     def initialize(self):
         """ This is an optional function that can be implemented by the AppConnector derived class. Since the
         configuration dictionary is already validated by the time this function is called, it's a good place to do any
-        extra initialization of any internal modules. This function MUST return a value of either phantom.APP_SUCCESS or
-        phantom.APP_ERROR. If this function returns phantom.APP_ERROR, then AppConnector::handle_action will not get
+        extra initialization of any internal modules. This function MUST return a value of either status_strings.APP_SUCCESS or
+        status_strings.APP_ERROR. If this function returns status_strings.APP_ERROR, then AppConnector::handle_action will not get
         called.
         """
 
@@ -1308,7 +1315,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(status_strings.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         self._state = self.load_state()
 
@@ -1321,7 +1328,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def finalize(self):
         """ This function gets called once all the param dictionary elements are looped over and no more handle_action
@@ -1336,7 +1343,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
 
-        return phantom.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
 
 if __name__ == '__main__':

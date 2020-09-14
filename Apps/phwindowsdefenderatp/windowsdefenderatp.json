@@ -1,4 +1,5 @@
 {
+    "connector_id": "e85407b7-91f0-4019-8fa4-0d29bca741d5",
     "appid": "e85407b7-91f0-4019-8fa4-0d29bca741d5",
     "name": "Windows Defender ATP",
     "description": "This app integrates with Windows Defender Advanced Threat Protection(ATP) to execute various containment, corrective and investigative actions",
@@ -11,6 +12,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
     "app_version": "3.0.0",
+    "connector_version": "3.0.0",
     "utctime_updated": "2020-07-07T13:23:56.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
