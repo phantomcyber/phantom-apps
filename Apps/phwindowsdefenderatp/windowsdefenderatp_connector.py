@@ -1,5 +1,5 @@
 # File: windowsdefenderatp_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -7,13 +7,17 @@
 # Phantom App imports
 import json
 import os
+import sys
 import time
-import urllib
+try:
+    from urllib.parse import urlencode
+except:
+    from urllib import urlencode
 import ipaddress
 import pwd
 import grp
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 from django.http import HttpResponse
 
 import phantom.app as phantom
@@ -33,11 +37,13 @@ def _handle_login_redirect(request, key):
 
     asset_id = request.GET.get('asset_id')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL')
+        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=400)
     state = _load_app_state(asset_id)
+    if not state:
+        return HttpResponse('ERROR: Invalid asset_id', content_type="text/plain", status=400)
     url = state.get(key)
     if not url:
-        return HttpResponse('App state is invalid, {key} not found.'.format(key=key))
+        return HttpResponse('App state is invalid, {key} not found.'.format(key=key), content_type="text/plain", status=400)
     response = HttpResponse(status=302)
     response['Location'] = url
     return response
@@ -51,11 +57,23 @@ def _load_app_state(asset_id, app_connector=None):
     :return: state: Current state file as a dictionary
     """
 
-    dirpath = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
     state = {}
     try:
-        with open(state_file, 'r') as state_file_obj:
+        with open(real_state_file_path, 'r') as state_file_obj:
             state_file_data = state_file_obj.read()
             state = json.loads(state_file_data)
     except Exception as e:
@@ -64,11 +82,12 @@ def _load_app_state(asset_id, app_connector=None):
 
     if app_connector:
         app_connector.debug_print('Loaded state: ', state)
+
     return state
 
 
 def _save_app_state(state, asset_id, app_connector):
-    """ This functions is used to save current state in file.
+    """ This function is used to save current state in file.
 
     :param state: Dictionary which contains data to write in state file
     :param asset_id: asset_id
@@ -76,17 +95,29 @@ def _save_app_state(state, asset_id, app_connector):
     :return: status: phantom.APP_SUCCESS
     """
 
-    dirpath = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _save_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.split(__file__)[0]
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _save_app_state: Invalid asset_id')
+        return {}
 
     if app_connector:
         app_connector.debug_print('Saving state: ', state)
 
     try:
-        with open(state_file, 'w+') as state_file_obj:
+        with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
-        print 'Unable to save state file: {0}'.format(str(e))
+        print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
@@ -100,7 +131,7 @@ def _handle_login_response(request):
 
     asset_id = request.GET.get('state')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)))
+        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     # Check for error in URL
     error = request.GET.get('error')
@@ -111,19 +142,19 @@ def _handle_login_response(request):
         message = 'Error: {0}'.format(error)
         if error_description:
             message = '{0} Details: {1}'.format(message, error_description)
-        return HttpResponse('Server returned {0}'.format(message))
+        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=400)
 
     code = request.GET.get('code')
 
     # If code is not available
     if not code:
-        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)))
+        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     state = _load_app_state(asset_id)
     state['code'] = code
     _save_app_state(state, asset_id, None)
 
-    return HttpResponse('Code received. Please close this window, the action will continue to get new token.')
+    return HttpResponse('Code received. Please close this window, the action will continue to get new token.', content_type="text/plain")
 
 
 def _handle_rest_request(request, path_parts):
@@ -135,7 +166,7 @@ def _handle_rest_request(request, path_parts):
     """
 
     if len(path_parts) < 2:
-        return HttpResponse('error: True, message: Invalid REST endpoint request')
+        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=404)
 
     call_type = path_parts[1]
 
@@ -147,9 +178,12 @@ def _handle_rest_request(request, path_parts):
     if call_type == 'result':
         return_val = _handle_login_response(request)
         asset_id = request.GET.get('state')
-        if asset_id:
+        if asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = '{0}/{1}_{2}'.format(app_dir, asset_id, DEFENDERATP_TC_FILE)
+            real_auth_status_file_path = os.path.realpath(auth_status_file_path)
+            if not os.path.dirname(real_auth_status_file_path) == app_dir:
+                return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=400)
             open(auth_status_file_path, 'w').close()
             try:
                 uid = pwd.getpwnam('apache').pw_uid
@@ -160,7 +194,7 @@ def _handle_rest_request(request, path_parts):
                 pass
 
         return return_val
-    return HttpResponse('error: Invalid endpoint')
+    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=404)
 
 
 def _get_dir_name_from_app_name(app_name):
@@ -194,9 +228,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._client_id = None
         self._access_token = None
         self._refresh_token = None
+        self._client_secret = None
 
-    @staticmethod
-    def _process_empty_response(response, action_result):
+    def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: response data
@@ -207,11 +241,10 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)),
                       None)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: response data
@@ -224,14 +257,20 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = self._handle_py_ver_compat_for_input_str(soup.text)
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text.encode('utf-8'))
+        if not error_text:
+            error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
+
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -245,51 +284,35 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        # Try a json parse
         try:
             # Process a json response
             resp_json = response.json()
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
-                                                   .format(str(e))), None)
+                                                   .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         message = None
+
         # Check whether the response contains error and error description fields
         # This condition will be used in test_connectivity
-        if resp_json.get('error') and resp_json.get('error_description'):
-            message = "Error from server. Status Code: {0} Data from server: \"error\": {1}, " \
-                      "\"error_description\": {2}".format(response.status_code, resp_json['error'],
-                                                          resp_json['error_description'])
+        if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
+            err = "Error:{0}, Error Description:{1}".format(
+                    self._handle_py_ver_compat_for_input_str(resp_json.get('error')), self._handle_py_ver_compat_for_input_str(resp_json.get('error_description')))
+            err += " Please check your asset configuration parameters and run the test connectivity."
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
-        if resp_json.get('error', {}).get('message'):
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                         resp_json['error']['message'])
-        if resp_json.get('error', {}).get('code'):
-            if resp_json['error']['code'] == 'NotFound':
-                device_actions = ['quarantine_device', 'unquarantine_device', 'scan_device']
-                file_actions = ['quarantine_file']
-                event_actions = ['get_status']
-                if self.get_action_identifier() in device_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_DEVICE_FOUND_MSG)
-                elif self.get_action_identifier() in file_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_FILE_DEVICE_FOUND_MSG)
-                elif self.get_action_identifier() in event_actions:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_EVENT_FOUND_MSG)
-                else:
-                    message = "Error from server. Status Code: {0} Data from server: {1}"\
-                        .format(response.status_code, DEFENDERATP_NO_DATA_FOUND_MSG)
+        if isinstance(resp_json.get('error'), dict) and resp_json.get('error', {}).get('code'):
+            message = "Error from server. Status Code: {0} Error Code: {1} Data from server: {2}".format(
+                response.status_code, resp_json.get('error', {}).get('code'), self._handle_py_ver_compat_for_input_str(resp_json.get('error', {}).get('message')))
 
         if not message:
             message = "Error from server. Status Code: {0} Data from server: {1}"\
-                .format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+                .format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -328,9 +351,54 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _update_request(self, action_result, endpoint, headers=None, params=None, data=None, method='get'):
         """ This function is used to update the headers with access_token before making REST call.
@@ -351,7 +419,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         token_data = {
             'client_id': self._client_id,
             'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
-            'refresh_token': self._refresh_token
+            'refresh_token': self._refresh_token,
+            'client_secret': self._client_secret,
+            'resource': DEFENDERATP_RESOURCE_URL
         }
 
         if not self._access_token:
@@ -412,10 +482,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-                response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
+            response = request_func(endpoint, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
+            try:
+                self.debug_print("make_rest_call exception...")
+                self.debug_print("Exception Message - {}".format(str(e)))
+                self.debug_print("make_rest_call exception ends...")
+            except:
+                self.debug_print("Error occurred while logging the make_rest_call exception message")
+
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
-                                                   .format(str(e))), resp_json)
+                                                   .format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(response, action_result)
 
@@ -494,14 +571,32 @@ class WindowsDefenderAtpConnector(BaseConnector):
         req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
-                                                  data=urllib.urlencode(data), method="post")
+                                                  data=urlencode(data), method="post")
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[DEFENDERATP_TOKEN_STRING] = resp_json
         self._access_token = resp_json[DEFENDERATP_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
+
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
+
+        self._state = self.load_state()
+
+        # Scenario -
+        #
+        # If the corresponding state file doesn't have correct owner, owner group or permissions,
+        # the newely generated token is not being saved to state file and automatic workflow for token has been stopped.
+        # So we have to check that token from response and token which are saved to state file after successful generation of new token are same or not.
+
+        if self._access_token != self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING):
+            message = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."
+            message += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
+            message += "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)."
+            return action_result.set_status(phantom.APP_ERROR, message)
+
         return phantom.APP_SUCCESS
 
     def _wait(self, action_result):
@@ -528,7 +623,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if not time_out:
             self.send_progress('')
-            return action_result.set_status(phantom.APP_ERROR, status_message='Timeout. Please try again later.')
+            return action_result.set_status(phantom.APP_ERROR, "Timeout. Please try again later.")
         self.send_progress('Authenticated')
         return phantom.APP_SUCCESS
 
@@ -541,7 +636,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DEFENDERATP_MAKING_CONNECTION_MSG)
-        self._state = {}
+
+        if not self._state:
+            self._state = {}
 
         # Get initial REST URL
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
@@ -592,6 +689,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         current_code = self._state['code']
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
 
         self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
 
@@ -600,7 +698,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'grant_type': 'authorization_code',
             'redirect_uri': redirect_uri,
             'code': current_code,
-            'resource': DEFENDERATP_RESOURCE_URL
+            'resource': DEFENDERATP_RESOURCE_URL,
+            'client_secret': self._client_secret
         }
         # for first time access, new access token is generated
         ret_val = self._generate_new_access_token(action_result=action_result, data=data)
@@ -669,7 +768,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -720,7 +824,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -766,7 +875,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        event_id = param[DEFENDERATP_EVENT_ID]
+        event_id = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_EVENT_ID])
 
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINEACTIONS_ENDPOINT
                                    .format(action_id=event_id))
@@ -775,17 +884,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
 
         if phantom.is_fail(ret_val):
-            if DEFENDERATP_NO_EVENT_FOUND_MSG not in action_result.get_message():
-                return action_result.get_status()
-
-            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_FILEMACHINEACTIONS_ENDPOINT
-                                       .format(action_id=event_id))
-
-            # make rest call
-            ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
-
-            if phantom.is_fail(response):
-                return action_result.get_status()
+            return action_result.get_status()
 
         action_result.add_data(response)
 
@@ -809,7 +908,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT:
@@ -862,7 +966,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        if not isinstance(timeout, int) or timeout <= 0:
+        try:
+            timeout = int(timeout)
+
+            if timeout <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_TIMEOUT_VALIDATION_MSG)
 
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
@@ -909,7 +1018,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        file_hash = param[DEFENDERATP_JSON_FILE_HASH]
+        file_hash = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_JSON_FILE_HASH])
         comment = param[DEFENDERATP_JSON_COMMENT]
 
         endpoint = '{0}{1}'.format(DEFENDERATP_MSGRAPH_API_BASE_URL,
@@ -938,7 +1047,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        file_hash = param[DEFENDERATP_JSON_FILE_HASH]
+        file_hash = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_JSON_FILE_HASH])
         comment = param[DEFENDERATP_JSON_COMMENT]
 
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_FILE_BLOCK_ENDPOINT
@@ -969,6 +1078,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         input_type = param[DEFENDERATP_JSON_INPUT_TYPE]
         input = param.get(DEFENDERATP_JSON_INPUT)
+        if input:
+            input = self._handle_py_ver_compat_for_input_str(input)
+
+        limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+
+        try:
+            limit = int(limit)
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
 
         endpoint = ""
         # Check if input type is All
@@ -980,52 +1100,44 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INPUT_REQUIRED_MSG)
 
         elif input and input_type:
-            # Check for valid IP
-            if input_type == DEFENDERATP_IP_CONST:
-                try:
-                    ipaddress.ip_address(unicode(input))
-                except:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_IP_CONST))
-                endpoint = DEFENDERATP_IP_MACHINES_ENDPOINT.format(input=input)
             # Check for valid domain
-            elif input_type == DEFENDERATP_DOMAIN_CONST:
-                if phantom.is_domain(input):
+            if input_type == DEFENDERATP_DOMAIN_CONST:
+                try:
+                    if phantom.is_domain(input):
+                        endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_DOMAIN_CONST))
+                except:
                     endpoint = DEFENDERATP_DOMAIN_MACHINES_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_DOMAIN_CONST))
+                    self.debug_print("Validation for the valid domain returned an exception. Hence, ignoring the validation and continuing the action execution.")
+
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
-                if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                try:
+                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                        endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_FILE_HASH_CONST))
+                except:
                     endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_FILE_HASH_CONST))
+                    self.debug_print(
+                        "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit)
 
-        while True:
+        # make rest call
+        ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-            # make rest call
-            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                if DEFENDERATP_NO_DATA_FOUND_MSG in action_result.get_message() and action_result.get_data_size():
-                    break
-                return action_result.get_status()
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
 
-            if response:
-                for machine in response.get('value', []):
-                    action_result.add_data(machine)
-            else:
-                break
-
-            # If no link for next page present then break
-            if response and not response.get(DEFENDERATP_NEXT_LINK_STRING):
-                break
-
-            url = response[DEFENDERATP_NEXT_LINK_STRING]
+        for machine in response.get('value', []):
+            action_result.add_data(machine)
 
         if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, "No device found")
@@ -1047,15 +1159,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         input_type = param.get(DEFENDERATP_JSON_INPUT_TYPE, DEFENDERATP_ALL_CONST)
         input = param.get(DEFENDERATP_JSON_INPUT, "")
+        if input:
+            input = self._handle_py_ver_compat_for_input_str(input)
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
-        if not isinstance(limit, int) or limit <= 0:
+        try:
+            limit = int(limit)
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
+        except:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_LIMIT_VALIDATION_MSG)
-
-        default_limit = DEFENDERATP_ALERT_DEFAULT_LIMIT
-        if limit < DEFENDERATP_ALERT_DEFAULT_LIMIT:
-            default_limit = limit
 
         endpoint = ""
 
@@ -1071,53 +1185,53 @@ class WindowsDefenderAtpConnector(BaseConnector):
             # Check for valid IP
             if input_type == DEFENDERATP_IP_CONST:
                 try:
-                    ipaddress.ip_address(unicode(input))
+                    ipaddress.ip_address(UnicodeDammit(input).unicode_markup)
                 except:
                     return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
                                                     .format(DEFENDERATP_IP_CONST))
                 endpoint = DEFENDERATP_IP_ALERTS_ENDPOINT.format(input=input)
             # Check for valid domain
             elif input_type == DEFENDERATP_DOMAIN_CONST:
-                if phantom.is_domain(input):
+                try:
+                    if phantom.is_domain(input):
+                        endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_DOMAIN_CONST))
+                except:
                     endpoint = DEFENDERATP_DOMAIN_ALERTS_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_DOMAIN_CONST))
+                    self.debug_print("Validation for the valid domain returned an exception. Hence, ignoring the validation and continuing the action execution.")
+
             # Check for valid File hash
             elif input_type == DEFENDERATP_FILE_HASH_CONST:
-                if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                try:
+                    if phantom.is_sha1(input) or phantom.is_sha256(input) or phantom.is_md5(input):
+                        endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
+                                                        .format(DEFENDERATP_FILE_HASH_CONST))
+                except:
                     endpoint = DEFENDERATP_FILE_ALERTS_ENDPOINT.format(input=input)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
-                                                    .format(DEFENDERATP_FILE_HASH_CONST))
+                    self.debug_print(
+                        "Validation for the valid sha1, sha256, and md5 hash returned an exception. Hence, ignoring the validation and continuing the action execution.")
 
-        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, default_limit)
+        url = "{0}{1}?$top={2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint, limit)
 
-        alert_count = 0
-        # Get alerts until the limit set by user or default limit is met
-        while alert_count < limit:
+        # make rest call
+        ret_val, response = self._update_request(endpoint=url, action_result=action_result)
 
-            # make rest call
-            ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
 
-            for alert in response.get('value', []):
-                action_result.add_data(alert)
-                alert_count += 1
-                # Check if alert count reached given limit
-                if alert_count == limit:
-                    break
-
-            # If no link for next page then break
-            if not response.get(DEFENDERATP_NEXT_LINK_STRING):
-                break
-
-            url = response[DEFENDERATP_NEXT_LINK_STRING]
+        for alert in response.get('value', []):
+            action_result.add_data(alert)
 
         if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+
         summary = action_result.update_summary({})
         summary['total_alerts'] = action_result.get_data_size()
 
@@ -1176,7 +1290,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -1190,15 +1304,22 @@ class WindowsDefenderAtpConnector(BaseConnector):
         called.
         """
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._state = self.load_state()
 
         # get the asset config
         config = self.get_config()
 
-        self._tenant = config[DEFENDERATP_CONFIG_TENANT_ID].encode('utf-8')
-        self._client_id = config[DEFENDERATP_CONFIG_CLIENT_ID].encode('utf-8')
+        self._tenant = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_TENANT_ID])
+        self._client_id = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_ID])
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
+        self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
 
         return phantom.APP_SUCCESS
 
@@ -1213,6 +1334,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
+        _save_app_state(self._state, self.get_asset_id(), self)
+
         return phantom.APP_SUCCESS
 
 
@@ -1243,7 +1366,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print "Accessing the Login page"
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1256,11 +1379,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print "Logging into Platform to get the session id"
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1276,6 +1399,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
