@@ -258,8 +258,11 @@ class FireeyeEtpConnector(BaseConnector):
             else:
                 limit = items.get('meta').get('total') - len(items_list)
 
-            for item in items.get("data"):
-                items_list.append(item)
+            if items.get("data"):
+                for item in items.get("data"):
+                    items_list.append(item)
+            else:
+                break
 
             if limit and items.get('meta').get('total') >= limit:
                 if endpoint == FIREETEETP_LIST_ALERTS_ENDPOINT:
@@ -914,7 +917,7 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the from email address
         if param.get('from'):
-            data['attributes']['from'] = param.get('from')
+            data['attributes']['from'] = param.get('from').strip()
 
         # Check the reason
         if param.get('reason'):
@@ -934,11 +937,11 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Check the sender domain
         if param.get('sender_domain'):
-            data['attributes']['sender_domain'] = param.get('sender_domain')
+            data['attributes']['sender_domain'] = param.get('sender_domain').strip()
 
         # Check the subject
         if param.get('subject'):
-            data['attributes']['subject'] = param.get('subject')
+            data['attributes']['subject'] = param.get('subject').strip()
 
         # Check the tags
         if param.get('tags'):

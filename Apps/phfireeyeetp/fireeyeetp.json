@@ -2134,21 +2134,6 @@
                     "default": "",
                     "order": 1
                 },
-                "etp_message_ids": {
-                    "description": "A Comma seperated list of ETP Message IDs",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "example_values": [
-                        "D1670833091CA91B5359A4969"
-                    ],
-                    "contains": [
-                        "fireeyeetp message id"
-                    ],
-                    "allow_list": true,
-                    "default": "",
-                    "order": 0
-                },
                 "size": {
                     "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
                     "data_type": "numeric",
@@ -2177,16 +2162,6 @@
                     ],
                     "contains": [
                         "fireeyeetp downstream message id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.etp_message_ids",
-                    "data_type": "string",
-                    "example_values": [
-                        "D1670833091CA91B5359A4969"
-                    ],
-                    "contains": [
-                        "fireeyeetp message id"
                     ]
                 },
                 {
