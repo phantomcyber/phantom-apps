@@ -716,7 +716,6 @@ class CofenseTriageConnector(BaseConnector):
             if page_dir != "1st_page first":
                 desired_pages = reversed(desired_pages)
 
-            max_ratelimit = int(self._r.headers['X-RateLimit-Limit'])
             ratelimit = int(self._r.headers['X-RateLimit-Remaining'])
 
             for page in desired_pages:
@@ -732,7 +731,7 @@ class CofenseTriageConnector(BaseConnector):
                     # try and get the next page
 
                     if ratelimit <= 0:
-                        status = "Ratelimit maximum of {} reached. Zero remaining. Unable to continue retrieval of results".format(max_ratelimit)
+                        status = "Zero remaining. Unable to continue retrieval of results"
                         self.save_progress(status)
                         break
 
@@ -748,12 +747,11 @@ class CofenseTriageConnector(BaseConnector):
                 downloaded_results += response
                 downloaded_length = len(downloaded_results)
 
-                max_ratelimit = int(self._r.headers['X-RateLimit-Limit'])
                 ratelimit = int(self._r.headers['X-RateLimit-Remaining'])
 
                 self.save_progress("Retrieved page {} with {} results. Retrieved {} of {} total results. {} limit of {} max results".format(
                     params['page'], len(response), downloaded_length, total_results, "Reached" if downloaded_length >= max_results else "Not at", max_results))
-                self.save_progress("Ratelimit {} of maximum {} used. {} remaining".format(max_ratelimit - ratelimit, max_ratelimit, ratelimit))
+                self.save_progress("{} remaining".format(ratelimit))
 
                 if downloaded_length >= max_results:
                     # we downloaded the maximum number of results we want, stop here
@@ -870,7 +868,7 @@ class CofenseTriageConnector(BaseConnector):
             'downloaded_threat_indicators': len(downloaded_results),
             'downloaded_pages': str(downloaded_pages),
             'available_results': self._r.headers.get('Total', "unknown"),
-            'ratelimits_remaining': "{} out of {}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown"), self._r.headers.get('X-RateLimit-Limit', "unknown")),
+            'ratelimits_remaining': "{}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown")),
         })
         action_result.add_extra_data({'headers': dict(self._r.headers)})
         action_result.update_summary({'headers': dict(self._r.headers)})
@@ -994,7 +992,7 @@ class CofenseTriageConnector(BaseConnector):
             'downloaded_reports': len(downloaded_results),
             'downloaded_pages': str(downloaded_pages),
             'available_results': self._r.headers.get('Total', "unknown"),
-            'ratelimits_remaining': "{} out of {}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown"), self._r.headers.get('X-RateLimit-Limit', "unknown")),
+            'ratelimits_remaining': "{}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown")),
         })
         action_result.add_extra_data({'headers': dict(self._r.headers)})
         action_result.update_summary({'headers': dict(self._r.headers)})
@@ -1208,7 +1206,7 @@ class CofenseTriageConnector(BaseConnector):
             'downloaded_reporters': len(downloaded_results),
             'downloaded_pages': str(downloaded_pages),
             'available_results': self._r.headers.get('Total', "unknown"),
-            'ratelimits_remaining': "{} out of {}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown"), self._r.headers.get('X-RateLimit-Limit', "unknown")),
+            'ratelimits_remaining': "{}".format(self._r.headers.get('X-RateLimit-Remaining', "unknown")),
         })
         action_result.add_extra_data({'headers': dict(self._r.headers)})
 
