@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2019 Splunk Inc.
+  Copyright (c) 2019-2020 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -7,63 +7,220 @@
 <html>
 <head></head>
 <body>
-<h2>Authentication</h2>
-This app requires creating a Microsoft Azure Application. To do so, navigate to <a href="https://portal.azure.com">https://portal.azure.com</a> in a browser and log in with a Microsoft account, then select <b>Azure Active Directory</b>.
-<br>
-<ol>
-  <li>Go to <b>App Registrations</b> and click on <b>+ New Application Registration</b>.</li>
-	<li>Give an appropriate name and provide a sign-on URL.</li>
-  <li>Select an app.</li>
-  <li>Go to <b>App Settings</b> → <b>API Permissions</b> and click on <b>App Name</b> → Select Permission Type.</li>
-	<li>The following Delegated and Application Permissions need to be added to the App:
-      <ul>
-        <b>Application Permissions</b>
+
+    <h2>Defender ATP Instance Minimum Version Compatibility</h2>
+      <p>
+        <ul>
+          <li>With this major version 2.0.0 of the Windows Defender ATP app on Phantom, we declare support for (on and above) the cloud 'November-December 2019' GA release for the ATP instances. This app has been tested and certified on the mentioned GA release of the Defender ATP and its APIs.</li>
+        </ul>
+      </p>
+
+    <h2>Playbook Backward Compatibility</h2>
+      <p>
+        <ul>
+          <li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
           <ul>
-            <li>Alert.ReadWrite.All</li>
-            <li>File.Read.All</li>
-            <li>Machine.Isolate</li>
-            <li>Machine.Offboard</li>
-            <li>Machine.Read.All</li>
-            <li>Machine.ReadWrite.All</li>
-            <li>Machine.RestrictExecution</li>
-            <li>Machine.Scan</li>
-            <li>Machine.StopAndQuarantine</li>
-            <li>User.Read.All</li>
+            <li>List Devices - The 'IP' option has been removed from the value list of the [input_type] action parameter because there is no specific API currently available to support the filtering of devices based on the IP in the Defender ATP.</li>
           </ul>
-      </ul>
-      <ul>
-        <b>Deligated Permissions</b>
+        </ul>
+      </p>
+
+    <h2>Pagination Not Supported</h2>
+      <p>
+        <ul>
+          <li>Based on the base URL link (<a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/exposed-apis-list" target="_blank">Microsoft Defender ATP API Documentation</a>), the pagination is not supported by the Defender ATP APIs. Hence, this app does not implement the pagination for the below-mentioned actions.</li>
           <ul>
-            <li>Alert.ReadWrite</li>
-            <li>File.Read.All</li>
-            <li>Machine.Isolate</li>
-            <li>Machine.Offboard</li>
-            <li>Machine.Read</li>
-            <li>Machine.ReadWrite</li>
-            <li>Machine.RestrictExecution</li>
-            <li>Machine.Scan</li>
-            <li>Machine.StopAndQuarantine</li>
-            <li>User.Read.All</li>
+            <li>List Devices</li>
+            <li>List Alerts</li>
+            <li>List Sessions</li>
           </ul>
+        </ul>
+      </p>
+
+    <h2>Explanation of Asset Configuration Parameters</h2>
+      <p>
+        <ul>
+          <li>Tenant ID - It is the Directory ID of the Microsoft Azure Active Directory on the Microsoft Azure portal.</li>
+          <li>Client ID - It is the Application ID of an application configured in the Microsoft Azure Active Directory.</li>
+          <li>Client Secret - It is the secret string used by the application to prove its identity when requesting a token. It can be generated for the configured application on the Microsoft Azure Active Directory.</li>
+        </ul>
+      </p>
+
+    <h2>Configure SIEM Integration on the Microsoft Defender Security Center</h2>
+      <ul>
+        <li>
+          <h3>SIEM Integration Configuration Link</h3>
+            <ul>
+              <li><a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/enable-siem-integration" target="_blank">Configure SIEM Integration</a></li>
+            </ul>
+        </li>
+        <li>
+          <h3>Prerequisites</h3>
+            <ul>
+              <li>The user who activates the setting must have permission to create an app in the Azure Active Directory (AAD).</li>
+              <li>During the initial activation, a pop-up screen is displayed for credentials to be entered. Make sure that you allow pop-ups for this site.</li>
+            </ul>
+        </li>
+        <li>
+          <h3>Steps</h3>
+            <ol>
+              <li>Login to <a href="https://securitycenter.microsoft.com/dashboard" target="_blank">Microsoft Defender Security Center</a>.</li>
+              <li>In the navigation pane, select Settings > APIs (section) > SIEM.</li>
+              <li>Select 'Enable SIEM connector' (this activates the SIEM connector access details section with pre-populated values and an application is created under your Azure Active Directory (AAD) tenant).</li>
+              <li>In the 'Choose the SIEM you want to configure and download details to file' section, select the 'Generic API' option.</li>
+              <li>Copy the individual pre-populated values displayed on the screen or click the 'Save details to file' button to download a file that contains all these values (these details are required to run the 'Test Connectivity' action).</li>
+              <li> After enabling the SIEM connector on the Microsoft Defender Security Center, the app 'WindowsDefenderATPSiemConnector' will be created on the Microsoft Azure portal.</li>
+            </ol>
+        </li>
       </ul>
-  </li>
-</ol>
-<h2>Phantom Graph Asset</h2>
-When creating an asset for the <b>Windows Defender ATP</b> app, place <b>Application Id</b> of the app created during the previous step in the <b>Client ID</b> field and the tenant ID (ID of the active directory) in the <b>Tenant ID</b> field, click <b>SAVE</b>.
-<br>
-For Tenant ID, Go to <b>Azure Active Directory</b> → <b>Properties</b> and copy the <b>Directory ID</b>.
-<br>
-After saving, a new field will appear in the <b>Asset Settings</b> tab. Take the URL found in the <b>POST incoming for Windows Defender ATP to this location</b> field and place it in the <b>App Settings → Redirect URIs</b> field of your registered app. To this URL, add <b>/result</b>. After doing so the URL should look something like:
-<br><br>
-<pre>
-https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_e85407b7-91f0-4019-8fa4-0d29bca741d5/&lt;asset_name&gt;/result
-</pre>
-<br>
-Once again, click save.
-<br>
-<h2>Method to run test connectivity</h2>
-After setting up the asset and user, click the <b>TEST CONNECTIVITY</b> button. A window should pop up and display a URL. Navigate to this URL in a separate browser tab. This new tab will redirect to a Microsoft login page. Log in to a Microsoft account. After logging in, review the requested permissions listed, then click <b>Accept</b>. Finally, close that tab. The test connectivity window should show success message.
-<br><br>
-The app should now be ready to be used.
+
+    <h2>Configure and set up permissions of the app created on the Microsoft Azure portal</h2>
+      <p>
+        <ol>
+          <li>Navigate to <a href="https://portal.azure.com" target="_blank">https://portal.azure.com</a>.</li>
+          <li>Log in with the same user which was used to enable the SIEM integration on Microsoft Defender Security Center.</li>
+          <li>Select the 'Azure Active Directory'.</li>
+          <li>Select the 'App registrations' menu from the left-side panel.</li>
+          <li>Select the 'WindowsDefenderATPSiemConnector' app.</li>
+          <li>Select the 'API Permissions' menu from the left-side panel.</li>
+          <li>Click on 'Add a permission'.</li>
+          <li>Under the 'Select an API' section, select 'APIs my organization uses'.</li>
+          <li>Search for 'WindowsDefenderATP' keyword in the search box and click on the displayed option for it.</li>
+          <li>Provide the following Delegated and Application permissions to the app.
+            <ul>
+              <li><b>Application Permissions</b></li>
+                <ul>
+                  <li>Alert.ReadWrite.All</li>
+                  <li>File.Read.All</li>
+                  <li>Machine.Isolate</li>
+                  <li>Machine.Offboard</li>
+                  <li>Machine.Read.All</li>
+                  <li>Machine.ReadWrite.All</li>
+                  <li>Machine.RestrictExecution</li>
+                  <li>Machine.Scan</li>
+                  <li>Machine.StopAndQuarantine</li>
+                  <li>User.Read.All</li>
+                </ul>
+              <li><b>Deligated Permissions</b></li>
+                <ul>
+                  <li>Alert.ReadWrite</li>
+                  <li>File.Read.All</li>
+                  <li>Machine.Isolate</li>
+                  <li>Machine.Offboard</li>
+                  <li>Machine.Read</li>
+                  <li>Machine.ReadWrite</li>
+                  <li>Machine.RestrictExecution</li>
+                  <li>Machine.Scan</li>
+                  <li>Machine.StopAndQuarantine</li>
+                  <li>User.Read.All</li>
+                </ul>
+            </ul>
+          </li>
+          <li>'Grant Admin Consent' for it.</li>
+          <li>Again click on 'Add a permission'.</li>
+          <li>Under the 'Select an API' section, select 'Microsoft APIs'.</li>
+          <li>Click on the 'Microsoft Graph' option.</li>
+          <li>Provide the following Delegated permission to the app.
+            <ul>
+              <li><b>Deligated Permission</b></li>
+                <ul>
+                  <li>offline_access</li>
+                </ul>
+            </ul>
+          </li>
+        </ol>
+      </p>
+
+    <h2>Configure the Microsoft Defender ATP Phantom app's asset</h2>
+      <p>
+        When creating an asset for the app,
+        <ul>
+          <li>Provide the client ID of the app created during the previous step of SIEM Integration in the 'Client ID' field.</li>
+          <li>Provide the client secret of the app created during the previous step of SIEM Integration in the 'Client Secret' field. If the client secret is not generated during the SIEM step, follow the below steps to generate the new client secret.
+            <ul>
+              <li>Navigate to <a href="https://portal.azure.com" target="_blank">https://portal.azure.com</a>.</li>
+              <li>Log in with the same user which was used to enable the SIEM integration on Microsoft Defender Security Center.</li>
+              <li>Select the 'Azure Active Directory'.</li>
+              <li>Select the 'App registrations' menu from the left-side panel.</li>
+              <li>Select the 'WindowsDefenderATPSiemConnector' app.</li>
+              <li>Click on the 'Certificates &amp; secrets' menu on the left-side panel.</li>
+              <li>Click on the 'New client secret' button to open a pop-up window.</li>
+              <li>Provide the description, select an appropriate option for deciding the client secret expiration time, and click on the 'Add' button to open a pop-up window.</li>
+              <li>Please save this client secret string displayed on the pop-up window to some secure place, as it cannot be retrieved after closing the pop-up window.</li>
+              <li>Provide the newly generated client secret string in the 'Client Secret' field of the asset.</li>
+            </ul>
+          </li>
+          <li>Provide the tenant ID of the app created during the previous step of SIEM Integration in the 'Tenant ID' field. For getting the value of tenant ID, navigate to the 'Azure Active Directory' on the Microsoft Azure portal; click on the 'App registrations' menu from the left-side panel; click on the earlier created 'WindowsDefenderATPSiemConnector' app. The value displayed in the 'Directory (tenant) ID' is the required tenant ID.</li>
+          <li>Save the asset with the above values.</li>
+          <li>After saving the asset, a new uneditable field will appear in the 'Asset Settings' tab of the configured asset for the ATP app on Phantom. Copy the URL mentioned in the 'POST incoming for Windows Defender ATP to this location' field. Add a suffix '/result' to the URL copied in the previous step. The resulting URL looks like the one mentioned below.</li>
+          <pre>
+            https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_&lt;appid&gt;/&lt;asset_name&gt;/result
+          </pre>
+          <li>Add the URL created in the earlier step into the 'Redirect URIs' section of the 'Authentication' menu for the registered app 'WindowsDefenderATPSiemConnector' on the Microsoft Azure portal. For the 'Redirect URIs' section, follow the below steps.</li>
+            <ol>
+              <li>Navigate to the 'Azure Active Directory' on the Microsoft Azure portal.</li>
+              <li>Click on the 'App registrations' menu from the left-side panel.</li>
+              <li>Click on the earlier created 'WindowsDefenderATPSiemConnector' app.</li>
+              <li>Navigate to the 'Authentication' menu of the app on the left-side panel.</li>
+              <li>Click on the 'Add a platform' button and select 'Web' from the displayed options.</li>
+              <li>Enter the URL created in the earlier section in the 'Redirect URIs' text-box.</li>
+              <li>This will display the 'Redirect URIs' under the 'Web' section displayed on the page.</li>
+            </ol>
+        </ul>
+      </p>
+
+    <h2>Method to run Test Connectivity</h2>
+      <p>
+        <ul>
+          <li>After setting up the asset and user, click the 'TEST CONNECTIVITY' button. A pop-up window will be displayed with appropriate test connectivity logs. It will also display a specific URL on that pop-up window.</li>
+          <li>Open this URL in a separate browser tab. This new tab will redirect to the Microsoft login page to complete the login process to grant the permissions to the app.</li>
+          <li>Log in using the same Microsoft account that was used to configure the SIEM connector workflow and the application on the Microsoft Azure Portal. After logging in, review the requested permissions listed and click on the 'Accept' button.</li>
+          <li>This will display a successful message of 'Code received. Please close this window, the action will continue to get new token.' on the browser tab.</li>
+          <li>Finally, close the browser tab and come back to the 'Test Connectivity' browser tab. The pop-up window should display a 'Test Connectivity Passed' message.</li>
+        </ul>
+      </p>
+
+    <h2>Explanation of Test Connectivity Workflow</h2>
+      <p>
+        <ul>
+          <li>This app uses (version 1.0) OAUTH 2.0 authorization code workflow APIs for generating the [access_token] and [refresh_token] pairs to be used for all the API calls to the Defender ATP instance.</li>
+          <li>This authentication mechanism is a user-context based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated tokens. For more information visit the link mentioned here for the <a href="https://docs.microsoft.com/en-gb/azure/active-directory/azuread-dev/v1-protocols-oauth-code" target="_blank">OAUTH 2.0 AUTH CODE</a>.</li>
+          <li>The step-by-step process for the entire authentication mechanism is explained below.</li>
+            <ul>
+              <li>The first step is to get an application created in a specific tenant on the Microsoft Azure Active Directory. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
+              <li>Configure the Windows Defender ATP app's asset with appropriate values for [tenant_id], [client_id], and [client_secret] configuration parameters.</li>
+              <li>Run the Test Connectivity action.</li>
+              <li>Internally, the connectivity creates a URL for hitting the /authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
+              <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and refersh_token pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
+              <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] gets expired then, the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] gets expired, the user will have to run the Test Connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
+              <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Defender ATP instance.</li>
+            </ul>
+        </ul>
+      </p>
+
+    <h2>State file permissions</h2>
+      <p>
+        Please check the permissions for the state file as mentioned below.
+        <h4>State file path</h4>
+        <ul>
+          <li>For Non-NRI instance: /opt/phantom/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+          <li>For NRI instance: /&lt;PHANTOM_HOME_DIRECTORY&gt;/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+        </ul>
+        <h4>State file permissions</h4>
+        <ul>
+          <li>File rights: rw-rw-r-- (664) (The phantom user should have read and write access for the state file)</li>
+          <li>File owner: Appropriate phantom user</li>
+        </ul>
+      </p>
+
+    <h2>Notes</h2>
+    <p>
+      <ul>
+        <li>&lt;appid&gt; - The app ID will be available in the Redirect URI which gets populated in the field 'POST incoming for Windows Defender ATP to this location' when the Defender ATP Phantom app asset is configured e.g. https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_&lt;appid&gt;/&lt;asset_name&gt;/result</li>
+        <li>&lt;asset_id&gt; - The asset ID will be available on the created asset's Phantom web URL e.g. https://&lt;phantom_host&gt;/apps/&lt;app_number&gt;/asset/&lt;asset_id&gt;/</li>
+      </ul>
+    </p>
+
+<h3>The app is configured and ready to be used now.</h3>
 </body>
 </html>
