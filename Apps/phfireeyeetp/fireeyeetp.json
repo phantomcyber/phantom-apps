@@ -19,7 +19,7 @@
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
-            "description": "The URL to access your ETP instance",
+            "description": "The URL for your ETP instance",
             "data_type": "string",
             "required": true,
             "example_values": [
@@ -31,7 +31,7 @@
             "order": 0
         },
         "api_key": {
-            "description": "API key for the ETP Instance",
+            "description": "API key",
             "data_type": "password",
             "required": true,
             "default": "",
@@ -53,6 +53,7 @@
         {
             "action": "on poll",
             "description": "Callback action for the on_poll ingest functionality.",
+            "verbose": "<p>Ingest alerts from ETP into Phantom.</p>",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
@@ -461,7 +462,7 @@
             "action": "get alert",
             "identifier": "get_alert",
             "description": "Get a details about a specific alert from the ETP instace",
-            "verbose": "",
+            "verbose": "<p>Get details about a specific alert by alert ID.</p>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1070,7 +1071,7 @@
             "action": "list email attributes",
             "identifier": "list_email_attributes",
             "description": "Get all the attributes from a list of email messages",
-            "verbose": "",
+            "verbose": "<p>Gets a list of messages that include specified message attributes that are accessible in the Email Security portal.</p>",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -1654,8 +1655,8 @@
         {
             "action": "trace email",
             "identifier": "trace_email",
-            "description": "Search for Email Message by specifying. ",
-            "verbose": "<p>One or the other parameter must be filled out. All fields are filtered by the IN clause where applicable making the search always an AND.</p><p>The modified date always uses the greater than or equal to. For example if you want to search the last 7 days, put a timestamp from 7 days ago.</p><p>The status field values are <ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags allows for the values <ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
+            "description": "Search for Email Message by specifying",
+            "verbose": "<p>At least one parameter must be filled out. All fields are filtered by the IN clause where applicable making the search always an AND.</p><p>The modified date always uses the greater than or equal to. For example if you want to search the last 7 days, put a timestamp from 7 days ago. IE. 2017-10-03T00:00:00.000Z. Also note that the datetime stamps need to be in UTC time otherwise the results will be off. ETP assumes all datetime stamps are in UTC.</p><p>The status field allows for the following values<ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags field allows for the following values<ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2101,7 +2102,7 @@
         {
             "action": "trace message",
             "identifier": "trace_message",
-            "description": "Search for Email Message by specifying the Queue/Message ID of the Downstream MTA or the Original Message ID. One or the other parameter must be filled out. All fields are filtered by the IN clause where applicable.",
+            "description": "Search for Email Message by specifying the Queue/Message ID of the Downstream MTA or the Original Message ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable.",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -2433,7 +2434,7 @@
         {
             "action": "download email",
             "identifier": "download_email",
-            "description": "Download the email text and adds it to the vault",
+            "description": "Download the email header as a text file and adds it to the vault",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -2499,7 +2500,7 @@
         {
             "action": "download pcap",
             "identifier": "download_pcap",
-            "description": "Downloads all PCAP files of the alert specified by alert ID and adds the files to the vault",
+            "description": "Downloads all PCAP files of the alert for a specified alert ID and adds the files to the vault",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -2565,8 +2566,8 @@
         {
             "action": "download malware files",
             "identifier": "download_malware_files",
-            "description": "Downloads all malware files of the alert specified by alert ID and adds the files to the vault",
-            "verbose": "",
+            "description": "Downloads all malware files of the alert for a specified alert ID and adds the files to the vault",
+            "verbose": "<p>These files can contain virus or other malicious software. Be caucious when opening these files!</p>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2631,7 +2632,7 @@
         {
             "action": "download case files",
             "identifier": "download_case_files",
-            "description": "Downloads all case files of the alert specified by alert ID and adds the files to the vault",
+            "description": "Downloads all case files of the alert for a specified alert ID and adds the files to the vault",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -2900,7 +2901,7 @@
         {
             "action": "unquarantine email",
             "identifier": "unquarantine_email",
-            "description": "Releases the email file(s) present in the quarantine within ETP",
+            "description": "Releases the email file(s) present in the Quarantine within ETP",
             "verbose": "",
             "type": "correct",
             "read_only": false,
@@ -3015,13 +3016,13 @@
         {
             "action": "delete quarantined email",
             "identifier": "delete_quarantined_email",
-            "description": "Deletes the email file present in quarantine for the given Email Security message ID",
+            "description": "Deletes the email file(s) present in quarantine for the given Email Security message ID",
             "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
                 "etp_message_id": {
-                    "description": "The ID of the Email Security message to download. Allows for a comma seperated string of IDs",
+                    "description": "The ID of the Email Security message to download. Allows a comma seperated string of IDs",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -3117,7 +3118,7 @@
             "action": "list quarantined emails",
             "identifier": "list_quarantined_emails",
             "description": "Get a list of quarantine emails from a given query filter.",
-            "verbose": "When specifying a date in either the to or from dates, the date is assumed to be in UTC. ETP server runs on UTC time so if you are not converting the timestamp to that time the results will be off.",
+            "verbose": "<p>When specifying a date in either the to or from dates, the date is assumed to be in UTC. ETP server runs on UTC time so if you are not converting the timestamp to that time the results will be off.</p>",
             "type": "generic",
             "read_only": true,
             "parameters": {
