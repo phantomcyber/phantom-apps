@@ -1,0 +1,1452 @@
+{
+    "appid": "b004a598-2eb9-42c8-9f45-f30433da9b85",
+    "name": "Docker",
+    "description": "The app makes the use of the docker remote API to perform a range of actions on existing containers within user-specified domain.",
+    "type": "endpoint",
+    "product_vendor": "Docker",
+    "logo": "docker_v3.png",
+    "logo_dark": "docker_v3_dark.png",
+    "product_name": "Docker",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "John Wang",
+    "license": "Copyright (c) John Wang, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-05-14T13:46:36.326886Z",
+    "package_name": "phantom_docker_v3",
+    "main_module": "docker_v3_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "host ip": {
+            "description": "the ip address of user specified docker host",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get changes of a container filesystem",
+            "identifier": "get_changes_of_a_container_filesystem",
+            "description": "Returns which files in a container's filesystem have been added, deleted, or modified.",
+            "verbose": "The Kind of modification can be one of:\n\n0: Modified\n1: Added\n2: Deleted",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.filesystem.*.Path",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.filesystem.*.Kind",
+                    "data_type": "string",
+                    "column_name": "Modification",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "inspect a container",
+            "identifier": "inspect_a_container",
+            "description": "return low level information about a container",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "size": {
+                    "description": "Return the size of the container as fields SizeRw and SizeRootFs",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "stream",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                	"data_path": "action_result.data.*.containerStats",
+                	"data_type": "string",
+                	"column_name": "data",
+                	"column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update a container",
+            "identifier": "update_a_container",
+            "description": "Change various configuration options of a container without having to recreate it.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "request_body": {
+                	"description": "configuration",
+                	"data_type": "string",
+                	"required": true,
+                	"primary": false,
+                	"contains": [],
+                	"value_list": [],
+                	"default": "",
+                	"order": 1
+                }	
+              
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+	                "data_path": "action_result.data.*.update_stats.Warnings",
+	                "data_type": "string",
+	                "column_name": "Warnings",
+	                "column_order": 2	
+                },
+                {
+                	"data_path": "action_result.data.*.update_stats.message",
+                	"data_type": "string",
+                	"column_name": "response message",
+                	"column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "restart a container",
+            "identifier": "restart_a_container",
+            "description": "restart a container",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "t": {
+                    "description": "Number of seconds to wait before killing the container",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.t",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "t",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "export a container",
+            "identifier": "export_a_container",
+            "description": "Export the contents of a container as a tarball.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list container",
+            "identifier": "list_container",
+            "description": "returns a list of containers",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "all": {
+                    "description": "Return all containers. By default, only running containers are shown",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "Return this number of most recently created containers, including non-running ones.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "size": {
+                    "description": "Return the size of container as fields SizeRw and SizeRootFs.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 2
+                },
+                "filters": {
+                    "description": "Filters to process on the container list, encoded as JSON (a map[string][]string). For example, {\"status\": [\"paused\"]} will only return paused containers.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.containers.*.Id",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "container id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.containers.*.Names",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "container names",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.containers.*.Ports.*.PublicPort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "public port",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "stop a container",
+            "identifier": "stop_a_container",
+            "description": "stop a container",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "t": {
+                    "description": "Number of seconds to wait before killing the container",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.t",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "t",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start a container",
+            "identifier": "start_a_container",
+            "description": "start a container",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "detachkeys": {
+                    "description": "Override the key sequence for detaching a container. Format is a single character [a-Z] or ctrl-<value> where <value> is one of: a-z, @, ^, [, , or _.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.detachkeys",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "detachkeys",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list images",
+            "identifier": "list_images",
+            "description": "Returns a list of images on the server. Note that it uses a different, smaller representation of an image than inspecting a single image.",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "all": {
+                    "description": "Show all images. Only images from a final layer (no children) are shown by default.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 0
+                },
+                "filters": {
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list.eg {\"status\":[\"exited\"]}",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "digests": {
+                    "description": "Show digest information as a RepoDigests field on each image.",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.images.*.Id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "image id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.images.*.RepoTags",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "repo tags",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.images.*.Created",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "created",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.images.*.Size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+        	"action": "rename container",
+        	"identifier": "rename_container",
+        	"description": "rename container",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+        		"id": {
+        			"description": "ID or name of the container",
+        			"data_type": "string",
+        			"required": true,
+        			"primary": false,
+        			"contains": [],
+        			"value_list": [],
+        			"default": "",
+        			"order": 0
+        		},
+        		"name": {
+        			"description": "New name for the container",
+        			"data_type": "string",
+        			"required": true,
+        			"primary": false,
+        			"contains": [],
+        			"value_list": [],
+        			"default": "",
+        			"order": 1
+        		}
+        	},
+        	"output": [
+        		{
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }                                                
+        	],
+    	    "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+        	"action": "kill container",
+        	"identifier": "kill_container",
+        	"description": "Send a POSIX signal to a container, defaulting to killing to the container.",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+        		"id": {
+        			"description": "ID or name of the container",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0  			
+        		},
+        		"signal": {
+        			"description": "Signal to send to the container as an integer or string (e.g. SIGINT) default SIGKILL",
+        			"data_type": "string",
+        			"required": false,
+        			"primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "SIGKILL",
+                    "order": 1
+        		}
+        	},
+        	"output": [
+        		{
+        			"data_path": "action_result.parameter.id",
+ 			        "data_type": "string",
+ 			        "contains": [],
+ 			        "column_name": "id",
+ 			       	"column_order": 0
+        		},
+                {
+                    "data_path": "action_result.parameter.signal",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "signal",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }              
+			],
+			"render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+        	"action": "remove container",
+        	"identifier": "remove_container",
+        	"description": "remove selected container",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+        		"id": {
+        			"description": "ID or name of the container",
+        			"data_type": "string",
+        			"required": true,
+        			"primary": false,
+        			"contains": [],
+        			"value_list": [],
+        			"default": "",
+        			"order": 0
+        		},
+        		"v": {
+        			"description": "Remove the volumes associated with the container.",
+        			"data_type": "boolean",
+        			"required": false,
+        			"primary": false,
+        			"contains": [],
+        			"value_list": [],
+        			"default": false,
+        			"order": 1
+        		},
+        		"force": {
+        			"description": "If the container is running, kill it before removing it.",
+        			"data_type": "boolean",
+        			"required": false,
+        			"primary": false,
+        			"contains": [],
+        			"default": false,
+        			"order": 2
+        		},
+        		"link": {
+        			"description": "Remove the specified link associated with the container.",
+        			"data_type": "boolean",
+        			"required": false,
+        			"primary": false,
+        			"contains": [],
+        			"default": false,
+        			"order": 3
+        		}
+        	},
+        	"output": [
+				{
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+             	    "data_path": "action_result.parameter.v",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "v",
+                    "column_order": 1
+                },
+				{
+                    "data_path": "action_result.parameter.force",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "force",
+                    "column_order": 2
+                },
+				{
+                    "data_path": "action_result.parameter.link",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "link",
+                    "column_order": 3
+                },
+				{
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+				{
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }                
+        	],
+             "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"       	
+        },
+        {
+        	"action": "delete stopped containers",
+        	"identifier": "delete_stopped",
+        	"description": "delete container that are stopped",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+				"filters": {
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+        	},
+        	"output": [
+				{
+                    "data_path": "action_result.parameter.filters",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filters",
+                    "column_order": 0
+                },
+				{
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+        	],
+			"render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"    	
+        },
+        {
+        	"action": "remove image",
+    	    "identifier": "remove_image",
+    	    "description": "Remove an image, along with any untagged parent images that were referenced by that image. Images can't be removed if they have descendant images, are being used by a running container or are being used by a build.",
+    	    "verbose": "",
+    	    "type": "generic",
+    	    "read_only": false,
+    	    "parameters": {
+                "name": {
+                    "description": "Image name or ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "force": {
+	                "description": "Remove the image even if it is being used by stopped containers or has other tags",
+	                "data_type": "boolean",
+	                "required": false,
+	                "primary": false,
+	                "contains": [],
+	                "default": false,
+	                "order": 1
+                },
+                "noprune": {
+                    "description": "Do not delete untagged parent images",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 2
+                }
+    	    },
+    	    "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.force",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "force",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.noprune",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "noprune",
+                    "column_order": 2
+                },    	  
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }                 
+    	    ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"	   
+        },
+		{
+            "action": "delete unused images",
+            "identifier": "delete_unused",
+            "description": "delete all unused images",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+				"filters": {
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+                
+        	},
+        	"output": [
+				{
+                    "data_path": "action_result.parameter.filters",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filters",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],        	
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+        	"action": "image history",
+        	"identifier": "image_history",
+        	"description": "Return parent layers of an image",
+        	"verbose": "",
+        	"type": "investigate",
+            "read_only": false,
+            "parameters": {
+				"name": {
+					"description": "Image name or ID",
+					"data_type": "string",
+					"required": true,
+					"primary": false,
+					"contains": [],
+					"value_list": [],
+					"default": "",
+					"order": 0
+                }
+            },
+			"output": [
+                {
+                    "data_path": "action_result.data.*.history.*.Id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "image id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.history.*.Tags",
+                    "data_type": "string",
+                    "column_name": "tag",
+                    "column_order": 1
+                },
+                {
+                	"data_path": "action_result.data.*.history.*.CreatedBy",
+            	    "data_type": "string",
+            	   	"column_name": "created by",
+            	    "column_order": 2
+                },
+                {
+                	"data_path": "action_result.data.*.history.*.Created",
+            	    "data_type": "string",
+            	   	"column_name": "created",
+            	    "column_order": 4
+                },
+                {
+                	"data_path": "action_result.data.*.history.*.Size",
+            	    "data_type": "string",
+            	   	"column_name": "size",
+            	    "column_order": 5
+                },
+                {
+                	"data_path": "action_result.data.*.history.*.Comment",
+            	    "data_type": "string",
+            	   	"column_name": "comment",
+            	    "column_order": 6
+                },                         
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+			"render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"      
+        },
+        {
+        	"action": "delete builder cache",
+        	"identifier": "delete_builder_cache",
+        	"description": "remove cache generated from building the container",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+        		"keep-storage": {
+        			"description": "Amount of disk space in bytes to keep for cache",
+        			"data_type": "numeric",
+        			"required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 0
+        		},
+				"all": {
+                    "description": "Remove all types of build cache",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 1
+        		},
+				"filters": {
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }        		
+        	},
+        	"output": [
+  				{
+					"data_path": "action_result.parameter.keep-storage",
+					"data_type": "numeric",
+					"contains": [],
+					"column_name": "keep-storage",
+					"column_order": 0
+				},
+        		{
+					"data_path": "action_result.parameter.all",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "all",
+                    "column_order": 1   			
+        		},
+        		{
+					"data_path": "action_result.parameter.filters",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filters",
+                    "column_order": 2      			
+        		},
+				{
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },        		
+				{
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+				{
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+				{
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }                             
+        	],
+			"render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+			"action": "snapshot of a container",
+            "identifier": "snapshot_of_a_container",
+            "description": "take a snapshot of one of the containers",
+            "verbose": "Available parameters see",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+				"container": {
+                    "description": "The ID or name of the container to commit",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "repo": {
+                	"description": "Repository name for the created image",
+                	"data_type": "string",
+                	"required": false,
+                	"primary": false,
+					"contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1            	
+                },
+                "tag": {
+                	"description": "Tag name for the create image",
+                	"data_type": "string",
+					"required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "comment": {
+					"description": "Commit message",
+					"data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3						
+                },
+                "author": {
+					"description": "Author of the image (e.g., John Hannibal Smith <hannibal@a-team.com>)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4          	
+                },
+                "pause": {
+					"description": "Whether to pause the container before committing",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 5        
+                },
+                "changes": {
+					"description": "Dockerfile instructions to apply while committing",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 6           	
+                },
+                "request_body": {
+                	"description": "configuration",
+                	"data_type": "string",
+                	"required": true,
+                	"primary": false,
+                	"contains": [],
+                	"value_list": [],
+                	"default": "",
+                	"order": 7
+                }              	
+            },
+            "output": [
+				{
+                    "data_path": "action_result.parameter.query_parameters",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "query_parameter",
+                    "column_order": 0
+                },
+				{
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+				{
+                    "data_path": "action_result.parameter.request_body",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "request_body",
+                    "column_order": 2
+                },                
+				{
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }                
+            ],
+			"render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+        	"action": "create a container",
+        	"identifier": "create_a_container",
+        	"description": "create container from exisiting image",
+        	"verbose": "",
+        	"type": "generic",
+        	"read_only": false,
+        	"parameters": {
+        		"name": {
+					"description": "Assign the specified name to the container.",
+					"data_type": "string",
+					"required": true,
+					"primary": false,
+					"contains": [],
+					"value_list": [],
+					"default": "",
+					"order": 0
+        		},
+				"request_body": {
+                    "description": "configuration example {\"AttachStdin\": true,\"Tty\": true, \"Image\": \"test\",\"ExposedPorts\": {\"3000/tcp\": { }},\"PortBindings\": { \"3000/tcp\": [{ \"HostPort\": \"3002\" }]},\"RestartPolicy\": { \"Name\": \"always\"}}",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+        	},
+			"output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                	"data_path": "action_result.data.*.create.message",
+                	"data_type": "string",
+                	"column_name": "response message",
+                	"column_order": 2
+                },
+                {
+                	"data_path": "action_result.data.*.create.Warnings",
+                	"data_type": "string",
+                	"column_name": "Warning",
+                	"column_order": 3	
+                },
+				{
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+ 			 "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"                            
+        }     	                 
+    ]
+}
