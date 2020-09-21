@@ -237,6 +237,15 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._refresh_token = None
         self._client_secret = None
 
+        self._base_url_local = None
+        self._platform = None
+        try:
+            self._base_url_local = self.get_phantom_base_url()
+            self._platform = "phantom"
+        except:
+            self._base_url_local = self.get_ims_base_url()
+            self._platform = "mc"
+
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
@@ -512,7 +521,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         asset_id = self.get_asset_id()
         rest_endpoint = DEFENDERATP_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
-        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self.get_phantom_base_url()), rest_endpoint)
+        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self._base_url_local)), rest_endpoint)
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
 
         if status_strings.is_fail(ret_val):
@@ -524,21 +533,26 @@ class WindowsDefenderAtpConnector(BaseConnector):
                                             None)
         return status_strings.APP_SUCCESS, asset_name
 
-    def _get_phantom_base_url_defenderatp(self, action_result):
-        """ Get base url of phantom.
+    def _get_base_url_defenderatp(self, action_result):
+        """ Get base url of framework instance.
 
         :param action_result: object of ActionResult class
         :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS(along with appropriate message),
-        base url of phantom
+        base url of framework instance.
         """
 
-        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self.get_phantom_base_url()), DEFENDERATP_PHANTOM_SYS_INFO_URL)
+        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self._base_url_local), DEFENDERATP_PHANTOM_SYS_INFO_URL)
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
         if status_strings.is_fail(ret_val):
             return ret_val, None
 
         phantom_base_url = resp_json.get('base_url')
         if not phantom_base_url:
+            if self._platform == "phantom":
+                return (action_result.set_status(status_strings.APP_ERROR, "Phantom Base URL is not configured, please configure it in System Settings"), None)
+            else:
+                return (action_result.set_status(status_strings.APP_ERROR, "Mission Control Base URL is not configured, please configure it in System Settings"), None)
+
             return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_BASE_URL_NOT_FOUND_MSG), None
         return status_strings.APP_SUCCESS, phantom_base_url
 
@@ -550,7 +564,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         URL to make rest calls
         """
 
-        ret_val, phantom_base_url = self._get_phantom_base_url_defenderatp(action_result)
+        ret_val, phantom_base_url = self._get_base_url_defenderatp(action_result)
         if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
@@ -558,7 +572,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if status_strings.is_fail(ret_val):
             return action_result.get_status(), None
 
-        self.save_progress('Using Phantom base URL as: {0}'.format(phantom_base_url))
+        if self._platform == "phantom":
+            self.save_progress('Using Phantom base URL as: {0}'.format(phantom_base_url))
+        else:
+            self.save_progress('Using Mission Control base URL as: {0}'.format(phantom_base_url))
+
         app_json = self.get_app_json()
         app_name = app_json['name']
 
@@ -1374,7 +1392,13 @@ if __name__ == '__main__':
     if username and password:
         try:
             print("Accessing the Login page")
-            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
+            login_url = None
+            try:
+                login_url = BaseConnector._get_phantom_base_url() + "login"
+            except:
+                login_url = BaseConnector._get_ims_base_url() + "login"
+
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1384,10 +1408,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
-            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
+            headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: {0}".format(str(e)))
