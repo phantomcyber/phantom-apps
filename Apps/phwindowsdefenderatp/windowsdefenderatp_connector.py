@@ -521,7 +521,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         asset_id = self.get_asset_id()
         rest_endpoint = DEFENDERATP_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
-        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self._base_url_local)), rest_endpoint)
+        url = '{}{}'.format(DEFENDERATP_PHANTOM_BASE_URL.format(phantom_base_url=self._base_url_local), rest_endpoint)
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
 
         if status_strings.is_fail(ret_val):
