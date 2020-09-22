@@ -431,20 +431,29 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if headers is None:
             headers = {}
-
-        token_data = {
-            'client_id': self._client_id,
-            'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
-            'refresh_token': self._refresh_token,
-            'client_secret': self._client_secret,
-            'resource': DEFENDERATP_RESOURCE_URL
-        }
+        
+        if not self._admin_consent:
+            token_data = {
+                'client_id': self._client_id,
+                'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
+                'refresh_token': self._refresh_token,
+                'client_secret': self._client_secret,
+                'resource': DEFENDERATP_RESOURCE_URL
+            }
+        else:
+            token_data = {
+                'client_id': self._client_id,
+                'scope': DEFENDERATP_DEFAULT_SCOPE,
+                'client_secret': self._client_secret,
+                'grant_type': 'client_credentials',
+            }
 
         if not self._access_token:
-            if not self._refresh_token:
-                # If none of the access_token and refresh_token is available
-                return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
-                       None
+            if not self._admin_consent:
+                if not self._refresh_token:
+                    # If none of the access_token and refresh_token is available
+                    return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
+                        None
 
             # If refresh_token is available and access_token is not available, generate new access_token
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
@@ -725,7 +734,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if self._admin_consent:
             data = {
                 'client_id': self._client_id,
-                'scope': "https://securitycenter.onmicrosoft.com/windowsatpservice/.default",
+                'scope': DEFENDERATP_DEFAULT_SCOPE,
                 'client_secret': self._client_secret,
                 'grant_type': 'client_credentials',
             }
