@@ -553,7 +553,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
             else:
                 return (action_result.set_status(status_strings.APP_ERROR, "Mission Control Base URL is not configured, please configure it in System Settings"), None)
 
-            return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_BASE_URL_NOT_FOUND_MSG), None
         return status_strings.APP_SUCCESS, phantom_base_url
 
     def _get_app_rest_url(self, action_result):
@@ -592,8 +591,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :param data: Data to send in REST call
         :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS
         """
-
-        req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
+        if not self._admin_consent:
+            token_url = DEFENDERATP_SERVER_TOKEN_URL
+        else:
+            token_url = DEFENDERATP_SERVER_TOKEN_V2_URL
+        
+        req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, token_url.format(tenant_id=self._tenant))
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
                                                   data=urlencode(data), method="post")
@@ -603,7 +606,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         self._state[DEFENDERATP_TOKEN_STRING] = resp_json
         self._access_token = resp_json[DEFENDERATP_ACCESS_TOKEN_STRING]
-        self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
+        self._refresh_token = resp_json.get(DEFENDERATP_REFRESH_TOKEN_STRING, None)
 
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
@@ -662,70 +665,80 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DEFENDERATP_MAKING_CONNECTION_MSG)
 
-        if not self._state:
-            self._state = {}
+        if not self._admin_consent:
+            if not self._state:
+                self._state = {}
 
-        # Get initial REST URL
-        ret_val, app_rest_url = self._get_app_rest_url(action_result)
-        if status_strings.is_fail(ret_val):
-            self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
-            return action_result.get_status()
+            # Get initial REST URL
+            ret_val, app_rest_url = self._get_app_rest_url(action_result)
+            if status_strings.is_fail(ret_val):
+                self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+                return action_result.get_status()
 
-        # Append /result to create redirect_uri
-        redirect_uri = '{0}/result'.format(app_rest_url)
-        self._state['redirect_uri'] = redirect_uri
+            # Append /result to create redirect_uri
+            redirect_uri = '{0}/result'.format(app_rest_url)
+            self._state['redirect_uri'] = redirect_uri
 
-        self.save_progress(DEFENDERATP_OAUTH_URL_MSG)
-        self.save_progress(redirect_uri)
+            self.save_progress(DEFENDERATP_OAUTH_URL_MSG)
+            self.save_progress(redirect_uri)
 
-        # Authorization URL used to make request for getting code which is used to generate access token
-        authorization_url = DEFENDERATP_AUTHORIZE_URL.format(tenant_id=self._tenant, client_id=self._client_id,
-                                                             redirect_uri=redirect_uri, state=self.get_asset_id(),
-                                                             response_type='code', resource=DEFENDERATP_RESOURCE_URL)
-        authorization_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, authorization_url)
+            # Authorization URL used to make request for getting code which is used to generate access token
+            authorization_url = DEFENDERATP_AUTHORIZE_URL.format(tenant_id=self._tenant, client_id=self._client_id,
+                                                                redirect_uri=redirect_uri, state=self.get_asset_id(),
+                                                                response_type='code', resource=DEFENDERATP_RESOURCE_URL)
+            authorization_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, authorization_url)
 
-        self._state['authorization_url'] = authorization_url
+            self._state['authorization_url'] = authorization_url
 
-        # URL which would be shown to the user
-        url_for_authorize_request = '{0}/start_oauth?asset_id={1}&'.format(app_rest_url, self.get_asset_id())
-        _save_app_state(self._state, self.get_asset_id(), self)
+            # URL which would be shown to the user
+            url_for_authorize_request = '{0}/start_oauth?asset_id={1}&'.format(app_rest_url, self.get_asset_id())
+            _save_app_state(self._state, self.get_asset_id(), self)
 
-        self.save_progress(DEFENDERATP_AUTHORIZE_USER_MSG)
-        self.save_progress(url_for_authorize_request)
+            self.save_progress(DEFENDERATP_AUTHORIZE_USER_MSG)
+            self.save_progress(url_for_authorize_request)
 
-        # Wait time for authorization
-        time.sleep(DEFENDERATP_AUTHORIZE_WAIT_TIME)
+            # Wait time for authorization
+            time.sleep(DEFENDERATP_AUTHORIZE_WAIT_TIME)
 
-        # Wait for some while user login to Microsoft
-        status = self._wait(action_result=action_result)
+            # Wait for some while user login to Microsoft
+            status = self._wait(action_result=action_result)
 
-        # Empty message to override last message of waiting
-        self.send_progress('')
-        if status_strings.is_fail(status):
-            self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
-            return action_result.get_status()
+            # Empty message to override last message of waiting
+            self.send_progress('')
+            if status_strings.is_fail(status):
+                self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+                return action_result.get_status()
 
-        self.save_progress(DEFENDERATP_CODE_RECEIVED_MSG)
-        self._state = _load_app_state(self.get_asset_id(), self)
+            self.save_progress(DEFENDERATP_CODE_RECEIVED_MSG)
+            self._state = _load_app_state(self.get_asset_id(), self)
 
-        # if code is not available in the state file
-        if not self._state or not self._state.get('code'):
-            return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+            # if code is not available in the state file
+            if not self._state or not self._state.get('code'):
+                return action_result.set_status(status_strings.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
 
-        current_code = self._state['code']
-        self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
+            current_code = self._state['code']
+            self.save_state(self._state)
+            _save_app_state(self._state, self.get_asset_id(), self)
 
-        self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
+            self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
+        
+        if self._admin_consent:
+            data = {
+                'client_id': self._client_id,
+                'scope': "https://securitycenter.onmicrosoft.com/windowsatpservice/.default",
+                'client_secret': self._client_secret,
+                'grant_type': 'client_credentials',
+            }
+        else:
+            data = {
+                'client_id': self._client_id,
+                'grant_type': 'authorization_code',
+                'redirect_uri': redirect_uri,
+                'code': current_code,
+                'resource': DEFENDERATP_RESOURCE_URL,
+                'client_secret': self._client_secret
+            }
 
-        data = {
-            'client_id': self._client_id,
-            'grant_type': 'authorization_code',
-            'redirect_uri': redirect_uri,
-            'code': current_code,
-            'resource': DEFENDERATP_RESOURCE_URL,
-            'client_secret': self._client_secret
-        }
         # for first time access, new access token is generated
         ret_val = self._generate_new_access_token(action_result=action_result, data=data)
 
@@ -1345,6 +1358,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
+        self._admin_consent = config.get('admin_consent')
 
         return status_strings.APP_SUCCESS
 
