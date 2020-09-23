@@ -127,9 +127,13 @@
                         {% for row in result_set.rows %}
                             <tr>
                                 {% for item in row.data %}
+                                <td>
+                                    <ul>
                                     {% for x in item %}
-                                        <td>{{ x.text }}</td>
+                                        <li>{{ x.text }}</li>
                                     {% endfor %}
+                                    </ul>
+                                </td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}

@@ -207,7 +207,7 @@ class AwsSecurityHubConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result, service='sqs')):
             return None
 
-        self.debug_print("THIS CONTAINER COUNT: {0}".format(max_containers))
+        self.debug_print("max containers to poll for: {0}".format(max_containers))
 
         findings = []
         while len(findings) < max_containers:
@@ -225,7 +225,8 @@ class AwsSecurityHubConnector(BaseConnector):
                 if message_dict and message_dict.get('detail', {}).get('findings', []):
                     findings.extend(json.loads(message['Body'])['detail']['findings'])
                 else:
-                    return None
+                    self.debug_print("skipping the following sqs message because of failure to extract finding object: {}".format(message_dict))
+                    continue
 
                 ret_val, resp_json = self._make_boto_call(action_result, 'delete_message', QueueUrl=url, ReceiptHandle=message['ReceiptHandle'])
 
