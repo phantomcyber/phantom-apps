@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Flashpoint",
     "license": "Copyright (c) Flashpoint, 2020",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2020-02-13T09:00:05.817664Z",
     "package_name": "phantom_flashpoint",
     "main_module": "flashpoint_connector.pyc",
@@ -46,6 +46,13 @@
             "required": false,
             "default": 1,
             "order": 3
+        },
+        "session_timeout":{
+            "description": "Session Timeout(in minutes)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 2,
+            "order": 4
         }
     },
     "actions": [

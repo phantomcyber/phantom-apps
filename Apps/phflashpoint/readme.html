@@ -27,6 +27,9 @@
                 <li>
                     <b>Number Of Retries - </b>  The value of this parameter defines the number of attempts for which the action will keep on retrying if the Flashpoint API continuously returns the “500 Internal Server Error”. If the intermittent error gets eliminated before the number of retries gets exhausted, then, the action execution will continue along its workflow with the next set of API calls and if the intermittent error is still persistent and all the number of retries are exhausted, then, the action will fail with the latest error message being displayed. It allows only zero or positive integer values as input. The default value is 1 retry.
                 </li>
+                <li>
+                    <b>Session Timeout - </b> This is the optional asset configuration parameter. The value of this parameter will be used as the session timeout value in the ‘Get Compromised Credentials’ and ‘Run Query’ actions while using the session scrolling pagination. The default value is 2 minutes and the maximum allowed value is 60 minutes.
+                </li>
             </ul>
         </p>
 

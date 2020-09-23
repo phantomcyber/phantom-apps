@@ -47,6 +47,7 @@ class FlashpointConnector(BaseConnector):
         self._x_fp_integration_version = None
         self._wait_timeout_period = None
         self._no_of_retries = None
+        self._session_timeout = None
 
         # Variable to hold the number of attempted retries of REST calls
         self._attempted_retries = 0
@@ -165,6 +166,10 @@ class FlashpointConnector(BaseConnector):
 
         # Process each 'Content-Type' of response separately
 
+        # it's not response text, handle an empty response
+        if not r.text:
+            return self._process_empty_response(r, action_result)
+
         # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
@@ -175,10 +180,6 @@ class FlashpointConnector(BaseConnector):
         # the error and adds it to the action_result.
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
-
-        # it's not content-type that is to be parsed, handle an empty response
-        if not r.text:
-            return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
@@ -517,7 +518,7 @@ class FlashpointConnector(BaseConnector):
             # This block will use for all search APIs
 
             # Enable the session scroll for the first time
-            params.update({'scroll': FLASHPOINT_SCROLL_ENABLE_MINUTES})
+            params.update({'scroll': "{}m".format(self._session_timeout)})
             endpoint = FLASHPOINT_ALL_SEARCH_ENDPOINT
 
         return phantom.APP_SUCCESS, params, endpoint, limit
@@ -600,7 +601,7 @@ class FlashpointConnector(BaseConnector):
             endpoint = FLASHPOINT_SIMPLIFIED_INDICATORS_SCROLL_ENDPOINT
         else:
             # This block is used for all search APIs
-            endpoint = FLASHPOINT_ALL_SEARCH_SCROLL_ENDPOINT
+            endpoint = "{0}?scroll={1}m".format(FLASHPOINT_ALL_SEARCH_SCROLL_ENDPOINT, self._session_timeout)
 
         return endpoint
 
@@ -1057,6 +1058,15 @@ class FlashpointConnector(BaseConnector):
 
         if self._no_of_retries is None:
             return self.get_status()
+
+        # Validate the 'session_timeout' config parameter
+        self._session_timeout = self._validate_integers(self, config.get('session_timeout', FLASHPOINT_SESSION_TIMEOUT), FLASHPOINT_CONFIG_SESSION_TIMEOUT_KEY)
+
+        if self._session_timeout is None:
+            return self.get_status()
+
+        if self._session_timeout > 60:
+            return self.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_SESSION_TIMEOUT_VALUE)
 
         return phantom.APP_SUCCESS
 
