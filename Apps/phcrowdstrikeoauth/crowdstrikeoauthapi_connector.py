@@ -26,6 +26,10 @@ import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
 import sys
 import imp
+try:
+    from _collections import defaultdict
+except ImportError:
+    pass
 
 
 class RetVal(tuple):
@@ -403,7 +407,9 @@ class CrowdstrikeConnector(BaseConnector):
             self.save_progress(CROWDSTRIKE_ERR_CONNECTIVITY_TEST)
             return phantom.APP_ERROR
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
+        self.save_progress("Test connectivity passed")
+
+        return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
 
     def _get_ids(self, action_result, endpoint, param, is_str=True):
 
@@ -999,29 +1005,88 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Groups listed successfully")
 
-    def _handle_list_custom_indicators(self, param):
+    def _handle_search_iocs(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {}
+        api_data = {
+            "limit": 400  # 500 is the max, don't want to give max, this could be tuned
+        }
 
-        if param.get('indicator_value'):
-            params['values'] = param['indicator_value']
-        if param.get('indicator_type'):
-            params['types'] = param['indicator_type']
+        # optional parameters
+        if CROWDSTRIKE_JSON_IOC in param:
+            api_data["values"] = [param[CROWDSTRIKE_JSON_IOC]]
+        if CROWDSTRIKE_SEARCH_IOCS_POLICY in param and param[CROWDSTRIKE_SEARCH_IOCS_POLICY] != "all":
+            api_data["policies"] = [param[CROWDSTRIKE_SEARCH_IOCS_POLICY]]
+        if CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL in param and param[CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL] != "all":
+            api_data["share_levels"] = param[CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL]
+        if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
+            api_data["from.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION]
+        if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
+            api_data["to.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION]
+        if CROWDSTRIKE_SEARCH_IOCS_SOURCE in param:
+            api_data["sources"] = param[CROWDSTRIKE_SEARCH_IOCS_SOURCE]
+        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param[CROWDSTRIKE_SEARCH_IOCS_TYPE] != "all":
+            api_data["types"] = param[CROWDSTRIKE_SEARCH_IOCS_TYPE]
+            if param[CROWDSTRIKE_SEARCH_IOCS_TYPE] == "hash":
+                api_data["types"] = ["md5", "sha1", "sha256"]
 
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=params, method='get')
+        more = True
 
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
+        self.send_progress("Completed 0 %")
+        data = defaultdict(list)
+        ioc_infos = []
+        while more:
 
-        action_result.add_data(resp_json)
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
 
-        summary = action_result.update_summary({})
-        summary['total_host_groups'] = action_result.get_data_size()
+            if (phantom.is_fail(ret_val)):
+                return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Indicators listed successfully")
+            ioc_infos.extend(response["resources"])
+
+            offset = response["meta"]["pagination"]["offset"]
+            total = response["meta"]["pagination"]["total"]
+
+            if (total):
+                self.send_progress(CROWDSTRIKE_COMPLETED, float(len(ioc_infos)) / float(total))
+
+            if offset >= total:
+                more = False
+            else:
+                api_data["offset"] = offset
+
+        self.save_progress("Processing results")
+
+        # instead of adding the ioc type in each ioc_info put them as the value in the dictionary,
+        # this way the ioc type 'domain' is not repeated for every domain ioc
+        for ioc_info in ioc_infos:
+
+            ioc_type, ioc = (ioc_info.split(':'))
+            data[ioc_type].append(ioc)
+
+        summary_keys = ['ip', 'domain', 'sha1', 'md5', 'sha256']
+
+        if (data):
+
+            data = dict(data)
+            if ('ipv4' in data):
+                data['ip'] = data.pop('ipv4')
+
+            action_result.add_data(data)
+
+            for key in summary_keys:
+
+                if (key not in data):
+                    action_result.update_summary({"total_" + key: 0})
+                    continue
+
+                action_result.update_summary({"total_" + key: len(data[key])})
+
+        action_result.update_summary({'alerts_found': len(ioc_infos)})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_put_files(self, param):
 
@@ -1666,22 +1731,23 @@ class CrowdstrikeConnector(BaseConnector):
         :return: integer value of the parameter or None in case of failure
         """
 
-        try:
-            if not float(parameter).is_integer():
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+                    return None
+                parameter = int(parameter)
+
+            except:
                 action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
                 return None
-            parameter = int(parameter)
 
-            if not allow_zero and parameter <= 0:
-                action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_LIMIT_VALIDATION_MSG.format(parameter=key))
+            if parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {} parameter".format(key))
                 return None
-            elif allow_zero and parameter < 0:
-                action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key))
+            if not allow_zero and parameter == 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide non-zero positive integer in {}".format(key))
                 return None
-        except:
-            error_text = CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key) if allow_zero else CROWDSTRIKE_LIMIT_VALIDATION_MSG.format(parameter=key)
-            action_result.set_status(phantom.APP_ERROR, error_text)
-            return None
 
         return parameter
 
@@ -1896,6 +1962,100 @@ class CrowdstrikeConnector(BaseConnector):
         action_result.set_summary({"process_count": len(resources)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_upload_iocs(self, param):
+
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # required parameters
+        ioc = param[CROWDSTRIKE_JSON_IOC]
+        policy = param[CROWDSTRIKE_UPLOAD_IOCS_POLICY]
+
+        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        api_data = {
+                "value": ioc,
+                "type": ioc_type,
+                "policy": policy}
+
+        # optional parameters
+        api_data["share_level"] = param.get(CROWDSTRIKE_UPLOAD_IOCS_SHARE_LEVEL, 'red')
+        if CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION in param:
+            data = self._validate_integers(action_result, param[CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+            if data is None:
+                return action_result.get_status()
+            api_data["expiration_days"] = data
+        if CROWDSTRIKE_UPLOAD_IOCS_SOURCE in param:
+            api_data["source"] = param[CROWDSTRIKE_UPLOAD_IOCS_SOURCE]
+        if CROWDSTRIKE_UPLOAD_IOCS_DESCRIPTION in param:
+            api_data["description"] = param[CROWDSTRIKE_UPLOAD_IOCS_DESCRIPTION]
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=[api_data], method="post")
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "IOC Uploaded to create alert")
+
+    def _handle_update_iocs(self, param):
+
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ioc = param[CROWDSTRIKE_JSON_IOC]
+        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
+
+        update_data = {}
+
+        # optional parameters
+        if CROWDSTRIKE_UPDATE_IOCS_POLICY in param:
+            update_data["policy"] = param[CROWDSTRIKE_UPDATE_IOCS_POLICY]
+        if CROWDSTRIKE_UPDATE_IOCS_SHARE_LEVEL in param:
+            update_data["share_level"] = param[CROWDSTRIKE_UPDATE_IOCS_SHARE_LEVEL]
+        if CROWDSTRIKE_UPDATE_IOCS_EXPIRATION in param:
+            data = self._validate_integers(action_result, param[CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+            if data is None:
+                return action_result.get_status()
+            update_data["expiration_days"] = data
+        if CROWDSTRIKE_UPDATE_IOCS_SOURCE in param:
+            update_data["source"] = param[CROWDSTRIKE_UPDATE_IOCS_SOURCE]
+        if CROWDSTRIKE_UPDATE_IOCS_DESCRIPTION in param:
+            update_data["description"] = param[CROWDSTRIKE_UPDATE_IOCS_DESCRIPTION]
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_data, method="patch", params=api_data)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_UPDATE_ALERT)
+
+    def _handle_delete_iocs(self, param):
+
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ioc = param[CROWDSTRIKE_JSON_IOC]
+        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=api_data, method="delete")
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -2218,7 +2378,7 @@ class CrowdstrikeConnector(BaseConnector):
             'get_session_file': self._handle_get_session_file,
             'upload_put_file': self._handle_upload_put_file,
             'get_indicator': self._handle_get_indicator,
-            'list_custom_indicators': self._handle_list_custom_indicators,
+            'search_iocs': self._handle_search_iocs,
             'list_put_files': self._handle_list_put_files,
             'hunt_file': self._handle_hunt_file,
             'hunt_domain': self._handle_hunt_domain,
@@ -2235,7 +2395,10 @@ class CrowdstrikeConnector(BaseConnector):
             'get_user_roles': self._handle_get_user_roles,
             'list_roles': self._handle_list_roles,
             'get_role': self._handle_get_roles,
-            'list_processes': self._handle_list_processes
+            'list_processes': self._handle_list_processes,
+            'upload_iocs': self._handle_upload_iocs,
+            'delete_iocs': self._handle_delete_iocs,
+            'update_iocs': self._handle_update_iocs
         }
 
         action = self.get_action_identifier()

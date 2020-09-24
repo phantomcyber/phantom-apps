@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.3",
+    "app_version": "2.0.5",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, August 24 2020, API version: v1, v2"
     ],
@@ -111,15 +111,21 @@
                     "order": 0,
                     "default": 50
                 },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "order": 1,
+                    "default": 0
+                },
                 "filter": {
                     "data_type": "string",
                     "description": "Filter expression used to limit the fetched devices (FQL Syntax)",
-                    "order": 1
+                    "order": 2
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 2
+                    "order": 3
                 }
             },
             "output": [
@@ -6717,7 +6723,7 @@
         },
         {
             "action": "get indicator",
-            "description": "Get an IOC by providing a type and value",
+            "description": "Get the full definition of one or more indicators that are being watched",
             "type": "investigate",
             "identifier": "get_indicator",
             "read_only": true,
@@ -6884,7 +6890,7 @@
             "versions": "EQ(*)",
             "render": {
                 "width": 12,
-                "title": "Get IOC",
+                "title": "IOC Details",
                 "type": "custom",
                 "height": 5,
                 "view": "crowdstrike_view.display_view"
@@ -6894,144 +6900,199 @@
             "action": "list custom indicators",
             "description": "Queries for custom indicators in your customer account",
             "type": "investigate",
-            "identifier": "list_custom_indicators",
+            "identifier": "search_iocs",
             "read_only": true,
             "parameters": {
-                "indicator_value": {
+                "ioc": {
+                    "description": "Hash, ip or domain IOC to match",
                     "data_type": "string",
-                    "description": "String representation of the indicator",
-                    "primary": true,
-                    "order": 0,
                     "contains": [
-                        "domain",
+                        "hash",
+                        "ip",
+                        "sha1",
                         "md5",
                         "sha256",
-                        "ip"
-                    ]
+                        "domain"
+                    ],
+                    "order": 0,
+                    "primary": true
                 },
-                "indicator_type": {
+                "type": {
+                    "description": "Indicator type",
                     "data_type": "string",
-                    "description": "The type of the indicator",
-                    "order": 1,
                     "value_list": [
-                        "sha256",
-                        "md5",
-                        "domain",
+                        "all",
+                        "hash",
                         "ipv4",
-                        "ipv6"
-                    ]
+                        "sha1",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ],
+                    "order": 1
+                },
+                "policy": {
+                    "description": "Enforcement policy",
+                    "data_type": "string",
+                    "value_list": [
+                        "all",
+                        "detect",
+                        "none"
+                    ],
+                    "order": 2
+                },
+                "share_level": {
+                    "description": "Indicator share level",
+                    "data_type": "string",
+                    "value_list": [
+                        "all",
+                        "red"
+                    ],
+                    "order": 3
+                },
+                "source": {
+                    "description": "The source of indicators",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "ph": {
+                    "data_type": "ph",
+                    "order": 5
+                },
+                "from_expiration": {
+                    "description": "The earliest indicator expiration date (RFC3339)",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "to_expiration": {
+                    "description": "The latest indicator expiration date (RFC3339)",
+                    "data_type": "string",
+                    "order": 7
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.from_expiration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Indicators listed successfully"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources",
-                    "data_type": "string",
-                    "example_values": [
-                        "domain:test"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        100
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.offset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0.007363052
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.trace_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "a514f53b-6b6c-49d2-b134-31f86c5cbe9f"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.entity",
-                    "data_type": "string",
-                    "example_values": [
-                        "/indicators/entities/iocs/v1{?ids*}"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.indicator_type",
-                    "data_type": "string",
-                    "example_values": [
+                    "contains": [
+                        "hash",
+                        "ip",
+                        "sha1",
+                        "md5",
+                        "sha256",
                         "domain"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.indicator_value",
+                    "data_path": "action_result.parameter.ph",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_level",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.to_expiration",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
                     "data_type": "string",
-                    "example_values": [
-                        "test"
-                    ],
                     "contains": [
-                        "domain",
-                        "md5",
-                        "sha256",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
                         "ip"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_host_groups",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.alerts_found",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_domain",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_ip",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_md5",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_sha1",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_sha256",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
+                    "data_type": "numeric"
                 }
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "List Custom Indicators",
+                "title": "List Indicators",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
@@ -7399,6 +7460,311 @@
                     "example_values": [
                         1
                     ]
+                }
+            ]
+        },
+        {
+            "action": "upload indicator",
+            "description": "Upload one or more indicators that you want CrowdStrike to watch",
+            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>detect<br>Send a notification when the particular indicator has been detected on a host</li><li>none<br>Take no action when the particular indicator has been detected on a host. This is equivalent to turning the indicator off.</li></ul><br>As of this writing the only valid value for the <b>share_level</b> parameter is <b>red</b>.<br>The <b>expiration</b> parameter is only valid for IP and Domains. As of this writing, if not specified, the Falcon API defaults to 30 days.",
+            "type": "contain",
+            "identifier": "upload_iocs",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "ioc": {
+                    "description": "Input domain, ip or hash ioc",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5",
+                        "domain",
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "policy": {
+                    "description": "Enforcement Policy (in case of detection)",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "detect",
+                        "none"
+                    ],
+                    "order": 1
+                },
+                "share_level": {
+                    "description": "Indicator share level",
+                    "data_type": "string",
+                    "value_list": [
+                        "red"
+                    ],
+                    "order": 2
+                },
+                "expiration": {
+                    "description": "Alert lifetime in days (domains and ips only)",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "source": {
+                    "description": "Indicator Originating source",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "description": {
+                    "description": "Indicator description",
+                    "data_type": "string",
+                    "order": 5
+                }
+            },
+            "render": {
+                "title": "Upload Indicator",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.expiration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5",
+                        "domain",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_level",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "delete indicator",
+            "description": "Delete an indicator that is being watched",
+            "type": "correct",
+            "identifier": "delete_iocs",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "ioc": {
+                    "description": "Hash, ip or domain IOC from previous upload",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "title": "Delete Indicator",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "update indicator",
+            "description": "Update an indicator that has been uploaded",
+            "type": "generic",
+            "identifier": "update_iocs",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "ioc": {
+                    "description": "Hash, ip or domain IOC to update",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "policy": {
+                    "description": "Enforcement policy (in case of detection)",
+                    "data_type": "string",
+                    "value_list": [
+                        "detect",
+                        "none"
+                    ],
+                    "order": 1
+                },
+                "share_level": {
+                    "description": "Indicator share level",
+                    "data_type": "string",
+                    "value_list": [
+                        "red"
+                    ],
+                    "order": 2
+                },
+                "expiration": {
+                    "description": "Alert lifetime in days (domains and ips only)",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "source": {
+                    "description": "Indicator originating source",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "description": {
+                    "description": "Indicator description",
+                    "data_type": "string",
+                    "order": 5
+                }
+            },
+            "render": {
+                "title": "Update Indicator",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.expiration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "sha1",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_level",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ]
         }

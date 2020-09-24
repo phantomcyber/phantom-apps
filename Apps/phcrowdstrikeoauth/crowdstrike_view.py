@@ -202,10 +202,19 @@ def display_view(provides, all_app_runs, context):
         return 'crowdstrike_list_incident_behaviors.html'
 
     if provides == 'list custom indicators':
-        return 'crowdstrike_list_custom_indicators.html'
+        return 'list_alerts_view.html'
 
     if provides == 'get user roles':
         return 'crowdstrike_get_user_roles.html'
+
+    if provides == 'upload indicator':
+        return 'crowdstrike_create_alert.html'
+
+    if provides == 'delete indicator':
+        return 'crowdstrike_create_alert.html'
+
+    if provides == 'update indicator':
+        return 'crowdstrike_update_alert.html'
 
 def hunt_view(provides, all_app_runs, context):
 
