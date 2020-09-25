@@ -443,7 +443,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         else:
             token_data = {
                 'client_id': self._client_id,
-                'scope': DEFENDERATP_DEFAULT_SCOPE,
+                'resource': DEFENDERATP_RESOURCE_URL,
                 'client_secret': self._client_secret,
                 'grant_type': 'client_credentials',
             }
@@ -600,12 +600,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :param data: Data to send in REST call
         :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS
         """
-        if not self._admin_consent:
-            token_url = DEFENDERATP_SERVER_TOKEN_URL
-        else:
-            token_url = DEFENDERATP_SERVER_TOKEN_V2_URL
         
-        req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, token_url.format(tenant_id=self._tenant))
+        req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
                                                   data=urlencode(data), method="post")

@@ -9,7 +9,6 @@ DEFENDERATP_PHANTOM_SYS_INFO_URL = '/system_info'
 DEFENDERATP_PHANTOM_ASSET_INFO_URL = '/asset/{asset_id}'
 DEFENDERATP_LOGIN_BASE_URL = 'https://login.microsoftonline.com'
 DEFENDERATP_SERVER_TOKEN_URL = '/{tenant_id}/oauth2/token'
-DEFENDERATP_SERVER_TOKEN_V2_URL = '/{tenant_id}/oauth2/v2.0/token'
 DEFENDERATP_AUTHORIZE_URL = '/{tenant_id}/oauth2/authorize?client_id={client_id}&redirect_uri={redirect_uri}' \
                             '&response_type={response_type}&state={state}&resource={resource}'
 DEFENDERATP_RESOURCE_URL = 'https://api.securitycenter.windows.com'
