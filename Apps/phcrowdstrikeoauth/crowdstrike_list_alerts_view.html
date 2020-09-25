@@ -10,9 +10,10 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- 
-File: ./list_alerts_view.html
+File: crowdstrike_list_alerts_view.html
+Copyright (c) 2019-2020 Splunk Inc.
 
-Copyright (c) Phantom Cyber Corporation, 2016-2018
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 This unpublished material is proprietary to Phantom Cyber.
 All rights reserved. The methods and
@@ -81,6 +82,10 @@ a:hover {
   margin-bottom: 20px
 }
 
+.fade:not(.show) {
+  display: none
+}
+
 </style>
 
 <div style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
@@ -93,19 +98,21 @@ a:hover {
   <li class="active">
     <a data-toggle="tab" href="#summary">Summary</a>
   </li>
-  {% for key, value in result.data.items %}
+  {% for data in result.data %}
+  {% for key, value in data.items %}
   {% if key != "version" and key != "system_info" and key != "full_hash" %}
   <li>
-  <a data-toggle="tab" href="#{{ key }}">{{ key|title }}</a>
+  <a data-toggle="tab" href="#{{ key }}" onclick="test()">{{ key|title }}</a>
   </li>
   {% endif %}
+  {% endfor %}
   {% endfor %}
 </ul>
 
 <div class="tab-content" style="z-index:1;"> <!--- All Tabs content -->
   <h4 class="ph-h4-style"> </h4>
   <div id="summary" class="tab-pane fade active in" role="tabpanel">
-    <table class="ph-table-vertical">
+    <table class="ph-table-vertical datatable">
       {% if result.summary %}
       <tr>
         <td><b>Total IPs</b></td>
@@ -136,12 +143,14 @@ a:hover {
   </div>
 </div>
 
-  {% if result.data.md5 %}
-  <div id="md5" class="tab-pane fade" role="tabpanel"> <!--- MD5 -->
+{% for data in result.data %}
+  {% if data.md5 %}
+  <div id="md5" class="tab-pane fade active in" role="tabpanel"> <!--- MD5 -->
     <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal">
-      <tr><th>MD5</th></tr>
-      {% for curr_entry in result.data.md5 %}
+    <table class="ph-table-horizontal datatable">
+      <thead><tr><th>MD5</th></tr></thead>
+      <tbody>
+      {% for curr_entry in data.md5 %}
       <tr>
         <td>
           {% if curr_entry != "..." %}
@@ -155,16 +164,18 @@ a:hover {
         </td>
       </tr>
       {% endfor %}
+      </tbody>
     </table>
   </div>
   {% endif %} <!-- if result.data.md5 -->
 
-  {% if result.data.sha256 %}
-  <div id="sha256" class="tab-pane fade" role="tabpanel"> <!--- sha256 -->
+  {% if data.sha256 %}
+  <div id="sha256" class="tab-pane fade active in" role="tabpanel"> <!--- sha256 -->
     <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal">
-      <tr><th>SHA256</th></tr>
-      {% for curr_entry in result.data.sha256 %}
+    <table class="ph-table-horizontal datatable">
+      <thead><tr><th>SHA256</th></tr></thead>
+      <tbody>
+      {% for curr_entry in data.sha256 %}
       <tr>
         <td>
           {% if curr_entry != "..." %}
@@ -178,16 +189,18 @@ a:hover {
         </td>
       </tr>
       {% endfor %}
+    </tbody>
     </table>
   </div>
-  {% endif %} <!-- if result.data.sha256 -->
+  {% endif %} <!-- if data.sha256 -->
 
-  {% if result.data.sha1 %}
-  <div id="sha1" class="tab-pane fade" role="tabpanel"> <!--- sha1 -->
+  {% if data.sha1 %}
+  <div id="sha1" class="tab-pane fade active in" role="tabpanel"> <!--- sha1 -->
     <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal">
-      <tr><th>SHA1</th></tr>
-      {% for curr_entry in result.data.sha1 %}
+    <table class="ph-table-horizontal datatable">
+      <thead><tr><th>SHA1</th></tr></thead>
+      <tbody>
+      {% for curr_entry in data.sha1 %}
       <tr>
         <td>
           {% if curr_entry != "..." %}
@@ -201,16 +214,18 @@ a:hover {
         </td>
       </tr>
       {% endfor %}
+    </tbody>
     </table>
   </div>
-  {% endif %} <!-- if result.data.sha1 -->
+  {% endif %} <!-- if data.sha1 -->
 
-  {% if result.data.domain %}
-  <div id="domain" class="tab-pane fade" role="tabpanel"> <!--- domain -->
+  {% if data.domain %}
+  <div id="domain" class="tab-pane fade active in" role="tabpanel"> <!--- domain -->
     <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal">
-      <tr><th>DOMAIN</th></tr>
-      {% for curr_entry in result.data.domain %}
+    <table class="ph-table-horizontal datatable">
+      <thead><tr><th>DOMAIN</th></tr></thead>
+      <tbody>
+      {% for curr_entry in data.domain %}
       <tr>
         <td>
           {% if curr_entry != "..." %}
@@ -224,16 +239,18 @@ a:hover {
         </td>
       </tr>
       {% endfor %}
+    </tbody>
     </table>
   </div>
-  {% endif %} <!-- if result.data.domain -->
+  {% endif %} <!-- if data.domain -->
 
-  {% if result.data.ip %}
-  <div id="ip" class="tab-pane fade" role="tabpanel"> <!--- ip -->
+  {% if data.ip %}
+  <div id="ip" class="tab-pane fade active in" role="tabpanel"> <!--- ip -->
     <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal">
-      <tr><th>IP</th></tr>
-      {% for curr_entry in result.data.ip %}
+    <table class="ph-table-horizontal datatable">
+      <thead><tr><th>IP</th></tr></thead>
+      <tbody>
+      {% for curr_entry in data.ip %}
       <tr>
         <td>
           {% if curr_entry != "..." %}
@@ -247,10 +264,11 @@ a:hover {
         </td>
       </tr>
       {% endfor %}
+    </tbody>
     </table>
   </div>
-  {% endif %} <!-- if result.data.ip -->
-
+  {% endif %} <!-- if data.ip -->
+{% endfor %}
 
 </div>
 
@@ -258,4 +276,27 @@ a:hover {
   <p> No alerts found </p>
 {% endif %}
 {% endfor %}
+
+<script>
+  function test(){
+    $.extend(true, $.fn.dataTable.defaults, {
+      "searching": false,
+      "bLengthChange": false,
+      "language": {
+          "paginate": {
+              "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+              "next": "<i class='fa fa-angle-right fa-lg'></i>"
+          }
+      },
+      "dom": '<"top">rt<"bottom"p><"clear">',
+      drawCallback: function(settings) {
+          var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+          pagination.toggle(this.api().page.info().pages > 1);
+      }
+  });
+  $.fn.DataTable.ext.pager.numbers_length = 5;
+  $('.datatable').DataTable();
+  }
+  test();
+</script>
 {% endblock %}

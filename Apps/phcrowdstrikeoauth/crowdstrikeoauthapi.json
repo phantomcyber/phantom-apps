@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.5",
+    "app_version": "2.0.3",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, August 24 2020, API version: v1, v2"
     ],
@@ -6796,6 +6796,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "test description"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.meta.query_time",
                     "data_type": "numeric",
                     "example_values": [
@@ -6900,12 +6914,14 @@
             "action": "list custom indicators",
             "description": "Queries for custom indicators in your customer account",
             "type": "investigate",
-            "identifier": "search_iocs",
+            "identifier": "list_custom_indicators",
             "read_only": true,
             "parameters": {
-                "ioc": {
-                    "description": "Hash, ip or domain IOC to match",
+                "indicator_value": {
                     "data_type": "string",
+                    "description": "String representation of the indicator",
+                    "primary": true,
+                    "order": 0,
                     "contains": [
                         "hash",
                         "ip",
@@ -6913,23 +6929,22 @@
                         "md5",
                         "sha256",
                         "domain"
-                    ],
-                    "order": 0,
-                    "primary": true
+                    ]
                 },
-                "type": {
-                    "description": "Indicator type",
+                "indicator_type": {
                     "data_type": "string",
+                    "description": "The type of the indicator",
+                    "order": 1,
                     "value_list": [
                         "all",
                         "hash",
                         "ipv4",
+                        "ipv6",
                         "sha1",
                         "md5",
                         "sha256",
                         "domain"
-                    ],
-                    "order": 1
+                    ]
                 },
                 "policy": {
                     "description": "Enforcement policy",
@@ -6973,14 +6988,21 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.from_expiration",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-17T00:00:00Z"
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.ioc",
+                    "data_path": "action_result.parameter.indicator_value",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -6989,6 +7011,9 @@
                         "md5",
                         "sha256",
                         "domain"
+                    ],
+                    "example_values": [
+                        "test"
                     ]
                 },
                 {
@@ -6997,23 +7022,38 @@
                 },
                 {
                     "data_path": "action_result.parameter.policy",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.share_level",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.source",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.to_expiration",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-17T00:00:00Z"
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.type",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.domain",
@@ -7079,15 +7119,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total ip: 20, Total domain: 26, Total sha1: 0, Total md5: 0, Total sha256: 1, Alerts found: 47"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -7466,7 +7515,7 @@
         {
             "action": "upload indicator",
             "description": "Upload one or more indicators that you want CrowdStrike to watch",
-            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>detect<br>Send a notification when the particular indicator has been detected on a host</li><li>none<br>Take no action when the particular indicator has been detected on a host. This is equivalent to turning the indicator off.</li></ul><br>As of this writing the only valid value for the <b>share_level</b> parameter is <b>red</b>.<br>The <b>expiration</b> parameter is only valid for IP and Domains. As of this writing, if not specified, the Falcon API defaults to 30 days.",
+            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>detect<br>Send a notification when the particular indicator has been detected on a host</li><li>none<br>Take no action when the particular indicator has been detected on a host. This is equivalent to turning the indicator off.</li></ul><br>As of this writing the only valid value for the <b>share_level</b> parameter is <b>red</b>.<br>The <b>expiration</b> parameter is only valid for IP and Domains. As of this writing, if not specified, the Falcon API defaults to 30 days. If the indicator with the same type and value is created again, the action will pass successfully and the indicator will be overwritten.",
             "type": "contain",
             "identifier": "upload_iocs",
             "read_only": false,
@@ -7506,7 +7555,7 @@
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (domains and ips only)",
+                    "description": "Alert lifetime in days (Valid for domains and ips only)",
                     "data_type": "numeric",
                     "order": 3
                 },
@@ -7529,15 +7578,25 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.description",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test description"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.expiration",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ioc",
@@ -7549,19 +7608,31 @@
                         "md5",
                         "domain",
                         "ip"
+                    ],
+                    "example_values": [
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.policy",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.share_level",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.source",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test source"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -7573,15 +7644,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "IOC Uploaded to create alert"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -7615,7 +7695,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ioc",
@@ -7626,6 +7710,9 @@
                         "md5",
                         "sha256",
                         "domain"
+                    ],
+                    "example_values": [
+                        "test"
                     ]
                 },
                 {
@@ -7638,21 +7725,31 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted alert"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
         {
             "action": "update indicator",
             "description": "Update an indicator that has been uploaded",
+            "verbose": "If no parameters are provided as input, the action would pass successfully.",
             "type": "generic",
             "identifier": "update_iocs",
             "read_only": false,
@@ -7690,7 +7787,7 @@
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (domains and ips only)",
+                    "description": "Alert lifetime in days (Valid for domains and ips only)",
                     "data_type": "numeric",
                     "order": 3
                 },
@@ -7713,15 +7810,25 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.description",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test description"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.expiration",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ioc",
@@ -7732,19 +7839,31 @@
                         "md5",
                         "sha256",
                         "domain"
+                    ],
+                    "example_values": [
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.policy",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.share_level",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.source",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test source"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -7756,15 +7875,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated alert"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         }

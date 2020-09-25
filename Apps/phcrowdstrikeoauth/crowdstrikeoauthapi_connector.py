@@ -13,6 +13,7 @@ from phantom.vault import Vault
 from crowdstrikeoauthapi_consts import *
 
 import requests
+import ipaddress
 import phantom.utils as util
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import uuid
@@ -127,29 +128,29 @@ class CrowdstrikeConnector(BaseConnector):
         :return: error message
         """
 
-        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
-        error_code = "Error code unavailable"
+        error_msg = CROWDSTRIKE_ERROR_MESSAGE
+        error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
+                error_msg = CROWDSTRIKE_ERROR_MESSAGE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
+            error_msg = CROWDSTRIKE_ERROR_MESSAGE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
+            error_msg = CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = CROWDSTRIKE_ERROR_MESSAGE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -227,6 +228,15 @@ class CrowdstrikeConnector(BaseConnector):
 
         if util.is_ip(ioc):
             return (phantom.APP_SUCCESS, "ipv4")
+
+        ip = UnicodeDammit(ioc).unicode_markup.encode('UTF-8').decode('UTF-8')
+        try:
+            ipv6_type = None
+            ipv6_type = ipaddress.IPv6Address(ip)
+            if ipv6_type:
+                return (phantom.APP_SUCCESS, "ipv6")
+        except:
+            pass
 
         if util.is_hash(ioc):
             return self._get_hash_type(ioc, action_result)
@@ -1005,8 +1015,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Groups listed successfully")
 
-    def _handle_search_iocs(self, param):
+    def _handle_list_custom_indicators(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1015,18 +1026,18 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         # optional parameters
-        if CROWDSTRIKE_JSON_IOC in param:
-            api_data["values"] = [param[CROWDSTRIKE_JSON_IOC]]
-        if CROWDSTRIKE_SEARCH_IOCS_POLICY in param and param[CROWDSTRIKE_SEARCH_IOCS_POLICY] != "all":
-            api_data["policies"] = [param[CROWDSTRIKE_SEARCH_IOCS_POLICY]]
-        if CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL in param and param[CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL] != "all":
-            api_data["share_levels"] = param[CROWDSTRIKE_SEARCH_IOCS_SHARE_LEVEL]
+        if CROWDSTRIKE_JSON_LIST_IOC in param:
+            api_data["values"] = [param[CROWDSTRIKE_JSON_LIST_IOC]]
+        if CROWDSTRIKE_IOCS_POLICY in param and param[CROWDSTRIKE_IOCS_POLICY] != "all":
+            api_data["policies"] = [param[CROWDSTRIKE_IOCS_POLICY]]
+        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param and param[CROWDSTRIKE_IOCS_SHARE_LEVEL] != "all":
+            api_data["share_levels"] = param[CROWDSTRIKE_IOCS_SHARE_LEVEL]
         if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
             api_data["from.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION]
         if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
             api_data["to.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION]
-        if CROWDSTRIKE_SEARCH_IOCS_SOURCE in param:
-            api_data["sources"] = param[CROWDSTRIKE_SEARCH_IOCS_SOURCE]
+        if CROWDSTRIKE_IOCS_SOURCE in param:
+            api_data["sources"] = param[CROWDSTRIKE_IOCS_SOURCE]
         if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param[CROWDSTRIKE_SEARCH_IOCS_TYPE] != "all":
             api_data["types"] = param[CROWDSTRIKE_SEARCH_IOCS_TYPE]
             if param[CROWDSTRIKE_SEARCH_IOCS_TYPE] == "hash":
@@ -1063,7 +1074,7 @@ class CrowdstrikeConnector(BaseConnector):
         # this way the ioc type 'domain' is not repeated for every domain ioc
         for ioc_info in ioc_infos:
 
-            ioc_type, ioc = (ioc_info.split(':'))
+            ioc_type, ioc = (ioc_info.split(':', 1))
             data[ioc_type].append(ioc)
 
         summary_keys = ['ip', 'domain', 'sha1', 'md5', 'sha256']
@@ -1073,6 +1084,9 @@ class CrowdstrikeConnector(BaseConnector):
             data = dict(data)
             if ('ipv4' in data):
                 data['ip'] = data.pop('ipv4')
+            if ('ipv6' in data):
+                data['ip'] = data.get('ip', [])
+                data['ip'].extend(data.pop('ipv6'))
 
             action_result.add_data(data)
 
@@ -1734,12 +1748,12 @@ class CrowdstrikeConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+                    action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE.format(key=key))
                     return None
                 parameter = int(parameter)
 
             except:
-                action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+                action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE.format(key=key))
                 return None
 
             if parameter < 0:
@@ -1970,10 +1984,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         # required parameters
         ioc = param[CROWDSTRIKE_JSON_IOC]
-        policy = param[CROWDSTRIKE_UPLOAD_IOCS_POLICY]
+        policy = param[CROWDSTRIKE_IOCS_POLICY]
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
-
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
@@ -1983,16 +1996,16 @@ class CrowdstrikeConnector(BaseConnector):
                 "policy": policy}
 
         # optional parameters
-        api_data["share_level"] = param.get(CROWDSTRIKE_UPLOAD_IOCS_SHARE_LEVEL, 'red')
-        if CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param[CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+        api_data["share_level"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL, 'red')
+        if CROWDSTRIKE_IOCS_EXPIRATION in param:
+            data = self._validate_integers(action_result, param[CROWDSTRIKE_IOCS_EXPIRATION], 'expiration', allow_zero=True)
             if data is None:
                 return action_result.get_status()
             api_data["expiration_days"] = data
-        if CROWDSTRIKE_UPLOAD_IOCS_SOURCE in param:
-            api_data["source"] = param[CROWDSTRIKE_UPLOAD_IOCS_SOURCE]
-        if CROWDSTRIKE_UPLOAD_IOCS_DESCRIPTION in param:
-            api_data["description"] = param[CROWDSTRIKE_UPLOAD_IOCS_DESCRIPTION]
+        if CROWDSTRIKE_IOCS_SOURCE in param:
+            api_data["source"] = param[CROWDSTRIKE_IOCS_SOURCE]
+        if CROWDSTRIKE_IOCS_DESCRIPTION in param:
+            api_data["description"] = param[CROWDSTRIKE_IOCS_DESCRIPTION]
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=[api_data], method="post")
 
@@ -2017,19 +2030,19 @@ class CrowdstrikeConnector(BaseConnector):
         update_data = {}
 
         # optional parameters
-        if CROWDSTRIKE_UPDATE_IOCS_POLICY in param:
-            update_data["policy"] = param[CROWDSTRIKE_UPDATE_IOCS_POLICY]
-        if CROWDSTRIKE_UPDATE_IOCS_SHARE_LEVEL in param:
-            update_data["share_level"] = param[CROWDSTRIKE_UPDATE_IOCS_SHARE_LEVEL]
-        if CROWDSTRIKE_UPDATE_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param[CROWDSTRIKE_UPLOAD_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+        if CROWDSTRIKE_IOCS_POLICY in param:
+            update_data["policy"] = param[CROWDSTRIKE_IOCS_POLICY]
+        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param:
+            update_data["share_level"] = param[CROWDSTRIKE_IOCS_SHARE_LEVEL]
+        if CROWDSTRIKE_IOCS_EXPIRATION in param:
+            data = self._validate_integers(action_result, param[CROWDSTRIKE_IOCS_EXPIRATION], 'expiration', allow_zero=True)
             if data is None:
                 return action_result.get_status()
             update_data["expiration_days"] = data
-        if CROWDSTRIKE_UPDATE_IOCS_SOURCE in param:
-            update_data["source"] = param[CROWDSTRIKE_UPDATE_IOCS_SOURCE]
-        if CROWDSTRIKE_UPDATE_IOCS_DESCRIPTION in param:
-            update_data["description"] = param[CROWDSTRIKE_UPDATE_IOCS_DESCRIPTION]
+        if CROWDSTRIKE_IOCS_SOURCE in param:
+            update_data["source"] = param[CROWDSTRIKE_IOCS_SOURCE]
+        if CROWDSTRIKE_IOCS_DESCRIPTION in param:
+            update_data["description"] = param[CROWDSTRIKE_IOCS_DESCRIPTION]
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_data, method="patch", params=api_data)
         if (phantom.is_fail(ret_val)):
@@ -2378,7 +2391,7 @@ class CrowdstrikeConnector(BaseConnector):
             'get_session_file': self._handle_get_session_file,
             'upload_put_file': self._handle_upload_put_file,
             'get_indicator': self._handle_get_indicator,
-            'search_iocs': self._handle_search_iocs,
+            'list_custom_indicators': self._handle_list_custom_indicators,
             'list_put_files': self._handle_list_put_files,
             'hunt_file': self._handle_hunt_file,
             'hunt_domain': self._handle_hunt_domain,

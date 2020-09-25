@@ -202,15 +202,12 @@ def display_view(provides, all_app_runs, context):
         return 'crowdstrike_list_incident_behaviors.html'
 
     if provides == 'list custom indicators':
-        return 'list_alerts_view.html'
+        return 'crowdstrike_list_alerts_view.html'
 
     if provides == 'get user roles':
         return 'crowdstrike_get_user_roles.html'
 
-    if provides == 'upload indicator':
-        return 'crowdstrike_create_alert.html'
-
-    if provides == 'delete indicator':
+    if provides in ['upload indicator', 'delete indicator']:
         return 'crowdstrike_create_alert.html'
 
     if provides == 'update indicator':
@@ -228,7 +225,7 @@ def hunt_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     # print context
-    return 'hunt_view.html'
+    return 'crowdstrike_hunt_view.html'
 
 
 def set_status_view(provides, all_app_runs, context):
