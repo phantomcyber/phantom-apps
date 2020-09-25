@@ -27,10 +27,7 @@ import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
 import sys
 import imp
-try:
-    from _collections import defaultdict
-except ImportError:
-    pass
+from _collections import defaultdict
 
 
 class RetVal(tuple):
@@ -1073,14 +1070,12 @@ class CrowdstrikeConnector(BaseConnector):
         # instead of adding the ioc type in each ioc_info put them as the value in the dictionary,
         # this way the ioc type 'domain' is not repeated for every domain ioc
         for ioc_info in ioc_infos:
-
             ioc_type, ioc = (ioc_info.split(':', 1))
             data[ioc_type].append(ioc)
 
         summary_keys = ['ip', 'domain', 'sha1', 'md5', 'sha256']
 
         if (data):
-
             data = dict(data)
             if ('ipv4' in data):
                 data['ip'] = data.pop('ipv4')
@@ -1091,7 +1086,6 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(data)
 
             for key in summary_keys:
-
                 if (key not in data):
                     action_result.update_summary({"total_" + key: 0})
                     continue

@@ -10,17 +10,10 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- 
-File: crowdstrike_list_alerts_view.html
+File: crowdstrike_list_custom_indicators.html
 Copyright (c) 2019-2020 Splunk Inc.
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
-This unpublished material is proprietary to Phantom Cyber.
-All rights reserved. The methods and
-techniques described herein are considered trade secrets
-and/or confidential. Reproduction or distribution, in whole
-or in part, is forbidden except by express written permission
-of Phantom Cyber Corporation.
 -->
 
 <style>
@@ -102,7 +95,7 @@ a:hover {
   {% for key, value in data.items %}
   {% if key != "version" and key != "system_info" and key != "full_hash" %}
   <li>
-  <a data-toggle="tab" href="#{{ key }}" onclick="test()">{{ key|title }}</a>
+  <a data-toggle="tab" href="#{{ key }}" onclick="displayDataTable()">{{ key|title }}</a>
   </li>
   {% endif %}
   {% endfor %}
@@ -111,7 +104,7 @@ a:hover {
 
 <div class="tab-content" style="z-index:1;"> <!--- All Tabs content -->
   <h4 class="ph-h4-style"> </h4>
-  <div id="summary" class="tab-pane fade active in" role="tabpanel">
+  <div id="summary" class="tab-pane active in" role="tabpanel">
     <table class="ph-table-vertical datatable">
       {% if result.summary %}
       <tr>
@@ -145,7 +138,7 @@ a:hover {
 
 {% for data in result.data %}
   {% if data.md5 %}
-  <div id="md5" class="tab-pane fade active in" role="tabpanel"> <!--- MD5 -->
+  <div id="md5" class="tab-pane fade" role="tabpanel"> <!--- MD5 -->
     <h4 class="ph-h4-style"> </h4>
     <table class="ph-table-horizontal datatable">
       <thead><tr><th>MD5</th></tr></thead>
@@ -170,7 +163,7 @@ a:hover {
   {% endif %} <!-- if result.data.md5 -->
 
   {% if data.sha256 %}
-  <div id="sha256" class="tab-pane fade active in" role="tabpanel"> <!--- sha256 -->
+  <div id="sha256" class="tab-pane fade" role="tabpanel"> <!--- sha256 -->
     <h4 class="ph-h4-style"> </h4>
     <table class="ph-table-horizontal datatable">
       <thead><tr><th>SHA256</th></tr></thead>
@@ -195,7 +188,7 @@ a:hover {
   {% endif %} <!-- if data.sha256 -->
 
   {% if data.sha1 %}
-  <div id="sha1" class="tab-pane fade active in" role="tabpanel"> <!--- sha1 -->
+  <div id="sha1" class="tab-pane fade" role="tabpanel"> <!--- sha1 -->
     <h4 class="ph-h4-style"> </h4>
     <table class="ph-table-horizontal datatable">
       <thead><tr><th>SHA1</th></tr></thead>
@@ -220,7 +213,7 @@ a:hover {
   {% endif %} <!-- if data.sha1 -->
 
   {% if data.domain %}
-  <div id="domain" class="tab-pane fade active in" role="tabpanel"> <!--- domain -->
+  <div id="domain" class="tab-pane fade" role="tabpanel"> <!--- domain -->
     <h4 class="ph-h4-style"> </h4>
     <table class="ph-table-horizontal datatable">
       <thead><tr><th>DOMAIN</th></tr></thead>
@@ -245,7 +238,7 @@ a:hover {
   {% endif %} <!-- if data.domain -->
 
   {% if data.ip %}
-  <div id="ip" class="tab-pane fade active in" role="tabpanel"> <!--- ip -->
+  <div id="ip" class="tab-pane fade" role="tabpanel"> <!--- ip -->
     <h4 class="ph-h4-style"> </h4>
     <table class="ph-table-horizontal datatable">
       <thead><tr><th>IP</th></tr></thead>
@@ -278,7 +271,7 @@ a:hover {
 {% endfor %}
 
 <script>
-  function test(){
+  function displayDataTable(){
     $.extend(true, $.fn.dataTable.defaults, {
       "searching": false,
       "bLengthChange": false,
@@ -297,6 +290,6 @@ a:hover {
   $.fn.DataTable.ext.pager.numbers_length = 5;
   $('.datatable').DataTable();
   }
-  test();
+  displayDataTable();
 </script>
 {% endblock %}
