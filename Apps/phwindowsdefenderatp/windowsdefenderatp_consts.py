@@ -13,6 +13,7 @@ DEFENDERATP_AUTHORIZE_URL = '/{tenant_id}/oauth2/authorize?client_id={client_id}
                             '&response_type={response_type}&state={state}&resource={resource}'
 DEFENDERATP_RESOURCE_URL = 'https://api.securitycenter.windows.com'
 DEFENDERATP_MSGRAPH_API_BASE_URL = 'https://api.securitycenter.windows.com/api'
+DEFENDERATP_DEFAULT_SCOPE = 'https://securitycenter.onmicrosoft.com/windowsatpservice/.default'
 DEFENDERATP_MACHINES_ENDPOINT = '/machines'
 DEFENDERATP_DOMAIN_MACHINES_ENDPOINT = '/domains/{input}/machines'
 DEFENDERATP_FILE_MACHINES_ENDPOINT = '/files/{input}/machines'
