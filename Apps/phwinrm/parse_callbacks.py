@@ -91,22 +91,34 @@ def list_processes(action_result, response):
         )
 
     output = response.std_out
-    lines = output.splitlines()
-    for line in lines[2:]:
-        process = {}
+    lines = list(filter(lambda x: not x.startswith('-----'), filter(lambda x:x, map(lambda x:x.decode('utf8').strip(), output.splitlines()))))
+    header = list(map(lambda x:x.lower(), lines[0].split() + [f"unknown_column_{x}" for x in range(0, 10)]))
+    processes = lines[1:]
+    result = []
+    for line in processes:
         columns = line.split()
-        try:
-            process['handles'] = int(columns[0])
-            process['non_paged_memory_(K)'] = int(columns[1])
-            process['paged_memory_(K)'] = int(columns[2])
-            process['working_set_(K)'] = int(columns[3])
-            process['virtual_memory_(M)'] = int(columns[4])
-            process['processor_time_(s)'] = float(columns[5])
-            process['pid'] = int(columns[6])
-            process['name'] = columns[7]
-        except:
-            continue
-        action_result.add_data(process)
+        process_dict = dict()
+        for i, x in enumerate(columns):
+            process_dict[header[i]] = x
+        result += [process_dict]
+
+    column_mapping  = {
+            'handles': 'handles',
+            'npm(k)': 'non_paged_memory_(K)',
+            'pm(k)': 'paged_memory_(K)',
+            'ws(k)': 'working_set_(K)',
+            'vm(m)': 'virtual_memory_(M)',
+            'cpu(s)': 'processor_time_(s)',
+            'id': 'pid',
+            'si': 'session_id',
+            'processname': 'name',
+    }
+
+    for line in result:
+        data = { 'raw': line }
+        for key, value in line.items():
+            data[column_mapping.get(key, key)] = value
+        action_result.add_data(data)
 
     size = action_result.get_data_size()
     if size == 0:
