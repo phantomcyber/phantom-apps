@@ -71,7 +71,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._base_url_oauth = self._handle_py_ver_compat_for_input_str(config[CROWDSTRIKE_JSON_URL_OAuth])
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
 
-        if (self._base_url_oauth[-1] == '/'):
+        if self._base_url_oauth[-1] == '/':
             self._base_url_oauth = self._base_url_oauth[:-1]
 
         app_id = self._handle_py_ver_compat_for_input_str(config.get('app_id', self.get_asset_id().replace('-', '')))
@@ -273,16 +273,16 @@ class CrowdstrikeConnector(BaseConnector):
 
             self.send_progress("Adding event artifact # {0}".format(i))
             # result is a dictionary of a single container and artifacts
-            if ('container' not in result):
+            if 'container' not in result:
                 self.debug_print("Skipping empty container # {0}".format(i))
                 continue
 
-            if ('artifacts' not in result):
+            if 'artifacts' not in result:
                 # ignore containers without artifacts
                 self.debug_print("Skipping container # {0} without artifacts".format(i))
                 continue
 
-            if (len(result['artifacts']) == 0):
+            if len(result['artifacts']) == 0:
                 # ignore containers without artifacts
                 self.debug_print("Skipping container # {0} with 0 artifacts".format(i))
                 continue
@@ -294,13 +294,13 @@ class CrowdstrikeConnector(BaseConnector):
                 result['container'], time_interval, config.get('collate')
             )
 
-            if ('artifacts' not in result):
+            if 'artifacts' not in result:
                 continue
 
             if not container_id:
                 container = result['container']
 
-                if (hasattr(self, '_preprocess_container')):
+                if hasattr(self, '_preprocess_container'):
                     try:
                         container = self._preprocess_container(container)
                     except Exception as e:
@@ -309,7 +309,7 @@ class CrowdstrikeConnector(BaseConnector):
                 ret_val, response, container_id = self.save_container(result['container'])
                 self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, response, container_id))
 
-                if (phantom.is_fail(ret_val)):
+                if phantom.is_fail(ret_val):
                     self.debug_print("Error occurred while creating a new container")
                     continue
             else:
@@ -322,7 +322,7 @@ class CrowdstrikeConnector(BaseConnector):
             for j, artifact in enumerate(artifacts):
 
                 # if it is the last artifact of the last container
-                if ((j + 1) == len_artifacts):
+                if (j + 1) == len_artifacts:
                     # mark it such that active playbooks get executed
                     artifact['run_automation'] = True
 
@@ -337,7 +337,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             containers_processed += 1
 
-        if (reused_containers and config.get('collate')):
+        if reused_containers and config.get('collate'):
             self.save_progress("Some containers were re-used due to collate set to True")
 
         return containers_processed
@@ -400,7 +400,7 @@ class CrowdstrikeConnector(BaseConnector):
         # initially set the token for first time
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if not param:
@@ -410,7 +410,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress(CROWDSTRIKE_ERR_CONNECTIVITY_TEST)
             return phantom.APP_ERROR
 
@@ -454,7 +454,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         try:
@@ -462,7 +462,7 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Unable to parse response {}".format(self._get_error_message_from_exception(e)))
 
-        if (not resources):
+        if not resources:
             action_result.update_summary({'device_count': 0})
             return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -482,12 +482,12 @@ class CrowdstrikeConnector(BaseConnector):
 
         count_only = param.get(CROWDSTRIKE_JSON_COUNT_ONLY, False)
 
-        if (count_only):
+        if count_only:
             return self._get_device_count(api_data, action_result)
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # successful request / "none found"
@@ -515,7 +515,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH, json=api_data, method="patch")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
@@ -528,7 +528,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, ioc_type = self._get_hash_type(file_hash, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return self._get_devices_ran_on(file_hash, ioc_type, param, action_result)
@@ -555,7 +555,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # successful request
@@ -587,7 +587,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH, params=api_data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         try:
@@ -611,7 +611,7 @@ class CrowdstrikeConnector(BaseConnector):
         "modified_timestamp.desc", "name.asc", "name.desc", "sort_score.asc", "sort_score.desc", "start.asc", "start.desc", "state.asc", "state.desc", "status.asc", "status.desc"]
 
         resp = self._check_data(action_result, param, max_limit, sort_data)
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         endpoint = CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT
@@ -637,7 +637,7 @@ class CrowdstrikeConnector(BaseConnector):
         sort_data = ["--", "timestamp.asc", "timestamp.desc"]
 
         resp = self._check_data(action_result, param, max_limit, sort_data)
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         endpoint = CROWDSTRIKE_LIST_BEHAVIORS_ENDPOINT
@@ -719,7 +719,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         resp = self._check_data(action_result, param, max_limit, sort_data)
 
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         endpoint = CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT
@@ -792,7 +792,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json=data, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -823,7 +823,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -844,7 +844,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -904,7 +904,7 @@ class CrowdstrikeConnector(BaseConnector):
         endpoint = CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Create the param variable to send
@@ -914,7 +914,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -929,7 +929,7 @@ class CrowdstrikeConnector(BaseConnector):
         max_limit = 5000
 
         resp = self._check_data(action_result, param, max_limit)
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         device_id_list = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param)
@@ -964,7 +964,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         resp = self._check_data(action_result, param, max_limit, sort_data)
 
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         host_group_id_list = self._get_ids(action_result, CROWDSTRIKE_GET_HOST_GROUP_ID_ENDPOINT, param)
@@ -1049,7 +1049,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
             ioc_infos.extend(response["resources"])
@@ -1057,7 +1057,7 @@ class CrowdstrikeConnector(BaseConnector):
             offset = response["meta"]["pagination"]["offset"]
             total = response["meta"]["pagination"]["total"]
 
-            if (total):
+            if total:
                 self.send_progress(CROWDSTRIKE_COMPLETED, float(len(ioc_infos)) / float(total))
 
             if offset >= total:
@@ -1075,18 +1075,18 @@ class CrowdstrikeConnector(BaseConnector):
 
         summary_keys = ['ip', 'domain', 'sha1', 'md5', 'sha256']
 
-        if (data):
+        if data:
             data = dict(data)
-            if ('ipv4' in data):
+            if 'ipv4' in data:
                 data['ip'] = data.pop('ipv4')
-            if ('ipv6' in data):
+            if 'ipv6' in data:
                 data['ip'] = data.get('ip', [])
                 data['ip'].extend(data.pop('ipv6'))
 
             action_result.add_data(data)
 
             for key in summary_keys:
-                if (key not in data):
+                if key not in data:
                     action_result.update_summary({"total_" + key: 0})
                     continue
 
@@ -1103,7 +1103,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         resp = self._check_data(action_result, param)
 
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
 
         put_file_ids_list = self._get_ids(action_result, CROWDSTRIKE_RTR_ADMIN_GET_PUT_FILES, param)
@@ -1311,7 +1311,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device quarantined successfully")
@@ -1328,7 +1328,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device unquarantined successfully")
@@ -1345,7 +1345,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Host added successfully")
@@ -1362,7 +1362,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val = self._perform_device_action(action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Host removed successfully")
@@ -1378,7 +1378,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RTR_SESSION_ENDPOINT, json=params, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
@@ -1401,7 +1401,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RTR_SESSION_ENDPOINT, params=params, method='delete')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
@@ -1418,7 +1418,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         resp = self._check_data(action_result, param)
 
-        if (phantom.is_fail(resp)):
+        if phantom.is_fail(resp):
             return action_result.get_status()
         session_id_list = self._get_ids(action_result, CROWDSTRIKE_GET_RTR_SESSION_ID_ENDPOINT, param)
 
@@ -1469,7 +1469,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RUN_COMMAND_ENDPOINT, json=params, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         try:
@@ -1497,7 +1497,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT, json=params, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         try:
@@ -1546,7 +1546,7 @@ class CrowdstrikeConnector(BaseConnector):
             }
             ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
             # check if command has completed
@@ -1562,7 +1562,7 @@ class CrowdstrikeConnector(BaseConnector):
                         }
                         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
-                        if (phantom.is_fail(ret_val)):
+                        if phantom.is_fail(ret_val):
                             return action_result.get_status()
 
                         action_result.add_data(resp_json)
@@ -1593,7 +1593,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_RTR_FILES_ENDPOINT, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if len(resp_json.get("resources", [])) == 0:
@@ -1619,7 +1619,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(vault_results)
@@ -1657,7 +1657,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RTR_ADMIN_PUT_FILES, headers=headers, data=multipart_data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
@@ -1676,7 +1676,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
@@ -1707,24 +1707,24 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_BASE_ENDPOINT, params=self._parameters)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         meta = resp.get('meta')
-        if (not meta):
+        if not meta:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_META_KEY_EMPTY)
 
         # Extract values that we require for other calls
         resources = resp.get('resources')
-        if (not resources):
+        if not resources:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
-        if (not self._data_feed_url):
+        if not self._data_feed_url:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_DATAFEED_EMPTY)
 
         session_token = resources[0].get('sessionToken')
-        if (not session_token):
+        if not session_token:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND)
 
         self._token = session_token['token']
@@ -1765,10 +1765,10 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Connect to the server
-        if (phantom.is_fail(self._get_stream(action_result))):
+        if phantom.is_fail(self._get_stream(action_result)):
             return action_result.get_status()
 
-        if (self._data_feed_url is None):
+        if self._data_feed_url is None:
             return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
 
         config = self.get_config()
@@ -1783,7 +1783,7 @@ class CrowdstrikeConnector(BaseConnector):
         if merge_time_interval is None:
             return action_result.get_status()
 
-        if (self.is_poll_now()):
+        if self.is_poll_now():
             # Manual Poll Now
             try:
                 self.debug_print("Validating 'max_events_poll_now' asset configuration parameter")
@@ -1804,7 +1804,7 @@ class CrowdstrikeConnector(BaseConnector):
                 max_events = DEFAULT_EVENTS_COUNT
 
         lower_id = 0
-        if (not self.is_poll_now()):
+        if not self.is_poll_now():
             # we only mange the ids in case of on_poll on the interval
             # For POLL NOW always start on 0
             # lower_id = int(self._get_lower_id())
@@ -1830,7 +1830,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, self._get_error_message_from_exception(e))
 
         # Handle any errors
-        if (r.status_code != requests.codes.ok):  # pylint: disable=E1101
+        if r.status_code != requests.codes.ok:  # pylint: disable=E1101
             resp_json = r.json()
             try:
                 err_message = resp_json['errors'][0]['message']
@@ -1871,7 +1871,7 @@ class CrowdstrikeConnector(BaseConnector):
                 resp_data += chunk
                 ret_val, resp_data = self._parse_resp_data(resp_data)
 
-                if (phantom.is_fail(ret_val)):
+                if phantom.is_fail(ret_val):
                     self.debug_print("On Poll failed for the chunk: ", chunk)
                     self.save_progress("On Poll failed for the chunk: ", chunk)
                     return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNABLE_TO_PARSE_DATA)
@@ -1910,11 +1910,11 @@ class CrowdstrikeConnector(BaseConnector):
             self.send_progress("Parsing the fetched DetectionSummaryEvents...")
             results = events_parser.parse_events(self._events, self, collate)
             self.save_progress("Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
-            if (results):
+            if results:
                 self.save_progress("Adding {0} event artifact{1}. Empty containers will be skipped.".format(len(results), 's' if len(results) > 1 else ''))
                 self._save_results(results, param)
                 self.send_progress("Done")
-            if (not self.is_poll_now()):
+            if not self.is_poll_now():
                 last_event = self._events[-1]
                 last_offset_id = last_event['metadata']['offset']
                 self._state['last_offset_id'] = last_offset_id + 1
@@ -1946,7 +1946,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         api_data = {
@@ -1957,7 +1957,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         resources = response.get("resources", [])
@@ -1981,7 +1981,7 @@ class CrowdstrikeConnector(BaseConnector):
         policy = param[CROWDSTRIKE_IOCS_POLICY]
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         api_data = {
@@ -2003,7 +2003,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=[api_data], method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "IOC Uploaded to create alert")
@@ -2016,7 +2016,7 @@ class CrowdstrikeConnector(BaseConnector):
         ioc = param[CROWDSTRIKE_JSON_IOC]
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
@@ -2039,7 +2039,7 @@ class CrowdstrikeConnector(BaseConnector):
             update_data["description"] = param[CROWDSTRIKE_IOCS_DESCRIPTION]
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_data, method="patch", params=api_data)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_UPDATE_ALERT)
@@ -2052,14 +2052,14 @@ class CrowdstrikeConnector(BaseConnector):
         ioc = param[CROWDSTRIKE_JSON_IOC]
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=api_data, method="delete")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
@@ -2288,7 +2288,7 @@ class CrowdstrikeConnector(BaseConnector):
         response obtained by making an API call
         """
         url = "{0}{1}".format(self._base_url_oauth, endpoint)
-        if (headers is None):
+        if headers is None:
             headers = {}
 
         token = self._state.get('oauth2_token', {})
@@ -2343,7 +2343,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
@@ -2357,7 +2357,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         self.debug_print("action_id ", self.get_action_identifier())
 
-        if (self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL):
+        if self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL:
             start_time = time.time()
             result = self._on_poll(param)
             end_time = time.time()
