@@ -239,12 +239,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         self._base_url_local = None
         self._platform = None
-        try:
-            self._base_url_local = self.get_phantom_base_url()
-            self._platform = "phantom"
-        except:
-            self._base_url_local = self.get_ims_base_url()
-            self._platform = "mc"
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -284,7 +278,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         if not error_text:
-            error_text = "Error message unavailable. Please check the asset configuration and|or the action parameters."
+            error_text = "Error message unavailable. Please check the connector configuration and|or the action parameters."
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
@@ -318,7 +312,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
             err = "Error:{0}, Error Description:{1}".format(
                     self._handle_py_ver_compat_for_input_str(resp_json.get('error')), self._handle_py_ver_compat_for_input_str(resp_json.get('error_description')))
-            err += " Please check your asset configuration parameters and run the test connectivity."
+            err += " Please check your connector configuration parameters and run the test connectivity."
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
@@ -402,17 +396,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     error_msg = e.args[0]
             else:
                 error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_msg = "Error message unavailable. Please check the connector configuration and|or action parameters."
         except:
             error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the connector configuration and|or action parameters."
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Windows server. Please check the connector configuration and|or the action parameters."
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = "Error message unavailable. Please check the connector configuration and|or action parameters."
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -431,7 +425,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if headers is None:
             headers = {}
-        
+
         if not self._admin_consent:
             token_data = {
                 'client_id': self._client_id,
@@ -600,7 +594,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :param data: Data to send in REST call
         :return: status status_strings.APP_ERROR/status_strings.APP_SUCCESS
         """
-        
+
         req_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, DEFENDERATP_SERVER_TOKEN_URL.format(tenant_id=self._tenant))
 
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=req_url,
@@ -670,10 +664,13 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DEFENDERATP_MAKING_CONNECTION_MSG)
 
-        if not self._admin_consent:
-            if not self._state:
-                self._state = {}
+        if not self._state:
+            self._state = {}
 
+        if not self._admin_consent:
+            if self._platform == "mc":
+                # Only non-interactive oauth supported for MC
+                return action_result.set_status(status_strings.APP_ERROR, status_message="Please checkmark the Admin Consent Already Provided configuration parameter")
             # Get initial REST URL
             ret_val, app_rest_url = self._get_app_rest_url(action_result)
             if status_strings.is_fail(ret_val):
@@ -726,11 +723,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
             _save_app_state(self._state, self.get_asset_id(), self)
 
             self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
-        
+
         if self._admin_consent:
             data = {
                 'client_id': self._client_id,
-                'scope': DEFENDERATP_DEFAULT_SCOPE,
+                'resource': DEFENDERATP_RESOURCE_URL,
                 'client_secret': self._client_secret,
                 'grant_type': 'client_credentials',
             }
@@ -1355,7 +1352,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         self._state = self.load_state()
 
-        # get the asset config
+        # get the connector config
         config = self.get_config()
 
         self._tenant = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_TENANT_ID])
@@ -1364,6 +1361,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
         self._admin_consent = config.get('admin_consent')
+        try:
+            self._base_url_local = self.get_phantom_base_url()
+            self._platform = "phantom"
+        except:
+            self._base_url_local = self.get_ims_base_url()
+            self._platform = "mc"
 
         return status_strings.APP_SUCCESS
 
