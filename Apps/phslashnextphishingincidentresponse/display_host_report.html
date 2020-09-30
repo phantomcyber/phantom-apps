@@ -168,12 +168,7 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 			{% if result.data.1.errorNo == 0 %} <!-- Host Report or URL Scan Sync success condition -->
 
-			{% if result.data.1.normalizeData.normalizeStatus == 1 %}
-			<h3 class="mb-5">host = {{result.param.host}}<em class="cr-blue1">*</em></h3>
-			<h3 class="mb-5 cr-blue1">*{{result.data.1.normalizeData.normalizeMessage}}</h3>
-			{% else %}
 			<h3 class="mb-5">host = {{result.param.host}}</h3>
-			{% endif %}
 
 			{% if result.data.1.urlData %} <!-- URL Scan Sync is executed condition -->
 			<div class="blockDiv">

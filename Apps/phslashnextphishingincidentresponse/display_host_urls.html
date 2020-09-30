@@ -108,11 +108,6 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 			{% if result.data.errorNo == 0 %} <!-- Host report success condition -->
 
-			{% if result.data.normalizeData.normalizeStatus == 1 %}
-			<!--h3 class="mb-5">host = {{result.param.host}}<em class="cr-blue1">*</em></h3-->
-			<h3 class="mb-5 cr-blue1">*{{result.data.normalizeData.normalizeMessage}}</h3>
-			{% endif %}
-
 			{% if result.data.urlDataList.0.threatData.verdict == "Unrated, No Intel Found" %} <!-- No related URLs found -->
 			<h3 class="mb-5">No entries found.</h3>
 			{% else %} <!-- Certain related URLs found -->
