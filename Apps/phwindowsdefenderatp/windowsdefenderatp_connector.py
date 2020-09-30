@@ -668,9 +668,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
             self._state = {}
 
         if not self._admin_consent:
-            if self._platform == "mc":
-                # Only non-interactive oauth supported for MC
-                return action_result.set_status(status_strings.APP_ERROR, status_message="Please checkmark the Admin Consent Already Provided configuration parameter")
             # Get initial REST URL
             ret_val, app_rest_url = self._get_app_rest_url(action_result)
             if status_strings.is_fail(ret_val):
@@ -1360,7 +1357,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_SECRET])
-        self._admin_consent = config.get('admin_consent')
+        self._admin_consent = config.get('admin_consent', True)
         try:
             self._base_url_local = self.get_phantom_base_url()
             self._platform = "phantom"

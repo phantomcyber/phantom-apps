@@ -45,12 +45,6 @@
             "data_type": "password",
             "required": true,
             "order": 3
-        },
-        "admin_consent": {
-            "description": "Admin Consent Already Provided",
-            "data_type": "boolean",
-            "default": true,
-            "order": 4
         }
     },
     "actions": [
