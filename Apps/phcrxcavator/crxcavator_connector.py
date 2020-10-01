@@ -19,6 +19,7 @@ import json
 from bs4 import BeautifulSoup
 import re
 
+
 class RetVal(tuple):
 
     def __new__(cls, val1, val2=None):
@@ -194,23 +195,20 @@ class CrxcavatorConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/', action_result, params=None, headers=None)
         print(response)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.get_status()
+            return action_result.set_status(phantom.APP_ERROR, response)
 
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def major_minor_micro_patch(self, version):
         # pad the numbers
-        if not re.search('(\d+)\.', version):
+        if not re.search(r'(\d+)\.', version):
             version += '.0.0.0'
-        elif not re.search('(\d+)\.(\d+)\.', version):
+        elif not re.search(r'(\d+)\.(\d+)\.', version):
             version += '.0.0'
-        elif not re.search('(\d+)\.(\d+)\.(\d+)\.', version):
+        elif not re.search(r'(\d+)\.(\d+)\.(\d+)\.', version):
             version += '.0'
-        major, minor, micro, patch = re.search('(\d+)\.(\d+)\.(\d+)\.(\d+)', version).groups()
+        major, minor, micro, patch = re.search(r'(\d+)\.(\d+)\.(\d+)\.(\d+)', version).groups()
         return int(major), int(minor), int(micro), int(patch)
 
     def _handle_extension_metadata(self, param):
@@ -307,7 +305,7 @@ class CrxcavatorConnector(BaseConnector):
         version = response.get('version')
         code = response.get('code')
 
-        summary = action_result.update_summary({"code": code, "extension_id": extension_id, "version": version})
+        action_result.update_summary({"code": code, "extension_id": extension_id, "version": version})
 
         return action_result.set_status(phantom.APP_SUCCESS, response['message'])
 
