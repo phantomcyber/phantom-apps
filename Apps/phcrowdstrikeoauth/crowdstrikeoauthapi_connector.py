@@ -397,6 +397,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        self._state = dict()
         # initially set the token for first time
         ret_val = self._get_token(action_result)
 
