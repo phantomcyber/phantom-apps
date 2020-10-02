@@ -13,6 +13,13 @@ PHANTOM_VAULT_DIR = "/opt/phantom/vault/tmp/"
 #
 MAX_PER_PAGE = 50
 DEFAULT_MAX_DOWNLOADED_RESULTS = 150
+
+# By default, client applications can make 25 requests to Cofense Triage within
+# a five-minute interval using the Cofense Triage API.
+#
+# This constant is used as a default value when the Cofense Triage API does not
+# explicitly respond with the X-RateLimit-Remaining header.
+DEFAULT_COFENSE_TRIAGE_RATE_LIMIT = 25
 #
 ENDPOINT_TYPE_VALUES = {
     "/reports": [ "all", "reports", "all reports"],
