@@ -1155,6 +1155,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
                     if utils.is_sha1(input) or utils.is_sha256(input) or utils.is_md5(input):
                         # For upper case file hash, API returns empty list. To handle that, converting file hash to lowercase.
                         input = input.lower()
+                        action_result.update_param({DEFENDERATP_JSON_INPUT: input})
                         endpoint = DEFENDERATP_FILE_MACHINES_ENDPOINT.format(input=input)
                     else:
                         return action_result.set_status(status_strings.APP_ERROR, DEFENDERATP_PARAM_VALIDATION_FAILED_MSG
