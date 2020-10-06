@@ -1,12 +1,6 @@
 # File: urlhaus_connector.py
 # Copyright (c) 2020 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
