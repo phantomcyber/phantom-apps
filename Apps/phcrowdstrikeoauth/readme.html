@@ -4,18 +4,18 @@
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
-<h2 id="appid">Preprocess Script</h2>
+<h2>Preprocess Script</h2>
 <p>
 The user can add a script file in the configuration parameter [<b>Script with functions to preprocess containers and artifacts</b>]. The script must contain a function with the name <b>preprocess_container</b> (to pre-process the containers and the artifacts) or else, it will throw an error.
 </p>
 
-<h2 id="appid">App ID</h2>
+<h2>App ID</h2>
 <ul>
- <li>Optionally, you can specify an <b>App ID</b> to be used with the Streaming API used in the on poll action. If one isn't set, it will default to the asset id.</li>
- <li>It is recommended to have a unique <b>App ID</b> for each connection to the Streaming API. That is to say, if you are planning on having multiple assets using the Streaming API at once, you should give them unique App IDs.</li>
+ <li>Optionally, you can specify an <b>App ID</b> to be used with the Crowdstrike OAuth API used in the on poll action. If one isn't set, it will default to the asset id.</li>
+ <li>It is recommended to have a unique <b>App ID</b> for each connection to the Crowdstrike OAuth API. That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at once, you should give them unique App IDs.</li>
 </ul>
 
-<h2 id="appid">On Poll</h2>
+<h2>On Poll</h2>
  <ul>
      <li>Common points for both manual and scheduled interval polling
          <ul>
@@ -114,7 +114,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
 <p>Each of the sub-events has a CEF key called <b>parentSdi</b> that stands for Parent Source Data Identifier. This is the value of the SDI of the main event that the sub-events were generated from.</p>
 
 
-<h2 id="appid">Notes</h2>
+<h2>Notes</h2>
   <li><b>Action -</b> List Groups</li>
     <ul>
       <li>
@@ -125,7 +125,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
       </li>
     </ul>
   <br>
-  <li><b>Action -</b> Query Devices</li>
+  <li><b>Action -</b> Query Device</li>
     <ul>
       <li>
         Both the filter and sort parameters follow the same concepts as mentioned above for the list groups action.
@@ -138,7 +138,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
           The devices will be fetched based on the values provided in both the device_id and hostname parameters.
         </li>
         <li>
-          If any incorrect value is provided in both the device_id and hostname parameters each, then, the action will fail with an appropriate error message.
+          If an incorrect value is provided in both the device_id and hostname parameters each, then, the action will fail with an appropriate error message.
         </li>
       </ul>
   <li><b>Action -</b> Run Command, Run Admin Command, List Session Files, Get Session File</li>

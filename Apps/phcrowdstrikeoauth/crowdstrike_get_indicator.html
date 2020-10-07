@@ -114,7 +114,11 @@
                                 <th>Value</th>
                                 <th>Policy</th>
                                 <th>Share Level</th>
+                                <th>Source</th>
+                                <th>Description</th>
                                 <th>Created By</th>
+                                <th>Created Timestamp</th>
+                                <th>Expiration Timestamp</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,7 +129,11 @@
                                         <td>{{ resource.value }}</td>
                                         <td>{{ resource.policy }}</td>
                                         <td>{{ resource.share_level }}</td>
+                                        <td>{{ resource.source }}</td>
+                                        <td>{{ resource.description }}</td>
                                         <td>{{ resource.created_by }}</td>
+                                        <td>{{ resource.created_timestamp }}</td>
+                                        <td>{{ resource.modified_timestamp }}</td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}

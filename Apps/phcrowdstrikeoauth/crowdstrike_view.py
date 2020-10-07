@@ -207,6 +207,13 @@ def display_view(provides, all_app_runs, context):
     if provides == 'get user roles':
         return 'crowdstrike_get_user_roles.html'
 
+    if provides in ['upload indicator', 'delete indicator']:
+        return 'crowdstrike_upload_indicator.html'
+
+    if provides == 'update indicator':
+        return 'crowdstrike_update_indicator.html'
+
+
 def hunt_view(provides, all_app_runs, context):
 
     context['results'] = results = []
@@ -219,7 +226,7 @@ def hunt_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     # print context
-    return 'hunt_view.html'
+    return 'crowdstrike_hunt_view.html'
 
 
 def set_status_view(provides, all_app_runs, context):
@@ -234,7 +241,7 @@ def set_status_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     # print context
-    return 'set_status_view.html'
+    return 'crowdstrike_set_status_view.html'
 
 
 def process_list_view(provides, all_app_runs, context):
@@ -249,4 +256,4 @@ def process_list_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     # print context
-    return 'process_list_view.html'
+    return 'crowdstrike_process_list_view.html'
