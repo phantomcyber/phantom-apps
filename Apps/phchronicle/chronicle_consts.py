@@ -100,4 +100,4 @@ GC_TIME_PARAM_ERROR += "in the start time and end time action parameters accordi
 GC_INT_RANGE_CONFIDENCE_ERROR = "Please provide exactly 2 positive integer values as comma-separated string in '{0}' parameter(s)."
 GC_ON_POLL_INVALID_TIME_ERROR = "Please provide valid time related parameters "
 GC_ON_POLL_INVALID_TIME_ERROR += "('Time range for POLL NOW' or 'Start time for the scheduled/interval POLL') for the ingestion action."
-GC_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. Reseting the state file with the default format. Please try again."
+GC_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again."
