@@ -52,15 +52,6 @@
             }
         ]
     },
-    "configuration": {
-        "update_days": {
-            "data_type": "numeric",
-            "order": 0,
-            "description": "Update the tld list once every N days",
-            "value": "14",
-            "required": true
-        }
-    },
     "actions": [
         {
             "action": "test connectivity",
