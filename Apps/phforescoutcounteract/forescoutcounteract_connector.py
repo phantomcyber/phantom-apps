@@ -353,9 +353,9 @@ class ForescoutCounteractConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['host_ip'] = response['host']['ip']
-        summary['host_mac'] = response['host']['mac']
-        summary['host_id'] = response['links']['href'].split('/')[-1]
+        summary['host_ip'] = response.get('host', {}).get('ip', 'missing')
+        summary['host_mac'] = response.get('host', {}).get('mac', 'missing')
+        summary['host_id'] = response.get('host', {}).get('id', 'missing')
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
