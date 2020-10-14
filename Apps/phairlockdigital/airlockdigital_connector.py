@@ -1,14 +1,15 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: airlockdigital_connector.py
+# Copyright (c) 2019-2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from airlockdigital_consts import *
+# This connector imports
+from airlockdigital_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -159,7 +160,7 @@ class AirlockDigitalConnector(BaseConnector):
             "X-APIKey": api_key
         }
 
-        url = '/license/get'
+        url = AIRLOCK_LICENSE_GET_ENDPOINT
         self.save_progress("Connecting to endpoint")
         # make rest call
         ret_val, response = self._make_rest_call(url, action_result, params=None, headers=header_var, method="post")
@@ -203,13 +204,13 @@ class AirlockDigitalConnector(BaseConnector):
 
         if (blocklistid == "" or None):
             self.save_progress("No blocklistid was specified, removing hash(es) from all blocklist packages")
-            url = '/hash/blocklist/remove/all'
+            url = AIRLOCK_HASH_BLOCKLIST_REMOVE_ALL_ENDPOINT
             request_json = {
                 "hashes": [param['hash']]
             }
         else:
             self.save_progress("Removing hash(es) from specified blocklist packages")
-            url = '/hash/blocklist/remove'
+            url = AIRLOCK_HASH_BLOCKLIST_REMOVE_ENDPOINT
             request_json = {
                 "hashes": [param['hash']],
                 "blocklistid": blocklistid
@@ -270,13 +271,13 @@ class AirlockDigitalConnector(BaseConnector):
 
         if (applicationid == "" or None):
             self.save_progress("No applicationid was specified, removing hash(es) from all application capture packages")
-            url = '/hash/application/remove/all'
+            url = AIRLOCK_HASH_APPLICATION_REMOVE_ALL_ENDPOINT
             request_json = {
                 "hashes": [param['hash']]
             }
         else:
             self.save_progress("Removing hash(es) from specified application capture packages")
-            url = '/hash/application/remove'
+            url = AIRLOCK_HASH_APPLICATION_REMOVE_ENDPOINT
             request_json = {
                 "hashes": [param['hash']],
                 "applicationid": applicationid
@@ -332,7 +333,7 @@ class AirlockDigitalConnector(BaseConnector):
             "X-APIKey": api_key
         }
 
-        url = '/hash/blocklist/add'
+        url = AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT
         # Required values can be accessed directly
         request_json = {
             "hashes": [param['hash']],
@@ -345,7 +346,7 @@ class AirlockDigitalConnector(BaseConnector):
         url_req.append({'url': url, 'header_var': header_var, 'request_type': 'blocklist'})
 
         # Make the request for each
-        self.save_progress("Sending hash value to /hash/blocklist/add")
+        self.save_progress("Sending hash value to AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT")
         ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
@@ -390,7 +391,7 @@ class AirlockDigitalConnector(BaseConnector):
         }
 
         # We first need to populate the hash value into the airlock file repository, so it can be added into an appcap
-        url = '/hash/add'
+        url = AIRLOCK_HASH_ADD_ENDPOINT
 
         # Required values can be accessed directly
         request_json = {
@@ -407,7 +408,7 @@ class AirlockDigitalConnector(BaseConnector):
         self.save_progress("Populating the Airlock repository with the specified hash value and path")
         ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
 
-        url2 = '/hash/application/add'
+        url2 = AIRLOCK_HASH_APPLICATION_ADD_ENDPOINT
         # Required values can be accessed directly
         request_json = {
             "hashes": [param['hash']],
@@ -468,22 +469,22 @@ class AirlockDigitalConnector(BaseConnector):
 
         # If policy type is blocklist
         if policy_type == 'blocklist':
-            url = '/blocklist'
+            url = AIRLOCK_BLOCKLIST_ENDPOINT
             req_method = "post"
 
         # If policy type is baseline
         elif policy_type == 'baseline':
-            url = '/baseline'
+            url = AIRLOCK_BASELINE_ENDPOINT
             req_method = "post"
 
         # If policy type is application
         elif (policy_type == 'application'):
-            url = '/application'
+            url = AIRLOCK_APPLICATION_ENDPOINT
             req_method = "post"
 
         # If policy type is group
         elif (policy_type == 'group'):
-            url = '/group'
+            url = AIRLOCK_GROUP_ENDPOINT
             req_method = "post"
 
         else:
@@ -558,7 +559,7 @@ class AirlockDigitalConnector(BaseConnector):
         }
 
         # URL Group Request
-        url = '/group/policies'
+        url = AIRLOCK_GROUP_POLICIES_ENDPOINT
 
         # Put the group ID to request in the JSON blody
         json_body = {"groupid": group_id}
@@ -605,7 +606,7 @@ class AirlockDigitalConnector(BaseConnector):
         }
 
         # URL Group Request
-        url = '/agent/move'
+        url = AIRLOCK_AGENT_MOVE_ENDPOINT
 
         # Group ID Parameter
         group_id = param['group_id']
@@ -696,12 +697,12 @@ class AirlockDigitalConnector(BaseConnector):
         if len(param_var.keys()) >= 1:
             if param_var["hostname"] != "all":
                 self.save_progress("Requested parameters: {}".format(param_var))
-                ret_val, response = self._make_rest_call('/agent/find', action_result, json=param_var, headers=header_var, method="post")
+                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, json=param_var, headers=header_var, method="post")
             else:
                 param_var.pop('hostname')
                 self.save_progress("Requested parameters: {}".format(param_var))
                 self.save_progress("All has been specified in hostname, so returning all hosts")
-                ret_val, response = self._make_rest_call('/agent/find', action_result, headers=header_var, method="post")
+                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -753,7 +754,7 @@ class AirlockDigitalConnector(BaseConnector):
         # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # make rest call
-        ret_val, response = self._make_rest_call('/otp/revoke', action_result, params=param_var, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(AIRLOCK_OTP_REVOKE_ENDPOINT, action_result, params=param_var, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -810,7 +811,7 @@ class AirlockDigitalConnector(BaseConnector):
         }
 
         # make rest call
-        ret_val, response = self._make_rest_call('/otp/retrieve', action_result, params=param_var, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(AIRLOCK_OTP_RETRIEVE_ENDPOINT, action_result, params=param_var, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -866,7 +867,7 @@ class AirlockDigitalConnector(BaseConnector):
         data_var = json.dumps(data_var)
 
         # make rest call
-        ret_val, response = self._make_rest_call('/hash/query', action_result, headers=header_var, method="post", data=data_var)
+        ret_val, response = self._make_rest_call(AIRLOCK_HASH_QUERY_ENDPOINT, action_result, headers=header_var, method="post", data=data_var)
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
