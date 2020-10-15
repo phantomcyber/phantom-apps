@@ -1319,8 +1319,7 @@ class TaniumThreatResponseConnector(BaseConnector):
             self.save_progress('Upload intel document failed')
             return action_result.get_status()
 
-        # TODO: add data
-        # action_result.add_data({})
+        action_result.add_data(response)
 
         action_result.update_summary({'total_results': len(response)})
 
