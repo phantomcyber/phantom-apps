@@ -1309,15 +1309,14 @@ class TaniumThreatResponseConnector(BaseConnector):
         '''
 
         headers = {
-            'type': 'openioc'
+            'Content-Type': 'application/xml'
         }
 
-        data = {
-            'intelDoc': UnicodeDammit(param['intel_doc']).unicode_markup.encode('utf-8')
-        }
+        # data = UnicodeDammit(param['intel_doc']).unicode_markup.encode('utf-8')
+        data = param['intel_doc']
 
         endpoint = '/plugin/products/detect3/api/v1/intels'
-        ret_val, response = self._make_rest_call_helper(endpoint, action_result, headers=headers, json=data, method='post')
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, headers=headers, data=data, method='post')
 
         if phantom.is_fail(ret_val):
             self.save_progress('Upload intel document failed')
