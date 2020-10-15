@@ -3096,7 +3096,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.intelDocId",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "contains": [
                         "threatresponse intel doc id"
@@ -3175,6 +3175,110 @@
                 {
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start quick scan",
+            "identifier": "start_quick_scan",
+            "description": "Scan a computer group for hashes in intel document",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "intelDocId": {
+                    "description": "The ID of an intel document",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                "computerGroupId": {
+                    "description": "The ID of a Tanium computer group",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "tanium computer group id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intelDocId",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.computerGroupId",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium computer group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerGroupId",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium computer group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.revisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.questionId",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary",

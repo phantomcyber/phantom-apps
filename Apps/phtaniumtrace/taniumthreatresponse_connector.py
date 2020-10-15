@@ -1306,7 +1306,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        '''
+        ''' future TODO: file ingestion
         vault_id = param['vault_id']
         file_path = Vault.get_file_path(vault_id)
         data = open(file_path, 'rb').read()
@@ -1316,7 +1316,6 @@ class TaniumThreatResponseConnector(BaseConnector):
             'Content-Type': 'application/xml'
         }
 
-        # data = UnicodeDammit(param['intel_doc']).unicode_markup.encode('utf-8')
         data = param['intel_doc']
 
         endpoint = '/plugin/products/detect3/api/v1/intels'
@@ -1328,10 +1327,38 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # action_result.update_summary({'total_results': len(response)})
-
         self.save_progress('Upload intel document successful')
         message = 'Uploaded intel document to Tanium Threat Response'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_start_quick_scan(self, param):
+        """ Scan a computer group for hashes in intel document.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        data = {
+            'intelDocId': param['intelDocId'],
+            'computerGroupId': param['computerGroupId']
+        }
+
+        endpoint = '/plugin/products/detect3/api/v1/quick-scans'
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, data=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Start quick scan failed')
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        self.save_progress('Start quick scan successful')
+        message = 'Started quick scan successfully'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def handle_action(self, param):
@@ -1369,7 +1396,8 @@ class TaniumThreatResponseConnector(BaseConnector):
             'save_file': self._handle_save_file,
             'delete_file': self._handle_delete_file,
             'get_file': self._handle_get_file,
-            'upload_intel_doc': self._handle_upload_intel_doc
+            'upload_intel_doc': self._handle_upload_intel_doc,
+            'start_quick_scan': self._handle_start_quick_scan
         }
 
         if action_id in supported_actions:
