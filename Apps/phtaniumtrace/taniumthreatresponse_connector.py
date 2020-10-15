@@ -1308,12 +1308,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         data = open(file_path, 'rb').read()
         '''
 
+        headers = {
+            'type': 'openioc'
+        }
+
         data = {
             'intelDoc': param['intel_doc']
         }
 
         endpoint = '/plugin/products/detect3/api/v1/intels'
-        ret_val, response = self._make_rest_call_helper(endpoint, action_result, json=data, method='post')
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, headers=headers, json=data, method='post')
 
         if phantom.is_fail(ret_val):
             self.save_progress('Upload intel document failed')
