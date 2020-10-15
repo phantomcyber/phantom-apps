@@ -3060,6 +3060,143 @@
                 "title": "Tanium Threat Response"
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "upload intel doc",
+            "identifier": "upload_intel_doc",
+            "description": "Upload intel document to Tanium Threat Response",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "intel_doc": {
+                    "description": "The text of the intel document",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "threatresponse intel doc"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intelDoc",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.revisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                      "openioc",
+                      "stix",
+                      "yara",
+                      "tanium-signal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.typeVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0",
+                        "2.3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intrinsicId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0",
+                        "2.3"
+                    ],
+                    "contains": [
+                      "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc file size"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.unresolvedAlertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Intel doc uploaded successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }

@@ -1290,6 +1290,41 @@ class TaniumThreatResponseConnector(BaseConnector):
         message = 'File downloaded to vault'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
+    def _handle_upload_intel_doc(self, param):
+        """ Upload intel document to Tanium Threat Response.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        '''
+        vault_id = param['vault_id']
+        file_path = Vault.get_file_path(vault_id)
+        data = open(file_path, 'rb').read()
+        '''
+
+        data = param['intel_doc']
+
+        endpoint = '/plugin/products/detect3/api/v1/intels'
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, data=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Upload intel document failed')
+            return action_result.get_status()
+
+        #action_result.add_data({})
+
+        action_result.update_summary({'total_results':len(response)})
+
+        self.save_progress('Upload intel document successful')
+        message = 'Uploaded intel document to Tanium Threat Response'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -1324,7 +1359,8 @@ class TaniumThreatResponseConnector(BaseConnector):
             'list_files': self._handle_list_files,
             'save_file': self._handle_save_file,
             'delete_file': self._handle_delete_file,
-            'get_file': self._handle_get_file
+            'get_file': self._handle_get_file,
+            'upload_intel_doc': self._handle_upload_intel_doc
         }
 
         if action_id in supported_actions:
