@@ -43,14 +43,14 @@ key_to_name = dict()
 
 
 def _get_value(in_dict, in_key, def_val=None, strip_it=True):
-    if (in_key not in in_dict):
+    if in_key not in in_dict:
         return def_val
 
     try:
         if (type(in_dict[in_key]) != str) and (type(in_dict[in_key]) != unicode):
             return in_dict[in_key]
     except:
-        if (type(in_dict[in_key]) != str):
+        if type(in_dict[in_key]) != str:
             return in_dict[in_key]
 
     value = in_dict[in_key].strip() if (strip_it) else in_dict[in_key]
@@ -62,15 +62,15 @@ def _set_cef_key(src_dict, src_key, dst_dict, dst_key, move=False):
     src_value = _get_value(src_dict, src_key)
 
     # Ignore if None
-    if (src_value is None):
+    if src_value is None:
         return False
 
-    if (src_value == 'N/A'):
+    if src_value == 'N/A':
         return False
 
     dst_dict[dst_key] = src_value
 
-    if (move):
+    if move:
         del src_dict[src_key]
 
     return True
@@ -95,7 +95,7 @@ def _set_cef_key_list(event_details, cef):
     _set_cef_key(event_details, 'DetectId', cef, 'detectId')
     _set_cef_key(event_details, 'FalconHostLink', cef, 'falconHostLink')
 
-    if ('CommandLine' in event_details):
+    if 'CommandLine' in event_details:
         cef['cs1Label'] = 'cmdLine'
         _set_cef_key(event_details, 'CommandLine', cef, 'cs1')
         _set_cef_key(event_details, 'CommandLine', cef, 'cmdLine', move=True)
@@ -161,7 +161,7 @@ def _collate_results(detection_events):
 
                 artifacts_ret = _create_artifacts_from_event(detection_event)
 
-                if (artifacts_ret):
+                if artifacts_ret:
                     artifacts.extend(artifacts_ret)
 
     return results
@@ -178,12 +178,12 @@ def _convert_to_cef_dict(output_dict, input_dict):
     for k, v in input_dict_items:
         new_key_name = k[:1].lower() + k[1:]
         output_dict[new_key_name] = v
-        if (new_key_name.lower().endswith('time')):
+        if new_key_name.lower().endswith('time'):
             time_keys.append(new_key_name)
 
     for curr_item in time_keys:
         v = output_dict.get(curr_item)
-        if (not v):
+        if not v:
             continue
         try:
             time_epoch = int(v)
@@ -205,11 +205,11 @@ def _set_cef_types(artifact, cef):
         cef_items = cef.items()
     for k, v in cef_items:
 
-        if (k.lower().endswith('filename')):
+        if k.lower().endswith('filename'):
             cef_types[k] = ['file name']
             continue
 
-        if (k.lower().endswith('domainname')):
+        if k.lower().endswith('domainname'):
             cef_types[k] = ['domain']
             continue
 
@@ -218,19 +218,19 @@ def _set_cef_types(artifact, cef):
         except:
             util_items = ph_utils.CONTAINS_VALIDATORS.items()
         for contains, function in util_items:
-            if (contains in IGNORE_CONTAINS_VALIDATORS):
+            if contains in IGNORE_CONTAINS_VALIDATORS:
                 continue
             try:
                 v_str = str(v)
             except UnicodeEncodeError:
                 # None of these contains should match if there is a unicode characters in it
                 continue
-            if (function(v_str)):
+            if function(v_str):
                 cef_types[k] = [contains]
                 # it's ok to add only one contains
                 break
 
-    if (not cef_types):
+    if not cef_types:
         return False
 
     artifact['cef_types'] = cef_types
@@ -244,12 +244,12 @@ def _get_artifact_name(key_name):
     # There should be a regex based way of replacing a Capital with '<space><CaP>'
     artifact_name = key_to_name.get(key_name, '')
 
-    if (artifact_name):
+    if artifact_name:
         return artifact_name
 
     for curr_char in key_name:
 
-        if (curr_char.isupper()):
+        if curr_char.isupper():
             artifact_name += ' '
 
         artifact_name += curr_char
@@ -265,7 +265,7 @@ def _create_dict_hash(input_dict):
 
     input_dict_str = None
 
-    if (not input_dict):
+    if not input_dict:
         return None
 
     try:
@@ -285,14 +285,14 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
     """
 
     # check if there is any data that can be parsed
-    if (key_name not in input_dict):
+    if key_name not in input_dict:
         return 0
 
     parent_sdi = parent_artifact['source_data_identifier']
     input_list = input_dict[key_name]
 
     # make it into a list
-    if (type(input_list) != list):
+    if type(input_list) != list:
         input_list = [input_list]
 
     artifact_name = _get_artifact_name(key_name)
@@ -306,7 +306,7 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
         artifact['cef'] = cef = dict()
         _convert_to_cef_dict(cef, curr_item)
 
-        if (not cef):
+        if not cef:
             continue
 
         cef['parentSdi'] = parent_sdi
@@ -339,14 +339,14 @@ def _create_artifacts_from_event(event):
     # convert any remaining keys in the event_details to follow the cef naming conventions
     _convert_to_cef_dict(cef, event_details)
 
-    if (cef):
-        if (event_metadata):
+    if cef:
+        if event_metadata:
             # add the metadata as is, it already contains the keys in cef naming conventions
             cef.update(event_metadata)
 
     artifact['data'] = event
 
-    if (not cef):
+    if not cef:
         return []
 
     artifacts = list()
@@ -380,13 +380,13 @@ def parse_events(events, base_connector, collate):
     # extract the type == 'DetectionSummaryEvent' events
     detection_events = [x for x in events if x['metadata']['eventType'] == 'DetectionSummaryEvent']
 
-    if (not detection_events):
+    if not detection_events:
         base_connector.save_progress("Did not match any events of type: DetectionSummaryEvent")
         return results
 
     base_connector.save_progress("Got {0} events of type DetectionSummaryEvent".format(len(detection_events)))
 
-    if (collate):
+    if collate:
         return _collate_results(detection_events)
 
     for i, curr_event in enumerate(detection_events):
@@ -401,7 +401,7 @@ def parse_events(events, base_connector, collate):
         ingest_event = dict()
         results.append(ingest_event)
 
-        if (creation_time):
+        if creation_time:
             creation_time = _get_str_from_epoch(creation_time)
 
         # Create the container

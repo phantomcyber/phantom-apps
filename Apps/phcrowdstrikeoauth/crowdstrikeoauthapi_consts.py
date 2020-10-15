@@ -17,6 +17,15 @@ CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE = "state"
 PAYLOAD_SECURITY_API_KEY = 'api_key'
 CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
+CROWDSTRIKE_IOCS_EXPIRATION = "expiration"
+CROWDSTRIKE_IOCS_POLICY = "policy"
+CROWDSTRIKE_IOCS_SHARE_LEVEL = "share_level"
+CROWDSTRIKE_IOCS_SOURCE = "source"
+CROWDSTRIKE_IOCS_DESCRIPTION = "description"
+CROWDSTRIKE_SEARCH_IOCS_TYPE = "indicator_type"
+CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION = "from_expiration"
+CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION = "to_expiration"
+CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
 
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
@@ -57,6 +66,14 @@ CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
 CROWDSTRIKE_ERR_EVENTS_FETCH = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
 CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
 CROWDSTRIKE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
+CROWDSTRIKE_SUCC_GET_ALERT = "Successfully retrieved alert"
+CROWDSTRIKE_SUCC_DELETE_ALERT = "Successfully deleted alert"
+CROWDSTRIKE_SUCC_UPDATE_ALERT = "Successfully updated alert"
+CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
+CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
+CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
+CROWDSTRIKE_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
