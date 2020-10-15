@@ -1328,7 +1328,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        #action_result.update_summary({'total_results': len(response)})
+        # action_result.update_summary({'total_results': len(response)})
 
         self.save_progress('Upload intel document successful')
         message = 'Uploaded intel document to Tanium Threat Response'
