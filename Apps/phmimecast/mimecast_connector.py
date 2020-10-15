@@ -183,6 +183,34 @@ class MimecastConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        try:
+            if not float(parameter).is_integer():
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+                return None
+            parameter = int(parameter)
+
+            if not allow_zero and parameter <= 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the {parameter} parameter".format(parameter=key))
+                return None
+            elif allow_zero and parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide zero or a valid positive integer value in the {parameter} parameter".format(parameter=key))
+                return None
+        except:
+            error_text = "Please provide zero or a valid positive integer value in the {parameter} parameter".format(parameter=key) if allow_zero else\
+                 "Please provide a valid non-zero positive integer value in the {parameter} parameter".format(parameter=key)
+            action_result.set_status(phantom.APP_ERROR, error_text)
+            return None
+
+        return parameter
+
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
         This method returns the encoded|original string based on the Python version.
@@ -600,9 +628,17 @@ class MimecastConnector(BaseConnector):
         uri = '/api/ttp/url/get-all-managed-urls'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
 
-        data = {'data': []}
+        data = {
+            'meta': {
+                'pagination': {
+                    'pageSize': 100
+                }
+            },
+            'data': [
+            ]
+        }
 
-        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._paginator(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -645,7 +681,13 @@ class MimecastConnector(BaseConnector):
         if data_object:
             data['data'].append(data_object)
 
-        ret_val, response = self._paginator(uri, action_result, limit=param.get('page_size'), headers=headers, method="post", data=data)
+        limit = param.get('page_size')
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
+
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -680,7 +722,13 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._paginator(uri, action_result, limit=param.get('page_size'), headers=headers, method="post", data=data)
+        limit = param.get('page_size')
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
+
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -702,7 +750,11 @@ class MimecastConnector(BaseConnector):
         uri = '/api/directory/get-group-members'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
         member = param.get('member')
-        search_type = param['type']
+        type_list = ['email', 'domain']
+        search_type = self._handle_py_ver_compat_for_input_str(param['type'])
+        if search_type:
+            if search_type not in type_list:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'type' parameter")
         if search_type == 'email':
             search_type = 'emailAddress'
 
@@ -822,7 +874,7 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": self._handle_py_ver_compat_for_input_str(param.get("id"))
                 }
             ]
         }
