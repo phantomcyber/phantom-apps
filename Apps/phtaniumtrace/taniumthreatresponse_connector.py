@@ -1313,7 +1313,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         }
 
         data = {
-            'intelDoc': param['intel_doc']
+            'intelDoc': UnicodeDammit(param['intel_doc']).unicode_markup.encode('utf-8')
         }
 
         endpoint = '/plugin/products/detect3/api/v1/intels'
