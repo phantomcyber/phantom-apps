@@ -1361,6 +1361,33 @@ class TaniumThreatResponseConnector(BaseConnector):
         message = 'Started quick scan successfully'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
+    def _handle_list_alerts(self, param):
+        """ List alerts with optional filtering.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = '/plugin/products/detect3/api/v1/alerts'
+        if param['query']:
+            endpoint += '?' + param['query'] + '&' + param['limit']
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('List alerts failed')
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        self.save_progress('List alerts successful')
+        message = 'Listed alerts successfully'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -1397,7 +1424,8 @@ class TaniumThreatResponseConnector(BaseConnector):
             'delete_file': self._handle_delete_file,
             'get_file': self._handle_get_file,
             'upload_intel_doc': self._handle_upload_intel_doc,
-            'start_quick_scan': self._handle_start_quick_scan
+            'start_quick_scan': self._handle_start_quick_scan,
+            'list_alerts': self._handle_list_alerts
         }
 
         if action_id in supported_actions:

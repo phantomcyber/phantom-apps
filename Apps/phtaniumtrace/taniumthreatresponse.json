@@ -3294,6 +3294,146 @@
                 "title": "Tanium Threat Response"
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "identifier": "list_alerts",
+            "description": "List alerts with optional filtering",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Query to filter alerts",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "The maximum number of alerts to return",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "default": 100
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                      "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocRevisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigRevisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "contains": [
+                      "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerIpAddress",
+                    "data_type": "string",
+                    "contains": [
+                      "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.matchType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }
