@@ -3089,7 +3089,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.intelDoc",
+                    "data_path": "action_result.parameter.intel_doc",
                     "data_type": "string",
                     "contains": [
                         "threatresponse intel doc"
@@ -3229,28 +3229,28 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.intelDocId",
+                    "data_path": "action_result.parameter.intel_doc_id",
                     "data_type": "string",
                     "contains": [
                         "threatresponse intel doc id"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.computerGroupId",
+                    "data_path": "action_result.parameter.computer_group_id",
                     "data_type": "string",
                     "contains": [
                         "tanium computer group id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.intelDocId",
+                    "data_path": "action_result.data.*.intel_doc_id",
                     "data_type": "string",
                     "contains": [
                         "threatresponse intel doc id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.computerGroupId",
+                    "data_path": "action_result.data.*.computer_group_id",
                     "data_type": "string",
                     "contains": [
                         "tanium computer group id"
