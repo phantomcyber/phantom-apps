@@ -3405,6 +3405,17 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.event_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                      "md5"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.alertedAt",
                     "data_type": "string"
                 },
