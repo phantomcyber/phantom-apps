@@ -1,0 +1,713 @@
+{
+    "appid": "ebcf0385-0494-4430-acfa-5e8afc51e05d",
+    "name": "URLhaus",
+    "description": "URLhaus is a project from abuse.ch with the goal of sharing malicious URLs that are being used for malware distribution.",
+    "type": "information",
+    "product_vendor": "abuse.ch",
+    "logo": "urlhaus.png",
+    "logo_dark": "urlhaus_dark.png",
+    "product_name": "URLhaus",
+    "python_version": "2",
+    "product_version_regex": ".*",
+    "publisher": "Drew Church",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-10-05T02:35:58.479347Z",
+    "package_name": "phantom_urlhaus",
+    "main_module": "urlhaus_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.1",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL for URLhaus API",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "https://urlhaus-api.abuse.ch/v1",
+            "order": 0
+        },
+        "api_key": {
+            "description": "API Key (Only required for submission)",
+            "data_type": "password",
+            "required": false,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup url",
+            "identifier": "lookup_url",
+            "description": "Check for the presence of a url in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.spamhaus_dbl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.surbl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.date_added",
+                    "data_type": "string",
+                    "column_name": "Date Added",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.larted",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.file_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.firstseen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.imphash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.response_md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.response_sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.response_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.signature",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.ssdeep",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.tlsh",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.urlhaus_download",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.virustotal.link",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.virustotal.percent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payloads.*.virustotal.result",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.query_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.takedown_time_seconds",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.threat",
+                    "data_type": "string",
+                    "column_name": "Threat",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.url_status",
+                    "data_type": "string",
+                    "column_name": "URL Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Check for the presence of an IP in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.spamhaus_dbl",
+                    "data_type": "string",
+                    "column_name": "Spamhaus DBL",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.surbl",
+                    "data_type": "string",
+                    "column_name": "SURBL",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.firstseen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.query_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.url_count",
+                    "data_type": "numeric",
+                    "column_name": "URL Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.date_added",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.larted",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.reporter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.takedown_time_seconds",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.threat",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup domain",
+            "identifier": "lookup_domain",
+            "description": "Check for the presence of a domain in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.spamhaus_dbl",
+                    "data_type": "string",
+                    "column_name": "Spamhaus DBL",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.blacklists.surbl",
+                    "data_type": "string",
+                    "column_name": "SURBL",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.firstseen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.query_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.url_count",
+                    "data_type": "numeric",
+                    "column_name": "URL Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.date_added",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.larted",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.reporter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.takedown_time_seconds",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.threat",
+                    "data_type": "string",
+                    "column_name": "Threat",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup hash",
+            "identifier": "lookup_hash",
+            "description": "Check for the presence of a hash in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "file_hash": {
+                    "description": "File Hash to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "hash"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256"
+                    ],
+                    "column_name": "file_hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.file_size",
+                    "data_type": "numeric",
+                    "column_name": "File Size",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.file_type",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.firstseen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.imphash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastseen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.md5_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ],
+                    "column_name": "MD5 Hash",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.query_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sha256_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ],
+                    "column_name": "SHA256 Hash",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.signature",
+                    "data_type": "string",
+                    "column_name": "Malware Signature",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.ssdeep",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlsh",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url_count",
+                    "data_type": "numeric",
+                    "column_name": "URL Count",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.urlhaus_download",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.firstseen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.lastseen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.urlhaus_reference",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.virustotal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.virustotal.link",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.virustotal.percent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.virustotal.result",
+                    "data_type": "string",
+                    "column_name": "Virus Total Summary",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
