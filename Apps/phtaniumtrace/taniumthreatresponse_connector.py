@@ -1374,9 +1374,12 @@ class TaniumThreatResponseConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = '/plugin/products/detect3/api/v1/alerts'
-        if param['query']:
-            endpoint += '?' + param['query'] + '&' + param['limit']
-        ret_val, response = self._make_rest_call_helper(endpoint, action_result)
+        params = {
+            'limit': param['limit']
+        }
+        for key in param.keys():
+            params[key] = param[key]
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
         if phantom.is_fail(ret_val):
             self.save_progress('List alerts failed')
