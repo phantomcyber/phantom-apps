@@ -1380,15 +1380,20 @@ class TaniumThreatResponseConnector(BaseConnector):
         for p in param['query'].split('&'):
             k = p.split('=')[0]
             v = p.split('=')[1]
-            params[k] = v
+            try:
+                params[k] = int(v)
+            except ValueError:
+                params[k] = v
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
         if phantom.is_fail(ret_val):
             self.save_progress('List alerts failed')
             return action_result.get_status()
 
-        for r in response:
-            action_result.add_data(r)
+        for alert in response:
+            details = json.loads(alert['details'])
+            alert['path'] = details['match']['properties']['full_path']
+            action_result.add_data(alert)
 
         action_result.update_summary({'total_alerts': len(response)})
 
