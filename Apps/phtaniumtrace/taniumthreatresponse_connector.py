@@ -1392,7 +1392,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         for alert in response:
             details = json.loads(alert['details'])
-            alert['path'] = details['match']['properties']['full_path']
+            alert['path'] = details['match']['properties']['fullpath']
             alert['event_type'] = details['match']['type']
             alert['md5'] = details['match']['properties']['md5']
             action_result.add_data(alert)
