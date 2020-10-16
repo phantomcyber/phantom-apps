@@ -1377,8 +1377,10 @@ class TaniumThreatResponseConnector(BaseConnector):
         params = {
             'limit': param['limit']
         }
-        for key in param.keys():
-            params[key] = param[key]
+        for p in param['query'].split('&'):
+            k = p.split('=')[0]
+            v = p.split('=')[1]
+            params[k] = v
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
         if phantom.is_fail(ret_val):
