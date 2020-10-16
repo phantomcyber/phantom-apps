@@ -3198,7 +3198,7 @@
             "type": "investigate",
             "read_only": true,
             "parameters": {
-                "intelDocId": {
+                "intel_doc_id": {
                     "description": "The ID of an intel document",
                     "data_type": "numeric",
                     "required": true,
@@ -3208,7 +3208,7 @@
                         "threatresponse intel doc id"
                     ]
                 },
-                "computerGroupId": {
+                "computer_group_id": {
                     "description": "The ID of a Tanium computer group",
                     "data_type": "numeric",
                     "required": true,
