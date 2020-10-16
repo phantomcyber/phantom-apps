@@ -1388,6 +1388,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         for r in response:
             action_result.add_data(r)
 
+        action_result.update_summary({'total_alerts': len(response)})
+
         self.save_progress('List alerts successful')
         message = 'Listed alerts successfully'
         return action_result.set_status(phantom.APP_SUCCESS, message)
