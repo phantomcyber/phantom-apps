@@ -1379,6 +1379,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         }
         for p in param['query'].split('&'):
             k = p.split('=')[0]
+            k = UnicodeDammit(k).unicode_markup.encode('utf-8')
             v = p.split('=')[1]
             try:
                 params[k] = int(v)
