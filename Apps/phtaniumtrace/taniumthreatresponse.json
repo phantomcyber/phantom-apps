@@ -3303,7 +3303,7 @@
             "read_only": true,
             "parameters": {
                 "query": {
-                    "description": "Query to filter alerts",
+                    "description": "Query to filter alerts (e.g. 'intelDocId=1&priority=high')",
                     "data_type": "string",
                     "required": true,
                     "primary": true,

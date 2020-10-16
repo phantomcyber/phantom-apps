@@ -1382,7 +1382,8 @@ class TaniumThreatResponseConnector(BaseConnector):
             self.save_progress('List alerts failed')
             return action_result.get_status()
 
-        action_result.add_data(response)
+        for r in response:
+            action_result.add_data(r)
 
         self.save_progress('List alerts successful')
         message = 'Listed alerts successfully'
