@@ -716,7 +716,9 @@ class CofenseTriageConnector(BaseConnector):
             if page_dir != "1st_page first":
                 desired_pages = reversed(desired_pages)
 
-            ratelimit = int(self._r.headers['X-RateLimit-Remaining'])
+            # Fallback to a default rate limit if the Cofense Triage API does
+            # not respond with the X-RateLimit-Remaining header.
+            ratelimit = int(self._r.headers.get('X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
 
             for page in desired_pages:
 
@@ -747,7 +749,7 @@ class CofenseTriageConnector(BaseConnector):
                 downloaded_results += response
                 downloaded_length = len(downloaded_results)
 
-                ratelimit = int(self._r.headers['X-RateLimit-Remaining'])
+                ratelimit = int(self._r.headers.get('X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
 
                 self.save_progress("Retrieved page {} with {} results. Retrieved {} of {} total results. {} limit of {} max results".format(
                     params['page'], len(response), downloaded_length, total_results, "Reached" if downloaded_length >= max_results else "Not at", max_results))
