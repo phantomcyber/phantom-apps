@@ -1344,8 +1344,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {
-            'intelDocId': param['intelDocId'],
-            'computerGroupId': param['computerGroupId']
+            'intelDocId': param['intel_doc_id'],
+            'computerGroupId': param['computer_group_id']
         }
 
         endpoint = '/plugin/products/detect3/api/v1/quick-scans'
