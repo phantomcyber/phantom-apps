@@ -41,7 +41,6 @@
             "description": "Username to authenticate with",
             "data_type": "string",
             "required": true,
-            "default": "",
             "order": 2
         },
         "password": {
@@ -1629,7 +1628,7 @@
             "read_only": true,
             "parameters": {
                 "page_size": {
-                    "description": "Number of results per page",
+                    "description": "Number of results to request",
                     "data_type": "numeric",
                     "order": 0
                 },
@@ -2206,18 +2205,12 @@
                 "start": {
                     "description": "YYYY-MM-DDTHH:MM:SS+0000 (Date and time of the earliest email to track)",
                     "data_type": "string",
-                    "order": 0,
-                    "example_values": [
-                        "2018-10-18T17:28:10+0000"
-                    ]
+                    "order": 0
                 },
                 "end": {
                     "description": "YYYY-MM-DDTHH:MM:SS+0000 (Date and time of the latest email to track)",
                     "data_type": "string",
-                    "order": 1,
-                    "example_values": [
-                        "2018-10-18T17:28:10+0000"
-                    ]
+                    "order": 1
                 },
                 "search_reason": {
                     "description": "Reason for tracking an email",
@@ -2276,14 +2269,14 @@
                 {
                     "data_path": "action_result.data.*.spamScore",
                     "data_type": "numeric",
-                    "example_values": [ 
+                    "example_values": [
                         0
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.detectionLevel",
                     "data_type": "string",
-                    "example_values": [ 
+                    "example_values": [
                         "relaxed"
                     ]
                 },
@@ -2477,7 +2470,8 @@
                         "test@testsplunk.com"
                     ],
                     "contains": [
-                        "email"
+                        "email",
+                        "domain"
                     ]
                 },
                 {
@@ -2547,14 +2541,14 @@
                     "data_path": "action_result.parameter.end",
                     "data_type": "string",
                     "example_values": [
-                        "YYYY-MM-DDTHH:MM:SS+0000"
+                        "2018-10-18T17:28:10+0000"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.start",
                     "data_type": "string",
                     "example_values": [
-                        "YYYY-MM-DDTHH:MM:SS+0000"
+                        "2018-10-18T17:28:10+0000"
                     ]
                 },
                 {
@@ -2845,160 +2839,160 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.to",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.to",
                     "data_type": "string",
                     "example_values": [
                         "test@test.biz"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.txEvent",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.txEvent",
                     "data_type": "string",
                     "example_values": [
                         "Item currently queued for delivery"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.remoteIp",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteIp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.actualSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.actualSize",
                     "data_type": "numeric",
                     "example_values": [
                         10094
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.receiptAck",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.receiptAck",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.returnPath",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.returnPath",
                     "data_type": "string",
                     "example_values": [
                         "test@gmail.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.smtpEndTime",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpEndTime",
                     "data_type": "string",
                     "example_values": [
                         "1970-01-01T00:00:00+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.deliveryType",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.deliveryType",
                     "data_type": "string",
                     "example_values": [
                         "Not Encrypted"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.remoteServer",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServer",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.smtpStartTime",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpStartTime",
                     "data_type": "string",
                     "example_values": [
                         "1970-01-01T00:00:00+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.processEndTime",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processEndTime",
                     "data_type": "string",
                     "example_values": [
                         "1970-01-01T00:00:00+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.smtpActualSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpActualSize",
                     "data_type": "numeric",
                     "example_values": [
                         10094
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.processStartTime",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processStartTime",
                     "data_type": "string",
                     "example_values": [
                         "1970-01-01T00:00:00+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.processingServer",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.processingServer",
                     "data_type": "string",
                     "example_values": [
                         "snd-mta-1.snd.mimecast.lan"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.transmissionSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionSize",
                     "data_type": "numeric",
                     "example_values": [
                         7624
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.queueDetailStatus",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.queueDetailStatus",
                     "data_type": "string",
                     "example_values": [
                         "Message Hold Applied - Spam Signature policy"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.compressedStoreSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.compressedStoreSize",
                     "data_type": "numeric",
                     "example_values": [
                         4865
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.remoteServerGreeting",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServerGreeting",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.remoteServerReceiptAck",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.remoteServerReceiptAck",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.transmissionComponents.*.hash",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.hash",
                     "data_type": "string",
                     "example_values": [
                         "90fdf560cd0c7c8f35427bd6abb11670ffcc5f2d6e07c4c508c0fbe2ca248998"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.transmissionComponents.*.txSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.txSize",
                     "data_type": "numeric",
                     "example_values": [
                         1987
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.transmissionComponents.*.fileName",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.fileName",
                     "data_type": "string",
                     "example_values": [
                         "body.htm"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.transmissionComponents.*.fileType",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.transmissionComponents.*.fileType",
                     "data_type": "string",
                     "example_values": [
                         "Email Primary Body HTML"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.txInfo.smtpCompressedStoreSize",
+                    "data_path": "action_result.data.*.deliveredMessage.*.txInfo.smtpCompressedStoreSize",
                     "data_type": "numeric",
                     "example_values": [
                         4865
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.policyInfo.*.inherited",
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.inherited",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -3006,67 +3000,67 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.policyInfo.*.policyName",
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyName",
                     "data_type": "string",
                     "example_values": [
                         "Enable AV scan on release"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.policyInfo.*.policyType",
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.policyType",
                     "data_type": "string",
                     "example_values": [
                         "AV Scan On Release"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.policyInfo.*.inheritedCustomerCode",
+                    "data_path": "action_result.data.*.deliveredMessage.*.policyInfo.*.inheritedCustomerCode",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.sent",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.sent",
                     "data_type": "string",
                     "example_values": [
                         "2020-10-14T12:49:40+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.route",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.route",
                     "data_type": "string",
                     "example_values": [
                         "inbound"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.subject",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.subject",
                     "data_type": "string",
                     "example_values": [
                         "Fwd: test - subject"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.processed",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.processed",
                     "data_type": "string",
                     "example_values": [
                         "2020-10-14T12:49:38+0000"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.fromHeader",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromHeader",
                     "data_type": "string",
                     "example_values": [
                         "test@gmail.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.fromEnvelope",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.fromEnvelope",
                     "data_type": "string",
                     "example_values": [
                         "test@gmail.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deliveredMessage.test@test.biz.messageInfo.transmissionInfo",
+                    "data_path": "action_result.data.*.deliveredMessage.*.messageInfo.transmissionInfo",
                     "data_type": "string",
                     "example_values": [
                         "<pre>\nReceived: from mail-yb1-f171.google.com (mail-yb1-f171.google.com\r\n [209.85.219.171]) (Using TLS) by relay.mimecast.com with ESMTP id\r\n snd-mta-1-KIyYjNg8OTiOKMovvmPbdA-1; Wed, 14 Oct 2020 13:49:38 +0100\r\nX-MC-Unique: KIyYjNg8OTiOKMovvmPbdA-1\r\nReceived: by mail-yb1-f171.google.com with SMTP id n142so2538466ybf.7\r\n        for &lt;test@test.biz&gt;; Wed, 14 Oct 2020 05:49:35 -0700 (PDT)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20161025;\r\n        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;\r\n        bh=W9FETRd1qJM1QRGx8NSwHH4P/tQ+LvBw5sU1sxE8Q/E=;\r\n        b=QuZ7ohIhlbp578kKYHNprpIrrz4F1g2Asi8NsiJNDARFNjwlNEqwZiEIBBUzJ3pCIE\r\n         6LR7eMmhfJfKCqrRmg+2eKPgEcJ13K6hZxY62hmnSKM1Onc2Fcx7XfECnz/RlmnHfxeH\r\n         g/qlyJh0W9k+cAC4qyjbzasPUSL5yeSLXUYOw7tO2RoCwfp8SWUdt0WwO9cI7ClltG1Z\r\n         vw/r/wJRz7Cb5rZ4LetHsGuoPcW9gcsSvUKZo1RqGkDMX0yWGSx0YcM1o6KFL7TCUZ7d\r\n         Hcxc6Lbq9DwIzH4PC0cNoijJ+Yq2KTVzeHupp2JlyMlMtRRQc8mW0h6TUoxsfhj63uK3\r\n         StNw==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:mime-version:references:in-reply-to:from:date\r\n         :message-id:subject:to;\r\n        bh=W9FETRd1qJM1QRGx8NSwHH4P/tQ+LvBw5sU1sxE8Q/E=;\r\n        b=D0VI6S/0A7RV7aDPPYXHvJM7ilq5GXt/7YUpPAawvO2q3ljJX1DHHOEtcPvos/+N8G\r\n         O8b0/+qLNA5m9xDNHpeoyi/Wv8PmIWqy08wKVqwI/i/Noqi3UXrigxWBbORovJdGTJKt\r\n         KL3Fvk9sLNVExDj8Q3PldVK5N9i1WSlJk9GaxrBWuuAK0k44S6psYWaNVqTMMRtZcs1B\r\n         zGw5iBxSURb/2D90hce2c9BofUhN+T8t79lC6JYyP5UyLPIZOPKgQ9B2YcLmDJaSIK+I\r\n         umqbMsZo1RCEI8TCiNgFbdQot/fSPVtTavUlQp9t5AONsdXw498tfWBVvuTydrhf95/k\r\n         K73Q==\r\nX-Gm-Message-State: AOAM533SPzodDJ6yMBKsG1I+KWKVoUabARHe0c938S7AU1EvaV/xpQPP\r\n\txsaTJCVlFDW5PK7kBe0Ctk8LAcz04jFK+xlVISuBfRaJWYc=\r\nX-Google-Smtp-Source: ABdhPJzRLh51dgVIcfON9oX0o1Ul77Lt0bcX5YUX/DkGYmEet57imNh0YkfEO6dszicx5artLUrjTtlwIpLru7U03xc=\r\nX-Received: by 2002:a25:5b84:: with SMTP id p126mr7159162ybb.477.1602679279249;\r\n Wed, 14 Oct 2020 05:41:19 -0700 (PDT)\r\nMIME-Version: 1.0\r\nReferences: &lt;CAGUkOup+R95mQMziAUEg9o2xpTti6FbdKFTn2C4LX0E7Vd91wQ@mail.gmail.com&gt;\r\n &lt;CAGUkOuqr7ZBvjffaqdAgEmw01LvxSh=Cjp2sQV2BBAi7ftHe+A@mail.gmail.com&gt;\r\nIn-Reply-To: &lt;CAGUkOuqr7ZBvjffaqdAgEmw01LvxSh=Cjp2sQV2BBAi7ftHe+A@mail.gmail.com&gt;\r\nFrom: Test user &lt;test@gmail.com&gt;\r\nDate: Wed, 14 Oct 2020 18:11:08 +0530\r\nMessage-ID: &lt;CAGUkOur64B1JnAyzSvsTrHKaNjU3=PYeTvpiy_1ZUR6fG4vNow@mail.gmail.com&gt;\r\nSubject: =?UTF-8?B?RndkOiB0ZXN0IC0g5ryi5a2XKGMpwqzJuNGg1o3bnuCoiuCvteC1rOC8g+GApOGEqOGHlw==?=\r\n\t=?UTF-8?B?4YqW4Y+M4ZSg4Zuv4Zyg4Z6m4aGk4aK74aSQ4aaq4aiD4amU4aq44a2S4a6I4a+h4bCm4bOA4bSe4bWG?=\r\n\t=?UTF-8?B?4bWd4biI4b2S4oGH4oSw4oWP4oW34oiw4ouQ4o+744K144Kk44OQ44O844K744Kt44Ol44Oq44OGIA==?=\r\n\t=?UTF-8?B?44Kj44Kk44Oz44K344OH44Oz44OI5pel5pys5qiZ5rqW5pmC4puw4pux4puy4puz4pu14pyU77iP4p2k?=\r\n\t=?UTF-8?B?77iP76yX4pWs4o6L4oya4oWN4oWO4oKsIOKCreKBguG+p9KI4oKu4oKv4oWP4oyb4o6O4piG4biC5bmz?=\r\n\t=?UTF-8?B?5Luu5ZCNLCDjgbLjgonjgYzjgap+IUAjICQlXiYqKClfKzw+PzoifXx7LC4vOydbXVwvYMOhIMOpIMOt?=\r\n\t=?UTF-8?B?IMOzIMO6IMOgIMOrIMOvIMO2IMO82KfYsdiv2Ygg2Krbgdis24zgqpfgq4HgqpzgqrDgqr7gqqTgq4A=?=\r\n\t=?UTF-8?B?4KS54KS/4KSo4KWN4KSm4KWA0LPRg9C00LbQsNGA0LDRgtC44YOS4YOj4YOv4YOQ4YOg4YOQ4YOX4YOY?=\r\n\t=?UTF-8?B?4KaX4KeB4Kac4Kaw4Ka+4Kaf4Ka/zqniiYjDp+KImuKIq8ucwrXiiaTiiaXDt8Olw5/iiILGkihjKcuZ?=\r\n\t=?UTF-8?B?4oiGy5rCrOKApsOmxZPiiJHCtChSKeKAoMKlwqjLhsO4z4DigJzigJjCq8Kh4oSi4oiewqfCtuKAosKq?=\r\n\t=?UTF-8?B?wrrigJPiiaDCuMubw4fil4rEscucw4LCr8uYwr/DhcONw47Dj8udw5PDlO+jv8OSw5rDhsWS4oCewrQ=?=\r\n\t=?UTF-8?B?4oCwy4fDgcKoy4bDmOKIj+KAneKAmcK74oGE4oKs4oC54oC676yB76yC4oChwrDCt+KAmuKAlMKxYA==?=\r\nTo: test@test.biz\r\nAuthentication-Results: relay.mimecast.com;\r\n\tdkim=pass header.d=gmail.com header.s=20161025 header.b=QuZ7ohIh;\r\n\tdmarc=pass (policy=none) header.from=gmail.com;\r\n\tspf=pass (relay.mimecast.com: domain of test@gmail.com designates 209.85.219.171 as permitted sender) smtp.mailfrom=test@gmail.com\r\nX-Mimecast-Spam-Score: 7\r\nContent-Type: multipart/alternative; boundary=&quot;00000000000020eb0b05b1a0d9e9&quot;\r\n\r\n--00000000000020eb0b05b1a0d9e9\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\nx-mimecast-att: mailfile=&quot;12010141349400021&quot;\r\n\r\n\r\n--00000000000020eb0b05b1a0d9e9\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\nx-mimecast-att: mailfile=&quot;12010141349400041&quot;\r\n\r\n\r\n--00000000000020eb0b05b1a0d9e9--\r\n\n</pre>"

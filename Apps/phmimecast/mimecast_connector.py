@@ -11,7 +11,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from mimecast_consts import *
+from mimecast_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -83,7 +83,7 @@ class MimecastConnector(BaseConnector):
         request_id = str(uuid.uuid4())
         hdr_date = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S') + ' UTC'
         # The 'hmac' library on Python v3 expects the parameters in bytes (or binary format),
-        # while the 'hmac' library on Python v3 expects the parameters in string
+        # while the 'hmac' library on Python v2 expects the parameters in string
         # (which are stored in binary and Unicode form on Python v2 and Python v3 respectively).
         # UnicodeDammit.unicode_markup.encode() works for both the versions, as it converts the
         # provided input to string on Python v2 and bytes on Python v3.
@@ -190,24 +190,23 @@ class MimecastConnector(BaseConnector):
         :param parameter: input parameter
         :return: integer value of the parameter or None in case of failure
         """
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
+                    return None
+                parameter = int(parameter)
 
-        try:
-            if not float(parameter).is_integer():
-                action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {} parameter".format(key))
+            except:
+                action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
                 return None
-            parameter = int(parameter)
 
-            if not allow_zero and parameter <= 0:
-                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in the {parameter} parameter".format(parameter=key))
+            if parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {} parameter".format(key))
                 return None
-            elif allow_zero and parameter < 0:
-                action_result.set_status(phantom.APP_ERROR, "Please provide zero or a valid positive integer value in the {parameter} parameter".format(parameter=key))
+            if not allow_zero and parameter == 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide non-zero positive integer in {}".format(key))
                 return None
-        except:
-            error_text = "Please provide zero or a valid positive integer value in the {parameter} parameter".format(parameter=key) if allow_zero else\
-                 "Please provide a valid non-zero positive integer value in the {parameter} parameter".format(parameter=key)
-            action_result.set_status(phantom.APP_ERROR, error_text)
-            return None
 
         return parameter
 
@@ -239,39 +238,31 @@ class MimecastConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = MIMECAST_ERROR_CODE_MESSAGE
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_code = MIMECAST_ERROR_CODE_MESSAGE
+                error_msg = MIMECAST_ERROR_MESSAGE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_code = MIMECAST_ERROR_CODE_MESSAGE
+            error_msg = MIMECAST_ERROR_MESSAGE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Mimecast server. Please check the asset configuration and|or the action parameters."
+            error_msg = MIMECAST_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = MIMECAST_ERROR_MESSAGE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _paginator(self, endpoint, action_result, limit=None, headers=None, data=None, method="get", **kwargs):
 
-        default_max_results = 100
-        page_size = default_max_results
+        page_size = DEFAULT_MAX_RESULTS
         # If page_size param is present, then validate if pageSize is a positive integer greater than zero
         data_object = {}
 
         if limit is not None:
-            # Validate pageSize is a positive integer greater than zero
-            try:
-                limit = int(limit)
-                if limit <= 0:
-                    return action_result.set_status(phantom.APP_ERROR, "Page size value must be an integer greater than 0")
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Page size value must be an integer greater than 0")
             page_size = min(page_size, limit)
 
         data_object['pageSize'] = page_size
@@ -631,7 +622,7 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageSize': 100
+                    'pageSize': DEFAULT_MAX_RESULTS
                 }
             },
             'data': [
@@ -662,7 +653,7 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageToken': param.get('page_token')
+                    'pageToken': None
                 }
             },
             'data': [
@@ -712,7 +703,7 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageToken': param.get('page_token')
+                    'pageToken': None
                 }
             },
             'data': [
@@ -752,9 +743,8 @@ class MimecastConnector(BaseConnector):
         member = param.get('member')
         type_list = ['email', 'domain']
         search_type = self._handle_py_ver_compat_for_input_str(param['type'])
-        if search_type:
-            if search_type not in type_list:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'type' parameter")
+        if search_type and search_type not in type_list:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'type' parameter")
         if search_type == 'email':
             search_type = 'emailAddress'
 
@@ -764,8 +754,8 @@ class MimecastConnector(BaseConnector):
             data = {
                 'meta': {
                     'pagination': {
-                        'pageToken': param.get('page_token'),
-                        'pageSize': 100
+                        'pageToken': None,
+                        'pageSize': DEFAULT_MAX_RESULTS
                     }
                 },
                 'data': [
@@ -979,6 +969,8 @@ class MimecastConnector(BaseConnector):
         return ret_val
 
     def initialize(self):
+        # Load the state in initialize, use it to store data
+        # that needs to be accessed across actions
         self._state = self.load_state()
 
         # Fetching the Python major version
@@ -996,9 +988,6 @@ class MimecastConnector(BaseConnector):
         self._auth_type = config['auth_type']
         self._access_key = self._state.get('access_key')
         self._secret_key = self._state.get('secret_key')
-
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
 
         return phantom.APP_SUCCESS
 
