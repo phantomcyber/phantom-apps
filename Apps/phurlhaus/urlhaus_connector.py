@@ -12,7 +12,8 @@ from phantom.action_result import ActionResult
 
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -31,16 +32,30 @@ class UrlhausConnector(BaseConnector):
         self._base_url = None
 
     def _process_empty_response(self, response, action_result):
+        """ This function is used to process empty response.
+
+        :param response: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code: {0}. Error : Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
     def _process_html_response(self, response, action_result):
+        """ This function is used to process html response.
+
+        :param response: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
         status_code = response.status_code
 
         try:
@@ -52,32 +67,44 @@ class UrlhausConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace(u'{', '{{').replace(u'}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
+        """ This function is used to process json response.
+
+        :param r: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
         try:
             resp_json = r.json()
         except Exception as e:
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
-                ), None
-            )
+                action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+                                         .format(self._get_error_message_from_exception(e))), None)
 
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
+        """ This function is used to process html response.
+
+        :param r: response data
+        :param action_result: object of Action Result
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
+        """
+
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
             action_result.add_debug_data({'r_text': r.text})
@@ -94,10 +121,60 @@ class UrlhausConnector(BaseConnector):
 
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except Exception:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except Exception:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the URLhaus server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        if error_code in "Error code unavailable":
+            error_text = "Error Message: {0}".format(error_msg)
+        else:
+            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+        return error_text
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
@@ -120,29 +197,26 @@ class UrlhausConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
-                ), resp_json
-            )
-
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
-        ret_val, response = self._make_rest_call(
+        ret_val, _ = self._make_rest_call(
             '/urls/recent/limit/1', action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
@@ -160,7 +234,7 @@ class UrlhausConnector(BaseConnector):
             '/url', action_result, params=None, headers=None, method="post", data=data)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Failed to contact URLhaus.")
+            self.save_progress("Failed to contact URLhaus")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -192,7 +266,7 @@ class UrlhausConnector(BaseConnector):
             '/host', action_result, params=None, headers=None, method="post", data=data)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Failed to contact URLhaus.")
+            self.save_progress("Failed to contact URLhaus")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -221,7 +295,7 @@ class UrlhausConnector(BaseConnector):
             '/host', action_result, params=None, headers=None, method="post", data=data)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Failed to contact URLhaus.")
+            self.save_progress("Failed to contact URLhaus")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -255,7 +329,7 @@ class UrlhausConnector(BaseConnector):
             '/payload', action_result, params=None, headers=None, method="post", data=data)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Failed to contact URLhaus.")
+            self.save_progress("Failed to contact URLhaus")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -306,6 +380,11 @@ class UrlhausConnector(BaseConnector):
         config = self.get_config()
 
         self._base_url = config.get('base_url')
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
