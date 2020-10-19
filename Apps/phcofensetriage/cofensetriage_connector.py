@@ -20,6 +20,7 @@ from bs4 import BeautifulSoup
 from datetime import timedelta
 from cofensetriage_consts import *
 from bs4 import UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -41,20 +42,57 @@ class CofenseTriageConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
-    def _unicode_string_handler(self, input_str):
-        """helper method for handling unicode strings
-
-        Arguments:
-            input_str  -- Input string that needs to be processed
-
-        Returns:
-             -- Processed input string based on input_str
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
         """
+
         try:
-            if input_str:
-                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
         except:
-            self.debug_print("Error ocurred while converting the string")
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Cofense Triage Server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        if error_code in "Error code unavailable":
+            error_text = "Error Message: {0}".format(error_msg)
+        else:
+            error_text = "Error Code: {0}. Error Message: {1}".format(
+                error_code, error_msg)
+
+        return error_text
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(
+                    input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(
+                "Error occurred while handling python 2to3 compatibility for the input string")
+
         return input_str
 
     def _process_empty_response(self, response, action_result):
@@ -78,10 +116,13 @@ class CofenseTriageConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-            message = 'Status Code: {0}. Data from server:\n{1}\n'.format(status_code, self._unicode_string_handler(error_text))
+            message = 'Status Code: {0}. Data from server:\n{1}\n'.format(
+                status_code, self._handle_py_ver_compat_for_input_str(error_text))
             message = message.replace('{', '{{').replace('}', '}}')
         except Exception as e:
-            message = "Status Code: {0}. Error occurred while parsing the error details in the data from server. Error: {1}".format(status_code, self._unicode_string_handler(e))
+            err = self._get_error_message_from_exception(e)
+            message = "Status Code: {0}. Error occurred while parsing the error details in the data from server. Error: {1}".format(
+                status_code, err)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -91,7 +132,8 @@ class CofenseTriageConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -99,7 +141,7 @@ class CofenseTriageConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, self._unicode_string_handler(r.text.replace(u'{', '{{').replace(u'}', '}}')))
+            r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -134,7 +176,7 @@ class CofenseTriageConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, self._unicode_string_handler(r.text.replace('{', '{{').replace('}', '}}')))
+            r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -151,7 +193,8 @@ class CofenseTriageConnector(BaseConnector):
         # Create a URL to connect to
         # handle cases which is missing the api.
         if 'api/' not in endpoint:
-            url = self._base_url.rstrip('/') + "/api/public/v1/" + endpoint.strip().strip('/')
+            url = self._base_url.rstrip(
+                '/') + "/api/public/v1/" + endpoint.strip().strip('/')
         else:
             url = self._base_url.rstrip('/') + endpoint
 
@@ -169,34 +212,26 @@ class CofenseTriageConnector(BaseConnector):
 
         try:
             r = request_func(
-                            url,
-                            # auth=(username, password),  # basic authentication
-                            verify=config.get('verify_server_cert', False),
-                            **kwargs)
+                url,
+                # auth=(username, password),  # basic authentication
+                verify=config.get('verify_server_cert', False),
+                **kwargs)
             self._r = r
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = self._unicode_string_handler(e.message)
-                except:
-                    error_msg = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-            else:
-                error_msg = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(error_msg))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
         return self._process_response(r, action_result)
-
-####################################################################################################
-####################################################################################################
-####################################################################################################
 
     def _handle_test_connectivity(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = CONNECTION_TEST_ENDPOINT
         self.save_progress("Connecting to endpoint")
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
+        ret_val, response = self._make_rest_call(
+            endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed.")
@@ -205,24 +240,20 @@ class CofenseTriageConnector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-####################################################################################################
-####################################################################################################
-
     # this is quick and dirty utility function. It is expected to abend if "definition" is not the expected dict(). Don't abuse it.
+
     def _determine_value(self, definition, search, category, return_none=False):
         if search is None:
             if return_none:
                 return True, None
             else:
                 return "Error: invalid value passed {}; {}".format(category if category else "", search), None
-        search = str(search).strip().lower().replace('_', ' ').replace('-', ' ')
+        search = str(search).strip().lower().replace(
+            '_', ' ').replace('-', ' ')
         for k, v in definition.items():
             if search in v:
                 return True, None if k == "_none_" else k
         return "Error: invalid value passed {}; {}".format(category if category else "", search), None
-
-####################################################################################################
 
     def _remap_cef(self, cef=None, cef_mapping=None):
 
@@ -239,8 +270,6 @@ class CofenseTriageConnector(BaseConnector):
 
         return newcef
 
-####################################################################################################
-
     def _parse_datetime(self, datestring, category=""):
 
         if datestring is None:
@@ -251,7 +280,8 @@ class CofenseTriageConnector(BaseConnector):
         default_time = dateutil.parser.parse("00:00Z")
         tzinfos = default_timezones.timezones()
         try:
-            dt = dateutil.parser.parse(datestring.upper(), tzinfos=tzinfos, default=default_time, fuzzy=True)
+            dt = dateutil.parser.parse(
+                datestring.upper(), tzinfos=tzinfos, default=default_time, fuzzy=True)
             utcdt = dt.astimezone(dateutil.tz.tzutc())
             return True, {
                 'datetime': utcdt,
@@ -261,8 +291,6 @@ class CofenseTriageConnector(BaseConnector):
             }
         except:
             return "Error: invalid date/time string passed for parsing {}; {}".format(category if category else "", datestring), None
-
-####################################################################################################
 
     def _get_user_info(self):
 
@@ -277,8 +305,6 @@ class CofenseTriageConnector(BaseConnector):
             return "Error: failed to get user_info; {}".format(ret_val.get('message', "REST error")), None
 
         return True, ret_val
-
-####################################################################################################
 
     def _validate_label(self, label=None):
 
@@ -297,8 +323,6 @@ class CofenseTriageConnector(BaseConnector):
             return "Error: label not valid; {}".format(label), None
 
         return True, label
-
-####################################################################################################
 
     def _validate_tenant(self, tenant=None):
 
@@ -321,8 +345,6 @@ class CofenseTriageConnector(BaseConnector):
 
         return "Error: tenant not valid; {}".format(tenant), None
 
-####################################################################################################
-
     def _associate_container_ids(self, data=None, stats=None):
 
         if not data or not stats:
@@ -333,10 +355,6 @@ class CofenseTriageConnector(BaseConnector):
                 if int(x['id']) == (y['ingest_id']):
                     x['container_id'] = y.get('container_id')
                     break
-
-####################################################################################################
-####################################################################################################
-####################################################################################################
 
     def _save_artifact(self, artifact=None):
 
@@ -360,8 +378,6 @@ class CofenseTriageConnector(BaseConnector):
 
         return True, ret_val['id']
 
-####################################################################################################
-
     def _save_email_artifact(self, source_data_identifier=None, filename=None, content=None):
 
         if not source_data_identifier or not filename or not content:
@@ -382,7 +398,8 @@ class CofenseTriageConnector(BaseConnector):
         if ret_val is not True and ret_val != "existing_artifact_id":
             return ret_val, None, None
         if ret_val == "existing_artifact_id":
-            self.save_progress("Notice: duplicated artifact; {}".format(artifact_id))
+            self.save_progress(
+                "Notice: duplicated artifact; {}".format(artifact_id))
 
         summary = {
             'artifact_id': artifact_id,
@@ -394,28 +411,30 @@ class CofenseTriageConnector(BaseConnector):
 
         return True, summary, data
 
-####################################################################################################
-
     def _vault_file(self, filename=None, content=None, makeartifact=False):
 
         if not filename or not content:
             return "Error: one or more arguments are null value", None, None
 
         if hasattr(Vault, 'get_vault_tmp_dir'):
-            tmp = tempfile.NamedTemporaryFile(mode="wb", dir=Vault.get_vault_tmp_dir(), delete=False)
+            tmp = tempfile.NamedTemporaryFile(
+                mode="wb", dir=Vault.get_vault_tmp_dir(), delete=False)
         else:
-            tmp = tempfile.NamedTemporaryFile(mode="wb", dir=PHANTOM_VAULT_DIR, delete=False)
+            tmp = tempfile.NamedTemporaryFile(
+                mode="wb", dir=PHANTOM_VAULT_DIR, delete=False)
 
         tmp.write(content)
         tmp.close()
 
-        ret_val = Vault.add_attachment(file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
+        ret_val = Vault.add_attachment(
+            file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
 
         if (ret_val['succeeded'] is not True):
             return "Error: Vaulting file error; {}".format(ret_val['message']), None, None
 
         vault_id = ret_val['vault_id']
-        fileinfo = Vault.get_file_info(vault_id=vault_id, file_name=None, container_id=self.get_container_id())
+        fileinfo = Vault.get_file_info(
+            vault_id=vault_id, file_name=None, container_id=self.get_container_id())
         if len(fileinfo) == 0:
             return "Error: Vaulting file error, newly vaulted file not found; {}".format(vault_id), None, None
         fileinfo = fileinfo[0]
@@ -447,14 +466,13 @@ class CofenseTriageConnector(BaseConnector):
             if ret_val is not True and ret_val != "existing_artifact_id":
                 return ret_val, None, None
             if ret_val == "existing_artifact_id":
-                self.save_progress("Notice: duplicated artifact; {}".format(artifact_id))
+                self.save_progress(
+                    "Notice: duplicated artifact; {}".format(artifact_id))
 
             summary['artifact_id'] = artifact_id
             data['artifact_id'] = artifact_id
 
         return True, summary, data
-
-####################################################################################################
 
     def _ingest_reports(self, reports=None, label=None, tenant=None, ingest_subfields=False, cef_mapping=False):
 
@@ -482,7 +500,8 @@ class CofenseTriageConnector(BaseConnector):
 
             report_id = str(x.get('id'))
 
-            ret_val, severity = self._determine_value(CATEGORY_ID_TO_SEVERITY, x.get('category_id'), 'for mapping severity')
+            ret_val, severity = self._determine_value(
+                CATEGORY_ID_TO_SEVERITY, x.get('category_id'), 'for mapping severity')
             if ret_val is not True:
                 severity = "low"
 
@@ -510,7 +529,8 @@ class CofenseTriageConnector(BaseConnector):
                 if isinstance(email_urls, list):
                     urls = [z for z in [y.get('url') for y in email_urls] if z]
                     for y in urls:
-                        cef = self._remap_cef(cef={'url': y}, cef_mapping=cef_mapping)
+                        cef = self._remap_cef(
+                            cef={'url': y}, cef_mapping=cef_mapping)
                         artifacts += [{
                             "source_data_identifier": "report id " + report_id,
                             "name": "Url Artifact",
@@ -520,7 +540,8 @@ class CofenseTriageConnector(BaseConnector):
                 tags = x.get("tags", )
                 if isinstance(tags, list):
                     for y in tags:
-                        cef = self._remap_cef(cef={'tag': y}, cef_mapping=cef_mapping)
+                        cef = self._remap_cef(
+                            cef={'tag': y}, cef_mapping=cef_mapping)
                         artifacts += [{
                             "source_data_identifier": "report id " + report_id,
                             "name": "Tag Artifact",
@@ -546,7 +567,8 @@ class CofenseTriageConnector(BaseConnector):
                             "name": "Attachment Artifact",
                             "cef": cef
                         }]
-                        cef = self._remap_cef(cef=y.get('email_attachment_payload'), cef_mapping=cef_mapping)
+                        cef = self._remap_cef(
+                            cef=y.get('email_attachment_payload'), cef_mapping=cef_mapping)
                         artifacts += [{
                             "source_data_identifier": "email attachment id " + str(y.get('id')),
                             "name": "Payload Artifact",
@@ -554,9 +576,12 @@ class CofenseTriageConnector(BaseConnector):
                         }]
 
             status, message, container_id = self.save_container(container)
-            self.save_progress("DEBUG: report_id ({}) reported_at ({})".format(x.get('id'), x.get('reported_at')))
-            self.save_progress("DEBUG: container: report_id ({}) status ({}) message ({}) container_id ({})".format(x.get('id'), status, message, container_id))
-            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(artifacts), 'status': status, 'message': message}]
+            self.save_progress("DEBUG: report_id ({}) reported_at ({})".format(
+                x.get('id'), x.get('reported_at')))
+            self.save_progress("DEBUG: container: report_id ({}) status ({}) message ({}) container_id ({})".format(
+                x.get('id'), status, message, container_id))
+            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(
+                artifacts), 'status': status, 'message': message}]
 
         ####
         # todo:
@@ -565,8 +590,6 @@ class CofenseTriageConnector(BaseConnector):
         # remember run_automation is default on (add flag)
         ####
         return True, stats
-
-####################################################################################################
 
     def _ingest_threat_indicators(self, threat_indicators=None, label=None, tenant=None, ingest_subfields=False, cef_mapping=False):
 
@@ -594,7 +617,8 @@ class CofenseTriageConnector(BaseConnector):
 
             indicator_id = str(x.get('id'))
 
-            ret_val, severity = self._determine_value(THREAT_LEVEL_TO_SEVERITY, x.get('threat_level'), 'for mapping severity')
+            ret_val, severity = self._determine_value(
+                THREAT_LEVEL_TO_SEVERITY, x.get('threat_level'), 'for mapping severity')
             if ret_val is not True:
                 severity = "low"
 
@@ -617,9 +641,12 @@ class CofenseTriageConnector(BaseConnector):
             }]
 
             status, message, container_id = self.save_container(container)
-            self.save_progress("DEBUG: threat indicator ({}) create_at ({})".format(x.get('id'), x.get('created_at')))
-            self.save_progress("DEBUG: container: threat_indicator_id ({}) status ({}) message ({}) container_id ({})".format(x.get('id'), status, message, container_id))
-            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(artifacts), 'status': status, 'message': message}]
+            self.save_progress("DEBUG: threat indicator ({}) create_at ({})".format(
+                x.get('id'), x.get('created_at')))
+            self.save_progress("DEBUG: container: threat_indicator_id ({}) status ({}) message ({}) container_id ({})".format(
+                x.get('id'), status, message, container_id))
+            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(
+                artifacts), 'status': status, 'message': message}]
 
         ####
         # todo:
@@ -629,12 +656,12 @@ class CofenseTriageConnector(BaseConnector):
         ####
         return True, stats
 
-####################################################################################################
+
 # network errors will raise "ConnectionError" all the way to the spawn process
 
     def _get_pages_from_endpoint(self, action_result, endpoint=None, start_date=None, end_date=None,
-        match_priority=None, category_id=None, vip=None, email=None, tags=None, threat_type=None,
-            threat_level=None, page=0, page_dir="1 first", results_dir=None, per_page=None, max_results=None):
+                                 match_priority=None, category_id=None, vip=None, email=None, tags=None, threat_type=None,
+                                 threat_level=None, page=0, page_dir="1 first", results_dir=None, per_page=None, max_results=None):
 
         if page == "all" or page is None:
             page = 0
@@ -643,9 +670,18 @@ class CofenseTriageConnector(BaseConnector):
             per_page = MAX_PER_PAGE
 
         # ensure all page/per_page comparisons are done int to int
-        page = int(page)
-        per_page = int(per_page)
-        max_results = int(max_results)
+        try:
+            page = int(page)
+        except:
+            return "Error: page parameter must be in numeric form; {}".format(page), None
+        try:
+            per_page = int(per_page)
+        except:
+            return "Error: per_page parameter must be in numeric form; {}".format(per_page), None
+        try:
+            max_results = int(max_results)
+        except:
+            return "Error: max_results parameter must be in numeric form; {}".format(max_results), None
 
         if page < 0:
             return "Error: page parameter must be greater or equal to zero; {}".format(page), None
@@ -681,7 +717,8 @@ class CofenseTriageConnector(BaseConnector):
         if page != 0:
             params['page'] = page
             self.save_progress("Retrieving page {}".format(params['page']))
-            ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
+            ret_val, response = self._make_rest_call(
+                endpoint, action_result, params=params)
             if (phantom.is_fail(ret_val)):
                 error_text = "Error: failed to retrieve results; REST error"
                 message = action_result.get_message() + error_text
@@ -692,20 +729,25 @@ class CofenseTriageConnector(BaseConnector):
         else:
             params['page'] = 1
             self.save_progress("Retrieving page {}".format(params['page']))
-            ret_val, first_page = self._make_rest_call(endpoint, action_result, params=params)
+            ret_val, first_page = self._make_rest_call(
+                endpoint, action_result, params=params)
             if (phantom.is_fail(ret_val)):
                 error_text = "Error: failed to retrieve results; REST error"
                 message = action_result.get_message() + error_text
                 return message, None
 
-            if per_page != int(self._r.headers.get('Per-Page')):
-                # this doesn't make sense, return as error, discard downloaded results
-                return "Error: requested results per page doesn't match actual results per page; requested ({}) actual ({})".format(per_page, self._r.headers.get('Per-Page')), None
-
+            try:
+                if per_page != int(self._r.headers.get('Per-Page')):
+                    # this doesn't make sense, return as error, discard downloaded results
+                    return "Error: requested results per page doesn't match actual results per page; requested ({}) actual ({})".format(per_page, self._r.headers.get('Per-Page')), None
+            except:
+                return "Error: requested results per page doesn't match actual results per page", None
             # figure out which pages to download and in what order
-
-            total_results = int(self._r.headers['Total'])
-
+            try:
+                total_results = int(self._r.headers['Total'])
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return err, None
             # we can actually get the last page from the headers but will calculate it instead
             total_pages = total_results / per_page
             if total_results % per_page != 0:
@@ -718,7 +760,8 @@ class CofenseTriageConnector(BaseConnector):
 
             # Fallback to a default rate limit if the Cofense Triage API does
             # not respond with the X-RateLimit-Remaining header.
-            ratelimit = int(self._r.headers.get('X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+            ratelimit = int(self._r.headers.get(
+                'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
 
             for page in desired_pages:
 
@@ -726,7 +769,8 @@ class CofenseTriageConnector(BaseConnector):
 
                 if page == 1:
                     # tack on the first page we initially downloaded
-                    self.save_progress("Recovering first page downloaded {}".format(params['page']))
+                    self.save_progress(
+                        "Recovering first page downloaded {}".format(params['page']))
                     response = first_page
 
                 else:
@@ -737,8 +781,10 @@ class CofenseTriageConnector(BaseConnector):
                         self.save_progress(status)
                         break
 
-                    self.save_progress("Retrieving page {}".format(params['page']))
-                    ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
+                    self.save_progress(
+                        "Retrieving page {}".format(params['page']))
+                    ret_val, response = self._make_rest_call(
+                        endpoint, action_result, params=params)
 
                     if (phantom.is_fail(ret_val)):
                         error_text = "Error: failed to retrieve results; REST error"
@@ -749,7 +795,8 @@ class CofenseTriageConnector(BaseConnector):
                 downloaded_results += response
                 downloaded_length = len(downloaded_results)
 
-                ratelimit = int(self._r.headers.get('X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+                ratelimit = int(self._r.headers.get(
+                    'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
 
                 self.save_progress("Retrieved page {} with {} results. Retrieved {} of {} total results. {} limit of {} max results".format(
                     params['page'], len(response), downloaded_length, total_results, "Reached" if downloaded_length >= max_results else "Not at", max_results))
@@ -765,21 +812,20 @@ class CofenseTriageConnector(BaseConnector):
             downloaded_results.sort(key=lambda x: x['id'], reverse=True)
 
         downloaded_results = downloaded_results[:max_results]
-        return status, { 'downloaded_results': downloaded_results, 'downloaded_pages': downloaded_pages}
-
-####################################################################################################
-####################################################################################################
-####################################################################################################
+        return status, {'downloaded_results': downloaded_results, 'downloaded_pages': downloaded_pages}
 
     # possible todo: add custom view depending on ingesting or not
     # flake8: noqa: C901
+
     def _handle_get_threat_indicators(self, param):
 
         if self.get_action_identifier() != "on_poll":
-            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+            self.save_progress("In action handler for: {0}".format(
+                self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get('date_sort'), 'to date_sort parameter', return_none=True)
+        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get(
+            'date_sort'), 'to date_sort parameter', return_none=True)
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
@@ -791,25 +837,29 @@ class CofenseTriageConnector(BaseConnector):
         else:
             page_dir = "last_page first"
 
-        ret_val, threat_type = self._determine_value(THREAT_TYPE_VALUES, param.get('type'), 'to type parameter')
+        ret_val, threat_type = self._determine_value(
+            THREAT_TYPE_VALUES, param.get('type'), 'to type parameter')
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, level = self._determine_value(THREAT_LEVEL_VALUES, param.get('level'), 'to level parameter', return_none=True)
+        ret_val, level = self._determine_value(THREAT_LEVEL_VALUES, param.get(
+            'level'), 'to level parameter', return_none=True)
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, start_date = self._parse_datetime(self._unicode_string_handler(param.get('start_date')), "start_date parameter")
+        ret_val, start_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('start_date')), "start_date parameter")
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, end_date = self._parse_datetime(self._unicode_string_handler(param.get('end_date')), "end_date parameter")
+        ret_val, end_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('end_date')), "end_date parameter")
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
@@ -822,7 +872,8 @@ class CofenseTriageConnector(BaseConnector):
             page = 0
             per_page = 0
 
-        ret_val, label = self._validate_label(self._unicode_string_handler(param.get('ingest_to_label')))
+        ret_val, label = self._validate_label(
+            self._handle_py_ver_compat_for_input_str(param.get('ingest_to_label')))
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
@@ -830,10 +881,11 @@ class CofenseTriageConnector(BaseConnector):
 
         if label:
             # to accomandate on_poll ingestion which does not provide a tenant id
-            if self._unicode_string_handler(param.get('tenant')) == "__NONE__":
+            if self._handle_py_ver_compat_for_input_str(param.get('tenant')) == "__NONE__":
                 tenant = None
             else:
-                ret_val, tenant = self._validate_tenant(self._unicode_string_handler(param.get('tenant', None)))
+                ret_val, tenant = self._validate_tenant(
+                    self._handle_py_ver_compat_for_input_str(param.get('tenant', None)))
                 if ret_val is not True:
                     if self.get_action_identifier() != "on_poll":
                         self.save_progress(ret_val)
@@ -849,8 +901,8 @@ class CofenseTriageConnector(BaseConnector):
 
         endpoint = "/triage_threat_indicators"
         ret_val, response = self._get_pages_from_endpoint(action_result=action_result, endpoint=endpoint, start_date=start_date, end_date=end_date,
-            threat_type=threat_type, threat_level=level,
-            page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
+                                                          threat_type=threat_type, threat_level=level,
+                                                          page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
 
         # most likely rest error
         if ret_val is not True:
@@ -880,7 +932,7 @@ class CofenseTriageConnector(BaseConnector):
 
         if label:
             ret_val, response = self._ingest_threat_indicators(threat_indicators=downloaded_results, label=label, tenant=tenant,
-                                                               cef_mapping=self._unicode_string_handler(param.get('cef_mapping')))
+                                                               cef_mapping=self._handle_py_ver_compat_for_input_str(param.get('cef_mapping')))
             if ret_val is not True:
                 if self.get_action_identifier() != "on_poll":
                     self.save_progress(ret_val)
@@ -893,16 +945,17 @@ class CofenseTriageConnector(BaseConnector):
         self._action_result = action_result
         return action_result.set_status(func_ret_val)
 
-####################################################################################################
-
     # possible todo: add custom view depending on ingesting or not
+
     def _handle_get_reports(self, param):
 
         if self.get_action_identifier() != "on_poll":
-            self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+            self.save_progress("In action handler for: {0}".format(
+                self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get('date_sort'), 'to date_sort parameter', return_none=True)
+        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get(
+            'date_sort'), 'to date_sort parameter', return_none=True)
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
@@ -914,29 +967,33 @@ class CofenseTriageConnector(BaseConnector):
         else:
             page_dir = "1st_page first"
 
-        ret_val, endpoint = self._determine_value(ENDPOINT_TYPE_VALUES, param['type'], 'to type parameter')
+        ret_val, endpoint = self._determine_value(
+            ENDPOINT_TYPE_VALUES, param['type'], 'to type parameter')
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, category_id = self._determine_value(CATEGORY_ID_VALUES, param.get('category_id'), 'to category_id parameter', return_none=True)
+        ret_val, category_id = self._determine_value(CATEGORY_ID_VALUES, param.get(
+            'category_id'), 'to category_id parameter', return_none=True)
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        tags = self._unicode_string_handler(param.get('tags'))
+        tags = self._handle_py_ver_compat_for_input_str(param.get('tags'))
         if tags:
             tags = ",".join([x.strip() for x in tags.split(',') if x])
 
-        ret_val, start_date = self._parse_datetime(self._unicode_string_handler(param.get('start_date')), "start_date parameter")
+        ret_val, start_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('start_date')), "start_date parameter")
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, end_date = self._parse_datetime(self._unicode_string_handler(param.get('end_date')), "end_date parameter")
+        ret_val, end_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('end_date')), "end_date parameter")
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
@@ -949,17 +1006,19 @@ class CofenseTriageConnector(BaseConnector):
             page = 0
             per_page = 0
 
-        ret_val, label = self._validate_label(self._unicode_string_handler(param.get('ingest_to_label')))
+        ret_val, label = self._validate_label(
+            self._handle_py_ver_compat_for_input_str(param.get('ingest_to_label')))
         if ret_val is not True:
             if self.get_action_identifier() != "on_poll":
                 self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         if label:
-            if self._unicode_string_handler(param.get('tenant')) == "__NONE__":
+            if self._handle_py_ver_compat_for_input_str(param.get('tenant')) == "__NONE__":
                 tenant = None
             else:
-                ret_val, tenant = self._validate_tenant(self._unicode_string_handler(param.get('tenant', None)))
+                ret_val, tenant = self._validate_tenant(
+                    self._handle_py_ver_compat_for_input_str(param.get('tenant', None)))
                 if ret_val is not True:
                     if self.get_action_identifier() != "on_poll":
                         self.save_progress(ret_val)
@@ -974,8 +1033,8 @@ class CofenseTriageConnector(BaseConnector):
         max_results = param.get('max_results')
 
         ret_val, response = self._get_pages_from_endpoint(action_result=action_result, endpoint=endpoint, start_date=start_date, end_date=end_date,
-            match_priority=param.get('match_priority'), category_id=category_id, tags=tags,
-            page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
+                                                          match_priority=param.get('match_priority'), category_id=category_id, tags=tags,
+                                                          page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
 
         # most likely rest error
         if ret_val is not True:
@@ -1004,7 +1063,7 @@ class CofenseTriageConnector(BaseConnector):
 
         if label:
             ret_val, response = self._ingest_reports(reports=downloaded_results, label=label, tenant=tenant,
-                ingest_subfields=param.get('ingest_subfields', False), cef_mapping=self._unicode_string_handler(param.get('cef_mapping')))
+                                                     ingest_subfields=param.get('ingest_subfields', False), cef_mapping=self._handle_py_ver_compat_for_input_str(param.get('cef_mapping')))
             if ret_val is not True:
                 if self.get_action_identifier() != "on_poll":
                     self.save_progress(ret_val)
@@ -1017,23 +1076,25 @@ class CofenseTriageConnector(BaseConnector):
         self._action_result = action_result
         return action_result.set_status(func_ret_val)
 
-####################################################################################################
-
     # possible todo: add custom view depending on ingesting or not
+
     def _handle_get_report(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
 
-        ret_val, label = self._validate_label(self._unicode_string_handler(param.get('ingest_to_label')))
+        ret_val, label = self._validate_label(
+            self._handle_py_ver_compat_for_input_str(param.get('ingest_to_label')))
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         if label:
-            ret_val, tenant = self._validate_tenant(self._unicode_string_handler(param.get('tenant', None)))
+            ret_val, tenant = self._validate_tenant(
+                self._handle_py_ver_compat_for_input_str(param.get('tenant', None)))
             if ret_val is not True:
                 self.save_progress(ret_val)
                 return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1060,7 +1121,7 @@ class CofenseTriageConnector(BaseConnector):
 
         if label:
             ret_val, response = self._ingest_reports(reports=response, label=label, tenant=tenant,
-                    ingest_subfields=param.get('ingest_subfields', False), cef_mapping=self._unicode_string_handler(param.get('cef_mapping', None)))
+                                                     ingest_subfields=param.get('ingest_subfields', False), cef_mapping=self._handle_py_ver_compat_for_input_str(param.get('cef_mapping', None)))
             if ret_val is not True:
                 self.save_progress(ret_val)
                 return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1069,40 +1130,44 @@ class CofenseTriageConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-
     def _handle_get_email(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
 
         endpoint = "/reports/" + str(report_id) + ".txt"
-        self.save_progress("Downloading raw email of report id {}".format(report_id))
+        self.save_progress(
+            "Downloading raw email of report id {}".format(report_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Error: failed to download raw email; REST error")
+            self.save_progress(
+                "Error: failed to download raw email; REST error")
             return action_result.get_status()
 
-        ret_val, method = self._determine_value(DOWNLOAD_METHOD_VALUES, param['download_method'], "for download method parameter")
+        ret_val, method = self._determine_value(
+            DOWNLOAD_METHOD_VALUES, param['download_method'], "for download method parameter")
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        filename = self._r.headers.get('Content-Disposition', "").split('filename=')[-1].strip('"')
+        filename = self._r.headers.get(
+            'Content-Disposition', "").split('filename=')[-1].strip('"')
         source_data_identifier = "report id " + str(report_id)
 
         if method == "artifact":
-            ret_val, summary, data = self._save_email_artifact(source_data_identifier=source_data_identifier, filename=filename, content=response)
+            ret_val, summary, data = self._save_email_artifact(
+                source_data_identifier=source_data_identifier, filename=filename, content=response)
             if ret_val is not True:
                 self.save_progress(ret_val)
                 return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         else:
             ret_val, summary, data = self._vault_file(filename=filename, content=response,
-                    makeartifact=source_data_identifier if param.get('create_vaulted_file_artifact', False) else None)
+                                                      makeartifact=source_data_identifier if param.get('create_vaulted_file_artifact', False) else None)
             if ret_val is not True:
                 self.save_progress(ret_val)
                 return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1113,28 +1178,30 @@ class CofenseTriageConnector(BaseConnector):
         action_result.add_data(data)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-
     def _handle_get_file(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         attachment_id = param['attachment_id']
 
         endpoint = "/attachment/" + str(attachment_id)
-        self.save_progress("Downloading attachment id {}".format(attachment_id))
+        self.save_progress(
+            "Downloading attachment id {}".format(attachment_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Error: failed to download raw email; REST error")
+            self.save_progress(
+                "Error: failed to download raw email; REST error")
             return action_result.get_status()
 
-        filename = self._r.headers.get('Content-Disposition', "").split('filename=')[-1].strip('"')
+        filename = self._r.headers.get(
+            'Content-Disposition', "").split('filename=')[-1].strip('"')
         source_data_identifier = "attachment_id " + str(attachment_id)
 
         ret_val, summary, data = self._vault_file(filename=filename, content=response,
-                makeartifact=source_data_identifier if param.get('create_vaulted_file_artifact', False) else None)
+                                                  makeartifact=source_data_identifier if param.get('create_vaulted_file_artifact', False) else None)
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1145,14 +1212,14 @@ class CofenseTriageConnector(BaseConnector):
         action_result.add_data(data)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-
     def _handle_get_reporters(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get('date_sort'), 'to date_sort parameter', return_none=True)
+        ret_val, direction = self._determine_value(DATE_SORT_DIRECTION, param.get(
+            'date_sort'), 'to date_sort parameter', return_none=True)
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1163,12 +1230,14 @@ class CofenseTriageConnector(BaseConnector):
         else:
             page_dir = "1st_page first"
 
-        ret_val, start_date = self._parse_datetime(self._unicode_string_handler(param.get('start_date')), "start_date parameter")
+        ret_val, start_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('start_date')), "start_date parameter")
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        ret_val, end_date = self._parse_datetime(self._unicode_string_handler(param.get('end_date')), "end_date parameter")
+        ret_val, end_date = self._parse_datetime(self._handle_py_ver_compat_for_input_str(
+            param.get('end_date')), "end_date parameter")
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1184,8 +1253,8 @@ class CofenseTriageConnector(BaseConnector):
 
         endpoint = "/reporters"
         ret_val, response = self._get_pages_from_endpoint(action_result=action_result, endpoint=endpoint, start_date=start_date, end_date=end_date,
-            vip=param.get('vip'), email=self._unicode_string_handler(param.get('email')),
-            page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
+                                                          vip=param.get('vip'), email=self._handle_py_ver_compat_for_input_str(param.get('email')),
+                                                          page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
 
         # most likely rest error
         if ret_val is not True:
@@ -1217,11 +1286,10 @@ class CofenseTriageConnector(BaseConnector):
 
         return action_result.set_status(func_ret_val)
 
-####################################################################################################
-
     def _handle_get_reporter(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         reporter_id = param['reporter_id']
@@ -1231,7 +1299,8 @@ class CofenseTriageConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Error: failed to retrieve reporter; REST error")
+            self.save_progress(
+                "Error: failed to retrieve reporter; REST error")
             return action_result.get_status()
 
         if len(response) == 0:
@@ -1242,14 +1311,14 @@ class CofenseTriageConnector(BaseConnector):
         action_result.add_data(response[0])
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-
     def _handle_run_query(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, method = self._determine_value(RUN_QUERY_METHOD_VALUES, param['query_type'], "for search type parameter")
+        ret_val, method = self._determine_value(
+            RUN_QUERY_METHOD_VALUES, param['query_type'], "for search type parameter")
         if ret_val is not True:
             self.save_progress(ret_val)
             return action_result.set_status(phantom.APP_ERROR, ret_val)
@@ -1258,10 +1327,12 @@ class CofenseTriageConnector(BaseConnector):
 
         endpoint = "/integration_search"
         self.save_progress("Retrieving {}: {}".format(method, search))
-        ret_val, response = self._make_rest_call(endpoint, action_result, params={ method: search })
+        ret_val, response = self._make_rest_call(
+            endpoint, action_result, params={method: search})
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Error: failed to retrieve reporter; REST error")
+            self.save_progress(
+                "Error: failed to retrieve reporter; REST error")
             return action_result.get_status()
 
         if 'message' in response:
@@ -1284,17 +1355,15 @@ class CofenseTriageConnector(BaseConnector):
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-####################################################################################################
-####################################################################################################
-####################################################################################################
-
     def _handle_on_poll(self, param):
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
         self._action_result = None
         config = self.get_config()
 
-        ret_val, method = self._determine_value(INGESTION_METHOD_VALUES, config.get('ingestion_method'), "for ingestion_method configuration")
+        ret_val, method = self._determine_value(INGESTION_METHOD_VALUES, config.get(
+            'ingestion_method'), "for ingestion_method configuration")
         if ret_val is not True:
             self.save_progress(ret_val)
             return self.add_action_result(ActionResult(dict(param))).set_status(phantom.APP_ERROR, ret_val)
@@ -1308,12 +1377,12 @@ class CofenseTriageConnector(BaseConnector):
             saved_date = 'threat_last_ingested_date'
 
             action_param = {
-                'start_date': self._state.get(saved_date, self._unicode_string_handler(config.get('start_date'))),
+                'start_date': self._state.get(saved_date, self._handle_py_ver_compat_for_input_str(config.get('start_date'))),
                 'max_results': param.get('container_count', config.get('max_results')),
                 'date_sort': config.get('date_sort'),
                 'type': config.get('threat_type'),
                 'level': config.get('threat_level'),
-                'cef_mapping': self._unicode_string_handler(config.get('cef_mapping')),
+                'cef_mapping': self._handle_py_ver_compat_for_input_str(config.get('cef_mapping')),
                 'ingest_to_label': config.get('ingest', {}).get('container_label'),
                 'tenant': "__NONE__",
                 'all_pages': True,
@@ -1321,11 +1390,14 @@ class CofenseTriageConnector(BaseConnector):
             ingest_on = "created_at"
 
             if self._state.get(saved_date):
-                self.save_progress("Starting ingestion from saved last ingested time {}".format(action_param['start_date']))
-            elif self._unicode_string_handler(config.get('start_date')):
-                self.save_progress("Initialing new ingestion from configured start time {}".format(action_param['start_date']))
+                self.save_progress("Starting ingestion from saved last ingested time {}".format(
+                    action_param['start_date']))
+            elif self._handle_py_ver_compat_for_input_str(config.get('start_date')):
+                self.save_progress("Initialing new ingestion from configured start time {}".format(
+                    action_param['start_date']))
             else:
-                self.save_progress("Initialing new ingestion from default product time range")
+                self.save_progress(
+                    "Initialing new ingestion from default product time range")
 
             ret_val = self._handle_get_threat_indicators(action_param)
 
@@ -1338,14 +1410,14 @@ class CofenseTriageConnector(BaseConnector):
             saved_date = 'report_last_ingested_date'
 
             action_param = {
-                'start_date': self._state.get(saved_date, self._unicode_string_handler(config.get('start_date'))),
+                'start_date': self._state.get(saved_date, self._handle_py_ver_compat_for_input_str(config.get('start_date'))),
                 'max_results': param.get('container_count', config.get('max_results')),
                 'date_sort': config.get('date_sort'),
                 'type': config.get('report_type'),
                 'match_priority': config.get('report_match_priority'),
                 'category_id': config.get('report_category_id'),
-                'tags': self._unicode_string_handler(config.get('report_tags')),
-                'cef_mapping': self._unicode_string_handler(config.get('cef_mapping')),
+                'tags': self._handle_py_ver_compat_for_input_str(config.get('report_tags')),
+                'cef_mapping': self._handle_py_ver_compat_for_input_str(config.get('cef_mapping')),
                 'ingest_to_label': config.get('ingest', {}).get('container_label'),
                 'ingest_subfields': config.get('report_ingest_subfields'),
                 'tenant': "__NONE__",
@@ -1354,11 +1426,14 @@ class CofenseTriageConnector(BaseConnector):
             ingest_on = "reported_at"
 
             if self._state.get(saved_date):
-                self.save_progress("Starting ingestion from saved last ingested time {}".format(action_param['start_date']))
-            elif self._unicode_string_handler(config.get('start_date')):
-                self.save_progress("Initialing new ingestion from configured start time {}".format(action_param['start_date']))
+                self.save_progress("Starting ingestion from saved last ingested time {}".format(
+                    action_param['start_date']))
+            elif self._handle_py_ver_compat_for_input_str(config.get('start_date')):
+                self.save_progress("Initialing new ingestion from configured start time {}".format(
+                    action_param['start_date']))
             else:
-                self.save_progress("Initialing new ingestion from default product time range")
+                self.save_progress(
+                    "Initialing new ingestion from default product time range")
 
             ret_val = self._handle_get_reports(action_param)
 
@@ -1377,27 +1452,26 @@ class CofenseTriageConnector(BaseConnector):
         # To get the last ingested date, get the relevant time of the highest ingested id.
         # todo: change to use last ingested result id to determine which ids to download
 
-        downloaded_results = [x for x in self._action_result.get_data() if x.get('container_id')]
+        downloaded_results = [
+            x for x in self._action_result.get_data() if x.get('container_id')]
         if len(downloaded_results) > 0:
             downloaded_results.sort(key=lambda x: x['id'], reverse=True)
-            ret_val, last_ingested_date = self._parse_datetime(downloaded_results[0][ingest_on])
+            ret_val, last_ingested_date = self._parse_datetime(
+                downloaded_results[0][ingest_on])
             if ret_val is not True:
                 self.save_progress(ret_val)
                 return self._action_result.set_status(phantom.APP_ERROR, ret_val)
 
             last_ingested_date['datetime'] += timedelta(microseconds=1000)
             self.save_progress("Saving last ingested time from result id ({}) container id ({}) of time ({})".format(
-                    downloaded_results[0]['id'], downloaded_results[0]['container_id'], last_ingested_date['datetime'].isoformat()))
+                downloaded_results[0]['id'], downloaded_results[0]['container_id'], last_ingested_date['datetime'].isoformat()))
             self._state = self.load_state()
             self._state[saved_date] = last_ingested_date['datetime'].isoformat()
             self.save_state(self._state)
         else:
-            self.save_progress("No successfully ingested containers, no last ingested time to save")
+            self.save_progress(
+                "No successfully ingested containers, no last ingested time to save")
         return ret_val
-
-####################################################################################################
-####################################################################################################
-####################################################################################################
 
     def handle_action(self, param):
 
@@ -1430,14 +1504,22 @@ class CofenseTriageConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         # get the asset config
         config = self.get_config()
 
-        self._base_url = self._unicode_string_handler(config['base_url'])
-        self._api_email = self._unicode_string_handler(config['api_email'])
-        self._api_token = self._unicode_string_handler(config['api_token'])
-        self._auth_string = 'Token token={0}:{1}'.format(self._api_email, self._api_token)
+        self._base_url = self._handle_py_ver_compat_for_input_str(
+            config['base_url'])
+        self._api_email = self._handle_py_ver_compat_for_input_str(
+            config['api_email'])
+        self._api_token = self._handle_py_ver_compat_for_input_str(
+            config['api_token'])
+        self._auth_string = 'Token token={0}:{1}'.format(
+            self._api_email, self._api_token)
         #
         self._user_info = None
 
@@ -1479,7 +1561,7 @@ if __name__ == '__main__':
         try:
             login_url = CofenseTriageConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1492,11 +1574,12 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False,
+                               data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1512,6 +1595,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

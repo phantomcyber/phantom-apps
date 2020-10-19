@@ -14,7 +14,7 @@
     "utctime_updated": "2020-09-16T20:25:45.000000Z",
     "package_name": "phantom_cofensetriage",
     "main_module": "cofensetriage_connector.pyc",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -148,9 +148,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [
@@ -171,9 +171,9 @@
         },
         {
             "action": "on poll",
-            "identifier": "on_poll",
             "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
+            "identifier": "on_poll",
             "read_only": true,
             "parameters": {},
             "output": [
@@ -191,11 +191,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -216,9 +222,9 @@
         },
         {
             "action": "get threat indicators",
-            "identifier": "get_threat_indicators",
             "description": "Retrieve the subjects, senders, domains, URLs, or MD5 or SHA256 hashes that operators identified in Cofense Triage as threat indicators within a specified timeframe",
             "type": "investigate",
+            "identifier": "get_threat_indicators",
             "read_only": true,
             "parameters": {
                 "max_results": {
@@ -271,7 +277,7 @@
                     "primary": true,
                     "order": 4,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "end_date": {
@@ -280,7 +286,7 @@
                     "primary": true,
                     "order": 5,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "all_pages": {
@@ -340,7 +346,7 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.end_date",
                     "data_type": "string"
@@ -367,7 +373,7 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.start_date",
                     "data_type": "string"
@@ -390,7 +396,7 @@
                     "column_name": "Container ID",
                     "column_order": 1,
                     "contains": [
-                        "container id"
+                        "cofensetriage container id"
                     ]
                 },
                 {
@@ -405,7 +411,7 @@
                     "column_name": "Threat Indicator ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense threat indicator id"
+                        "cofensetriage threat indicator id"
                     ]
                 },
                 {
@@ -420,7 +426,7 @@
                     "column_name": "Report ID",
                     "column_order": 2,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 {
@@ -451,11 +457,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -466,9 +478,9 @@
         },
         {
             "action": "get reports",
-            "identifier": "get_reports",
             "description": "Retrieve all reports in the Inbox, Recon, and Processed folders that match specified parameters",
             "type": "investigate",
+            "identifier": "get_reports",
             "read_only": true,
             "parameters": {
                 "max_results": {
@@ -506,7 +518,7 @@
                     "primary": true,
                     "order": 3,
                     "contains": [
-                        "cofense match priority"
+                        "cofensetriage match priority"
                     ]
                 },
                 "category_id": {
@@ -516,7 +528,7 @@
                     "default": "All",
                     "order": 4,
                     "contains": [
-                        "cofense category id"
+                        "cofensetriage category id"
                     ],
                     "value_list": [
                         "All",
@@ -533,7 +545,7 @@
                     "primary": true,
                     "order": 5,
                     "contains": [
-                        "tags"
+                        "cofensetriage tags"
                     ]
                 },
                 "start_date": {
@@ -542,7 +554,7 @@
                     "primary": true,
                     "order": 6,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "end_date": {
@@ -551,7 +563,7 @@
                     "primary": true,
                     "order": 7,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "all_pages": {
@@ -609,7 +621,7 @@
                 },
                 {
                     "contains": [
-                        "cofense category id"
+                        "cofensetriage category id"
                     ],
                     "data_path": "action_result.parameter.category_id",
                     "data_type": "string"
@@ -624,7 +636,7 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.end_date",
                     "data_type": "string"
@@ -639,7 +651,7 @@
                 },
                 {
                     "contains": [
-                        "cofense match priority"
+                        "cofensetriage match priority"
                     ],
                     "data_path": "action_result.parameter.match_priority",
                     "data_type": "numeric"
@@ -658,14 +670,14 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.start_date",
                     "data_type": "string"
                 },
                 {
                     "contains": [
-                        "tags"
+                        "cofensetriage tags"
                     ],
                     "data_path": "action_result.parameter.tags",
                     "data_type": "string"
@@ -688,7 +700,7 @@
                     "column_name": "Category ID",
                     "column_order": 8,
                     "contains": [
-                        "cofense category id"
+                        "cofensetriage category id"
                     ]
                 },
                 {
@@ -697,7 +709,7 @@
                     "column_name": "Container ID",
                     "column_order": 1,
                     "contains": [
-                        "container id"
+                        "cofensetriage container id"
                     ]
                 },
                 {
@@ -706,7 +718,7 @@
                     "column_name": "Report ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 {
@@ -721,7 +733,7 @@
                     "column_name": "Match Priority",
                     "column_order": 7,
                     "contains": [
-                        "cofense match priority"
+                        "cofensetriage match priority"
                     ]
                 },
                 {
@@ -740,7 +752,7 @@
                     "column_name": "Processed At",
                     "column_order": 4,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 {
@@ -755,7 +767,7 @@
                     "column_name": "Reported At",
                     "column_order": 3,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 {
@@ -764,7 +776,7 @@
                     "column_name": "Reporter ID",
                     "column_order": 2,
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ]
                 },
                 {
@@ -783,7 +795,7 @@
                     "column_name": "Tags",
                     "column_order": 9,
                     "contains": [
-                        "tags"
+                        "cofensetriage tags"
                     ]
                 },
                 {
@@ -796,11 +808,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -811,9 +829,9 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
             "description": "Retrieve a single report that matches the specified report ID. Optionally ingest to a provided label",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "report_id": {
@@ -824,7 +842,7 @@
                     "default": 0,
                     "order": 0,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 "ingest_to_label": {
@@ -872,7 +890,7 @@
                 },
                 {
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ],
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "numeric"
@@ -891,7 +909,7 @@
                     "column_name": "Category ID",
                     "column_order": 8,
                     "contains": [
-                        "cofense category id"
+                        "cofensetriage category id"
                     ]
                 },
                 {
@@ -900,7 +918,7 @@
                     "column_name": "Container ID",
                     "column_order": 1,
                     "contains": [
-                        "container id"
+                        "cofensetriage container id"
                     ]
                 },
                 {
@@ -909,7 +927,7 @@
                     "column_name": "Report ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 {
@@ -924,7 +942,7 @@
                     "column_name": "Match Priority",
                     "column_order": 7,
                     "contains": [
-                        "cofense match priority"
+                        "cofensetriage match priority"
                     ]
                 },
                 {
@@ -943,7 +961,7 @@
                     "column_name": "Processed At",
                     "column_order": 4,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 {
@@ -958,7 +976,7 @@
                     "column_name": "Reported At",
                     "column_order": 3,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 {
@@ -967,7 +985,7 @@
                     "column_name": "Reporter ID",
                     "column_order": 2,
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ]
                 },
                 {
@@ -986,7 +1004,7 @@
                     "column_name": "Tags",
                     "column_order": 9,
                     "contains": [
-                        "tags"
+                        "cofensetriage tags"
                     ]
                 },
                 {
@@ -999,11 +1017,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1014,9 +1038,9 @@
         },
         {
             "action": "get email",
-            "identifier": "get_email",
             "description": "Downloads the raw email attachment for the report that matches the specified report ID",
             "type": "investigate",
+            "identifier": "get_email",
             "read_only": true,
             "parameters": {
                 "report_id": {
@@ -1027,7 +1051,7 @@
                     "default": 0,
                     "order": 0,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 "download_method": {
@@ -1067,7 +1091,7 @@
                 },
                 {
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ],
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "numeric"
@@ -1082,7 +1106,7 @@
                     "column_name": "Artifact ID",
                     "column_order": 2,
                     "contains": [
-                        "artifact id"
+                        "cofensetriage artifact id"
                     ]
                 },
                 {
@@ -1110,7 +1134,7 @@
                     "column_name": "Report ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense report id"
+                        "cofensetriage report id"
                     ]
                 },
                 {
@@ -1157,11 +1181,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1172,9 +1202,9 @@
         },
         {
             "action": "get file",
-            "identifier": "get_file",
             "description": "Downloads and vault the attachment that matches the specified attachment ID",
             "type": "investigate",
+            "identifier": "get_file",
             "read_only": true,
             "parameters": {
                 "attachment_id": {
@@ -1185,7 +1215,7 @@
                     "default": 0,
                     "order": 0,
                     "contains": [
-                        "cofense attachment id"
+                        "cofensetriage attachment id"
                     ]
                 },
                 "create_vaulted_file_artifact": {
@@ -1206,7 +1236,7 @@
                 },
                 {
                     "contains": [
-                        "cofense attachment id"
+                        "cofensetriage attachment id"
                     ],
                     "data_path": "action_result.parameter.attachment_id",
                     "data_type": "numeric"
@@ -1225,7 +1255,7 @@
                     "column_name": "Artifact ID",
                     "column_order": 2,
                     "contains": [
-                        "artifact id"
+                        "cofensetriage artifact id"
                     ]
                 },
                 {
@@ -1234,7 +1264,7 @@
                     "column_name": "Attachment ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense attachment id"
+                        "cofensetriage attachment id"
                     ]
                 },
                 {
@@ -1300,11 +1330,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1315,9 +1351,9 @@
         },
         {
             "action": "get reporters",
-            "identifier": "get_reporters",
             "description": "Retrieves information about reporters, such as their email address and credit score, whether they are VIP reporters, how many reports they reported, and the date and time of their last report",
             "type": "investigate",
+            "identifier": "get_reporters",
             "read_only": true,
             "parameters": {
                 "max_results": {
@@ -1354,7 +1390,7 @@
                     "primary": true,
                     "order": 4,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "end_date": {
@@ -1363,7 +1399,7 @@
                     "primary": true,
                     "order": 5,
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ]
                 },
                 "all_pages": {
@@ -1408,7 +1444,7 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.end_date",
                     "data_type": "string"
@@ -1427,7 +1463,7 @@
                 },
                 {
                     "contains": [
-                        "date"
+                        "cofensetriage date"
                     ],
                     "data_path": "action_result.parameter.start_date",
                     "data_type": "string"
@@ -1467,7 +1503,7 @@
                     "column_name": "Reporter ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ]
                 },
                 {
@@ -1491,7 +1527,7 @@
                 {
                     "data_path": "action_result.data.*.vip",
                     "data_type": "string",
-                    "column_name": "VIP",
+                    "column_name": "Vip",
                     "column_order": 3
                 },
                 {
@@ -1504,11 +1540,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1519,9 +1561,9 @@
         },
         {
             "action": "get reporter",
-            "identifier": "get_reporter",
             "description": "Retrieve reporter that matches the specified reporter ID",
             "type": "investigate",
+            "identifier": "get_reporter",
             "read_only": true,
             "parameters": {
                 "reporter_id": {
@@ -1532,7 +1574,7 @@
                     "default": 0,
                     "order": 0,
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ]
                 }
             },
@@ -1547,7 +1589,7 @@
                 },
                 {
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ],
                     "data_path": "action_result.parameter.reporter_id",
                     "data_type": "numeric"
@@ -1583,7 +1625,7 @@
                     "column_name": "Reporter ID",
                     "column_order": 0,
                     "contains": [
-                        "cofense reporter id"
+                        "cofensetriage reporter id"
                     ]
                 },
                 {
@@ -1607,7 +1649,7 @@
                 {
                     "data_path": "action_result.data.*.vip",
                     "data_type": "string",
-                    "column_name": "VIP",
+                    "column_name": "Vip",
                     "column_order": 3
                 },
                 {
@@ -1620,11 +1662,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1635,9 +1683,9 @@
         },
         {
             "action": "run query",
-            "identifier": "run_query",
             "description": "Retrieve integration results based on the specified hash (MD5 or SHA256) or URL. Specify only one parameter (sha256, md5, or URL) with this method",
             "type": "investigate",
+            "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "query_type": {
@@ -1704,11 +1752,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
