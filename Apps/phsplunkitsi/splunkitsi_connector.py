@@ -274,7 +274,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             payload['status'] = self.itsi_episode_status_values.get(status, '1')
 
         # Create params for POST request
-        q_params = { 'is_partial_update': '1' }
+        q_params = { 'is_partial_data': '1' }
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/notable_event_group/{0}'.format(itsi_group_id),
@@ -322,7 +322,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Create params for POST request
         q_params = {
             'break_group_policy_id': itsi_policy_id,
-            'is_partial_update': '1'
+            'is_partial_data': '1'
         }
 
         # make rest call
@@ -409,7 +409,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             self.save_progress("Add Episode Comment Failed")
             return action_result.get_status()
-
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -589,7 +588,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Required values can be accessed directly
         itsi_service_id = param['itsi_service_id']
 
-
         # Create params for GET request
         q_params = {'filter': json.dumps({ 'services._key': itsi_service_id })}
 
@@ -604,7 +602,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             self.save_progress("Get Service Entities Failed")
             return action_result.get_status()
-
 
         # Return only the entity information
         # Add the response into the data section
@@ -928,7 +925,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Create payload for POST request
         # end_time is now in seconds since the epoch (which mean UTC)
-        payload = { 'start_time': time.time(), 'end_time': time.time() + 1 }
+        payload = { 'end_time': time.time() + 1 }
         if comment is not None:
             payload['comment'] = comment
 
@@ -1079,7 +1076,7 @@ if __name__ == '__main__':
         try:
             login_url = SplunkItServiceIntelligenceConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1092,11 +1089,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1112,6 +1109,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
