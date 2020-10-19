@@ -206,14 +206,9 @@ class TaniumThreatResponseConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-        headers.update({
-                'session': str(self._session_key),
-            })
-
+        headers.update({'session': str(self._session_key),})
         if 'Content-Type' not in headers.keys():
-            headers.update({
-                    'Content-Type': 'application/json',
-                })
+            headers.update({'Content-Type': 'application/json'})
 
         ret_val, resp_json = self._make_rest_call(url, action_result, verify=self._verify, headers=headers, params=params, data=data, json=json, method=method)
 
@@ -224,7 +219,9 @@ class TaniumThreatResponseConnector(BaseConnector):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
-            headers.update({'session': str(self._session_key), 'Content-Type': 'application/json'})
+            headers.update({'session': str(self._session_key))
+            if 'Content-Type' not in headers.keys():
+                headers.update({'Content-Type': 'application/json'})
 
             ret_val, resp_json = self._make_rest_call(url, action_result, verify=self._verify, headers=headers, params=params, data=data, json=json, method=method)
 
