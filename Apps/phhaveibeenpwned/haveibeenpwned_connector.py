@@ -7,12 +7,12 @@
 try:
     from phantom.base_connector import BaseConnector
     from phantom.action_result import ActionResult
-    from phantom import status
+    from phantom import status as status_strings
     from phantom import utils
 except:
     from base_connector import BaseConnector
     from action_result import ActionResult
-    import status
+    import status as status_strings
     import utils
 
 # THIS Connector imports
@@ -33,7 +33,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         config = self.get_config()
         self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
 
-        return status.APP_SUCCESS
+        return status_strings.APP_SUCCESS
 
     def _make_rest_call(self, endpoint, params=None, truncate=False):
         full_url = HAVEIBEENPWNED_API_BASE_URL + endpoint
@@ -45,19 +45,19 @@ class HaveIBeenPwnedConnector(BaseConnector):
         try:
             response = requests.get(full_url, params=params, headers=headers)
         except:
-            return status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_FAILURE
+            return status_strings.APP_ERROR, HAVEIBEENPWNED_REST_CALL_FAILURE
 
         if response.status_code in HAVEIBEENPWNED_BAD_RESPONSE_CODES:
             if response.status_code == HAVEIBEENPWNED_STATUS_CODE_NO_DATA:
-                return status.APP_SUCCESS, [{"not_found": HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]}]
-            return status.APP_ERROR, HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]
+                return status_strings.APP_SUCCESS, [{"not_found": HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]}]
+            return status_strings.APP_ERROR, HAVEIBEENPWNED_BAD_RESPONSE_CODES[response.status_code]
 
         try:
             resp_json = response.json()
         except:
-            return status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
+            return status_strings.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
 
-        return status.APP_SUCCESS, resp_json
+        return status_strings.APP_SUCCESS, resp_json
 
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
@@ -72,8 +72,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
         kwargs = {HAVEIBEENPWEND_PARAM_DOMAIN_KEY: domain}
         ret_val, response = self._make_rest_call(endpoint, params=kwargs)
 
-        if (status.is_fail(ret_val)):
-            return action_result.set_status(status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
+        if (status_strings.is_fail(ret_val)):
+            return action_result.set_status(status_strings.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
 
         for item in response:
             action_result.add_data(item)
@@ -81,7 +81,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         action_result.set_summary(
             {HAVEIBEENPWNED_TOTAL_BREACHES: len(response)})
 
-        return action_result.set_status(status.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_DOMAIN_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_DOMAIN_SUCCESS)
 
     def _lookup_email(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
@@ -92,8 +92,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
 
-        if (status.is_fail(ret_val)):
-            return action_result.set_status(status.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
+        if (status_strings.is_fail(ret_val)):
+            return action_result.set_status(status_strings.APP_ERROR, HAVEIBEENPWNED_REST_CALL_ERR, response)
 
         for item in response:  # Response ends up being a list
             action_result.add_data(item)
@@ -104,12 +104,12 @@ class HaveIBeenPwnedConnector(BaseConnector):
             action_result.set_summary(
                 {HAVEIBEENPWNED_TOTAL_BREACHES: len(response)})
 
-        return action_result.set_status(status.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_EMAIL_SUCCESS)
+        return action_result.set_status(status_strings.APP_SUCCESS, HAVEIBEENPWNED_LOOKUP_EMAIL_SUCCESS)
 
     def handle_action(self, params):
 
         action = self.get_action_identifier()
-        ret_val = status.APP_SUCCESS
+        ret_val = status_strings.APP_SUCCESS
         if (action == self.ACTION_ID_LOOKUP_DOMAIN):
             ret_val = self._lookup_domain(params)
         elif (action == self.ACTION_ID_LOOKUP_EMAIL):
