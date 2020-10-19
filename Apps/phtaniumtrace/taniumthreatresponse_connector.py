@@ -206,7 +206,7 @@ class TaniumThreatResponseConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-        headers.update({'session': str(self._session_key),})
+        headers.update({'session': str(self._session_key)})
         if 'Content-Type' not in headers.keys():
             headers.update({'Content-Type': 'application/json'})
 
