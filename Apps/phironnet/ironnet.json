@@ -10,6 +10,11 @@
     "product_version_regex": ".*",
     "publisher": "IronNet",
     "license": "Copyright (c) IronNet, 2020",
+    "pip_dependencies": {
+        "wheel": [
+            {"module": "swagger_client", "input_file": "wheels/swagger_client-1.0.0-py2-none-any.whl"}
+        ]
+    },
     "app_version": "1.0.1",
     "utctime_updated": "2020-02-19T19:55:57.000000Z",
     "package_name": "phantom_ironnet",
