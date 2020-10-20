@@ -58,15 +58,15 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         self.save_progress("Connecting to the Have I Been Pwned server")
 
-        endpoint = HAVEIBEENPWNED_API_ENDPOINT_TEST_CONNECTIVITY
+        email = "test@gmail.com"
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
 
         ret_val, response = self._make_rest_call(endpoint, truncate=True)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_messsage()))
+            self.save_progress("Test Connectivity Failed. Error: {0}".format(response))
             return action_result.get_status()
 
-        self.save_progress("Total Data Classes: {}".format(len(response)))
         self.save_progress("Login to Have I Been Pwned server is successful")
         self.save_progress("Test Connectivity passed")
         return action_result.set_status(phantom.APP_SUCCESS)

@@ -6,7 +6,6 @@
 HAVEIBEENPWNED_API_BASE_URL = "https://haveibeenpwned.com/api/v3/"
 HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL = "breachedaccount/{email}"
 HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_DOMAIN = "breaches"
-HAVEIBEENPWNED_API_ENDPOINT_TEST_CONNECTIVITY = "dataclasses"
 HAVEIBEENPWNED_CONFIG_API_KEY = "api_key"
 HAVEIBEENPWNED_ACTION_PARAM_EMAIL = "email"
 HAVEIBEENPWNED_ACTION_PARAM_DOMAIN = "domain"
@@ -20,6 +19,7 @@ HAVEIBEENPWNED_REST_CALL_JSON_FAILURE = "Conversion of Response to JSON failed"
 HAVEIBEENPWNED_BAD_RESPONSE_CODES = {400: "Bad Request - the account does not comply with an acceptable format",
                                      403: "Forbidden - no user agent has been specified in the request",
                                      404: "Not found - The account could not be found and has likely not been pwned",
-                                     429: "Too many requests - the rate limit has been exceeded"}
+                                     429: "Too many requests - the rate limit has been exceeded",
+                                     401: "UnAuthorized - Access denied due to improperly formed hibp-api-key"}
 HAVEIBEENPWNED_STATUS_CODE_NO_DATA = 404
 HAVEIBEENPWNED_TOTAL_BREACHES = "total_breaches"
