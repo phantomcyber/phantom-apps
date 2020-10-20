@@ -18,6 +18,7 @@ import simplejson as json
 class HaveIBeenPwnedConnector(BaseConnector):
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
     ACTION_ID_LOOKUP_EMAIL = "lookup_email"
+    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
 
     def __init__(self):
         super(HaveIBeenPwnedConnector, self).__init__()
@@ -51,6 +52,25 @@ class HaveIBeenPwnedConnector(BaseConnector):
             return phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
 
         return phantom.APP_SUCCESS, resp_json
+
+    def _handle_test_connectivity(self, params):
+        action_result = self.add_action_result(ActionResult(dict(params)))
+
+        self.save_progress("Connecting to the Have I Been Pwned server")
+
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_TEST_CONNECTIVITY
+
+        ret_val, response = self._make_rest_call(endpoint, truncate=True)
+
+        self.save_progress("Total Data Classes: {}".format(len(response)))
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_messsage()))
+            return action_result.get_status()
+
+        self.save_progress("Login to Have I Been Pwned server is successful")
+        self.save_progress("Test Connectivity passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
@@ -107,6 +127,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
             ret_val = self._lookup_domain(params)
         elif (action == self.ACTION_ID_LOOKUP_EMAIL):
             ret_val = self._lookup_email(params)
+        elif (action == self.ACTION_ID_TEST_CONNECTIVITY):
+            ret_val = self._handle_test_connectivity(params)
 
         return ret_val
 
