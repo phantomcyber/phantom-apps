@@ -1,0 +1,345 @@
+{
+    "appid": "a8ca5e0d-8209-4476-a9b6-5213ed314319",
+    "name": "Browserless chrome",
+    "description": "Browserless.io Service and browserless/chrome App",
+    "type": "sandbox",
+    "product_vendor": "browerless.io",
+    "logo": "browserlessio.svg",
+    "logo_dark": "browserlessio_dark.svg",
+    "product_name": "chrome",
+    "product_version_regex": ".*",
+    "publisher": "Stboch",
+    "license": "Copyright (c) Stboch, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-01T21:36:33.805158Z",
+    "package_name": "phantom_browserlessio",
+    "main_module": "browserlessio_connector.pyc",
+    "min_phantom_version": "4.8.23319",
+    "app_wizard_version": "1.1.0",
+    "configuration": {
+        "URL": {
+            "description": "URL for browserless.io (if using hosted service) https://chrome.browserless.io",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "token": {
+            "description": "token for accessing service (not required if self hosting)",
+            "data_type": "password",
+            "required": false,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get pdf",
+            "identifier": "get_pdf",
+            "description": "PDF screenshot of URL",
+            "verbose": "Download a PDF of the URL",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "headerfooter": {
+                    "description": "Display Header and Footer",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 1
+                },
+                "printbackground": {
+                    "description": "Display background images in PDF",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 2
+                },
+                "landscape": {
+                    "description": "Print as Landscape",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": false,
+                    "order": 3
+                },
+                "followRefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.headerfooter",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "headerfooter",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.printbackground",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "printbackground",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.landscape",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "landscape",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get content",
+            "identifier": "get_content",
+            "description": "Get HTML contents of a webpage",
+            "verbose": "Download the HTML code for a URL provided",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "followRefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get screenshot",
+            "identifier": "get_screenshot",
+            "description": "Get Screenshot of URL",
+            "verbose": "Create a screenshot of a URL",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "type": {
+                    "description": "Type of Screenshot PNG or JEPG",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [
+                        "jpeg",
+                        "png"
+                    ],
+                    "default": "png",
+                    "order": 1
+                },
+                "quality": {
+                    "description": "Quality of image",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "80",
+                    "order": 2
+                },
+                "fullpage": {
+                    "description": "Full Page Screenshot",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 3
+                },
+                "followRefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "default": true,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.quality",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "quality",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.fullpage",
+                    "data_type": "boolean",
+                    "contains": [],
+                    "column_name": "fullpage",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "browserlessio_view.display_screenshot",
+                "title": "Screen Shot"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
