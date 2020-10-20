@@ -62,12 +62,11 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, truncate=True)
 
-        self.save_progress("Total Data Classes: {}".format(len(response)))
-
         if (phantom.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_messsage()))
             return action_result.get_status()
 
+        self.save_progress("Total Data Classes: {}".format(len(response)))
         self.save_progress("Login to Have I Been Pwned server is successful")
         self.save_progress("Test Connectivity passed")
         return action_result.set_status(phantom.APP_SUCCESS)
