@@ -38,7 +38,7 @@
     },
     "configuration": {
         "endpoint": {
-            "description": "IP/Hostname (For TEST CONNECTIVITY)",
+            "description": "IP/Hostname (For TEST CONNECTIVITY and default, if not provided in an action)",
             "data_type": "string",
             "required": false,
             "order": 0
@@ -144,7 +144,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -317,7 +317,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -465,7 +465,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -620,7 +620,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -708,7 +708,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -899,7 +899,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1208,7 +1208,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1365,7 +1365,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1560,7 +1560,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1714,7 +1714,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1808,7 +1808,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -1929,7 +1929,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2001,7 +2001,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2072,7 +2072,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "primary": true,
                     "order": 0,
                     "contains": [
@@ -2154,7 +2154,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "primary": true,
                     "order": 0,
                     "contains": [
@@ -2236,7 +2236,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2446,7 +2446,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2591,7 +2591,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2695,7 +2695,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2803,7 +2803,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -2917,7 +2917,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
@@ -3031,7 +3031,7 @@
                 "ip_hostname": {
                     "description": "IP/Hostname",
                     "data_type": "string",
-                    "required": true,
+                    "required": false,
                     "order": 0,
                     "contains": [
                         "ip",
