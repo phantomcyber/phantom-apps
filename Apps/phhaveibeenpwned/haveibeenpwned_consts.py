@@ -20,6 +20,6 @@ HAVEIBEENPWNED_BAD_RESPONSE_CODES = {400: "Bad Request - the account does not co
                                      403: "Forbidden - no user agent has been specified in the request",
                                      404: "Not found - The account could not be found and has likely not been pwned",
                                      429: "Too many requests - the rate limit has been exceeded",
-                                     401: "UnAuthorized - Access denied due to improperly formed hibp-api-key"}
+                                     401: "Unauthorized - Access denied due to improperly formed hibp-api-key"}
 HAVEIBEENPWNED_STATUS_CODE_NO_DATA = 404
 HAVEIBEENPWNED_TOTAL_BREACHES = "total_breaches"
