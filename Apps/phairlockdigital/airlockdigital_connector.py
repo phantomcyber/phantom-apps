@@ -12,7 +12,8 @@ from phantom.action_result import ActionResult
 from airlockdigital_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -55,8 +56,7 @@ class AirlockDigitalConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace(u'{', '{{').replace(u'}', '}}')
 
@@ -73,7 +73,8 @@ class AirlockDigitalConnector(BaseConnector):
             try:
                 resp_json = json.loads(str(r.text).replace("\\", "\\\\"))
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+                              .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -81,7 +82,7 @@ class AirlockDigitalConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -113,9 +114,59 @@ class AirlockDigitalConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except Exception:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except Exception:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the URLhaus server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        if error_code in "Error code unavailable":
+            error_text = "Error Message: {0}".format(error_msg)
+        else:
+            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+        return error_text
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
@@ -135,12 +186,12 @@ class AirlockDigitalConnector(BaseConnector):
         try:
             r = request_func(
                             url,
-                            # auth=(username, password),  # basic authentication
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
 
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
+                                                   .format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -168,8 +219,8 @@ class AirlockDigitalConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed. Error Message: {}".format(response['error']))
-            # return action_result.get_status()
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
@@ -196,11 +247,6 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Place api key in its own variable.
         api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
 
         if (blocklistid == "" or None):
             self.save_progress("No blocklistid was specified, removing hash(es) from all blocklist packages")
@@ -264,11 +310,6 @@ class AirlockDigitalConnector(BaseConnector):
         # Place api key in its own variable.
         api_key = config.get('apiKey')
 
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
-
         if (applicationid == "" or None):
             self.save_progress("No applicationid was specified, removing hash(es) from all application capture packages")
             url = AIRLOCK_HASH_APPLICATION_REMOVE_ALL_ENDPOINT
@@ -328,11 +369,6 @@ class AirlockDigitalConnector(BaseConnector):
         # Place api key in its own variable.
         api_key = config.get('apiKey')
 
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
-
         url = AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT
         # Required values can be accessed directly
         request_json = {
@@ -369,7 +405,6 @@ class AirlockDigitalConnector(BaseConnector):
     def _handle_allow_hash(self, param):
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -384,11 +419,6 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Place api key in its own variable.
         api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
 
         # We first need to populate the hash value into the airlock file repository, so it can be added into an appcap
         url = AIRLOCK_HASH_ADD_ENDPOINT
@@ -872,21 +902,14 @@ class AirlockDigitalConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
             return action_result.set_status(phantom.APP_ERROR, "Failed to lookup hash for Airlock Digital.  Error Message {}".format(response['error']))
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['result'] = response['error']
-
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def handle_action(self, param):
 
@@ -943,17 +966,13 @@ class AirlockDigitalConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
         self._base_url = config.get('base_url')
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
