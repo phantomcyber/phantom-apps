@@ -1,6 +1,7 @@
 # File: urlhaus_connector.py
 # Copyright (c) 2020 Splunk Inc.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -60,6 +61,9 @@ class UrlhausConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -69,7 +73,6 @@ class UrlhausConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -92,8 +95,7 @@ class UrlhausConnector(BaseConnector):
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}'))
-        )
+            self._handle_py_ver_compat_for_input_str(r.text))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -239,16 +241,21 @@ class UrlhausConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        if response['query_status'] == "no_results":
-            summary['message'] = "No results found for: {0}".format(url)
-        elif response['query_status'] == "ok":
-            summary['date_added'] = response['date_added']
-            payload_count = len(response['payloads'])
-            summary['payload_count'] = payload_count
-            summary['message'] = "URL {0} observed dropping {1} payloads".format(
-                url, payload_count)
-        summary['query_status'] = response['query_status']
+        try:
+            summary = action_result.update_summary({})
+            if response['query_status'] == "no_results":
+                summary['message'] = "No results found for: {0}".format(url)
+            elif response['query_status'] == "ok":
+                summary['date_added'] = response['date_added']
+                payload_count = len(response['payloads'])
+                summary['payload_count'] = payload_count
+                summary['message'] = "URL {0} observed dropping {1} payloads".format(
+                    url, payload_count)
+            summary['query_status'] = response['query_status']
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -271,15 +278,20 @@ class UrlhausConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        if response['query_status'] == "no_results":
-            summary['message'] = "No results found for: {0}".format(ip)
-        elif response['query_status'] == "ok":
-            summary['firstseen'] = response['firstseen']
-            url_count = len(response['urls'])
-            summary['url_count'] = url_count
-            summary['message'] = "IP {0} observed serving {1} URLs".format(ip, url_count)
-        summary['query_status'] = response['query_status']
+        try:
+            summary = action_result.update_summary({})
+            if response['query_status'] == "no_results":
+                summary['message'] = "No results found for: {0}".format(ip)
+            elif response['query_status'] == "ok":
+                summary['firstseen'] = response['firstseen']
+                url_count = len(response['urls'])
+                summary['url_count'] = url_count
+                summary['message'] = "IP {0} observed serving {1} URLs".format(ip, url_count)
+            summary['query_status'] = response['query_status']
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_domain(self, param):
@@ -299,15 +311,21 @@ class UrlhausConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-        summary = action_result.update_summary({})
-        if response['query_status'] == "no_results":
-            summary['message'] = "No results found for: {0}".format(domain)
-        elif response['query_status'] == "ok":
-            summary['firstseen'] = response['firstseen']
-            url_count = len(response['urls'])
-            summary['url_count'] = url_count
-            summary['message'] = "Domain {0}  observed serving {1} URLs".format(domain, url_count)
-        summary['query_status'] = response['query_status']
+
+        try:
+            summary = action_result.update_summary({})
+            if response['query_status'] == "no_results":
+                summary['message'] = "No results found for: {0}".format(domain)
+            elif response['query_status'] == "ok":
+                summary['firstseen'] = response['firstseen']
+                url_count = len(response['urls'])
+                summary['url_count'] = url_count
+                summary['message'] = "Domain {0}  observed serving {1} URLs".format(domain, url_count)
+            summary['query_status'] = response['query_status']
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_hash(self, param):
@@ -334,17 +352,22 @@ class UrlhausConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        if response['query_status'] == "no_results":
-            summary['message'] = "No results found for: {0}".format(file_hash)
-        elif response['query_status'] == "ok":
-            summary['firstseen'] = response['firstseen']
-            url_count = len(response['urls'])
-            summary['url_count'] = url_count
-            signature = response['signature']
-            summary['message'] = "File Hash {0} observed being served by {1} URLs. Possible signature {2}".format(
-                file_hash, url_count, signature)
-        summary['query_status'] = response['query_status']
+        try:
+            summary = action_result.update_summary({})
+            if response['query_status'] == "no_results":
+                summary['message'] = "No results found for: {0}".format(file_hash)
+            elif response['query_status'] == "ok":
+                summary['firstseen'] = response['firstseen']
+                url_count = len(response['urls'])
+                summary['url_count'] = url_count
+                signature = response['signature']
+                summary['message'] = "File Hash {0} observed being served by {1} URLs. Possible signature {2}".format(
+                    file_hash, url_count, signature)
+            summary['query_status'] = response['query_status']
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
