@@ -2370,10 +2370,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.tasks.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.tasks.*.due_date",
@@ -3711,10 +3708,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.assessment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.city",
@@ -4025,10 +4019,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_acquired_comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_additional_misuse",
@@ -4036,10 +4027,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_additional_misuse_comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_adverse",
@@ -4047,10 +4035,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_adverse_comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_breach",
@@ -4058,10 +4043,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_breach_comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_misused",
@@ -4069,10 +4051,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hipaa.hipaa_misused_comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -4302,10 +4281,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.pii.assessment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.pii.data_compromised",
@@ -9272,10 +9248,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.tasks.*.child_tasks.*.user_notes",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.tasks.*.id",
@@ -9361,7 +9334,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "taskid"
+                        "ibm resilient taskid"
                     ]
                 }
             },
@@ -9482,9 +9455,6 @@
                 {
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "column_name": "Description",
                     "column_order": 5
                 },
@@ -9760,7 +9730,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "taskid"
+                        "ibm resilient taskid"
                     ]
                 },
                 "taskdto": {
@@ -9871,7 +9841,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "taskid"
+                        "ibm resilient taskid"
                     ]
                 }
             },
@@ -10379,7 +10349,7 @@
                     ]
                 },
                 "vault_id": {
-                    "description": "vault ID of file",
+                    "description": "Vault ID of file",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
