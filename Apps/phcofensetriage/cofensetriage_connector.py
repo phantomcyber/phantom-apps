@@ -95,12 +95,27 @@ class CofenseTriageConnector(BaseConnector):
 
         return input_str
 
+    def _validate_integer(self, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return "Please provide a valid integer value in the {}".format(key), None
+
+                parameter = int(parameter)
+            except:
+                return "Please provide a valid integer value in the {}".format(key), None
+
+            if parameter < 0:
+                return "Please provide a valid non-negative integer value in the {}".format(key), None
+
+        return True, parameter
+
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -141,7 +156,7 @@ class CofenseTriageConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}')))
+            r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -329,7 +344,7 @@ class CofenseTriageConnector(BaseConnector):
         if tenant is None:
             return True, None
 
-        tenant = str(tenant).lower()
+        tenant = tenant.lower()
 
         if not self._user_info:
             ret_val, self._user_info = self._get_user_info()
@@ -670,30 +685,30 @@ class CofenseTriageConnector(BaseConnector):
             per_page = MAX_PER_PAGE
 
         # ensure all page/per_page comparisons are done int to int
-        try:
-            page = int(page)
-        except:
-            return "Error: page parameter must be in numeric form; {}".format(page), None
-        try:
-            per_page = int(per_page)
-        except:
-            return "Error: per_page parameter must be in numeric form; {}".format(per_page), None
-        try:
-            max_results = int(max_results)
-        except:
-            return "Error: max_results parameter must be in numeric form; {}".format(max_results), None
 
-        if page < 0:
-            return "Error: page parameter must be greater or equal to zero; {}".format(page), None
-
-        if per_page <= 0:
-            return "Error: per_page parameter must be greater than zero; {}".format(per_page), None
+        ret_val, page = self._validate_integer(page, PAGE_KEY)
+        if ret_val is not True:
+            return ret_val, None
+        ret_val, per_page = self._validate_integer(per_page, PER_PAGE_KEY)
+        if ret_val is not True:
+            return ret_val, None
+        ret_val, max_results = self._validate_integer(
+            max_results, MAX_RESULTS_KEY)
+        if ret_val is not True:
+            return ret_val, None
+        ret_val, match_priority = self._validate_integer(
+            match_priority, MATCH_PRIORITY_KEY)
+        if ret_val is not True:
+            return ret_val, None
+        
+        if per_page == 0:
+            return "Error: 'per_page' parameter must be greater than zero; {}".format(per_page), None
 
         if per_page > MAX_PER_PAGE:
-            return "Error: per_page parameter must be less than or equal to {}; {}".format(MAX_PER_PAGE, per_page), None
+            return "Error: 'per_page' parameter must be less than or equal to {}; {}".format(MAX_PER_PAGE, per_page), None
 
-        if max_results <= 0:
-            return "Error: max_results parameter must be greater than zero; {}".format(max_results), None
+        if max_results == 0:
+            return "Error: 'max_results' parameter must be greater than zero; {}".format(max_results), None
 
         params = {
             'match_priority': match_priority,
@@ -741,7 +756,7 @@ class CofenseTriageConnector(BaseConnector):
                     # this doesn't make sense, return as error, discard downloaded results
                     return "Error: requested results per page doesn't match actual results per page; requested ({}) actual ({})".format(per_page, self._r.headers.get('Per-Page')), None
             except:
-                return "Error: requested results per page doesn't match actual results per page", None
+                return "Error: Actual per page is not an integer", None
             # figure out which pages to download and in what order
             try:
                 total_results = int(self._r.headers['Total'])
@@ -760,8 +775,12 @@ class CofenseTriageConnector(BaseConnector):
 
             # Fallback to a default rate limit if the Cofense Triage API does
             # not respond with the X-RateLimit-Remaining header.
-            ratelimit = int(self._r.headers.get(
-                'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+            try:
+                ratelimit = int(self._r.headers.get(
+                    'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return err, None
 
             for page in desired_pages:
 
@@ -794,9 +813,12 @@ class CofenseTriageConnector(BaseConnector):
                 downloaded_pages += [page]
                 downloaded_results += response
                 downloaded_length = len(downloaded_results)
-
-                ratelimit = int(self._r.headers.get(
-                    'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+                try:
+                    ratelimit = int(self._r.headers.get(
+                        'X-RateLimit-Remaining', DEFAULT_COFENSE_TRIAGE_RATE_LIMIT))
+                except Exception as e:
+                    err = self._get_error_message_from_exception(e)
+                    return err, None
 
                 self.save_progress("Retrieved page {} with {} results. Retrieved {} of {} total results. {} limit of {} max results".format(
                     params['page'], len(response), downloaded_length, total_results, "Reached" if downloaded_length >= max_results else "Not at", max_results))
@@ -1085,7 +1107,9 @@ class CofenseTriageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
-
+        ret_val, report_id = self._validate_integer(report_id, REPORT_ID_KEY)
+        if ret_val is not True:
+            return action_result.set_status(phantom.APP_ERROR, ret_val)
         ret_val, label = self._validate_label(
             self._handle_py_ver_compat_for_input_str(param.get('ingest_to_label')))
         if ret_val is not True:
@@ -1137,6 +1161,9 @@ class CofenseTriageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
+        ret_val, report_id = self._validate_integer(report_id, REPORT_ID_KEY)
+        if ret_val is not True:
+            return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         endpoint = "/reports/" + str(report_id) + ".txt"
         self.save_progress(
@@ -1185,6 +1212,10 @@ class CofenseTriageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         attachment_id = param['attachment_id']
+        ret_val, attachment_id = self._validate_integer(
+            attachment_id, ATTACHMENT_ID_KEY)
+        if ret_val is not True:
+            return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         endpoint = "/attachment/" + str(attachment_id)
         self.save_progress(
@@ -1293,6 +1324,10 @@ class CofenseTriageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         reporter_id = param['reporter_id']
+        ret_val, reporter_id = self._validate_integer(
+            reporter_id, REPORTER_ID_KEY)
+        if ret_val is not True:
+            return action_result.set_status(phantom.APP_ERROR, ret_val)
 
         endpoint = "/reporters/" + str(reporter_id)
         self.save_progress("Retrieving reporter id {}".format(reporter_id))
@@ -1516,8 +1551,7 @@ class CofenseTriageConnector(BaseConnector):
             config['base_url'])
         self._api_email = self._handle_py_ver_compat_for_input_str(
             config['api_email'])
-        self._api_token = self._handle_py_ver_compat_for_input_str(
-            config['api_token'])
+        self._api_token = config['api_token']
         self._auth_string = 'Token token={0}:{1}'.format(
             self._api_email, self._api_token)
         #
