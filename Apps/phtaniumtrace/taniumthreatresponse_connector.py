@@ -1340,9 +1340,29 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        computer_group_name = param['computer_group_name']
+        endpoint = "{}/{}".format("/api/v2/groups/by-name", computer_group_name)
+        ret_val, response = self._make_rest_call_helper(action_result, endpoint)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        response_data = response.get("data")
+
+        if not response_data:
+            return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
+                    Also, please verify that your account has sufficient permissions to access the groups".format(computer_group_name))
+        '''
+        resp_data = self._get_response_data(response_data, action_result, "group")
+
+        if resp_data is None:
+            return action_result.get_status()
+        '''
+        computer_group_id = response_data.get("id")
+
         data = {
             'intelDocId': param['intel_doc_id'],
-            'computerGroupId': int(param['computer_group_id'])
+            'computerGroupId': computer_group_id)
         }
 
         endpoint = '/plugin/products/detect3/api/v1/quick-scans'

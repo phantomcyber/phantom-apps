@@ -3208,14 +3208,14 @@
                         "threatresponse intel doc id"
                     ]
                 },
-                "computer_group_id": {
-                    "description": "The ID of a Tanium computer group",
-                    "data_type": "numeric",
+                "computer_group_name": {
+                    "description": "The name of a Tanium computer group",
+                    "data_type": "string",
                     "required": true,
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "tanium computer group id"
+                        "tanium computer group name"
                     ]
                 }
             },
@@ -3230,30 +3230,30 @@
                 },
                 {
                     "data_path": "action_result.parameter.intel_doc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "threatresponse intel doc id"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.computer_group_id",
+                    "data_path": "action_result.parameter.computer_group_name",
                     "data_type": "string",
                     "contains": [
-                        "tanium computer group id"
+                        "tanium computer group name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.intel_doc_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "threatresponse intel doc id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.computer_group_id",
+                    "data_path": "action_result.data.*.computer_group_name",
                     "data_type": "string",
                     "contains": [
-                        "tanium computer group id"
+                        "tanium computer group name"
                     ]
                 },
                 {
