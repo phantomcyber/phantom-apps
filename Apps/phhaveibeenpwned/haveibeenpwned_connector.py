@@ -19,6 +19,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
     ACTION_ID_LOOKUP_EMAIL = "lookup_email"
     ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
+    TEST_CONNECTIVITY_EMAIL = "test@gmail.com"
 
     def __init__(self):
         super(HaveIBeenPwnedConnector, self).__init__()
@@ -58,8 +59,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         self.save_progress("Connecting to the Have I Been Pwned server")
 
-        email = "test@gmail.com"
-        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=self.TEST_CONNECTIVITY_EMAIL)
 
         ret_val, response = self._make_rest_call(endpoint, truncate=True)
 
