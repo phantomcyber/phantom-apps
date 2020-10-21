@@ -1354,7 +1354,7 @@ class TaniumThreatResponseConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, error_message)
 
         computer_group_id = response_data.get("id")
-
+        
         data = {
             'intelDocId': param['intel_doc_id'],
             'computerGroupId': computer_group_id)
