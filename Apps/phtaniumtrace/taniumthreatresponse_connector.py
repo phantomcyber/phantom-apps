@@ -1342,7 +1342,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         computer_group_name = param['computer_group_name']
         endpoint = "{}/{}".format("/api/v2/groups/by-name", computer_group_name)
-        ret_val, response = self._make_rest_call_helper(action_result, endpoint)
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
