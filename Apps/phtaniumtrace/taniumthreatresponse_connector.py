@@ -1350,9 +1350,9 @@ class TaniumThreatResponseConnector(BaseConnector):
         response_data = response.get("data")
 
         if not response_data:
-            return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                    Also, please verify that your account has sufficient permissions to access the groups".format(computer_group_name))
-        
+            error_message = "No group exists with name {}. Also, please verify that your account has sufficient permissions to access the groups".format(computer_group_name)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+
         computer_group_id = response_data.get("id")
 
         data = {
