@@ -2577,12 +2577,12 @@
         {
             "action": "get email",
             "identifier": "get_email",
-            "description": "Returns message information for a tracked message",
+            "description": "Returns message information for a tracked email",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "id": {
-                    "description": "Mimecast ID of the message to load",
+                    "description": "Mimecast ID of the email to load",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
