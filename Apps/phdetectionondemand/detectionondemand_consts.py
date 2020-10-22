@@ -1,3 +1,8 @@
+# File: detectionondemand_consts.py
+# Copyright (c) FireEye, 2020
+#
+# Licensed under FireEye
+#
 # Define your constants here
 DOD_API_AUTH_HEADER = 'feye-auth-key'
 

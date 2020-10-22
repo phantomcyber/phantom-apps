@@ -80,18 +80,6 @@
                 }
             },
             "output": [{
-                    "data_path": "action_result.data.*.report_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "9f7dd79d-1e94-473d-bef9-bd405a04336a"
-                    ],
-                    "contains": [
-                        "report_id"
-                    ],
-                    "column_name": "Report ID",
-                    "column_order": 0
-                },
-                {
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "contains": [
@@ -239,6 +227,10 @@
                     "description": "The MD5 hash of the file to investigate",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "md5_hash"
+                    ],
                     "order": 0
                 }
             },

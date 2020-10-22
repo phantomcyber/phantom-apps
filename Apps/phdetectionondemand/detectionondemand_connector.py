@@ -1,4 +1,9 @@
-#!/usr/bin/python
+# File: detectionondemand_connector.py
+# Copyright (c) FireEye, 2020
+#
+# Licensed under FireEye
+#
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 # -----------------------------------------
 # Phantom sample App Connector python file
@@ -19,7 +24,7 @@ import requests
 import time
 import json
 import sys
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 
 
 class RetVal(tuple):
@@ -36,10 +41,6 @@ class DetectionOnDemandConnector(BaseConnector):
         super(DetectionOnDemandConnector, self).__init__()
 
         self._state = None
-
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
         self._base_url = None
         self._api_token = None
 
@@ -97,7 +98,7 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the <Your APP Name> Server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Detection on Demand Server. Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
@@ -114,7 +115,7 @@ class DetectionOnDemandConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -124,6 +125,11 @@ class DetectionOnDemandConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -133,7 +139,7 @@ class DetectionOnDemandConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -141,8 +147,8 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            error_code, error_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_msg)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -151,7 +157,7 @@ class DetectionOnDemandConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -214,9 +220,9 @@ class DetectionOnDemandConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
-            error_code, error_msg = self._get_error_message_from_exception(e)
+            error_msg = self._get_error_message_from_exception(e)
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), resp_json)
+                action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -240,8 +246,6 @@ class DetectionOnDemandConnector(BaseConnector):
             self.save_progress("Test Connectivity Passed")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
@@ -267,9 +271,13 @@ class DetectionOnDemandConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, "Unable to find vault item")
 
-        files = {
-            "file": (file_name, open(file_path, 'rb'))
-        }
+        try:
+            files = {
+                "file": (file_name, open(file_path, 'rb'))
+            }
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         data = {}
         if password:
@@ -299,7 +307,7 @@ class DetectionOnDemandConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
 
-        # Format the url as a stringly typed array: ex. ["https://www.google.com"]
+        # Format the url as a stringly typed array: ex. ["https://www.test.com"]
         urls = {
             'urls': f'["{param["url"]}"]'
         }
@@ -353,19 +361,19 @@ class DetectionOnDemandConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
-        # Validation of the presigned_url_expiry parameter
+        # Integer Validation for 'presigned_url_expiry' parameter
         expiry = param['presigned_url_expiry']
         ret_val, expiry = self._validate_integer(action_result, expiry, PRESIGNED_URL_EXPIRY_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Validation of the poll_attempts parameter
+        # Integer Validation for 'poll_attempts' parameter
         poll_attempts = param['poll_attempts']
         ret_val, poll_attempts = self._validate_integer(action_result, poll_attempts, POLL_ATTEMPTS_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Validation of the poll_interval parameter
+        # Integer Validation for 'poll_interval' parameter
         poll_interval = param['poll_interval']
         ret_val, poll_interval = self._validate_integer(action_result, poll_interval, POLL_INTERVAL_KEY)
         if phantom.is_fail(ret_val):
