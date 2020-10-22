@@ -119,6 +119,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         email = self._handle_py_ver_compat_for_input_str(params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL])
         truncate = params[HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE] == "True"
         endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
+        endpoint = UnicodeDammit(endpoint).unicode_markup
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
 
