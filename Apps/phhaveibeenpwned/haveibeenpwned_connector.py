@@ -7,6 +7,8 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from bs4 import UnicodeDammit
+import sys
 
 # THIS Connector imports
 from haveibeenpwned_consts import *
@@ -26,9 +28,25 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
     def initialize(self):
         config = self.get_config()
-        self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
+        self._python_version = int(sys.version_info[0])
+
+        self._api_key = self._handle_py_ver_compat_for_input_str(config[HAVEIBEENPWNED_CONFIG_API_KEY])
 
         return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except Exception:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
 
     def _make_rest_call(self, endpoint, params=None, truncate=False):
         full_url = HAVEIBEENPWNED_API_BASE_URL + endpoint
@@ -73,7 +91,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
-        domain = params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN]
+        domain = self._handle_py_ver_compat_for_input_str(params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN])
         if phantom.is_url(domain):
             domain = phantom.get_host_from_url(domain).replace("www.", "")
 
@@ -98,7 +116,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
     def _lookup_email(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
 
-        email = params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL]
+        email = self._handle_py_ver_compat_for_input_str(params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL])
         truncate = params[HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE] == "True"
         endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
 
@@ -139,7 +157,6 @@ if __name__ == '__main__':
         """
 
     # Imports
-    import sys
     import pudb
 
     # Breakpoint at runtime
