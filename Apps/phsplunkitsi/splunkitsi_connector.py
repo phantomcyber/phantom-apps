@@ -226,11 +226,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             error_message = 'Error Details: Connection Refused from the Server'
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            if hasattr(e, 'message'):
-                error_message = self._unicode_string_handler(e.message)
-            else:
-                error_message = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message), resp_json))
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err), resp_json))
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -504,7 +501,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         earliest_time = param.get('earliest_time', '60 mins')
         max_results = param.get('max_results', '1')
 
-        # Create parms for GET request
+        # Create params for GET request
         earliest_time = '-' + self.relative_time_values.get(earliest_time, earliest_time)
         search_string = ('search index=itsi_grouped_alerts sourcetype=itsi_notable:group NOT source=itsi@internal@group_closing_event '
                          'itsi_group_id="' + itsi_group_id + '"'
@@ -810,22 +807,26 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Optional values should use the .get() function
         start_time = param.get('start_time', None)
-        ret_val, start_time = self._validate_integer(action_result, start_time, 'Start Time')
+        # Integer validation for 'start_time' parameter
+        ret_val, start_time = self._validate_integer(action_result, start_time, "'start_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        ret_val, end_time = self._validate_integer(action_result, end_time, 'End Time')
+        # Integer validation for 'end_time' parameter
+        ret_val, end_time = self._validate_integer(action_result, end_time, "'end_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', 0)
-        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, 'Relative Start Time')
+        # Integer validation for 'relative_start_time' parameter
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, "'relative_start_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', 300)
-        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, 'Relative End Time')
+        # Integer validation for 'relative_end_time' parameter
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, "'relative_end_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -901,22 +902,26 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Optional values should use the .get() function
         title = param.get('title', None)
         start_time = param.get('start_time', None)
-        ret_val, start_time = self._validate_integer(action_result, start_time, 'Start Time')
+        # Integer validation for 'start_time' parameter
+        ret_val, start_time = self._validate_integer(action_result, start_time, "'start_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        ret_val, end_time = self._validate_integer(action_result, end_time, 'End Time')
+        # Integer validation for 'end_time' parameter
+        ret_val, end_time = self._validate_integer(action_result, end_time, "'end_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', None)
-        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, 'Relative Start Time')
+        # Integer validation for 'relative_start_time' parameter
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, "'relative_start_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', None)
-        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, 'Relative End Time')
+        # Integer validation for 'relative_end_time' parameter
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, "'relative_end_time' action parameter")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
