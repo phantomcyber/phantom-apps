@@ -14,6 +14,7 @@ from phantom.action_result import ActionResult
 
 import requests
 import json
+import sys
 from bs4 import BeautifulSoup, UnicodeDammit
 import random
 
@@ -51,20 +52,69 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.relative_time_values = { '15 min': '15m', '60 mins': '60m', '4 hours': '4h', '24 hours': '24h', '7 days': '7d', '30 days': '30d' }
 
     def _unicode_string_handler(self, input_str):
-        """helper method for handling unicode strings
-
-        Arguments:
-            input_str  -- Input string that needs to be processed
-
-        Returns:
-             -- Processed input string based on input_str
         """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
         try:
-            if input_str:
-                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print("Error ocurred while Unicode handling of the string")
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
         return input_str
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._unicode_string_handler(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Splunk IT Service Intelligence Server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        if error_code in "Error code unavailable":
+            error_text = "Error Message: {0}".format(error_msg)
+        else:
+            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
@@ -102,7 +152,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 400:
@@ -215,6 +266,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -246,6 +299,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._handle_update_episode_helper(param, action_result)
         if phantom.is_fail(ret_val):
@@ -303,6 +358,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._handle_break_episode_helper(param, action_result)
         if phantom.is_fail(ret_val):
@@ -338,6 +395,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             self.save_progress("Break Episode Failed")
             return action_result.get_status()
 
+        action_result.add_data(response)
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Break Episode Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -349,6 +407,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Optional values should use the .get() function
@@ -386,6 +446,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -415,7 +477,10 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({ 'itsi_group_id': itsi_group_id})
-        summary['comment_id'] = response['comment_id']
+        try:
+            summary['comment_id'] = response['comment_id']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error while parsing API response to get the Comment ID")
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Add Episode Comment Passed")
@@ -428,6 +493,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -477,6 +544,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -521,6 +590,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -552,6 +623,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -583,6 +656,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -618,6 +693,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -658,6 +735,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -689,6 +768,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -720,6 +801,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -727,30 +810,24 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Optional values should use the .get() function
         start_time = param.get('start_time', None)
-        if start_time is not None:
-            try:
-                start_time = float(start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+        ret_val, start_time = self._validate_integer(action_result, start_time, 'Start Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        if end_time is not None:
-            try:
-                end_time = float(end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+        ret_val, end_time = self._validate_integer(action_result, end_time, 'End Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', 0)
-        try:
-            relative_start_time = float(relative_start_time)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, 'Relative Start Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', 300)
-        try:
-            relative_end_time = float(relative_end_time)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, 'Relative End Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
@@ -814,6 +891,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -822,32 +901,24 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Optional values should use the .get() function
         title = param.get('title', None)
         start_time = param.get('start_time', None)
-        if start_time is not None:
-            try:
-                start_time = float(start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+        ret_val, start_time = self._validate_integer(action_result, start_time, 'Start Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        if end_time is not None:
-            try:
-                end_time = float(end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+        ret_val, end_time = self._validate_integer(action_result, end_time, 'End Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', None)
-        if relative_start_time is not None:
-            try:
-                relative_start_time = float(relative_start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, 'Relative Start Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', None)
-        if relative_end_time is not None:
-            try:
-                relative_end_time = float(relative_end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, 'Relative End Time')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
@@ -915,6 +986,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -1037,6 +1110,12 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             self._auth = None
         else:
             self._auth = (self._username, self._password)
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 

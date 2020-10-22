@@ -57,9 +57,9 @@
     "actions": [
         {
             "action": "end maintenance window",
-            "identifier": "end_maintenance_window",
             "description": "End Splunk ITSI maintenance window",
             "type": "generic",
+            "identifier": "end_maintenance_window",
             "read_only": false,
             "parameters": {
                 "maintenance_window_id": {
@@ -77,26 +77,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.maintenance_window_id",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 4,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                    "column_name": "Maintenance Window ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "column_name": "Comment",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.maintenance_window_id",
-                    "data_type": "string",
-                    "column_name": "Maintenance Window ID",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
@@ -109,6 +99,16 @@
                     "data_type": "string",
                     "column_name": "Summary",
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -136,9 +136,9 @@
         },
         {
             "action": "update maintenance window",
-            "identifier": "update_maintenance_window",
             "description": "Update Splunk ITSI maintenance window",
             "type": "generic",
+            "identifier": "update_maintenance_window",
             "read_only": false,
             "parameters": {
                 "maintenance_window_id": {
@@ -194,44 +194,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 9,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "column_name": "Comment",
-                    "column_order": 6
-                },
-                {
-                    "data_path": "action_result.parameter.end_time",
-                    "data_type": "numeric",
-                    "column_name": "End Time",
-                    "column_order": 3
-                },
-                {
                     "data_path": "action_result.parameter.maintenance_window_id",
                     "data_type": "string",
                     "column_name": "Maintenance Window ID",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.object_ids",
+                    "data_path": "action_result.parameter.title",
                     "data_type": "string",
-                    "column_name": "Object IDs",
-                    "column_order": 5
-                },
-                {
-                    "data_path": "action_result.parameter.object_type",
-                    "data_type": "string",
-                    "column_name": "Object Type",
-                    "column_order": 4
+                    "column_name": "Title",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.relative_end_time",
@@ -248,10 +220,28 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.parameter.title",
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "numeric",
+                    "column_name": "End Time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.object_type",
                     "data_type": "string",
-                    "column_name": "Title",
-                    "column_order": 1
+                    "column_name": "Object Type",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.object_ids",
+                    "data_type": "string",
+                    "column_name": "Object Ids",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data",
@@ -264,6 +254,16 @@
                     "data_type": "string",
                     "column_name": "Summary",
                     "column_order": 8
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 9,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -291,9 +291,9 @@
         },
         {
             "action": "add maintenance window",
-            "identifier": "add_maintenance_window",
             "description": "Add Splunk ITSI maintenance window",
             "type": "generic",
+            "identifier": "add_maintenance_window",
             "read_only": false,
             "parameters": {
                 "title": {
@@ -357,13 +357,13 @@
                 {
                     "data_path": "action_result.parameter.relative_start_time",
                     "data_type": "numeric",
-                    "column_name": "Start Time",
+                    "column_name": "Relative Start Time",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.relative_end_time",
                     "data_type": "numeric",
-                    "column_name": "Start Time",
+                    "column_name": "Relative End Time",
                     "column_order": 2
                 },
                 {
@@ -387,7 +387,7 @@
                 {
                     "data_path": "action_result.parameter.object_ids",
                     "data_type": "string",
-                    "column_name": "Object IDs",
+                    "column_name": "Object Ids",
                     "column_order": 6
                 },
                 {
@@ -444,9 +444,9 @@
         },
         {
             "action": "get maintenance window",
-            "identifier": "get_maintenance_window",
             "description": "Get Splunk ITSI maintenance window information",
             "type": "investigate",
+            "identifier": "get_maintenance_window",
             "read_only": true,
             "parameters": {
                 "maintenance_window_id": {
@@ -511,15 +511,19 @@
         },
         {
             "action": "update service status",
-            "identifier": "update_service_status",
             "description": "Update Splunk ITSI service status",
             "type": "generic",
+            "identifier": "update_service_status",
             "read_only": false,
             "parameters": {
                 "itsi_service_id": {
                     "description": "Splunk ITSI service ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "service_status": {
@@ -539,6 +543,9 @@
                     "data_path": "action_result.parameter.itsi_service_id",
                     "data_type": "string",
                     "column_name": "ITSI Service ID",
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -595,15 +602,19 @@
         },
         {
             "action": "get service entities",
-            "identifier": "get_service_entities",
             "description": "Get entities of a Splunk ITSI service",
             "type": "investigate",
+            "identifier": "get_service_entities",
             "read_only": true,
             "parameters": {
                 "itsi_service_id": {
                     "description": "Splunk ITSI service ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
+                    "primary": true,
                     "order": 0
                 }
             },
@@ -612,6 +623,9 @@
                     "data_path": "action_result.parameter.itsi_service_id",
                     "data_type": "string",
                     "column_name": "ITSI Service ID",
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -662,15 +676,19 @@
         },
         {
             "action": "get service",
-            "identifier": "get_service",
             "description": "Get Splunk ITSI service information",
             "type": "investigate",
+            "identifier": "get_service",
             "read_only": true,
             "parameters": {
                 "itsi_service_id": {
                     "description": "Splunk ITSI service ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
+                    "primary": true,
                     "order": 0
                 }
             },
@@ -679,6 +697,9 @@
                     "data_path": "action_result.parameter.itsi_service_id",
                     "data_type": "string",
                     "column_name": "ITSI Service ID",
+                    "contains": [
+                        "splunk itsi service id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -729,9 +750,9 @@
         },
         {
             "action": "get entity",
-            "identifier": "get_entity",
             "description": "Get Splunk ITSI entity information",
             "type": "investigate",
+            "identifier": "get_entity",
             "read_only": true,
             "parameters": {
                 "itsi_entity_id": {
@@ -748,7 +769,7 @@
                     "column_name": "ITSI Entity ID",
                     "column_order": 0
                 },
-               {
+                {
                     "data_path": "action_result.data",
                     "data_type": "string",
                     "column_name": "Data",
@@ -796,15 +817,19 @@
         },
         {
             "action": "get episode tickets",
-            "identifier": "get_episode_tickets",
             "description": "Get ticket information for a Splunk ITSI episode",
             "type": "investigate",
+            "identifier": "get_episode_tickets",
             "read_only": true,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 }
             },
@@ -813,6 +838,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -863,15 +891,19 @@
         },
         {
             "action": "add episode ticket",
-            "identifier": "add_episode_ticket",
             "description": "Add a ticket to a Splunk ITSI episode",
             "type": "generic",
+            "identifier": "add_episode_ticket",
             "read_only": false,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "ticket_system": {
@@ -886,12 +918,12 @@
                     "order": 1
                 },
                 "ticket_id": {
-                    "description": "Ticket ID in ticketing system",
+                    "description": "Ticket ID in the ticketing system",
                     "data_type": "string",
                     "order": 2
                 },
                 "ticket_url": {
-                    "description": "Ticket URL in ticketing system",
+                    "description": "Ticket URL in the ticketing system",
                     "data_type": "string",
                     "order": 3
                 }
@@ -901,6 +933,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -969,15 +1004,19 @@
         },
         {
             "action": "get episode events",
-            "identifier": "get_episode_events",
             "description": "Get latest events for Splunk ITSI episode",
             "type": "investigate",
+            "identifier": "get_episode_events",
             "read_only": true,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "earliest_time": {
@@ -1014,6 +1053,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -1076,15 +1118,19 @@
         },
         {
             "action": "close episode",
-            "identifier": "close_episode",
             "description": "Close a Splunk ITSI episode",
             "type": "generic",
+            "identifier": "close_episode",
             "read_only": false,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "break_episode": {
@@ -1097,6 +1143,10 @@
                     "description": "Splunk ITSI notable event aggregation policy ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi policy id"
+                    ],
+                    "primary": true,
                     "order": 2
                 }
             },
@@ -1105,18 +1155,28 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.break_episode",
                     "data_type": "boolean",
                     "column_name": "Break Episode",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.itsi_policy_id",
                     "data_type": "string",
                     "column_name": "ITSI Policy ID",
+                    "contains": [
+                        "splunk itsi policy id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -1167,21 +1227,29 @@
         },
         {
             "action": "break episode",
-            "identifier": "break_episode",
             "description": "Break a Splunk ITSI episode",
             "type": "generic",
+            "identifier": "break_episode",
             "read_only": false,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "itsi_policy_id": {
                     "description": "Splunk ITSI notable event aggregation policy ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi policy id"
+                    ],
+                    "primary": true,
                     "order": 1
                 }
             },
@@ -1190,12 +1258,18 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.itsi_policy_id",
                     "data_type": "string",
                     "column_name": "ITSI Policy ID",
+                    "contains": [
+                        "splunk itsi policy id"
+                    ],
                     "column_order": 1
                 },
                 {
@@ -1246,15 +1320,19 @@
         },
         {
             "action": "add episode comment",
-            "identifier": "add_episode_comment",
             "description": "Add a comment to a Splunk ITSI episode",
             "type": "generic",
+            "identifier": "add_episode_comment",
             "read_only": false,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "comment": {
@@ -1269,6 +1347,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -1325,15 +1406,19 @@
         },
         {
             "action": "update episode",
-            "identifier": "update_episode",
             "description": "Update Splunk ITSI episode status, severity and owner",
             "type": "generic",
+            "identifier": "update_episode",
             "read_only": false,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 },
                 "status": {
@@ -1373,6 +1458,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -1441,15 +1529,19 @@
         },
         {
             "action": "get episode",
-            "identifier": "get_episode",
             "description": "Get Splunk ITSI episode information",
             "type": "investigate",
+            "identifier": "get_episode",
             "read_only": true,
             "parameters": {
                 "itsi_group_id": {
                     "description": "Splunk ITSI episode ID",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
+                    "primary": true,
                     "order": 0
                 }
             },
@@ -1458,6 +1550,9 @@
                     "data_path": "action_result.parameter.itsi_group_id",
                     "data_type": "string",
                     "column_name": "ITSI Group ID",
+                    "contains": [
+                        "splunk itsi group id"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -1508,9 +1603,9 @@
         },
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
