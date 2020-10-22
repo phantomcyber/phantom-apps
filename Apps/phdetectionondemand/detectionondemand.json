@@ -1,11 +1,11 @@
 {
     "appid": "de5847c9-526f-4ab1-bea9-a61255d244dd",
     "name": "Detection on Demand",
-    "description": "This app integrates with FireEye's Detection on Demand service to identify malicious files and hashes.",
+    "description": "This app integrates with FireEye's Detection on Demand service to identify malicious files and hashes",
     "type": "sandbox",
     "product_vendor": "FireEye",
-    "logo": "detectionondemand.png",
-    "logo_dark": "detectionondemand_dark.png",
+    "logo": "logo_detectionondemand.svg",
+    "logo_dark": "logo_detectionondemand_dark.svg",
     "product_name": "Detection on Demand",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2020-06-28T06:11:20.514630Z",
     "package_name": "phantom_detectionondemand",
-    "main_module": "detectionondemand_connector.pyc",
+    "main_module": "detectionondemand_connector.py",
     "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -22,7 +22,6 @@
             "description": "The base url of the Detection on Demand API to connect to",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "https://feapi.marketplace.apps.fireeye.com",
             "order": 0
         },
@@ -30,18 +29,14 @@
             "description": "Your API token for accessing the Detection on Demand API",
             "data_type": "password",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         }
     },
-    "actions": [
-        {
+    "actions": [{
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -49,11 +44,10 @@
         },
         {
             "action": "detonate file",
+            "description": "Execute a file in FireEye's various detection engines to determine what malicious behaviors, if any, the file exhibits",
+            "type": "generic",
             "identifier": "detonate_file",
-            "description": "Execute a file in FireEye's various detection engines to determine what malicious behaviors, if any, the file exhibits.",
-            "verbose": "",
-            "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "vault_id": {
                     "description": "Vault ID of file to detonate",
@@ -69,33 +63,23 @@
                         "doc",
                         "xls",
                         "ppt",
-                        "txt"
+                        "txt",
+                        "vault id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "password": {
                     "description": "Password to be used by the detection engine to decrypt a password protected file",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "param": {
                     "description": "Command line parameter(s) to be used by detection engine when running the file. Mainly applicable to .exe files. For example, setting param to \"start -h localhost -p 5555\" will make the detection engine run a file named \"malicious.exe\" as \"malicious.exe start -h localhost -p 5555\"",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 }
             },
-            "output": [
-                {
+            "output": [{
                     "data_path": "action_result.data.*.report_id",
                     "data_type": "string",
                     "example_values": [
@@ -118,22 +102,51 @@
                         "jar",
                         "doc",
                         "xls",
-                        "ppt"
+                        "ppt",
+                        "vault id"
                     ],
                     "column_name": "Vault ID",
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string"
+                }, {
+                    "data_path": "action_result.parameter.param",
+                    "data_type": "string"
+                }, {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f7dd79d-1e94-473d-bef9-bd405a04336a"
+                    ],
+                    "contains": [
+                        "report_id"
+                    ],
+                    "column_name": "Report ID",
+                    "column_order": 0
+                }, {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }, {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
+                }, {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }, {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -143,24 +156,34 @@
         },
         {
             "action": "detonate url",
+            "description": "Send a URL to Detection on Demand to scan for malicious behavior and artifacts",
+            "type": "generic",
             "identifier": "detonate_url",
-            "description": "Send a URL to Detection on Demand to scan for malicious behavior and artifacts.",
-            "verbose": "",
-            "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "url": {
                     "description": "The URL to analyze",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "urls"
+                    ],
                     "order": 0
                 }
             },
-            "output": [
+            "output": [{
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.test.com"
+                    ],
+                    "contains": [
+                        "urls"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 1
+                },
                 {
                     "data_path": "action_result.data.*.report_id",
                     "data_type": "string",
@@ -174,11 +197,12 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.url",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "URL",
-                    "column_order": 1
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -186,11 +210,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -200,24 +230,19 @@
         },
         {
             "action": "lookup hash",
-            "identifier": "lookup_hash",
             "description": "Search FireEye's hash database to see if there is already a report on the file",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "lookup_hash",
             "read_only": true,
             "parameters": {
                 "md5_hash": {
                     "description": "The MD5 hash of the file to investigate",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
-            "output": [
-                {
+            "output": [{
                     "data_path": "action_result.parameter.md5_hash",
                     "data_type": "string",
                     "contains": [
@@ -231,10 +256,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_malicious",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "column_name": "Is Malicious",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ],
                     "contains": [
                         "is_malicious"
@@ -242,16 +268,30 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -261,10 +301,9 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
             "description": "Get a detailed report on the execution results of a submitted file",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "report_id": {
@@ -272,16 +311,15 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "report_id"
+                    ],
                     "order": 0
                 },
                 "presigned_url_expiry": {
                     "description": "Number of hours to let the presigned URL be active for",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
                     "default": 72,
                     "order": 1
                 },
@@ -289,7 +327,6 @@
                     "description": "Number of seconds to wait between each request to get the report",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
                     "default": 10,
                     "order": 2
                 },
@@ -297,15 +334,29 @@
                     "description": "Total number of attempts to fetch the report before failing",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
                     "default": 12,
                     "order": 3
                 }
             },
-            "render": {
-                "type": "table"
-            },
-            "output": [
+            "output": [{
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string",
+                    "contains": [
+                        "report_id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.presigned_url_expiry",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.poll_interval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.poll_attempts",
+                    "data_type": "numeric"
+                },
                 {
                     "data_path": "action_result.data.*.file_name",
                     "data_type": "string",
@@ -322,7 +373,7 @@
                     "data_path": "action_result.data.*.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "urls"
@@ -334,7 +385,8 @@
                     "data_path": "action_result.data.*.is_malicious",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ],
                     "contains": [
                         "is_malicious"
@@ -377,18 +429,35 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]

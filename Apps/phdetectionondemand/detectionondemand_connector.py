@@ -18,6 +18,7 @@ from detectionondemand_consts import *
 import requests
 import time
 import json
+import sys
 from bs4 import BeautifulSoup
 
 
@@ -41,6 +42,71 @@ class DetectionOnDemandConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
         self._api_token = None
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the <Your APP Name> Server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        if error_code in "Error code unavailable":
+            error_text = "Error Message: {0}".format(error_msg)
+        else:
+            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -75,11 +141,8 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
-                ), None
-            )
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -151,11 +214,9 @@ class DetectionOnDemandConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
-                ), resp_json
-            )
+                action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -199,9 +260,12 @@ class DetectionOnDemandConnector(BaseConnector):
         password = param.get('password', None)
         command_param = param.get('param', None)
 
-        file_info = Vault.get_file_info(vault_id=vault_id)[0]
-        file_path = file_info['path']
-        file_name = file_info['name']
+        try:
+            file_info = Vault.get_file_info(vault_id=vault_id)[0]
+            file_path = file_info['path']
+            file_name = file_info['name']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Unable to find vault item")
 
         files = {
             "file": (file_name, open(file_path, 'rb'))
@@ -289,9 +353,23 @@ class DetectionOnDemandConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         report_id = param['report_id']
+        # Validation of the presigned_url_expiry parameter
         expiry = param['presigned_url_expiry']
-        poll_attempts = int(param['poll_attempts'])
-        poll_interval = int(param['poll_interval'])
+        ret_val, expiry = self._validate_integer(action_result, expiry, PRESIGNED_URL_EXPIRY_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Validation of the poll_attempts parameter
+        poll_attempts = param['poll_attempts']
+        ret_val, poll_attempts = self._validate_integer(action_result, poll_attempts, POLL_ATTEMPTS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Validation of the poll_interval parameter
+        poll_interval = param['poll_interval']
+        ret_val, poll_interval = self._validate_integer(action_result, poll_interval, POLL_INTERVAL_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         while attempt <= poll_attempts:
             self.save_progress(f'Polling attempt {attempt} of {poll_attempts}')
@@ -349,6 +427,12 @@ class DetectionOnDemandConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         # get the asset config
         config = self.get_config()
