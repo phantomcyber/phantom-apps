@@ -7,9 +7,9 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "whois_connector.py",
-    "app_version": "2.0.10",
-    "connector_version": "2.0.10",
-    "utctime_updated": "2020-10-08T21:08:57.000000Z",
+    "app_version": "2.0.11",
+    "connector_version": "2.0.11",
+    "utctime_updated": "2020-10-22T22:22:27.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
@@ -60,7 +60,7 @@
             "value": "14",
             "required": true
         }
-},
+    },
     "actions": [
         {
             "action": "test connectivity",
