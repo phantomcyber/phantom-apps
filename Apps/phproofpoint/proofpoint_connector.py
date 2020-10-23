@@ -5,24 +5,20 @@
 
 from datetime import datetime
 from datetime import timedelta
-from HTMLParser import HTMLParseError
 from bs4 import BeautifulSoup
 import requests
+import json
+from proofpoint_consts import *
 
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 
-PP_API_BASE_URL = 'https://tap-api-v2.proofpoint.com'
-PP_API_PATH_CLICKS_BLOCKED = '/v2/siem/clicks/blocked'
-PP_API_PATH_CLICKS_PERMITTED = '/v2/siem/clicks/permitted'
-PP_API_PATH_MESSAGES_BLOCKED = '/v2/siem/messages/blocked'
-PP_API_PATH_MESSAGES_DELIVERED = '/v2/siem/messages/delivered'
-PP_API_PATH_ISSUES = '/v2/siem/issues'
-PP_API_PATH_ALL = '/v2/siem/all'
-PP_API_PATH_CAMPAIGN = '/v2/campaign/{}'
-PP_API_PATH_FORENSICS = '/v2/forensics'
+class RetVal(tuple):
+
+    def __new__(cls, val1, val2=None):
+        return tuple.__new__(RetVal, (val1, val2))
 
 
 class ProofpointConnector(BaseConnector):
@@ -42,54 +38,73 @@ class ProofpointConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
-    def _make_rest_call(self, action_result, endpoint, params=None):
+    def _process_empty_response(self, response, action_result):
+        if response.status_code == 200:
+            return RetVal(phantom.APP_SUCCESS, {})
+        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Empty response and no information in the header'), None)
+
+    def _process_html_response(self, response, action_result):
+        status_code = response.status_code
+        try:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            error_text = soup.text
+            split_lines = error_text.split('\n')
+            split_lines = [ x.strip() for x in split_lines if x.strip() ]
+            error_text = ('\n').join(split_lines)
+        except:
+            error_text = 'Cannot parse error details'
+
+        message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code, error_text)
+        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _process_json_response(self, r, action_result):
+        try:
+            resp_json = r.json()
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to parse JSON response. Error: {0}').format(str(e))), None)
+        else:
+            if 200 <= r.status_code < 399:
+                return RetVal(phantom.APP_SUCCESS, resp_json)
+
+        message = ('Error from server. Status Code: {0} Data from server: {1}').format(r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _process_response(self, r, action_result):
+        if hasattr(action_result, 'add_debug_data'):
+            action_result.add_debug_data({'r_status_code': r.status_code})
+            action_result.add_debug_data({'r_text': r.text})
+            action_result.add_debug_data({'r_headers': r.headers})
+        if 'json' in r.headers.get('Content-Type', ''):
+            return self._process_json_response(r, action_result)
+        if 'html' in r.headers.get('Content-Type', ''):
+            return self._process_html_response(r, action_result)
+        if not r.text:
+            return self._process_empty_response(r, action_result)
+        message = ("Can't process response from server. Status Code: {0} Data from server: {1}").format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _make_rest_call(self, action_result, endpoint, method='get', **kwargs):
         config = self.get_config()
         user = config['username'].encode('utf-8')
         password = config['password']
+        header = {'X-Requested-With': 'REST API',
+                'Content-type': 'application/json',
+                'Accept': 'application/json'}
+
         url = PP_API_BASE_URL + endpoint
-        if not params:
-            params = {}
-        params['format'] = 'json'
 
         try:
-            res = requests.get(url, params=params, auth=(user, password))
-            res.raise_for_status()
-        except requests.exceptions.HTTPError:
-            # a status code outside of the 200s occured
-            res_text = res.text.replace('{', '{{').replace('}', '}}')
-            message = ('Error response from server. Status code: {0}'
-                       'Response: {1}').format(res.status_code, res_text)
-            return action_result.set_status(phantom.APP_ERROR, message), None
-        except requests.exceptions.RequestException as e:
-            message = 'Error connecting to the url ({0})'.format(url)
-            return (action_result.set_status(phantom.APP_ERROR, message, e),
-                    None)
-
-        content_type = res.headers.get('Content-Type', '')
-        if 'html' in content_type:
-            try:
-                soup = BeautifulSoup(res.test, 'html.parser')
-                error_text = soup.text
-                split_lines = error_text.splitlines()
-                split_lines = [x.strip() for x in split_lines if x.strip()]
-                error_text = '\n'.join(split_lines)
-            except HTMLParseError as e:
-                error_text = 'Cannot parse error details: {}'.format(e.msg)
-
-            message = ('Error response from server. Status code: {0}'
-                       'Response: \n{1}\n').format(res.status_code, error_text)
-            return action_result.set_status(phantom.APP_ERROR, message), None
-        elif 'plain' not in content_type and 'json' not in content_type:
-            res_text = res.text.replace('{', '{{').replace('}', '}}')
-            message = 'Unexpected response from server: {0}'.format(res_text)
-            return action_result.set_status(phantom.APP_ERROR, message), None
+            request_func = getattr(requests, method)
+        except AttributeError:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Invalid method: {0}').format(method)), resp_json)
 
         try:
-            return phantom.APP_SUCCESS, res.json()
-        except ValueError as e:
-            message = 'Unable to parse response JSON.'
-            return (action_result.set_status(phantom.APP_ERROR, message, e),
-                    None)
+            res = request_func(url, auth=(user, password), headers=header, **kwargs)
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(str(e))), resp_json)
+
+        return self._process_response(res, action_result)
 
     def _process_clicks(self, clicks, action):
         for click in clicks:
@@ -269,8 +284,7 @@ class ProofpointConnector(BaseConnector):
         start_at = ((datetime.utcnow() - timedelta(minutes=mins))
                     .replace(microsecond=0).isoformat() + 'Z')
 
-        if (not self._state or 'last_poll' not in self._state or
-                self._state['last_poll'] < start_at):
+        if (not self._state or 'last_poll' not in self._state or self._state['last_poll'] < start_at):
             self._state['last_poll'] = start_at
 
         params = {
@@ -278,8 +292,8 @@ class ProofpointConnector(BaseConnector):
         }
 
         # Connect to the server
-        ret_val, data = self._make_rest_call(action_result,
-                                             PP_API_PATH_ALL, params)
+        ret_val, data = self._make_rest_call(action_result, PP_API_PATH_ALL, params=params)
+
         if phantom.is_fail(ret_val):
             if "The sinceTime parameter gives a time too far into the past" in action_result.get_message():
                 action_result.append_to_message("It is possible the Phantom clock has drifted. Please re-sync it or consider lowering initial_ingestion_window")
@@ -294,8 +308,7 @@ class ProofpointConnector(BaseConnector):
             self.save_progress('Processing {} blocked clicks'
                                .format(len(data['clicksBlocked'])))
             self._process_clicks(data['clicksBlocked'], 'blocked')
-        if (config.get('ingest_delivered_messages') and
-                'messagesDelivered' in data):
+        if (config.get('ingest_delivered_messages') and 'messagesDelivered' in data):
             self.save_progress('Processing {} delivered messages'
                                .format(len(data['messagesDelivered'])))
             self._process_messages(data['messagesDelivered'], 'delivered')
@@ -319,7 +332,7 @@ class ProofpointConnector(BaseConnector):
 
         # Connect to the server
         ret_val, _ = self._make_rest_call(action_result,
-                                          PP_API_PATH_ALL, params)
+                                          PP_API_PATH_ALL, params=params)
         if phantom.is_fail(ret_val):
             return self.set_status_save_progress(phantom.APP_ERROR,
                                                  'Connection Failed.')
@@ -333,7 +346,9 @@ class ProofpointConnector(BaseConnector):
 
         campaign_url = PP_API_PATH_CAMPAIGN.format(campaign_id)
 
-        ret_val, data = self._make_rest_call(action_result, campaign_url)
+        params = {'format': 'json'}
+
+        ret_val, data = self._make_rest_call(action_result, campaign_url, params=params)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -364,11 +379,43 @@ class ProofpointConnector(BaseConnector):
             if include_campaign_forensics:
                 params['includeCampaignForensics'] = include_campaign_forensics
         ret_val, data = self._make_rest_call(action_result,
-                                             PP_API_PATH_FORENSICS, params)
+                                             PP_API_PATH_FORENSICS, params=params)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(data)
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _decode_url(self, param):
+        """ This function is used to handle the decoding of a Proofpoint rewritten URL.
+        :param param: Dictionary of input parameters
+        :return: status success/failure
+        """
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+        url_list = []
+
+        # The Decode API allows for multiple values. Split the parameter by ,
+        url_split = param.get('url').split(',')
+
+        for url in url_split:
+            # Add the URL to the list to decode
+            url_list.append(url)
+
+        # Add the URL(s) to the json
+        params['urls'] = url_list
+
+        # Make rest call
+        ret_val, response = self._make_rest_call(action_result, PP_API_PATH_DECODE, method="post", json=params)
+
+        if (phantom.is_fail(ret_val)):
+           return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -380,15 +427,91 @@ class ProofpointConnector(BaseConnector):
             A status code
         """
 
-        result = None
-        action = self.get_action_identifier()
+        self.debug_print('action_id', self.get_action_identifier())
 
-        if action == phantom.ACTION_ID_INGEST_ON_POLL:
-            result = self._on_poll(param)
-        elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
-            result = self._test_connectivity(param)
-        elif ((action == 'get_campaign_details') or (action == 'get_campaign')):
-            result = self.get_campaign_details(param)
-        elif ((action == 'get_forensic_data') or (action == 'get_forensic')):
-            result = self.get_forensic_data(param)
-        return result
+        action_mapping = {
+            'test_connectivity': self._test_connectivity,
+            'get_campaign_details': self.get_campaign_details,
+            'get_campaign': self.get_campaign_details,
+            'get_forensic_data': self.get_forensic_data,
+            'get_forensic': self.get_forensic_data,
+            'decode_url': self._decode_url,
+            'on_poll': self._on_poll
+        }
+
+        action = self.get_action_identifier()
+        action_execution_status = phantom.APP_SUCCESS
+
+        if action in action_mapping.keys():
+            action_function = action_mapping[action]
+            action_execution_status = action_function(param)
+        return action_execution_status
+
+
+if __name__ == '__main__':
+
+    import sys
+    import argparse
+    import pudb
+
+    pudb.set_trace()
+
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        try:
+            print ("Accessing the Login page")
+            r = requests.get("https://127.0.0.1/login", verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = 'https://127.0.0.1/login'
+
+            print ("Logging into Platform to get the session id")
+            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    if (len(sys.argv) < 2):
+        print "No test json specified as input"
+        exit(0)
+
+    with open(sys.argv[1]) as f:
+        in_json = f.read()
+        in_json = json.loads(in_json)
+        print(json.dumps(in_json, indent=4))
+
+        connector = ProofpointConnector()
+        connector.print_progress_message = True
+
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print (json.dumps(json.loads(ret_val), indent=4))
+
+    exit(0)
