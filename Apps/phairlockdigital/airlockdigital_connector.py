@@ -49,6 +49,9 @@ class AirlockDigitalConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -58,7 +61,7 @@ class AirlockDigitalConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -71,7 +74,7 @@ class AirlockDigitalConnector(BaseConnector):
             # If I can't parse the json
             self.save_progress("Failed to parse json naturally")
             try:
-                resp_json = json.loads(str(r.text).replace("\\", "\\\\"))
+                resp_json = json.loads(self._handle_py_ver_compat_for_input_str(r.text).replace("\\", "\\\\"))
             except Exception as e:
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
                               .format(self._get_error_message_from_exception(e))), None)
@@ -82,7 +85,7 @@ class AirlockDigitalConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace(u'{', '{{').replace(u'}', '}}')))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -145,26 +148,30 @@ class AirlockDigitalConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERROR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-        except Exception:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the URLhaus server. Please check the asset configuration and|or the action parameters."
+            error_msg = TYPE_ERR_MSG
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = ERROR_MSG_UNAVAILABLE
 
-        if error_code in "Error code unavailable":
-            error_text = "Error Message: {0}".format(error_msg)
-        else:
-            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
 
         return error_text
 
@@ -196,7 +203,6 @@ class AirlockDigitalConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -227,9 +233,7 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unblock_hash(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Optional values use get parameter
@@ -272,7 +276,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to unblock hash, perhaps the specified blocklistid does not exist")
+            self.debug_print("Failed to unblock hash")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -334,7 +339,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to unblock hash, perhaps the specified applicationid does not exist")
+            self.debug_print("Failed to unblock hash")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -351,9 +357,6 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_block_hash(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -386,7 +389,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to block hash")
+            self.debug_print("Failed to block hash")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -403,7 +407,6 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_allow_hash(self, param):
-
         # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -455,7 +458,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url2, action_result, json=request_json, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add hash to application capture")
+            self.debug_print("Failed to add hash to application capture")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -472,9 +476,7 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_identifiers(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -525,7 +527,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, headers=header_var, method=req_method)
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Request Failed.  Error message: {}".format(response['error']))
+            self.debug_print("Failed to list identifiers")
+            return action_result.get_status()
 
         # Modify Baseline Requests to fit in the columns
         if policy_type == 'baseline':
@@ -563,12 +566,8 @@ class AirlockDigitalConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
     def _handle_list_policy(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -600,7 +599,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, json=json_body, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to request group list ")
+            self.debug_print("Failed to request group list")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -616,9 +616,7 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_move_endpoints(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -650,7 +648,8 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, headers=header_var, json=json_body, method="post")
 
         if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to move endpoint")
+            self.debug_print("Failed to move endpoint")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
@@ -666,15 +665,11 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_endpoints(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Optional values should use the .get() function
         ip = param.get('ip', '')
@@ -737,8 +732,8 @@ class AirlockDigitalConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list endpoints for Airlock Digital.  Error Message {}".format(response['error']))
+            self.debug_print('Failed to list endpoints for Airlock Digital')
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
 
@@ -753,9 +748,7 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_otp_revoke(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -779,20 +772,14 @@ class AirlockDigitalConnector(BaseConnector):
         param_var = {
             "otpid": otpid
         }
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
-
         # make rest call
         ret_val, response = self._make_rest_call(AIRLOCK_OTP_REVOKE_ENDPOINT, action_result, params=param_var, headers=header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            return action_result.set_status(phantom.APP_ERROR, "Failed to revoke OTP for Airlock Digital.  Error Message {}".format(response['error']))
-
-        # Now post process the data,  uncomment code as you deem fit
+            self.debug_print("Failed to revoke OTP for Airlock Digital")
+            return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -806,15 +793,11 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_otp_retrieve(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         agentid = param['agentid']
@@ -846,8 +829,8 @@ class AirlockDigitalConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve OTP for Airlock Digital.  Error Message {}".format(response['error']))
+            self.debug_print("Failed to retrieve OTP for Airlock Digital")
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
 
@@ -862,18 +845,12 @@ class AirlockDigitalConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
     def _handle_lookup_hash(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         hash_var = param['hash']
@@ -902,7 +879,8 @@ class AirlockDigitalConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
-            return action_result.set_status(phantom.APP_ERROR, "Failed to lookup hash for Airlock Digital.  Error Message {}".format(response['error']))
+            self.debug_print("Failed to lookup hash for Airlock Digital")
+            return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)

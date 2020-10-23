@@ -22,3 +22,9 @@ AIRLOCK_AGENT_FIND_ENDPOINT = "/agent/find"
 AIRLOCK_OTP_REVOKE_ENDPOINT = "/otp/revoke"
 AIRLOCK_OTP_RETRIEVE_ENDPOINT = "/otp/retrieve"
 AIRLOCK_HASH_QUERY_ENDPOINT = "/hash/query"
+
+# execption handling
+ERROR_CODE_MSG = "Error code unavailable"
+ERROR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Airlock Digital Server. Please check the asset configuration and|or the action parameters"
