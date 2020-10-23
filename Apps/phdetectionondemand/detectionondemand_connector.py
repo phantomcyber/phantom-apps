@@ -1,8 +1,3 @@
-# File: detectionondemand_connector.py
-# Copyright (c) FireEye, 2020
-#
-# Licensed under FireEye
-#
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 # -----------------------------------------
@@ -98,14 +93,18 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Detection on Demand Server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the <Your APP Name> Server. Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
-        if error_code in "Error code unavailable":
-            error_text = "Error Message: {0}".format(error_msg)
-        else:
-            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        try:
+            if error_code in "Error code unavailable":
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = "Unable to parse the error message. Please check the asset configuration and|or action parameters."
 
         return error_text
 
@@ -147,8 +146,8 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(error_msg)), None)
+            err = self._get_error_message_from_exception(e)
+            action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response: {}'.format(err))
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -220,9 +219,8 @@ class DetectionOnDemandConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_msg)), resp_json)
+            err = self._get_error_message_from_exception(e)
+            action_result.set_status(phantom.APP_ERROR, 'Error Connecting to server: {}'.format(err))
 
         return self._process_response(r, action_result)
 
@@ -276,8 +274,8 @@ class DetectionOnDemandConnector(BaseConnector):
                 "file": (file_name, open(file_path, 'rb'))
             }
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            err = self._get_error_message_from_exception(e)
+            action_result.set_status(phantom.APP_ERROR, '{}'.format(err))
 
         data = {}
         if password:
