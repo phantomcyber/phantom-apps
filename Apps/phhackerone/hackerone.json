@@ -1,0 +1,470 @@
+{
+    "appid": "2ab1b33f-1951-4dbd-862b-8347e511a6d5",
+    "name": "HackerOne",
+    "description": "This app interacts with HackerOne",
+    "publisher": "Mhike",
+    "type": "generic",
+    "main_module": "hackerone_connector.py",
+    "app_version": "1.5.0",
+    "utctime_updated": "2020-01-28T00:00:00.000000Z",
+    "package_name": "phantom_hacker1",
+    "product_vendor": "Mhike",
+    "product_name": "HackerOne",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.5.15370",
+    "logo": "logo_hackerone.svg",
+    "logo_dark": "logo_hackerone_dark.svg",
+    "license": "Internal Use Only",
+    "configuration": {
+        "api_identifier": {
+            "data_type": "string",
+            "order": 0,
+            "description": "HackerOne Identifier",
+            "required": true
+        },
+        "api_token": {
+            "data_type": "password",
+            "order": 1,
+            "description": "HackerOne API Token",
+            "required": true
+        },
+        "program_name": {
+            "data_type": "string",
+            "order": 2,
+            "description": "HackerOne Program Name",
+            "required": true
+        },
+        "state_filter": {
+            "data_type": "string",
+            "order": 3,
+            "description": "Filter for report state (to be used when polling)",
+            "required": false
+        },
+        "assignment_filter": {
+            "data_type": "string",
+            "order": 4,
+            "description": "Filter for report assignment (to be used when polling)",
+            "required": false
+        },
+        "full_comments": {
+            "data_type": "boolean",
+            "order": 5,
+            "description": "Collect comments for reports (to be used when polling, Much Slower)",
+            "required": false
+        },
+        "phantom_api_token": {
+            "data_type": "password",
+            "order": 6,
+            "description": "Phantom API token for updating existing containers",
+            "required": true
+        }
+    },
+    "actions": [{
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Get hacker1 report with ID",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "get_report",
+            "read_only": false,
+            "parameters": {
+                "report_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "ID of report to update",
+                    "required": true
+                }
+            },
+            "output": [{
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_reputation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assignee_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assignee_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assignee_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.program_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.program_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_rating",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_author_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_attack_complexity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_attack_vector",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_availability",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_confidentiality",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_integrity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_privileges_required",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_user_interaction",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_cvf",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.weakness_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.weakness_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.weakness_external_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.closed_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_reporter_activity_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.first_program_activity_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_program_activity_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bounty_awarded_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.swag_awarded_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.disclosed_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_agreed_on_going_public_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue_tracker_reference_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue_tracker_reference_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_public_activity_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_activity_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cve_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get reports",
+            "description": "Get H1 reports",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "get_reports",
+            "read_only": false,
+            "parameters": {
+                "state_filter": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Report State Filter",
+                    "required": false
+                },
+                "assignment_filter": {
+                    "description": "Report Assignment Filter",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                },
+                "full_comments": {
+                    "data_type": "boolean",
+                    "order": 2,
+                    "description": "Collect comments for reports (Much Slower)",
+                    "required": true
+                }
+            },
+            "output": [{
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.state_filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignment_filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.full_comments",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reports",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+
+        {
+            "action": "get updated reports",
+            "description": "Get updated H1 reports",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "get_updated_reports",
+            "read_only": false,
+            "parameters": {
+                "state_filter": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Report State Filter",
+                    "required": false
+                },
+                "assignment_filter": {
+                    "description": "Report Assignment Filter",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                },
+                "full_comments": {
+                    "data_type": "boolean",
+                    "order": 2,
+                    "description": "Collect comments for reports (Much Slower)",
+                    "required": true
+                },
+                "range": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "How many minutes back to get changed reports from",
+                    "required": false
+                }
+            },
+            "output": [{
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.state_filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignment_filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.full_comments",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.range",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reports",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update tracking id",
+            "description": "Update H1 report with tracking ID",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "update_id",
+            "read_only": false,
+            "parameters": {
+                "report_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "ID of report to update",
+                    "required": true
+                },
+                "tracking_id": {
+                    "description": "ID of tracking ticket",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true
+                }
+            },
+            "output": [{
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tracking_id",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unassign report",
+            "description": "Update H1 report with tracking ID",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "unassign",
+            "read_only": false,
+            "parameters": {
+                "report_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "ID of report to unassign",
+                    "required": true
+                }
+            },
+            "output": [{
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Consume hacker1 reports and generate containers for them",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": false,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
