@@ -72,6 +72,7 @@ class UrlhausConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -95,7 +96,7 @@ class UrlhausConnector(BaseConnector):
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            self._handle_py_ver_compat_for_input_str(r.text))
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -160,7 +161,7 @@ class UrlhausConnector(BaseConnector):
             else:
                 error_code = "Error code unavailable"
                 error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-        except Exception:
+        except:
             error_code = "Error code unavailable"
             error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
@@ -171,10 +172,14 @@ class UrlhausConnector(BaseConnector):
         except:
             error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
 
-        if error_code in "Error code unavailable":
-            error_text = "Error Message: {0}".format(error_msg)
-        else:
-            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        try:
+            if error_code in "Error code unavailable":
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = "Unable to parse the error message. Please check the asset configuration and|or action parameters."
 
         return error_text
 
@@ -253,9 +258,8 @@ class UrlhausConnector(BaseConnector):
                     url, payload_count)
             summary['query_status'] = response['query_status']
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -289,9 +293,9 @@ class UrlhausConnector(BaseConnector):
                 summary['message'] = "IP {0} observed serving {1} URLs".format(ip, url_count)
             summary['query_status'] = response['query_status']
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_domain(self, param):
@@ -323,9 +327,9 @@ class UrlhausConnector(BaseConnector):
                 summary['message'] = "Domain {0}  observed serving {1} URLs".format(domain, url_count)
             summary['query_status'] = response['query_status']
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_hash(self, param):
@@ -365,9 +369,9 @@ class UrlhausConnector(BaseConnector):
                     file_hash, url_count, signature)
             summary['query_status'] = response['query_status']
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "{0}".format(self._get_error_message_from_exception(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
