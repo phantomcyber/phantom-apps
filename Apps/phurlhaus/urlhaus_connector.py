@@ -10,6 +10,7 @@ from __future__ import print_function, unicode_literals
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from urlhaus_consts import *
 
 import requests
 import json
@@ -45,7 +46,7 @@ class UrlhausConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Status Code: {0}. Error : Empty response and no information in the header".format(response.status_code)
+                phantom.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -156,30 +157,30 @@ class UrlhausConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERROR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the URLhaus server. Please check the asset configuration and|or the action parameters."
+            error_msg = TYPE_ERR_MSG
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
-            if error_code in "Error code unavailable":
-                error_text = "Error Message: {0}".format(error_msg)
+            if error_code in ERROR_CODE_MSG:
+                error_text = error_msg
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
             self.debug_print("Error occurred while parsing error message")
-            error_text = "Unable to parse the error message. Please check the asset configuration and|or action parameters."
+            error_text = PARSE_ERR_MSG
 
         return error_text
 
@@ -210,7 +211,7 @@ class UrlhausConnector(BaseConnector):
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json)
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(self._get_error_message_from_exception(e))), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
