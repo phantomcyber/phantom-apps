@@ -143,7 +143,7 @@ class CrxcavatorConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -165,7 +165,7 @@ class CrxcavatorConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -329,7 +329,7 @@ class CrxcavatorConnector(BaseConnector):
                     versions.append(data['version'])
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server. Details: {}".format(err))
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server. {}".format(err))
 
             latest = max(versions, key=self.major_minor_micro_patch)
             endpoint = '/report/{}/{}'.format(extension_id, latest)
@@ -376,7 +376,8 @@ class CrxcavatorConnector(BaseConnector):
         code = response.get('code')
 
         action_result.update_summary({"code": code, "extension_id": extension_id, "version": version})
-        return action_result.set_status(phantom.APP_SUCCESS)
+        msg = response.get("message", "Successfully submitted extension")
+        return action_result.set_status(phantom.APP_SUCCESS, msg)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
