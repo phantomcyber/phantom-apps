@@ -264,7 +264,7 @@
                         "airlockdigital policytype"
                     ],
                     "data_type": "string",
-                    "column_name": "Status",
+                    "column_name": "Policy Type",
                     "column_order": 4,
                     "example_values": [
                         "group"
@@ -321,19 +321,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 7
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 8
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 9
                 }
             ],
             "render": {
@@ -751,6 +759,8 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 41,
                     "example_values": [
                         "success",
                         "failed"
@@ -758,19 +768,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 42
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 43
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 44
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Object Successful",
+                    "column_order": 45
                 }
             ],
             "render": {
@@ -814,6 +832,8 @@
                     "contains": [
                         "airlockdigital agentid"
                     ],
+                    "column_name": "Agent ID",
+                    "column_order": 2,
                     "example_values": [
                         "5a57f007-214c-4604-960e-1706f3bf10cd"
                     ]
@@ -824,6 +844,8 @@
                     "contains": [
                         "airlockdigital groupid"
                     ],
+                    "column_name": "Group ID",
+                    "column_order": 3,
                     "example_values": [
                         "a2d3b733-1261-4449-b91e-33f6fa59abbe"
                     ]
@@ -840,6 +862,8 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
@@ -847,19 +871,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 7
                 }
             ],
             "render": {
@@ -965,19 +997,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 7
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 8
                 }
             ],
             "render": {
@@ -1060,19 +1100,27 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 7
                 }
             ],
             "render": {
@@ -1177,6 +1225,8 @@
                     "contains": [
                         "airlockdigital devicestatus"
                     ],
+                    "column_name": "Device Status",
+                    "column_order": 13,
                     "example_values": [
                         "3"
                     ]
@@ -1187,6 +1237,8 @@
                     "contains": [
                         "airlockdigital agentid"
                     ],
+                    "column_name": "Agent ID",
+                    "column_order": 14,
                     "example_values": [
                         "1378682a-3d2f-4f13-9839-e12c9d6fd126"
                     ]
@@ -1197,6 +1249,8 @@
                     "contains": [
                         "host name"
                     ],
+                    "column_name": "Host Name",
+                    "column_order": 15,
                     "example_values": [
                         "DESKTOP-LAB001"
                     ]
@@ -1207,6 +1261,8 @@
                     "contains": [
                         "airlockdigital operatingsystem"
                     ],
+                    "column_name": "OS",
+                    "column_order": 16,
                     "example_values": [
                         "Windows 10 x64"
                     ]
@@ -1217,6 +1273,8 @@
                     "contains": [
                         "airlockdigital groupid"
                     ],
+                    "column_name": "Group ID",
+                    "column_order": 17,
                     "example_values": [
                         "a2d3b733-1261-4449-b91e-33f6fa59abbe"
                     ]
@@ -1227,6 +1285,8 @@
                     "contains": [
                         "domain"
                     ],
+                    "column_name": "Domain",
+                    "column_order": 18,
                     "example_values": [
                         "example.domain"
                     ]
@@ -1237,6 +1297,8 @@
                     "contains": [
                         "ip"
                     ],
+                    "column_name": "IP",
+                    "column_order": 19,
                     "example_values": [
                         "10.1.1.129"
                     ]
@@ -1247,6 +1309,8 @@
                     "contains": [
                         "user name"
                     ],
+                    "column_name": "User Name",
+                    "column_order": 20,
                     "example_values": [
                         "username1"
                     ]
@@ -1353,7 +1417,7 @@
                     "contains": [
                         "airlockdigital devicestatus"
                     ],
-                    "column_name": "Status",
+                    "column_name": "Device Status",
                     "column_order": 1,
                     "example_values": [
                         "1"
@@ -1383,19 +1447,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 12
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 21
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 22
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 23
                 }
             ],
             "render": {
@@ -1456,19 +1528,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 4
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 6
                 }
             ],
             "render": {
@@ -1603,19 +1683,27 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 8
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 9
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 10
                 }
             ],
             "render": {
@@ -1871,16 +1959,20 @@
                 {
                     "data_path": "action_result.datetime",
                     "data_type": "string",
-                    "column_name": "Status",
+                    "column_name": "Date Time",
                     "column_order": 23
                 },
                 {
                     "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 24
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 25,
                     "example_values": [
                         "success",
                         "failed"
@@ -1888,15 +1980,21 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 26
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 27
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Total Objects Successful",
+                    "column_order": 28
                 }
             ],
             "render": {
