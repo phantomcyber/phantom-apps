@@ -1,0 +1,219 @@
+{
+    "appid": "cd06b954-df08-49cc-aab5-37da164a07c7",
+    "name": "S/MIME",
+    "description": "This app provides support to S/MIME integrations",
+    "type": "email",
+    "product_vendor": "Splunk",
+    "logo": "smime.svg",
+    "logo_dark": "smime_dark.svg",
+    "product_name": "S/MIME",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-12-06T22:45:54.000000Z",
+    "package_name": "phantom_smime",
+    "main_module": "smime_connector.pyc",
+    "min_phantom_version": "4.2.7532",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "M2Crypto",
+                "input_file": "wheels/M2Crypto-0.35.2-cp27-cp27mu-linux_x86_64.whl"
+            },
+            {
+                "module": "typing",
+                "input_file": "wheels/typing-3.7.4.1-py2-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "private_key": {
+            "data_type": "file",
+            "description": "Private Key .pem file",
+            "required": true,
+            "order": 0
+        },
+        "public_key": {
+            "description": "Public Key .pem file",
+            "data_type": "file",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "sign email",
+            "identifier": "sign_email",
+            "description": "Sign email message body",
+            "verbose": "Sign email message body",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "message_body": {
+                    "description": "The message body to send signed",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.message_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SMIME.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "message",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "encrypt email",
+            "identifier": "encrypt_email",
+            "description": "Encrypt email message",
+            "verbose": "Encrypt email message body",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "message_body": {
+                    "description": "The message body to encrypt",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.message_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SMIME.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "message",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "decrypt email",
+            "identifier": "decrypt_email",
+            "description": "Decrypt email message",
+            "verbose": "Decrypt email message body",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "encrypted_message": {
+                    "description": "The encrypted message body to decrypt",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.encrypted_message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SMIME.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "message",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "verify email",
+            "identifier": "verify_email",
+            "description": "Verify signed email message",
+            "verbose": "Verify signed email message body",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "signed_message": {
+                    "description": "The signed message body to verify",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.signed_message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SMIME.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "message",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
