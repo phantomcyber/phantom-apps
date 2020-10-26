@@ -1,7 +1,7 @@
 {
     "appid": "b29ae591-b692-4435-98e9-b0619e2e2476",
     "name": "Airlock Digital",
-    "description": "This app provides investigative, containment and management actions for Airlock Digital's Execution Control & Allowlisting endpoint product.",
+    "description": "This app provides investigative, containment and management actions for Airlock Digital's Execution Control & Allowlisting endpoint product",
     "type": "endpoint",
     "product_vendor": "Airlock",
     "logo": "airlockdigital.svg",
@@ -319,7 +319,7 @@
                         "policyname"
                     ],
                     "column_name": "Name",
-                    "column_order": 2,
+                    "column_order": 1,
 					"example_values": [
                         "Bulk Add"
                     ]					
@@ -331,7 +331,7 @@
                         "policyid"
                     ],
                     "column_name": "ID",
-                    "column_order": 3,
+                    "column_order": 2,
 					"example_values": [
                         "a2d3b733-1261-4449-b91e-33f6fa59abbe",
 						"154419029"
@@ -344,7 +344,7 @@
                         "parentgroupid"
                     ],
                     "column_name": "Parent Group",
-                    "column_order": 4,
+                    "column_order": 3,
 					"example_values": [
                         "a3144513-1331-4229-b91e-33414a455aaa5",
 						"global-policy-settings",
@@ -358,7 +358,7 @@
                     ],					
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 6,
+                    "column_order": 4,
 					"example_values": [
                         "application",
 						"baseline",
@@ -380,28 +380,32 @@
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 7
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 8
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 9
                 }
             ],
             "render": {
@@ -941,35 +945,40 @@
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 41
                 },
                 {
                     "data_path": "action_result.status",
                     "contains": [
                         "resultstatus"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 42
                 },				
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 43
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 44
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 45
                 }
 				
             ],
@@ -1028,7 +1037,8 @@
                     "contains": [
                         "resultstatus"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.agent_id",
@@ -1036,7 +1046,8 @@
                     "data_type": "string",
 					"example_values": [
                         "5a57f007-214c-4604-960e-1706f3bf10cd"
-                    ]					
+                    ],
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.group_id",
@@ -1044,35 +1055,40 @@
                     "data_type": "string",
 					"example_values": [
                         "a2d3b733-1261-4449-b91e-33f6fa59abbe"
-                    ]						
+                    ],
+                    "column_order": 3					
                 },				
                 {
                     "data_path": "action_result.summary",
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 7
                 }
             ],
             "render": {
@@ -1165,7 +1181,7 @@
                     "data_type": "string",
                     "contains": ["file path"],
                     "column_name": "path",
-                    "column_order": 2,
+                    "column_order": 3,
 					"example_values": [
                         "C:\\\\phantom\\\\hash.dll"
                     ]					
@@ -1177,35 +1193,39 @@
                         "resultstatus"
                     ],
                     "column_name": "status",
-                    "column_order": 3
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.summary",
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 7
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 8
                 }
             ],
             "render": {
@@ -1295,28 +1315,32 @@
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.summary",
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 6
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 7
                 }
             ],
             "render": {
@@ -1557,7 +1581,8 @@
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 12
                 },
                 {
                     "data_path": "action_result.parameter.status",
@@ -1569,7 +1594,8 @@
                         "0",
 						"1",
 						"3"
-                    ]					
+                    ],
+                    "column_order": 13					
                 },
                 {
                     "data_path": "action_result.parameter.agentid",
@@ -1579,7 +1605,8 @@
                     ],
 					"example_values": [
                         "1378682a-3d2f-4f13-9839-e12c9d6fd126"
-                    ]					
+                    ],
+                    "column_order": 14					
                 },
                 {
                     "data_path": "action_result.parameter.hostname",
@@ -1589,7 +1616,8 @@
                     ],
 					"example_values": [
                         "DESKTOP-LAB001"
-                    ]					
+                    ],
+                    "column_order": 15					
                 },
                 {
                     "data_path": "action_result.parameter.os",
@@ -1599,7 +1627,8 @@
                     ],
 					"example_values": [
                         "Windows 10 x64"
-                    ]					
+                    ],
+                    "column_order": 16					
                 },
                 {
                     "data_path": "action_result.parameter.groupid",
@@ -1607,7 +1636,8 @@
                     "contains": ["groupid"],
 					"example_values": [
                         "a2d3b733-1261-4449-b91e-33f6fa59abbe"
-                    ]					
+                    ],
+                    "column_order": 17					
                 },
                 {
                     "data_path": "action_result.parameter.domain",
@@ -1617,7 +1647,8 @@
                     ],
 					"example_values": [
                         "example.domain"
-                    ]					
+                    ],
+                    "column_order": 18					
                 },
                 {
                     "data_path": "action_result.parameter.ip",
@@ -1627,7 +1658,8 @@
                     ],
 					"example_values": [
                         "10.1.1.129"
-                    ]					
+                    ],
+                    "column_order": 19					
                 },
                 {
                     "data_path": "action_result.parameter.username",
@@ -1635,28 +1667,32 @@
                     "contains": ["user name"],
 					"example_values": [
                         "username1"
-                    ]					
+                    ],
+                    "column_order": 20					
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "contains": [
                         "resultmessage"
-                    ]
+                    ],
+                    "column_order": 21
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 22
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 23
                 }
             ],
             "render": {
@@ -1721,28 +1757,32 @@
                     "contains": [
                         "resultsummary"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 4
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 5
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 6
                 }
             ],
             "render": {
@@ -1848,7 +1888,7 @@
                     "data_type": "string",
                     "contains": ["errorresult"],
                     "column_name": "response",
-                    "column_order": 2,
+                    "column_order": 4,
 					"example_values": [
                         "Agent not found",
 						"No available otp found"
@@ -1859,7 +1899,7 @@
                     "data_type": "string",
                     "contains": ["otpcode"],
                     "column_name": "otpcode",
-                    "column_order": 3,
+                    "column_order": 5,
 					"example_values": [
                         "12847518751"
                     ]					
@@ -1869,7 +1909,7 @@
                     "data_type": "string",
                     "contains": ["otpid"],
                     "column_name": "otpid",
-                    "column_order": 4,
+                    "column_order": 6,
 					"example_values": [
                         "f56142c9-fdc7-4abe-9974-4ba813dd1002"
                     ]					
@@ -1879,28 +1919,32 @@
                     "contains": [
                         "resultsumamry"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.message",
                     "contains": [
                         "resultmessage"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 8
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": [
                         "totalobjects"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 9
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": [
                         "totalobjectssuccessful"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 10
                 }
             ],
             "render": {
@@ -1947,7 +1991,7 @@
                     "data_type": "string",
                     "contains": ["file name"],
                     "column_name": "Original File Name",
-                    "column_order": 3,
+                    "column_order": 1,
 					"example_values": [
                         "explorer.exe"
                     ]	
@@ -1957,7 +2001,7 @@
                     "data_type": "string",
                     "contains": ["createtime"],
                     "column_name": "Create Time",
-                    "column_order": 3,
+                    "column_order": 2,
 					"example_values": [
                         "2020-01-01 00:00:00 +0000 UTC"
                     ]				
@@ -1977,7 +2021,7 @@
                     "data_type": "string",
                     "contains": ["datetime"],
                     "column_name": "First Seen",
-                    "column_order": 3,
+                    "column_order": 4,
 					"example_values": [
                         "2020-01-01 00:00:00 +0000 UTC"
                     ]					
@@ -1987,7 +2031,7 @@
                     "data_type": "string",
                     "contains": ["publisher"],
                     "column_name": "Publisher",
-                    "column_order": 3,
+                    "column_order": 5,
 					"example_values": [
                         "Microsoft Corporation",
 						"Not Signed"
@@ -1998,7 +2042,7 @@
                     "data_type": "string",
                     "contains": ["file size"],
                     "column_name": "filesize",
-                    "column_order": 3,
+                    "column_order": 6,
 					"example_values": [
                         "1325"
                     ]							
@@ -2008,7 +2052,7 @@
                     "data_type": "string",
                     "contains": ["md5"],
                     "column_name": "MD5",
-                    "column_order": 3,
+                    "column_order": 7,
 					"example_values": [
                         "e8a5253ecad88d53ac510c7382bb54cc"
                     ]					
@@ -2018,7 +2062,7 @@
                     "data_type": "string",
                     "contains": ["sha128"],
                     "column_name": "SHA128",
-                    "column_order": 3,
+                    "column_order": 8,
 					"example_values": [
                         "53dc8d33e38b22b0bbbf1511fe7a6977cd783d97"
                     ]						
@@ -2028,7 +2072,7 @@
                     "data_type": "string",
                     "contains": ["sha384"],
                     "column_name": "SHA384",
-                    "column_order": 3,
+                    "column_order": 9,
 					"example_values": [
                         "f54dbe5f7f09c96210a7f934cc0b1b6575d5cd..."
                     ]							
@@ -2038,7 +2082,7 @@
                     "data_type": "string",
                     "contains": ["sha512"],
                     "column_name": "SHA512",
-                    "column_order": 3,
+                    "column_order": 10,
 					"example_values": [
                         "ccc80f377db9788a680cc689e8b29583131cb72..."
                     ]							
@@ -2048,7 +2092,7 @@
                     "data_type": "string",
                     "contains": ["filedescription"],
                     "column_name": "Description",
-                    "column_order": 3,
+                    "column_order": 11,
 					"example_values": [
                         "Rufus USB Utility"
                     ]					
@@ -2058,7 +2102,7 @@
                     "data_type": "string",
                     "contains": ["productname"],
                     "column_name": "Product Name",
-                    "column_order": 3,
+                    "column_order": 12,
 					"example_values": [
                         "Rufus"
                     ]					
@@ -2068,7 +2112,7 @@
                     "data_type": "string",
                     "contains": ["productversion"],
                     "column_name": "Product Version",
-                    "column_order": 3,
+                    "column_order": 13,
 					"example_values": [
                         "2.2.688"
                     ]					
@@ -2078,7 +2122,7 @@
                     "data_type": "string",
                     "contains": ["filepath"],
                     "column_name": "File Path",
-                    "column_order": 3,
+                    "column_order": 14,
 					"example_values": [
                         "C:\\\\code\\\\bin\\\\x64\\\\"
                     ]					
@@ -2088,7 +2132,7 @@
                     "data_type": "string",
                     "contains": ["file name"],
                     "column_name": "File Name",
-                    "column_order": 3,
+                    "column_order": 15,
 					"example_values": [
                         "rufus-2.2.exe"
                     ]					
@@ -2098,7 +2142,7 @@
                     "data_type": "string",
                     "contains": ["reputationstatus"],
                     "column_name": "Reputation Status",
-                    "column_order": 3,
+                    "column_order": 16,
 					"example_values": [
                         "KNOWN",
 						"UNKNOWN",
@@ -2111,7 +2155,7 @@
                     "data_type": "string",
                     "contains": ["threatname"],
                     "column_name": "Reputation Threat Name",
-                    "column_order": 3,
+                    "column_order": 17,
 					"example_values": [
                         "N/A",
 						"Trojan Heur.42"
@@ -2122,7 +2166,7 @@
                     "data_type": "string",
                     "contains": ["threatlevel"],
                     "column_name": "Reputation Threat Level",
-                    "column_order": 3,
+                    "column_order": 18,
 					"example_values": [
                         "N/A",
 						"0",
@@ -2138,7 +2182,7 @@
                     "data_type": "string",
                     "contains": ["scannermatch"],
                     "column_name": "Reputation Scanner Match",
-                    "column_order": 3,
+                    "column_order": 19,
 					"example_values": [
                         "10"
                     ]					
@@ -2149,7 +2193,7 @@
                     "data_type": "string",
                     "contains": ["scannercount"],
                     "column_name": "Reputation Scanner Count",
-                    "column_order": 3,
+                    "column_order": 20,
 					"example_values": [
                         "42"
                     ]					
@@ -2159,7 +2203,7 @@
                     "data_type": "string",
                     "contains": ["lastseen"],
                     "column_name": "Reputation Last Seen",
-                    "column_order": 3,
+                    "column_order": 21,
 					"example_values": [
                         "Never",
 						"2020-01-10 18:58:03.262 +0000 UTC"
@@ -2170,7 +2214,7 @@
                     "data_type": "string",
                     "contains": ["timestamp"],
                     "column_name": "Reputation Timestamp",
-                    "column_order": 3,
+                    "column_order": 22,
 					"example_values": [
 						"N/A",
 						"2020-01-10 18:58:03.262 +0000 UTC"
@@ -2181,32 +2225,38 @@
                     "data_type": "string",
                     "contains": ["datetime"],
                     "column_name": "status",
-                    "column_order": 3
+                    "column_order": 3,
+                    "column_order": 23
                 },
                 {
                     "data_path": "action_result.summary",
                     "contains": ["resultsummary"],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 24
                 },
                 {
                     "data_path": "action_result.status",
                     "contains": ["resultstatus"],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 25
                 },				
                 {
                     "data_path": "action_result.message",
                     "contains": ["resultmessage"],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 26
                 },
                 {
                     "data_path": "summary.total_objects",
                     "contains": ["totalobjects"],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 27
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "contains": ["totalobjectssuccessful"],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_order": 28
                 }
             ],
             "render": {
