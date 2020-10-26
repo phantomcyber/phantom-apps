@@ -13,10 +13,11 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from docker_v3_consts import *
+from docker_v3_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+import sys
+from bs4 import BeautifulSoup, UnicodeDammit
 
 
 class RetVal(tuple):
@@ -38,6 +39,59 @@ class Docker_V3Connector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._unicode_string_handler(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -76,10 +130,11 @@ class Docker_V3Connector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Unable to parse JSON response. Error: {0}".format(str(e))
+                    "Unable to parse JSON response. Error: {0}".format(err)
                 ), None
             )
 
@@ -162,10 +217,11 @@ class Docker_V3Connector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(str(e))
+                    "Error Connecting to server. Details: {0}".format(err)
                 ), resp_json
             )
 
@@ -193,7 +249,16 @@ class Docker_V3Connector(BaseConnector):
         url = self._base_url + endpoint
         try:
             if 'data' in kwargs:
-                k_data = json.loads(kwargs['data'])
+                try:
+                    k_data = json.loads(kwargs['data'])
+                except Exception as e:
+                    err = self._get_error_message_from_exception(e)
+                    return RetVal(
+                        action_result.set_status(
+                            phantom.APP_ERROR,
+                            "Please verify 'request_body' action parameter. Details: {0}".format(err)
+                        ), resp_json
+                    )
                 r = request_func(
                     url,
                     verify=config.get("verify_server_cert", False),
@@ -212,10 +277,11 @@ class Docker_V3Connector(BaseConnector):
                     **kwargs
                 )
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(str(e))
+                    "Error Connecting to server. Details: {0}".format(err)
                 ), resp_json
             )
         r.status_code = 200
@@ -240,6 +306,14 @@ class Docker_V3Connector(BaseConnector):
         self.save_progress("obtaining the version of the docker host")
         # make rest call
         ret_val, response = self._make_rest_call('/version', action_result)
+        if phantom.is_fail(ret_val):
+            # the call to the 3rd party device or service failed,
+            # action result should contain all the error details
+            # for now the return is commented out, but after implementation,
+            # return from here
+            self.save_progress("Test Connectivity Failed.")
+            return action_result.get_status()
+
         res = json.dumps(response)
 
         indices = [i + 1 for i, elem in enumerate(res) if elem == ',']
@@ -250,13 +324,6 @@ class Docker_V3Connector(BaseConnector):
         self.save_progress(self._base_url)
         # action_result.add_data(response)
         # self.save_progress("{0}".len(response))
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out, but after implementation,
-            # return from here
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.get_status()
 
         # Return success
         # self.save_progress("version".format(ret_val)
@@ -278,6 +345,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self (BaseConnector)
         # to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -330,6 +399,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self (BaseConnector)
         # to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -338,7 +409,7 @@ class Docker_V3Connector(BaseConnector):
         # required_parameter = param['required_parameter']
 
         # Optional values should use the .get() function
-        id = param.get('id', '')
+        id = param.get['id']
         size = param.get('size', '')
 
         # make rest call
@@ -356,8 +427,11 @@ class Docker_V3Connector(BaseConnector):
         # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
-        response_dict = {'containerStats': response['HostConfig']}
-        action_result.add_data(response_dict)
+        try:
+            response_dict = {'containerStats': response['HostConfig']}
+            action_result.add_data(response_dict)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, 'Error while parsing API response for fetching HostConfig')
 
         # Add a dictionary that is made up of the most
         # important values from data into the summary
@@ -380,12 +454,15 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         id = param['id']
+        request_body = param['request_body']
         # request_body = param['request_body']
         # Optional values should use the .get() function
         # optional_parameter = param.get('optional_parameter', 'default_value')
@@ -394,7 +471,7 @@ class Docker_V3Connector(BaseConnector):
         ret_val, response = self._make_post_call(
             '/containers/{0}/update'.format(id),
             action_result,
-            data=param['request_body'])
+            data=request_body)
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
@@ -428,6 +505,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -441,7 +520,6 @@ class Docker_V3Connector(BaseConnector):
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/restart?t={1}'.format(id, t), action_result)
-        response = "container {0} has restarted".format(id)
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
             # action result should contain all the error details
@@ -449,6 +527,7 @@ class Docker_V3Connector(BaseConnector):
             # but after implementation, return from here
             return action_result.get_status()
             # pass
+        response = "container {0} has restarted".format(id)
 
         # Now post process the data,  uncomment code as you deem fit
 
@@ -475,6 +554,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -522,6 +603,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -560,12 +643,15 @@ class Docker_V3Connector(BaseConnector):
         # Add a dictionary that is made up of the
         # most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['container_summary'] = [
-                {'container ' + str(item):
-                    {
-                    'id': response_dict['containers'][item]['Id'],
-                    'Name': response_dict['containers'][item]['Names'][0]}}
-                for item in range(len(response_dict['containers']))]
+        try:
+            summary['container_summary'] = [
+                    {'container ' + str(item):
+                        {
+                        'id': response_dict['containers'][item]['Id'],
+                        'Name': response_dict['containers'][item]['Names'][0]}}
+                    for item in range(len(response_dict['containers']))]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, 'Error while parsing API response to fetch ID and Name')
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual
@@ -582,6 +668,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -595,7 +683,7 @@ class Docker_V3Connector(BaseConnector):
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/stop'.format(ID), action_result)
-        response = "container {0} has terminated".format(ID)
+
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
             # action result should contain all the error details
@@ -604,7 +692,7 @@ class Docker_V3Connector(BaseConnector):
             return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
-
+        response = "container {0} has terminated".format(ID)
         # Add the response into the data section
         response_dict = {'pause': response}
         action_result.add_data(response_dict)
@@ -629,6 +717,8 @@ class Docker_V3Connector(BaseConnector):
 
         # Add an action result object to self (BaseConnector)
         # to represent the action for this param
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -644,7 +734,6 @@ class Docker_V3Connector(BaseConnector):
                                                         ID,
                                                         detachkeys),
             action_result)
-        response = "Container {0} has resumed".format(ID)
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
             # action result should contain all the error details
@@ -655,6 +744,7 @@ class Docker_V3Connector(BaseConnector):
         # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
+        response = "Container {0} has resumed".format(ID)
         response_dict = {'unpause': response}
         action_result.add_data(response_dict)
         # Add a dictionary that is made up of the
@@ -730,6 +820,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_rename_container(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         ID = param['id']
         name = param['name']
@@ -753,6 +845,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_kill_container(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         # Access action parameters passed in the 'param' dictionary
 
@@ -779,6 +873,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_remove_container(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         ID = param['id']
         v = param.get('v', '')
@@ -806,6 +902,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_delete_stopped_containers(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
         ret_val, response = self._make_post_call(
@@ -832,6 +930,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_remove_image(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
         force = param.get('force', '')
@@ -863,6 +963,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_delete_unused_images(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
         ret_val, response = self._make_post_call(
@@ -882,6 +984,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_image_history(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
         ret_val, response = self._make_rest_call(
@@ -901,8 +1005,10 @@ class Docker_V3Connector(BaseConnector):
     def _handle_delete_builder_cache(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
-        keep_storage = param.get('keep-storage', '')
+        keep_storage = param.get('keep_storage', 0)
         all = param.get('all', '')
         filters = param.get('filters', '')
         ret_val, response = self._make_post_call(
@@ -927,6 +1033,8 @@ class Docker_V3Connector(BaseConnector):
     def _handle_snapshot_of_a_container(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         container = param['container']
         repo = param.get('repo', '')
@@ -935,13 +1043,14 @@ class Docker_V3Connector(BaseConnector):
         author = param.get('author', '')
         pause = param.get('pause', '')
         changes = param.get('changes', '')
+        request_body = param['request_body']
         rest_call_1 = '/commit?container={0}&repo={1}&tag={2}'
         rest_call_2 = '&comment={3}&author={4}&pause={5}'
         ret_val, response = self._make_post_call(
             rest_call_1 + rest_call_2.format(
                 container, repo,
                 tag, comment, author,
-                pause, changes), action_result, data=param['request_body'])
+                pause, changes), action_result, data=request_body)
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
             # action result should contain all the error details
@@ -957,11 +1066,14 @@ class Docker_V3Connector(BaseConnector):
     def _handle_create_a_container(self, param):
         self.save_progress("""In action
         handler for: {0}""".format(self.get_action_identifier()))
+        if param is None:
+            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
+        request_body = param['request_body']
         ret_val, response = self._make_post_call(
             '/containers/create?name={0}'.format(name),
-            action_result, data=param['request_body'])
+            action_result, data=request_body)
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed,
             # action result should contain all the error details
@@ -1055,6 +1167,11 @@ class Docker_V3Connector(BaseConnector):
         """
 
         self._base_url = config['host ip']
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
