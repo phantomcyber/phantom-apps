@@ -1,9 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
-
+# File: crxcavator_connector.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
@@ -13,7 +12,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from crxcavator_consts import *
+from crxcavator_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -62,33 +61,36 @@ class CrxcavatorConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-
         try:
             if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERROR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the CRXcavator Server. Please check the asset configuration and|or the action parameters."
+            error_msg = TYPE_ERR_MSG
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = ERROR_MSG_UNAVAILABLE
 
-        if error_code in "Error code unavailable":
-            error_text = "Error Message: {0}".format(error_msg)
-        else:
-            error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
 
         return error_text
 
@@ -122,7 +124,7 @@ class CrxcavatorConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -313,28 +315,33 @@ class CrxcavatorConnector(BaseConnector):
 
         extension_id = param['extension_id']
         version = param.get('version')
-        try:
-            if version:
-                endpoint = '/report/{}/{}'.format(extension_id, version)
-            else:
-                # Get latest version
-                endpoint = '/report/{}'.format(extension_id)
-                ret_val, response = self._make_rest_call(endpoint, action_result)
-                if response is None:
-                    return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
-                versions = []
-                for data in response:
-                    versions.append(data['version'])
-                latest = max(versions, key=self.major_minor_micro_patch)
-                endpoint = '/report/{}/{}'.format(extension_id, latest)
-
+        if version:
+            endpoint = '/report/{}/{}'.format(extension_id, version)
+        else:
+            # Get latest version
+            endpoint = '/report/{}'.format(extension_id)
             ret_val, response = self._make_rest_call(endpoint, action_result)
-
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
             if response is None:
                 return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
+            versions = []
+            try:
+                for data in response:
+                    versions.append(data['version'])
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server")
 
+            latest = max(versions, key=self.major_minor_micro_patch)
+            endpoint = '/report/{}/{}'.format(extension_id, latest)
+
+        ret_val, response = self._make_rest_call(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if response is None:
+            return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
+
+        try:
             # Scrub dots from field names
             response = self.replace_dict(response)
             data = response['data']
@@ -344,7 +351,7 @@ class CrxcavatorConnector(BaseConnector):
             total_risk = data['risk']['total']
             action_result.update_summary({"extension_id": extension_id, "version": response['version'], "total_risk": total_risk})
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server for given extension ID")
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
