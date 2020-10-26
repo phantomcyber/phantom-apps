@@ -438,9 +438,11 @@ class CofenseTriageConnector(BaseConnector):
         tmp.close()
 
         ret_val = Vault.add_attachment(file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
-
-        if (ret_val['succeeded'] is not True):
-            return "Error: Vaulting file error; {}".format(ret_val['message']), None, None
+        try:
+            if (ret_val['succeeded'] is not True):
+                return "Error: Vaulting file error; {}".format(ret_val['message']), None, None
+        except:
+            return "Error: Unable to perform Vault operation", None, None
 
         vault_id = ret_val['vault_id']
         fileinfo = Vault.get_file_info(vault_id=vault_id, file_name=None, container_id=self.get_container_id())
