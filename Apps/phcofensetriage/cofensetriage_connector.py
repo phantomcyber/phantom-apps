@@ -54,27 +54,31 @@ class CofenseTriageConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERROR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Cofense Triage Server. Please check the asset configuration and|or the action parameters."
+            error_msg = TYPE_ERR_MSG
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = ERROR_MSG_UNAVAILABLE
 
-        if error_code in "Error code unavailable":
-            error_text = "Error Message: {0}".format(error_msg)
-        else:
-            error_text = "Error Code: {0}. Error Message: {1}".format(
-                error_code, error_msg)
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
 
         return error_text
 
@@ -87,11 +91,9 @@ class CofenseTriageConnector(BaseConnector):
 
         try:
             if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(
-                    input_str).unicode_markup.encode('utf-8')
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print(
-                "Error occurred while handling python 2to3 compatibility for the input string")
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
         return input_str
 
@@ -208,10 +210,9 @@ class CofenseTriageConnector(BaseConnector):
         # Create a URL to connect to
         # handle cases which is missing the api.
         if 'api/' not in endpoint:
-            url = self._base_url.rstrip(
-                '/') + "/api/public/v1/" + endpoint.strip().strip('/')
+            url = "{0}/api/public/v1/{1}".format(self._base_url.rstrip('/'), endpoint.strip().strip('/'))
         else:
-            url = self._base_url.rstrip('/') + endpoint
+            url = "{0}{1}".format(self._base_url.rstrip('/'), endpoint)
 
         action_result.update_summary({'requests_url': url})
         action_result.update_summary({'requests_params': kwargs.get('params')})
@@ -245,8 +246,7 @@ class CofenseTriageConnector(BaseConnector):
 
         endpoint = CONNECTION_TEST_ENDPOINT
         self.save_progress("Connecting to endpoint")
-        ret_val, response = self._make_rest_call(
-            endpoint, action_result, params=None, headers=None)
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Test Connectivity Failed.")
@@ -263,8 +263,7 @@ class CofenseTriageConnector(BaseConnector):
                 return True, None
             else:
                 return "Error: invalid value passed {}; {}".format(category if category else "", search), None
-        search = str(search).strip().lower().replace(
-            '_', ' ').replace('-', ' ')
+        search = str(search).strip().lower().replace('_', ' ').replace('-', ' ')
         for k, v in definition.items():
             if search in v:
                 return True, None if k == "_none_" else k
@@ -413,8 +412,7 @@ class CofenseTriageConnector(BaseConnector):
         if ret_val is not True and ret_val != "existing_artifact_id":
             return ret_val, None, None
         if ret_val == "existing_artifact_id":
-            self.save_progress(
-                "Notice: duplicated artifact; {}".format(artifact_id))
+            self.save_progress("Notice: duplicated artifact; {}".format(artifact_id))
 
         summary = {
             'artifact_id': artifact_id,
@@ -432,24 +430,21 @@ class CofenseTriageConnector(BaseConnector):
             return "Error: one or more arguments are null value", None, None
 
         if hasattr(Vault, 'get_vault_tmp_dir'):
-            tmp = tempfile.NamedTemporaryFile(
-                mode="wb", dir=Vault.get_vault_tmp_dir(), delete=False)
+            tmp = tempfile.NamedTemporaryFile(mode="wb", dir=Vault.get_vault_tmp_dir(), delete=False)
         else:
-            tmp = tempfile.NamedTemporaryFile(
-                mode="wb", dir=PHANTOM_VAULT_DIR, delete=False)
+            tmp = tempfile.NamedTemporaryFile(mode="wb", dir=PHANTOM_VAULT_DIR, delete=False)
 
         tmp.write(content)
         tmp.close()
 
-        ret_val = Vault.add_attachment(
-            file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
+        ret_val = Vault.add_attachment(file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
 
         if (ret_val['succeeded'] is not True):
             return "Error: Vaulting file error; {}".format(ret_val['message']), None, None
 
         vault_id = ret_val['vault_id']
-        fileinfo = Vault.get_file_info(
-            vault_id=vault_id, file_name=None, container_id=self.get_container_id())
+        fileinfo = Vault.get_file_info(vault_id=vault_id, file_name=None, container_id=self.get_container_id())
+
         if len(fileinfo) == 0:
             return "Error: Vaulting file error, newly vaulted file not found; {}".format(vault_id), None, None
         fileinfo = fileinfo[0]
@@ -481,8 +476,7 @@ class CofenseTriageConnector(BaseConnector):
             if ret_val is not True and ret_val != "existing_artifact_id":
                 return ret_val, None, None
             if ret_val == "existing_artifact_id":
-                self.save_progress(
-                    "Notice: duplicated artifact; {}".format(artifact_id))
+                self.save_progress("Notice: duplicated artifact; {}".format(artifact_id))
 
             summary['artifact_id'] = artifact_id
             data['artifact_id'] = artifact_id
@@ -515,8 +509,7 @@ class CofenseTriageConnector(BaseConnector):
 
             report_id = str(x.get('id'))
 
-            ret_val, severity = self._determine_value(
-                CATEGORY_ID_TO_SEVERITY, x.get('category_id'), 'for mapping severity')
+            ret_val, severity = self._determine_value(CATEGORY_ID_TO_SEVERITY, x.get('category_id'), 'for mapping severity')
             if ret_val is not True:
                 severity = "low"
 
@@ -544,8 +537,7 @@ class CofenseTriageConnector(BaseConnector):
                 if isinstance(email_urls, list):
                     urls = [z for z in [y.get('url') for y in email_urls] if z]
                     for y in urls:
-                        cef = self._remap_cef(
-                            cef={'url': y}, cef_mapping=cef_mapping)
+                        cef = self._remap_cef(cef={'url': y}, cef_mapping=cef_mapping)
                         artifacts += [{
                             "source_data_identifier": "report id " + report_id,
                             "name": "Url Artifact",
@@ -555,8 +547,7 @@ class CofenseTriageConnector(BaseConnector):
                 tags = x.get("tags", )
                 if isinstance(tags, list):
                     for y in tags:
-                        cef = self._remap_cef(
-                            cef={'tag': y}, cef_mapping=cef_mapping)
+                        cef = self._remap_cef(cef={'tag': y}, cef_mapping=cef_mapping)
                         artifacts += [{
                             "source_data_identifier": "report id " + report_id,
                             "name": "Tag Artifact",
@@ -591,12 +582,11 @@ class CofenseTriageConnector(BaseConnector):
                         }]
 
             status, message, container_id = self.save_container(container)
-            self.save_progress("DEBUG: report_id ({}) reported_at ({})".format(
-                x.get('id'), x.get('reported_at')))
-            self.save_progress("DEBUG: container: report_id ({}) status ({}) message ({}) container_id ({})".format(
-                x.get('id'), status, message, container_id))
-            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(
-                artifacts), 'status': status, 'message': message}]
+
+            self.save_progress("DEBUG: report_id ({}) reported_at ({})".format(x.get('id'), x.get('reported_at')))
+            self.save_progress("DEBUG: container: report_id ({}) status ({}) message ({}) container_id ({})".format(x.get('id'), status, message, container_id))
+
+            stats += [{'ingest_id': x.get('id'), 'container_id': container_id, 'num_artifacts': len(artifacts), 'status': status, 'message': message}]
 
         ####
         # todo:
@@ -1110,6 +1100,7 @@ class CofenseTriageConnector(BaseConnector):
         ret_val, report_id = self._validate_integer(report_id, REPORT_ID_KEY)
         if ret_val is not True:
             return action_result.set_status(phantom.APP_ERROR, ret_val)
+
         ret_val, label = self._validate_label(
             self._handle_py_ver_compat_for_input_str(param.get('ingest_to_label')))
         if ret_val is not True:
@@ -1128,7 +1119,7 @@ class CofenseTriageConnector(BaseConnector):
                 self.save_progress(e)
                 return action_result.set_status(phantom.APP_ERROR, e)
 
-        endpoint = "/reports/" + str(report_id)
+        endpoint = "/reports/{0}".format(str(report_id))
         self.save_progress("Retrieving report id {}".format(report_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
@@ -1165,7 +1156,7 @@ class CofenseTriageConnector(BaseConnector):
         if ret_val is not True:
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        endpoint = "/reports/" + str(report_id) + ".txt"
+        endpoint = "/reports/{0}.txt".format(str(report_id))
         self.save_progress(
             "Downloading raw email of report id {}".format(report_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
@@ -1183,7 +1174,7 @@ class CofenseTriageConnector(BaseConnector):
 
         filename = self._r.headers.get(
             'Content-Disposition', "").split('filename=')[-1].strip('"')
-        source_data_identifier = "report id " + str(report_id)
+        source_data_identifier = "report id  {0}".format(str(report_id))
 
         if method == "artifact":
             ret_val, summary, data = self._save_email_artifact(
@@ -1217,7 +1208,7 @@ class CofenseTriageConnector(BaseConnector):
         if ret_val is not True:
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        endpoint = "/attachment/" + str(attachment_id)
+        endpoint = "/attachment/{0}".format(str(attachment_id))
         self.save_progress(
             "Downloading attachment id {}".format(attachment_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
@@ -1229,7 +1220,7 @@ class CofenseTriageConnector(BaseConnector):
 
         filename = self._r.headers.get(
             'Content-Disposition', "").split('filename=')[-1].strip('"')
-        source_data_identifier = "attachment_id " + str(attachment_id)
+        source_data_identifier = "attachment_id {0}".format(str(attachment_id))
 
         ret_val, summary, data = self._vault_file(filename=filename, content=response,
                                                   makeartifact=source_data_identifier if param.get('create_vaulted_file_artifact', False) else None)
@@ -1284,7 +1275,8 @@ class CofenseTriageConnector(BaseConnector):
 
         endpoint = "/reporters"
         ret_val, response = self._get_pages_from_endpoint(action_result=action_result, endpoint=endpoint, start_date=start_date, end_date=end_date,
-                                                          vip=param.get('vip'), email=self._handle_py_ver_compat_for_input_str(param.get('email')),
+                                                          vip=param.get('vip'),
+                                                          email=self._handle_py_ver_compat_for_input_str(param.get('email')),
                                                           page=page, per_page=per_page, page_dir=page_dir, results_dir=direction, max_results=max_results)
 
         # most likely rest error
@@ -1329,7 +1321,7 @@ class CofenseTriageConnector(BaseConnector):
         if ret_val is not True:
             return action_result.set_status(phantom.APP_ERROR, ret_val)
 
-        endpoint = "/reporters/" + str(reporter_id)
+        endpoint = "/reporters/{0}".format(str(reporter_id))
         self.save_progress("Retrieving reporter id {}".format(reporter_id))
         ret_val, response = self._make_rest_call(endpoint, action_result)
 

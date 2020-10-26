@@ -387,10 +387,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.container_id",
                     "data_type": "string",
                     "column_name": "Container ID",
@@ -691,10 +687,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.category_id",
                     "data_type": "string",
                     "column_name": "Category ID",
@@ -900,10 +892,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.category_id",
                     "data_type": "string",
                     "column_name": "Category ID",
@@ -1095,10 +1083,6 @@
                     ],
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.artifact_id",
@@ -1473,10 +1457,6 @@
                     "data_type": "boolean"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.created_at",
                     "data_type": "string",
                     "column_name": "Created At",
@@ -1593,10 +1573,6 @@
                     ],
                     "data_path": "action_result.parameter.reporter_id",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_at",

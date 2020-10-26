@@ -27,6 +27,10 @@ MATCH_PRIORITY_KEY = "'match_priority' action parameter"
 REPORTER_ID_KEY = "'reporter_id' action parameter"
 REPORT_ID_KEY = "'report_id' action parameter"
 ATTACHMENT_ID_KEY = "'attachment_id' action parameter"
+ERROR_CODE_MSG = "Error code unavailable"
+ERROR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the CRXcavator Server. Please check the asset configuration and|or the action parameters"
 #
 ENDPOINT_TYPE_VALUES = {
     "/reports": ["all", "reports", "all reports"],
