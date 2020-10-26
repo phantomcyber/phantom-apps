@@ -329,7 +329,7 @@ class CrxcavatorConnector(BaseConnector):
                     versions.append(data['version'])
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server")
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server. Details: {}".format(err))
 
             latest = max(versions, key=self.major_minor_micro_patch)
             endpoint = '/report/{}/{}'.format(extension_id, latest)
