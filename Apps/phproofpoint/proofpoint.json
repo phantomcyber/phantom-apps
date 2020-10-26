@@ -3,18 +3,18 @@
     "name": "Proofpoint TAP",
     "description": "This App integrates with Proofpoint to implement ingestion and investigative actions",
     "type": "network security",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "main_module": "proofpoint_connector.pyc",
-    "app_version": "1.2.19",
+    "app_version": "1.2.20",
     "utctime_updated": "2019-03-25T22:17:43.000000Z",
     "package_name": "phantom_proofpoint",
     "product_vendor": "phantom_proofpoint",
     "product_name": "Targeted Attack Protection",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.8.24304",
     "logo": "logo_proofpoint.svg",
     "logo_dark": "logo_proofpoint_dark.svg",
-    "license": "Copyright (c) 2017-2019 Splunk Inc.",
+    "license": "Copyright (c) 2017-2020 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -42,28 +42,24 @@
         "ingest_permitted_clicks": {
             "data_type": "boolean",
             "description": "Ingest Permitted Clicks",
-            "required": false,
             "order": 4,
             "default": true
         },
         "ingest_blocked_clicks": {
             "data_type": "boolean",
             "description": "Ingest Blocked Clicks",
-            "required": false,
             "order": 5,
             "default": true
         },
         "ingest_delivered_messages": {
             "data_type": "boolean",
             "description": "Ingest Delivered Messages",
-            "required": false,
             "order": 6,
             "default": true
         },
         "ingest_blocked_messages": {
             "data_type": "boolean",
             "description": "Ingest Blocked Messages",
-            "required": false,
             "order": 7,
             "default": true
         }
@@ -81,34 +77,38 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality",
+            "description": "Callback action for the On Poll ingest functionality",
+            "verbose": "For 'start_time' parameter default is past 10 days and for 'end_time' parameter default is now.",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
             "parameters": {
                 "start_time": {
                     "data_type": "numeric",
-                    "description": "Start of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is past 10 days"
+                    "order": 0,
+                    "description": "Start of time range, in epoch time (milliseconds) (default is past 10 days)"
                 },
                 "end_time": {
                     "data_type": "numeric",
-                    "description": "End of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is now"
+                    "order": 1,
+                    "description": "End of time range, in epoch time (milliseconds) (default is now)"
                 },
                 "container_id": {
                     "data_type": "string",
+                    "order": 2,
                     "description": "Matching email subject. Wildcards supported",
                     "allow_list": true
                 },
                 "container_count": {
                     "data_type": "numeric",
+                    "order": 3,
                     "description": "Maximum number of container records to query for",
                     "required": true,
                     "value": 100
                 },
                 "artifact_count": {
                     "data_type": "numeric",
+                    "order": 4,
                     "description": "Maximum number of artifact records to query for",
                     "required": true,
                     "value": 1000
@@ -121,7 +121,7 @@
             "action": "get campaign data",
             "description": "Fetch detailed information for a given campaign (deprecated)",
             "verbose": "This action is deprecated due to action name change. Please use <b>get campaign</b> instead.",
-            "type": "test",
+            "type": "investigate",
             "deprecated": true,
             "identifier": "get_campaign_details",
             "read_only": true,
@@ -133,10 +133,22 @@
                     "contains": [
                         "proofpoint campaign id"
                     ],
-                    "primary": true
+                    "primary": true,
+                    "order": 0
                 }
             },
+            "render": {
+                "type": "json"
+            },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.campaign_id",
                     "data_type": "string",
@@ -145,15 +157,74 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.actors.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.actors.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "proofpoint threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.subType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.threat",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.threatTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.families.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.families.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.malware.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.malware.*.name",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.data.*.startDate",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.techniques.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.techniques.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -173,69 +244,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.startDate",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.id",
-                    "data_type": "string",
-                    "contains": [
-                        "proofpoint threat id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.threat",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.subType",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.threatTime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.actors.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.actors.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.malware.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.malware.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.families.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.families.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.techniques.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.techniques.*.name",
-                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -262,72 +270,19 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.campaign_id",
                     "data_type": "string",
                     "contains": [
                         "proofpoint campaign id"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.startDate",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.id",
-                    "data_type": "string",
-                    "contains": [
-                        "proofpoint threat id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.threat",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.subType",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.campaignMembers.*.threatTime",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.actors.*.id",
@@ -338,11 +293,30 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.malware.*.id",
+                    "data_path": "action_result.data.*.campaignMembers.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "proofpoint threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.subType",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.malware.*.name",
+                    "data_path": "action_result.data.*.campaignMembers.*.threat",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.threatTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaignMembers.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string"
                 },
                 {
@@ -354,82 +328,35 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.malware.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.malware.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.startDate",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.techniques.*.id",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.techniques.*.name",
                     "data_type": "string"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get forensic data",
-            "description": "Fetch forensic information for a given threat or campaign (deprecated)",
-            "verbose": "This action is deprecated due to action name change. Please use <b>get forensic</b> instead.",
-            "type": "test",
-            "deprecated": true,
-            "identifier": "get_forensic_data",
-            "read_only": true,
-            "parameters": {
-                "campaign_id": {
-                    "data_type": "string",
-                    "description": "Proofpoint campaign ID from other Proofpoint events",
-                    "required": false,
-                    "contains": [
-                        "proofpoint campaign id"
-                    ],
-                    "primary": true,
-                    "order": 1
-                },
-                "threat_id": {
-                    "data_type": "string",
-                    "description": "Proofpoint threat ID from other Proofpoint events",
-                    "required": false,
-                    "contains": [
-                        "proofpoint threat id"
-                    ],
-                    "primary": true,
-                    "order": 0
-                },
-                "include_campaign_forensics": {
-                    "data_type": "boolean",
-                    "description": "Include full campaign forensic data for a threat. This value is ignored for campaign queries",
-                    "required": false,
-                    "default": false,
-                    "order": 2
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.campaign_id",
-                    "data_type": "string",
-                    "contains": [
-                        "proofpoint campaign id"
-                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.threat_id",
-                    "data_type": "string",
-                    "contains": [
-                        "proofpoint threat id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.include_campaign_forensics",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -445,29 +372,76 @@
                     "example_values": [
                         1
                     ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get forensic data",
+            "description": "Fetch forensic information for a given threat or campaign (deprecated)",
+            "verbose": "This action is deprecated due to action name change. Please use <b>get forensic</b> instead.",
+            "type": "investigate",
+            "deprecated": true,
+            "identifier": "get_forensic_data",
+            "read_only": true,
+            "parameters": {
+                "campaign_id": {
+                    "data_type": "string",
+                    "description": "Proofpoint campaign ID from other Proofpoint events",
+                    "contains": [
+                        "proofpoint campaign id"
+                    ],
+                    "primary": true,
+                    "order": 1
+                },
+                "threat_id": {
+                    "data_type": "string",
+                    "description": "Proofpoint threat ID from other Proofpoint events",
+                    "contains": [
+                        "proofpoint threat id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                },
+                "include_campaign_forensics": {
+                    "data_type": "boolean",
+                    "description": "Include full campaign forensic data for a threat. This value is ignored for campaign queries",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "json"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.campaign_id",
+                    "data_type": "string",
+                    "contains": [
+                        "proofpoint campaign id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.include_campaign_forensics",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.threat_id",
+                    "data_type": "string",
+                    "contains": [
+                        "proofpoint threat id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.generated",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.scope",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.type",
                     "data_type": "string"
                 },
                 {
@@ -476,10 +450,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.malicious",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.time",
                     "data_type": "string"
                 },
                 {
@@ -495,37 +465,23 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "sha256"
-                    ]
+                    "data_path": "action_result.data.*.reports.*.forensics.*.time",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "md5"
-                    ]
+                    "data_path": "action_result.data.*.reports.*.forensics.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.action",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.blacklisted",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.offset",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.rule",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.action",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.cnames.*",
                     "data_type": "string"
                 },
                 {
@@ -536,56 +492,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.value",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.host",
                     "data_type": "string",
                     "contains": [
-                        "hostname"
+                        "host name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.cnames.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.ips.*",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameservers.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameserversList.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.signatureId",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.httpStatus",
                     "data_type": "string"
                 },
                 {
@@ -596,16 +510,118 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.ips.*",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameservers.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameserversList.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.path",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.port",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.rule",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.signatureId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.httpStatus",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.value",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -620,7 +636,6 @@
                 "campaign_id": {
                     "data_type": "string",
                     "description": "Proofpoint campaign ID from other Proofpoint events",
-                    "required": false,
                     "contains": [
                         "proofpoint campaign id"
                     ],
@@ -630,7 +645,6 @@
                 "threat_id": {
                     "data_type": "string",
                     "description": "Proofpoint threat ID from other Proofpoint events",
-                    "required": false,
                     "contains": [
                         "proofpoint threat id"
                     ],
@@ -640,7 +654,6 @@
                 "include_campaign_forensics": {
                     "data_type": "boolean",
                     "description": "Include full campaign forensic data for a threat. This value is ignored for campaign queries",
-                    "required": false,
                     "default": false,
                     "order": 2
                 }
@@ -650,11 +663,23 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.campaign_id",
                     "data_type": "string",
                     "contains": [
                         "proofpoint campaign id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.include_campaign_forensics",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.parameter.threat_id",
@@ -664,57 +689,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.include_campaign_forensics",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.generated",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.scope",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.type",
                     "data_type": "string"
                 },
                 {
@@ -723,10 +698,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.malicious",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.time",
                     "data_type": "string"
                 },
                 {
@@ -742,37 +713,23 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "sha256"
-                    ]
+                    "data_path": "action_result.data.*.reports.*.forensics.*.time",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "md5"
-                    ]
+                    "data_path": "action_result.data.*.reports.*.forensics.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.action",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.blacklisted",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.offset",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.rule",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.action",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.cnames.*",
                     "data_type": "string"
                 },
                 {
@@ -783,56 +740,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.value",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.host",
                     "data_type": "string",
                     "contains": [
-                        "hostname"
+                        "host name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.cnames.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.ips.*",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameservers.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameserversList.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.signatureId",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.httpStatus",
                     "data_type": "string"
                 },
                 {
@@ -843,50 +758,103 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.ips.*",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameservers.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.nameserversList.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.path",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.port",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.rule",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.signatureId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.reports.*.forensics.*.what.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.reports.*.forensics.*.what.httpStatus",
-                    "data_type": "string"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "decode url",
-            "description": "Decode Proofpoint rewritten URL(s)",
-            "type": "information",
-            "identifier": "decode_url",
-            "read_only": true,
-            "parameters": {
-                "url": {
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.url",
                     "data_type": "string",
-                    "description": "List of URL(s) to decode, comma separated",
-                    "required": true,
-                    "primary": true,
-                    "order": 0,
-                    "allow_list": true
-                }
-            },
-            "render": {
-                "type": "json"
-            },
-            "output": [
+                    "contains": [
+                        "url"
+                    ]
+                },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.reports.*.forensics.*.what.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.reports.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reports.*.type",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -902,6 +870,40 @@
                     "example_values": [
                         1
                     ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "decode url",
+            "description": "Decode Proofpoint rewritten URL(s)",
+            "type": "generic",
+            "identifier": "decode_url",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "data_type": "string",
+                    "description": "List of URL(s) to decode, comma separated",
+                    "required": true,
+                    "order": 0,
+                    "allow_list": true
+                }
+            },
+            "render": {
+                "type": "json"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.clusterName",
@@ -914,7 +916,7 @@
                         "url"
                     ]
                 },
-				{
+                {
                     "data_path": "action_result.data.*.encodedUrl",
                     "data_type": "string",
                     "contains": [
@@ -936,6 +938,28 @@
                 {
                     "data_path": "action_result.data.*.success",
                     "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"

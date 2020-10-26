@@ -1,4 +1,5 @@
-# Copyright (c) 2017-2019 Splunk Inc.
+# File: proofpoint_connector.py
+# Copyright (c) 2017-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -13,6 +14,8 @@ from proofpoint_consts import *
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+import sys
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -31,22 +34,121 @@ class ProofpointConnector(BaseConnector):
         self._state = {}
 
     def initialize(self):
+
+        # Load the state in initialize, use it to store data
+        # that needs to be accessed across actions
         self._state = self.load_state()
+
+        # get the asset config
+        config = self.get_config()
+
+        self._username = self._handle_py_ver_compat_for_input_str(config['username'])
+        self._password = config['password']
+        self._headers = {
+            'X-Requested-With': 'REST API',
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        self._auth = (self._username, self._password)
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version.")
+
         return phantom.APP_SUCCESS
 
     def finalize(self):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
-        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Empty response and no information in the header'), None)
+
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
+
+        # An html response, treat it like an error
         status_code = response.status_code
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [ x.strip() for x in split_lines if x.strip() ]
@@ -54,45 +156,62 @@ class ProofpointConnector(BaseConnector):
         except:
             error_text = 'Cannot parse error details'
 
-        message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code, error_text)
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        error_text = self._get_error_message_from_exception(error_text)
+        message = 'Status Code: {0}. Data from server:\n{1}\n'.format(status_code, error_text)
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
+
+        # Try a json parse
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to parse JSON response. Error: {0}').format(str(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to parse JSON response. Error: {0}').format(error_msg)), None)
         else:
             if 200 <= r.status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = ('Error from server. Status Code: {0} Data from server: {1}').format(r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+        error_msg = self._get_error_message_from_exception(r.text.replace('{', '{{').replace('}', '}}'))
+        message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, error_msg)
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
+
+        # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
             action_result.add_debug_data({'r_text': r.text})
             action_result.add_debug_data({'r_headers': r.headers})
+
+        # Process each 'Content-Type' of response separately
+
+        # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
+
+        # Process an HTML response
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
+
+        # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
             return self._process_empty_response(r, action_result)
-        message = ("Can't process response from server. Status Code: {0} Data from server: {1}").format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+
+        # everything else is actually an error at this point
+        error_msg = self._get_error_message_from_exception(r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+            r.status_code, error_msg)
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, action_result, endpoint, method='get', **kwargs):
-        config = self.get_config()
-        user = config['username'].encode('utf-8')
-        password = config['password']
-        header = {'X-Requested-With': 'REST API',
-                'Content-type': 'application/json',
-                'Accept': 'application/json'}
+        # **kwargs can be any additional parameters that requests.request accepts
 
-        url = PP_API_BASE_URL + endpoint
+        resp_json = None
+
+        # Create a URL to connect to
+        url = '{0}{1}'.format(PP_API_BASE_URL, endpoint)
 
         try:
             request_func = getattr(requests, method)
@@ -100,9 +219,13 @@ class ProofpointConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, ('Invalid method: {0}').format(method)), resp_json)
 
         try:
-            res = request_func(url, auth=(user, password), headers=header, **kwargs)
+            res = request_func(url, auth=self._auth, headers=self._headers, **kwargs)
+        except requests.exceptions.ConnectionError:
+            error_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(str(e))), resp_json)
+            error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(error_msg)), resp_json)
 
         return self._process_response(res, action_result)
 
@@ -334,11 +457,11 @@ class ProofpointConnector(BaseConnector):
         ret_val, _ = self._make_rest_call(action_result,
                                           PP_API_PATH_ALL, params=params)
         if phantom.is_fail(ret_val):
-            return self.set_status_save_progress(phantom.APP_ERROR,
-                                                 'Connection Failed.')
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS,
-                                             'Connection successful.')
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def get_campaign_details(self, param):
         action_result = self.add_action_result(ActionResult(param))
@@ -396,13 +519,11 @@ class ProofpointConnector(BaseConnector):
 
         params = {}
         url_list = []
+        url = param['url']
 
         # The Decode API allows for multiple values. Split the parameter by ,
-        url_split = param.get('url').split(',')
-
-        for url in url_split:
-            # Add the URL to the list to decode
-            url_list.append(url)
+        url_list = [x.strip() for x in url.split(',')]
+        url_list = list(filter(None, url_list))
 
         # Add the URL(s) to the json
         params['urls'] = url_list
@@ -430,7 +551,7 @@ class ProofpointConnector(BaseConnector):
         self.debug_print('action_id', self.get_action_identifier())
 
         action_mapping = {
-            'test_connectivity': self._test_connectivity,
+            'test_asset_connectivity': self._test_connectivity,
             'get_campaign_details': self.get_campaign_details,
             'get_campaign': self.get_campaign_details,
             'get_forensic_data': self.get_forensic_data,
@@ -450,7 +571,6 @@ class ProofpointConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import argparse
     import pudb
 
@@ -477,7 +597,8 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            login_url = BaseConnector._get_phantom_base_url() + "login"
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -487,17 +608,17 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -512,6 +633,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
