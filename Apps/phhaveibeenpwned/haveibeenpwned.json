@@ -29,6 +29,16 @@
   },
   "actions": [
     {
+      "action": "test connectivity",
+      "identifier": "test_connectivity",
+      "description": "Validate the asset configuration for connectivity using supplied configuration",
+      "type": "test",
+      "read_only": true,
+      "parameters": {},
+      "output": [],
+      "versions": "EQ(*)"
+    },
+    {
       "action": "lookup email",
       "identifier": "lookup_email",
       "description": "Searches for breaches associated with an email",
