@@ -165,20 +165,20 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.login(swagger_client.IronapiTypesLoginRequest(), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Fetch for Login failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Fetch for Login failed. Status code was {}".format(response.status))
             else:
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         if phantom.is_success(call_status):
             return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity to IronAPI Passed")
         else:
@@ -215,21 +215,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.rate_alert(swagger_client.AlertRateAlertRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Rate Alert failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Rate Alert failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Alert rating was successful")
@@ -263,23 +263,23 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.set_alert_status(swagger_client.AlertSetAlertStatusRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Set Alert status failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Set Alert status failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         if phantom.is_success(call_status):
-            self.debug_print("Setting alert staus was successful")
+            self.debug_print("Setting alert status was successful")
             # Add the response into the data section
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Setting alert status was successful")
@@ -308,21 +308,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.comment_on_alert(swagger_client.AlertCommentOnAlertRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Comment on Alert failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Comment on Alert failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Adding comment to alert was successful")
@@ -358,21 +358,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.report_observed_bad_activity(swagger_client.ThreatReportObservedBadActivityRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Report observed bad activity failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Report observed bad activity failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Reporting bad activity to IronDefense was successful")
@@ -400,21 +400,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_alert_iron_dome_information(swagger_client.DomeGetAlertIronDomeInformationRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Get alert IronDome info failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Get alert IronDome info failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving IronDome alert info was successful")
@@ -435,22 +435,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_alert_notifications(swagger_client.AlertGetAlertNotificationsRequest(limit=self._alert_limit), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(
-                response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Fetch for AlertNotifications failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Fetch for Alert Notifications failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.save_progress("Fetching alert notifications was successful")
@@ -491,7 +490,7 @@ class IronnetConnector(BaseConnector):
                                     action_result.set_status(phantom.APP_ERROR, 'Alert Notification artifact creation failed: {}'.format(artifact_msg))
                                     return artifact_status
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occured while processing response from server")
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
 
             self.save_progress("Filtering alert notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -510,10 +509,10 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_dome_notifications(swagger_client.DomeGetDomeNotificationsRequest(limit=self._dome_limit), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Fetch for DomeNotifications failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Fetch for Dome Notifications failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
@@ -524,7 +523,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.save_progress("Fetching dome notifications was successful")
@@ -560,7 +559,7 @@ class IronnetConnector(BaseConnector):
                                 action_result.set_status(phantom.APP_ERROR, 'Dome Notification artifact creation failed: {}'.format(artifact_msg))
                                 return artifact_status
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occured while processing response from server")
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
             self.save_progress("Filtering dome notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
@@ -578,10 +577,10 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_event_notifications(swagger_client.EventGetEventNotificationsRequest(limit=self._event_limit), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Fetch for EventNotifications failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Fetch for Event Notifications failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
@@ -592,11 +591,11 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if response.status != 200:
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, "Fetch for EventNotifications failed. Status code was {}".format(str(response.status)))
+            action_result.set_status(call_status, "Fetch for EventNotifications failed. Status code was {}".format(response.status))
 
         if phantom.is_success(call_status):
             self.save_progress("Fetching event notifications was successful")
@@ -659,7 +658,7 @@ class IronnetConnector(BaseConnector):
                                     action_result.set_status(phantom.APP_ERROR, 'Event Notification artifact creation failed: {}'.format(artifact_msg))
                                     return artifact_status
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occured while processing response from server")
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
             self.save_progress("Filtering event notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
@@ -680,9 +679,9 @@ class IronnetConnector(BaseConnector):
         if 'alert_id' in param and self._handle_py_ver_compat_for_input_str(param['alert_id']).strip() != '':
             request['alert_id'] = self._handle_py_ver_compat_for_input_str(param['alert_id']).strip().split(",")
         if 'category' in param and self._handle_py_ver_compat_for_input_str(param['category']).strip() != '':
-            request['category'] = [str(cat).strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['category']).split(',')]
+            request['category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['category']).split(',')]
         if 'sub_category' in param and self._handle_py_ver_compat_for_input_str(param['sub_category']).strip() != '':
-            request['sub_category'] = [str(cat).strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['sub_category']).split(',')]
+            request['sub_category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['sub_category']).split(',')]
         try:
             if 'status' in param and self._handle_py_ver_compat_for_input_str(param['status']).strip() != '':
                 request['status'] = [status_mapping[status.strip().lower()]for status in self._handle_py_ver_compat_for_input_str(param['status']).split(',')]
@@ -711,21 +710,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_alerts(swagger_client.AlertGetAlertsRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Get Alerts failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Get Alerts failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving alerts was successful")
@@ -751,21 +750,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_events(swagger_client.EventGetEventsRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Get Events failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Get Events failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving events was successful")
@@ -791,21 +790,21 @@ class IronnetConnector(BaseConnector):
 
         try:
             response = self._api_instance.get_event(swagger_client.EventGetEventRequest(request), _preload_content=False)
-            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, response.data.encode('utf-8')))
+            self.save_progress("Received response: Code:{}, Data:{}".format(response.status, self._handle_py_ver_compat_for_input_str(response.data)))
             if response.status != 200:
                 call_status = phantom.APP_ERROR
-                action_result.set_status(call_status, "Get Event failed. Status code was {}".format(str(response.status)))
+                action_result.set_status(call_status, "Get Event failed. Status code was {}".format(response.status))
             else:
                 response_data = json.loads(response.data)
                 call_status = phantom.APP_SUCCESS
         except ApiException as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(phantom.APP_ERROR, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving event was successful")
@@ -892,17 +891,17 @@ class IronnetConnector(BaseConnector):
         if self._enable_alert_notifications:
             alert_acts = self._handle_py_ver_compat_for_input_str(config.get('alert_notification_actions'))
             if alert_acts:
-                self._alert_notification_actions = ["ANA_ {}".format(str(act).strip().replace(" ", "_").upper()) for act in alert_acts.split(',') if act.strip()]
+                self._alert_notification_actions = ["ANA_ {}".format(act.strip().replace(" ", "_").upper()) for act in alert_acts.split(',') if act.strip()]
             else:
                 self._alert_notification_actions = ["ANA_ALERT_CREATED"]
             alert_cats = self._handle_py_ver_compat_for_input_str(config.get('alert_categories'))
             if alert_cats:
-                self._alert_categories = [str(cat).strip().replace(" ", "_").upper() for cat in alert_cats.split(',') if cat.strip()]
+                self._alert_categories = [cat.strip().replace(" ", "_").upper() for cat in alert_cats.split(',') if cat.strip()]
             else:
                 self._alert_categories = []
             alert_subcats = self._handle_py_ver_compat_for_input_str(config.get('alert_subcategories'))
             if alert_subcats:
-                self._alert_subcategories = [str(subcat).strip().replace(" ", "_").upper() for subcat in alert_subcats.split(',') if subcat.strip()]
+                self._alert_subcategories = [subcat.strip().replace(" ", "_").upper() for subcat in alert_subcats.split(',') if subcat.strip()]
             else:
                 self._alert_subcategories = []
             ret_val, self._alert_severity_lower = self._validate_integer(self, config.get('alert_severity_lower'), ALERT_SEVERITY_LOWER_KEY)
@@ -926,7 +925,7 @@ class IronnetConnector(BaseConnector):
         if self._enable_dome_notifications:
             dome_cats = self._handle_py_ver_compat_for_input_str(config.get('dome_categories'))
             if dome_cats:
-                self._dome_categories = ["DNC_{}".format(str(cat).strip().replace(" ", "_").upper()) for cat in dome_cats.split(',') if cat.strip()]
+                self._dome_categories = ["DNC_{}".format(cat.strip().replace(" ", "_").upper()) for cat in dome_cats.split(',') if cat.strip()]
             else:
                 self._dome_categories = []
             ret_val, self._dome_limit = self._validate_integer(self, config.get('dome_limit'), DOME_LIMIT_KEY)
@@ -938,17 +937,17 @@ class IronnetConnector(BaseConnector):
         if self._enable_event_notifications:
             event_acts = self._handle_py_ver_compat_for_input_str(config.get('event_notification_actions'))
             if event_acts:
-                self._event_notification_actions = ["ENA_ {}".format(str(act).strip().replace(" ", "_").upper()) for act in event_acts.split(',') if act.strip()]
+                self._event_notification_actions = ["ENA_ {}".format(act.strip().replace(" ", "_").upper()) for act in event_acts.split(',') if act.strip()]
             else:
                 self._event_notification_actions = ["ENA_EVENT_CREATED"]
             event_cats = self._handle_py_ver_compat_for_input_str(config.get('event_categories'))
             if event_cats:
-                self._event_categories = [str(cat).strip().replace(" ", "_").upper() for cat in event_cats.split(',') if cat.strip()]
+                self._event_categories = [cat.strip().replace(" ", "_").upper() for cat in event_cats.split(',') if cat.strip()]
             else:
                 self._event_categories = []
             event_subcats = self._handle_py_ver_compat_for_input_str(config.get('event_subcategories'))
             if event_subcats:
-                self._event_subcategories = [str(subcat).strip().replace(" ", "_").upper() for subcat in event_subcats.split(',') if subcat.strip()]
+                self._event_subcategories = [subcat.strip().replace(" ", "_").upper() for subcat in event_subcats.split(',') if subcat.strip()]
             else:
                 self._event_subcategories = []
             ret_val, self._event_severity_lower = self._validate_integer(self, config.get('event_severity_lower'), EVENT_SEVERITY_LOWER_KEY)
