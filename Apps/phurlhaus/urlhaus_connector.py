@@ -174,10 +174,11 @@ class UrlhausConnector(BaseConnector):
             error_msg = ERROR_MSG_UNAVAILABLE
 
         try:
+            self.debug_print("MMMMMMMMMMMMMMM: ", error_msg)
             if error_code in ERROR_CODE_MSG:
                 error_text = error_msg
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                error_text = "Error Code: %s. Error Message: %s" % (error_code, error_msg)
         except:
             self.debug_print("Error occurred while parsing error message")
             error_text = PARSE_ERR_MSG
@@ -407,7 +408,7 @@ class UrlhausConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config.get('base_url')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
