@@ -14,11 +14,13 @@ from phantom.action_result import ActionResult
 from phantom.vault import Vault
 
 # Usage of the consts file is recommended
-# from browserlessio_consts import *
+from browserlessio_consts import *
 import requests
 import json
 import os
 import hashlib
+import sys
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -40,6 +42,7 @@ class BrowserlessIoConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+        self._rest_url = None
 
     def _process_empty_response(self, r, action_result):
         if r.status_code == 200:
@@ -64,9 +67,10 @@ class BrowserlessIoConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)
                 ), None
             )
 
@@ -77,7 +81,7 @@ class BrowserlessIoConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -143,13 +147,82 @@ class BrowserlessIoConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -158,7 +231,7 @@ class BrowserlessIoConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
         query = '{"url":"https://google.com"}'
         # make rest call
-        ret_val, response = self._make_rest_call('/stats', action_result, data=json.dumps(query))
+        ret_val, _ = self._make_rest_call('/stats', action_result, data=json.dumps(query))
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -166,10 +239,9 @@ class BrowserlessIoConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
-        if response.status_code == 200:
-            # Return success
-            self.save_progress("Test Connectivity Passed")
-            return action_result.set_status(phantom.APP_SUCCESS)
+        # Return success
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
@@ -185,12 +257,12 @@ class BrowserlessIoConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        s_url = param['url']
+        s_url = self._handle_py_ver_compat_for_input_str(param['url'])
         headerfooter = param['headerfooter']
-        printbackground = param['printbackground']
-        landscape = param['landscape']
-        followRefresh = param['followRefresh']
-        query = {"url": "{}".format(s_url), "options": {
+        printbackground = param.get('printbackground', False)
+        landscape = param.get('landscape', False)
+        followRefresh = param['followrefresh']
+        query = {"url": s_url, "options": {
             "displayHeaderFooter": "{}".format(headerfooter),
             "printBackground": "{}".format(printbackground),
             "landscape": "{}".format(landscape)
@@ -205,7 +277,7 @@ class BrowserlessIoConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         else:
-            file_name = s_url + "_screenshot.pdf"
+            file_name = "{}_screenshot.pdf".format(s_url)
             if hasattr(Vault, 'create_attachment'):
                 vault_ret = Vault.create_attachment(response, self.get_container_id(), file_name=file_name)
             else:
@@ -213,7 +285,7 @@ class BrowserlessIoConnector(BaseConnector):
                     temp_dir = Vault.get_vault_tmp_dir()
                 else:
                     temp_dir = '/opt/phantom/vault/tmp'
-                temp_dir = temp_dir + ('/{}').format(hashlib.md5(file_name).hexdigest())
+                temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
                 with open(file_path, 'wb') as (f):
@@ -237,10 +309,9 @@ class BrowserlessIoConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
-        s_url = param['url']
-        followRefresh = param['followRefresh']
-
-        query = {"url": "{}".format(s_url)}
+        s_url = self._handle_py_ver_compat_for_input_str(param['url'])
+        followRefresh = param['followrefresh']
+        query = {"url": s_url}
         if followRefresh:
             query["gotoOptions"] = {"waitUntil": "networkidle2"}
         # make rest call
@@ -250,7 +321,7 @@ class BrowserlessIoConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         else:
-            file_name = s_url + "_contents.txt"
+            file_name = "{}_contents.txt".format(s_url)
             if hasattr(Vault, 'create_attachment'):
                 vault_ret = Vault.create_attachment(response, self.get_container_id(), file_name=file_name)
             else:
@@ -258,7 +329,7 @@ class BrowserlessIoConnector(BaseConnector):
                     temp_dir = Vault.get_vault_tmp_dir()
                 else:
                     temp_dir = '/opt/phantom/vault/tmp'
-                temp_dir = temp_dir + ('/{}').format(hashlib.md5(file_name).hexdigest())
+                temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
                 with open(file_path, 'wb') as (f):
@@ -282,26 +353,34 @@ class BrowserlessIoConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
-        s_url = param['url']
-        ftype = param['type']
+        s_url = self._handle_py_ver_compat_for_input_str(param['url'])
+        ftype = self._handle_py_ver_compat_for_input_str(param['type']).lower()
         quality = param['quality']
-        fullpage = param['fullpage']
-        followRefresh = param['followRefresh']
+        # Validation of the quality parameter
+        ret_val, quality = self._validate_integer(action_result, quality, QUALITY_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        jpeg_query = {"url": "{}".format(s_url), "options": {
-            "type": "{}".format(ftype),
+        fullpage = param['fullpage']
+        followRefresh = param['followrefresh']
+
+        jpeg_query = {"url": s_url, "options": {
+            "type": ftype,
             "quality": "{}".format(quality),
             "fullPage": "{}".format(fullpage)
         }}
-        png_query = {"url": "{}".format(s_url), "options": {
-            "type": "{}".format(ftype),
+        png_query = {"url": s_url, "options": {
+            "type": ftype,
             "fullPage": "{}".format(fullpage)
         }}
 
         if ftype == "png":
             query = png_query
-        else:
+        elif ftype == "jpeg":
             query = jpeg_query
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid input. The 'type' parameter value can be either png or jpeg")
+
         if followRefresh:
             query["gotoOptions"] = {"waitUntil": "networkidle2"}
         # make rest call
@@ -311,7 +390,7 @@ class BrowserlessIoConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         else:
-            file_name = s_url + "_screenshot." + ftype
+            file_name = "{}_screenshot.{}".format(s_url, ftype)
             if hasattr(Vault, 'create_attachment'):
                 vault_ret = Vault.create_attachment(response, self.get_container_id(), file_name=file_name)
             else:
@@ -319,7 +398,7 @@ class BrowserlessIoConnector(BaseConnector):
                     temp_dir = Vault.get_vault_tmp_dir()
                 else:
                     temp_dir = '/opt/phantom/vault/tmp'
-                temp_dir = temp_dir + ('/{}').format(hashlib.md5(file_name).hexdigest())
+                temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
                 with open(file_path, 'wb') as (f):
@@ -364,9 +443,14 @@ class BrowserlessIoConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._rest_url = config.get('URL')
+        self._rest_url = self._handle_py_ver_compat_for_input_str(config.get('URL'))
         self._rest_token = config.get('token')
         self._base_url = config.get('base_url')
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
