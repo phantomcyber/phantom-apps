@@ -290,26 +290,27 @@ class CrowdstrikeConnector(BaseConnector):
             config = self.get_config()
             time_interval = config.get('merge_time_interval', 0)
 
-            ret_val, container_id = self._check_for_existing_container(
-                result['container'], time_interval, config.get('collate')
-            )
-
             if 'artifacts' not in result:
                 continue
 
             artifacts = result['artifacts']
 
+            container = result['container']
+            container['artifacts'] = artifacts
+
+            if hasattr(self, '_preprocess_container'):
+                try:
+                    container = self._preprocess_container(container)
+                except Exception as e:
+                    self.debug_print('Preprocess error: {}'.format(self._get_error_message_from_exception(e)))
+
+            artifacts = container.pop('artifacts', [])
+
+            ret_val, container_id = self._check_for_existing_container(
+                container, time_interval, config.get('collate')
+            )
+
             if not container_id:
-                container = result['container']
-                container['artifacts'] = artifacts
-
-                if hasattr(self, '_preprocess_container'):
-                    try:
-                        container = self._preprocess_container(container)
-                    except Exception as e:
-                        self.debug_print('Preprocess error: {}'.format(self._get_error_message_from_exception(e)))
-
-                artifacts = container.pop('artifacts', [])
                 ret_val, response, container_id = self.save_container(container)
                 self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, response, container_id))
 
