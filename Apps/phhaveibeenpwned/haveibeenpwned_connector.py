@@ -14,6 +14,8 @@ except:
     from action_result import ActionResult
     import status as status_strings
     import utils
+from bs4 import UnicodeDammit
+import sys
 
 # THIS Connector imports
 from haveibeenpwned_consts import *
@@ -25,15 +27,33 @@ import simplejson as json
 class HaveIBeenPwnedConnector(BaseConnector):
     ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
     ACTION_ID_LOOKUP_EMAIL = "lookup_email"
+    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
+    TEST_CONNECTIVITY_EMAIL = "test@gmail.com"
 
     def __init__(self):
         super(HaveIBeenPwnedConnector, self).__init__()
 
     def initialize(self):
         config = self.get_config()
-        self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
+        self._python_version = int(sys.version_info[0])
+
+        self._api_key = self._handle_py_ver_compat_for_input_str(config[HAVEIBEENPWNED_CONFIG_API_KEY])
 
         return status_strings.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except Exception:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
 
     def _make_rest_call(self, endpoint, params=None, truncate=False):
         full_url = HAVEIBEENPWNED_API_BASE_URL + endpoint
@@ -59,9 +79,26 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         return status_strings.APP_SUCCESS, resp_json
 
+    def _handle_test_connectivity(self, params):
+        action_result = self.add_action_result(ActionResult(dict(params)))
+
+        self.save_progress("Connecting to the Have I Been Pwned server")
+
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=self.TEST_CONNECTIVITY_EMAIL)
+
+        ret_val, response = self._make_rest_call(endpoint, truncate=True)
+
+        if (status_strings.is_fail(ret_val)):
+            self.save_progress("Test Connectivity Failed. Error: {0}".format(response))
+            return action_result.get_status()
+
+        self.save_progress("Login to Have I Been Pwned server is successful")
+        self.save_progress("Test Connectivity passed")
+        return action_result.set_status(status_strings.APP_SUCCESS)
+
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
-        domain = params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN]
+        domain = self._handle_py_ver_compat_for_input_str(params[HAVEIBEENPWNED_ACTION_PARAM_DOMAIN])
         if utils.is_url(domain):
             domain = utils.get_host_from_url(domain).replace("www.", "")
 
@@ -86,9 +123,10 @@ class HaveIBeenPwnedConnector(BaseConnector):
     def _lookup_email(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
 
-        email = params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL]
+        email = self._handle_py_ver_compat_for_input_str(params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL])
         truncate = params[HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE] == "True"
         endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
+        endpoint = UnicodeDammit(endpoint).unicode_markup
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
 
@@ -114,6 +152,8 @@ class HaveIBeenPwnedConnector(BaseConnector):
             ret_val = self._lookup_domain(params)
         elif (action == self.ACTION_ID_LOOKUP_EMAIL):
             ret_val = self._lookup_email(params)
+        elif (action == self.ACTION_ID_TEST_CONNECTIVITY):
+            ret_val = self._handle_test_connectivity(params)
 
         return ret_val
 
@@ -125,7 +165,6 @@ if __name__ == '__main__':
         """
 
     # Imports
-    import sys
     import pudb
 
     # Breakpoint at runtime

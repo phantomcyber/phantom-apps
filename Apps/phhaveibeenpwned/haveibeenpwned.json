@@ -1,6 +1,6 @@
 {
-    "appid": "6a474f60-5355-4ac1-8654-37a2d4a2143b",
     "connector_id": "6a474f60-5355-4ac1-8654-37a2d4a2143b",
+    "appid": "6a474f60-5355-4ac1-8654-37a2d4a2143b",
     "name": "Have I Been Pwned",
     "description": "Queries Have I Been Pwned for data breach information with investigative actions",
     "type": "investigative",
@@ -30,6 +30,16 @@
         }
     },
     "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
         {
             "action": "lookup email",
             "identifier": "lookup_email",
