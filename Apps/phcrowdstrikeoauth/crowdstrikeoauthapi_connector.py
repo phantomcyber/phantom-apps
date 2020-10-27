@@ -297,8 +297,11 @@ class CrowdstrikeConnector(BaseConnector):
             if 'artifacts' not in result:
                 continue
 
+            artifacts = result['artifacts']
+
             if not container_id:
                 container = result['container']
+                container['artifacts'] = artifacts
 
                 if hasattr(self, '_preprocess_container'):
                     try:
@@ -306,7 +309,8 @@ class CrowdstrikeConnector(BaseConnector):
                     except Exception as e:
                         self.debug_print('Preprocess error: {}'.format(self._get_error_message_from_exception(e)))
 
-                ret_val, response, container_id = self.save_container(result['container'])
+                artifacts = container.pop('artifacts', '')
+                ret_val, response, container_id = self.save_container(container)
                 self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, response, container_id))
 
                 if phantom.is_fail(ret_val):
@@ -314,8 +318,6 @@ class CrowdstrikeConnector(BaseConnector):
                     continue
             else:
                 reused_containers += 1
-
-            artifacts = result['artifacts']
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
@@ -397,7 +399,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self._state = dict()
         # initially set the token for first time
         ret_val = self._get_token(action_result)
 
@@ -2345,6 +2346,7 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method='post')
 
         if phantom.is_fail(ret_val):
+            self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, '')
             return action_result.get_status()
 
         self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
