@@ -309,7 +309,7 @@ class CrowdstrikeConnector(BaseConnector):
                     except Exception as e:
                         self.debug_print('Preprocess error: {}'.format(self._get_error_message_from_exception(e)))
 
-                artifacts = container.pop('artifacts', '')
+                artifacts = container.pop('artifacts', [])
                 ret_val, response, container_id = self.save_container(container)
                 self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, response, container_id))
 
@@ -2346,7 +2346,7 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method='post')
 
         if phantom.is_fail(ret_val):
-            self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, '')
+            self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
             return action_result.get_status()
 
         self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
