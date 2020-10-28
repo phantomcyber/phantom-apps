@@ -49,7 +49,7 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 #### Compatibility
 
 * Splunk IT Service Intelligence: 4.4
-* Phantom: 4.6
+* Phantom: 4.8
 
 #### Changes
 
