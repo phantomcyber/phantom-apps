@@ -109,7 +109,7 @@
                         "9f7dd79d-1e94-473d-bef9-bd405a04336a"
                     ],
                     "contains": [
-                        "report_id"
+                        "detectionondemand report id"
                     ],
                     "column_name": "Report ID",
                     "column_order": 0
@@ -155,7 +155,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "urls"
+                        "url"
                     ],
                     "order": 0
                 }
@@ -167,7 +167,7 @@
                         "https://www.test.com"
                     ],
                     "contains": [
-                        "urls"
+                        "url"
                     ],
                     "column_name": "URL",
                     "column_order": 1
@@ -179,7 +179,7 @@
                         "9f7dd79d-1e94-473d-bef9-bd405a04336a"
                     ],
                     "contains": [
-                        "report_id"
+                        "detectionondemand report id"
                     ],
                     "column_name": "Report ID",
                     "column_order": 0
@@ -229,7 +229,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "md5_hash"
+                        "md5"
                     ],
                     "order": 0
                 }
@@ -238,7 +238,7 @@
                     "data_path": "action_result.parameter.md5_hash",
                     "data_type": "string",
                     "contains": [
-                        "md5_hash"
+                        "md5"
                     ],
                     "example_values": [
                         "4ba739fd8c216809e485e7972597c995"
@@ -255,7 +255,7 @@
                         false
                     ],
                     "contains": [
-                        "is_malicious"
+                        "detectionondemand is malicious"
                     ],
                     "column_order": 1
                 },
@@ -304,7 +304,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "report_id"
+                        "detectionondemand report id"
                     ],
                     "order": 0
                 },
@@ -334,7 +334,7 @@
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "string",
                     "contains": [
-                        "report_id"
+                        "detectionondemand report id"
                     ]
                 },
                 {
@@ -356,7 +356,7 @@
                         "malware.exe"
                     ],
                     "contains": [
-                        "file_name"
+                        "file name"
                     ],
                     "column_name": "File Name",
                     "column_order": 0
@@ -368,7 +368,7 @@
                         "https://www.test.com"
                     ],
                     "contains": [
-                        "urls"
+                        "url"
                     ],
                     "column_name": "URLs",
                     "column_order": 1
@@ -381,7 +381,7 @@
                         false
                     ],
                     "contains": [
-                        "is_malicious"
+                        "detectionondemand is malicious"
                     ],
                     "column_name": "Is Malicious",
                     "column_order": 2
@@ -393,7 +393,7 @@
                         "https://public-feapi.marketplace.apps.fireeye.com/reports/874da611-f82a-4331-afde-5943f4facb92?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXBvcnup67QiOiJlZWE4NmM1Yi01YWJiLTQ3MmItYWEwYi0zYjY3NDkxM2MwZmIiLCJleHAiOjE1ODc5MjM4ODJ9.qVx5iTZKBPsbRLIc1iIiLj3BI9nzimPaSB087AHPn1Y"
                     ],
                     "contains": [
-                        "presigned_report_url"
+                        "detectionondemand presigned report url"
                     ],
                     "column_name": "Report Dashboard",
                     "column_order": 3
@@ -405,7 +405,7 @@
                         "1512e23daa92e6f178b3a6cdac4d507a"
                     ],
                     "contains": [
-                        "md5_hash"
+                        "md5"
                     ],
                     "column_name": "MD5 Hash",
                     "column_order": 4
@@ -417,7 +417,7 @@
                         "9f7dd79d-1e94-473d-bef9-bd405a04336a"
                     ],
                     "contains": [
-                        "report_id"
+                        "detectionondemand report id"
                     ]
                 },
                 {

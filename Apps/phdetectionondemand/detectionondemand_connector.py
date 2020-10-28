@@ -147,11 +147,17 @@ class DetectionOnDemandConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response: {}'.format(err))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response: {}'.format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
+
+        if isinstance(resp_json, dict) and resp_json.get('message'):
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(
+                        r.status_code,
+                        resp_json.get('message', ''))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
@@ -220,7 +226,10 @@ class DetectionOnDemandConnector(BaseConnector):
             )
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            action_result.set_status(phantom.APP_ERROR, 'Error Connecting to server: {}'.format(err))
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, 'Error Connecting to server: {}'.format(err)),
+                resp_json
+            )
 
         return self._process_response(r, action_result)
 
@@ -275,7 +284,7 @@ class DetectionOnDemandConnector(BaseConnector):
             }
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            action_result.set_status(phantom.APP_ERROR, '{}'.format(err))
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to open vault item. {}'.format(err))
 
         data = {}
         if password:
