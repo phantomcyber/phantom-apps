@@ -1,57 +1,78 @@
 {
     "appid": "abf9abcc-2e5c-401a-915e-a15e028b3473",
     "name": "Hashicorp Vault",
-    "description": "This is an app that support various interactions with the Hashicorp vault REST API",
+    "description": "This is an app that supports various interactions with the Hashicorp Vault REST API",
     "publisher": "Dallan",
     "type": "generic",
     "main_module": "hashicorp_vault_connector.pyc",
     "app_version": "1.0.0",
     "utctime_updated": "2019-07-08T00:00:00.000000Z",
-    "package_name": "hashicorp_vault",
+    "package_name": "phantom_hashicorp_vault",
     "product_vendor": "Dallan",
     "product_name": "Hashicorp Vault",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "4.8.0",
-    "logo": "hashicorp_vault.svg",
-    "logo_dark": "hashicorp_vault_dark.svg",
+    "min_phantom_version": "4.8.24304",
+    "logo": "logo_hashicorp_vault.svg",
+    "logo_dark": "logo_hashicorp_vault_dark.svg",
     "license": "Internal Use Only",
     "pip_dependencies": {
-      "wheel": [
-        {"module": "hvac", "input_file": "wheels/hvac-0.10.1-py2.py3-none-any.whl"},
-        {"module": "certifi", "input_file": "wheels/certifi-2020.4.5.1-py2.py3-none-any.whl"},
-        {"module": "chardet", "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"},
-        {"module": "idna", "input_file": "wheels/idna-2.9-py2.py3-none-any.whl"},
-        {"module": "requests", "input_file": "wheels/requests-2.23.0-py2.py3-none-any.whl"},
-        {"module": "six", "input_file": "wheels/six-1.14.0-py2.py3-none-any.whl"},
-        {"module": "urllib3", "input_file": "wheels/urllib3-1.25.9-py2.py3-none-any.whl"}
-      ]
-     },
+        "wheel": [
+            {
+                "module": "hvac",
+                "input_file": "wheels/hvac-0.10.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2020.4.5.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.9-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.23.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.14.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.25.9-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
             "default": false,
             "required": true,
-            "order": 0,
-            "description": "Verify server certificate",
-            "data_type": "boolean"
+            "order": 0
         },
         "vault_url": {
-           "data_type": "string",
-           "order": 1,
-           "description": "URL of Hashicorp Vault instance",
-           "required": true
+            "description": "URL of the Hashicorp Vault instance",
+            "data_type": "string",
+            "required": true,
+            "order": 1
         },
         "vault_mountpoint": {
-           "data_type": "string",
-           "order": 2,
-           "description": "Vault mountpoint you would like to connect to",
-           "required": true
+            "description": "Vault mountpoint to connect with",
+            "data_type": "string",
+            "required": true,
+            "order": 2
         },
         "vault_token": {
-           "data_type": "password",
-           "order": 3,
-           "description": "Token used to authenticate requests to Hashicorp Vault",
-           "required": true
+            "description": "Token used to authenticate requests to Hashicorp Vault",
+            "data_type": "password",
+            "required": true,
+            "order": 3
         }
     },
     "actions": [
@@ -67,79 +88,70 @@
         },
         {
             "action": "set secret",
-            "description": "Set secret value at specified path",
-            "verbose": "Set secret value at specified path",
+            "description": "Set secret value at the specified path",
             "type": "generic",
             "identifier": "set_secret",
             "read_only": false,
             "parameters": {
                 "location": {
+                    "description": "Location to keep the secret value",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "The location where the secret will be created",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "hashicorp vault location"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "update": {
+                    "description": "Update secret value if already exists",
                     "data_type": "boolean",
-                    "order": 1,
-                    "description": "Update value if value already exists",
                     "default": true,
-                    "required": true
+                    "required": true,
+                    "order": 1
                 },
                 "secret_json": {
+                    "description": "JSON formatted object of dictionary to store at the given location",
                     "data_type": "string",
-                    "order": 2,
-                    "description": "JSON formatted object of dictionary to store at given location",
-                    "required": true
+                    "required": true,
+                    "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.location",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "hashicorp vault location"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update",
                     "data_type": "boolean"
                 },
                 {
+                    "data_path": "action_result.parameter.secret_json",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.succeeded",
-                    "data_type": "boolean"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get secret",
-            "description": "get secret value at specified path",
-            "verbose": "get secret value at specified path",
-            "type": "generic",
-            "identifier": "get_secret",
-            "read_only": false,
-            "parameters": {
-                "location": {
-                    "data_type": "string",
-                    "order": 0,
-                    "description": "The location where the secret will be created",
-                    "required": true
-                }
-            },
-            "output": [
+                    "data_type": "boolean",
+                    "column_name": "Succeeded",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 0
+                },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -150,8 +162,44 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get secret",
+            "description": "Get secret value present at the specified path",
+            "type": "investigate",
+            "identifier": "get_secret",
+            "read_only": true,
+            "parameters": {
+                "location": {
+                    "description": "Location of the secret value",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "hashicorp vault location"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
                     "data_path": "action_result.parameter.location",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "hashicorp vault location"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.secret_value",
@@ -159,30 +207,23 @@
                 },
                 {
                     "data_path": "action_result.data.*.succeeded",
-                    "data_type": "boolean"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "list secrets",
-            "description": "list secrets at specified path",
-            "verbose": "list secrets at specified path",
-            "type": "generic",
-            "identifier": "list_secrets",
-            "read_only": false,
-            "parameters": {
-                "location": {
-                    "data_type": "string",
-                    "order": 0,
-                    "description": "The location where the secret will be created",
-                    "required": true
-                }
-            },
-            "output": [
+                    "data_type": "boolean",
+                    "column_name": "Succeeded",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 0
+                },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -193,8 +234,44 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list secrets",
+            "description": "List secret values present at the specified path",
+            "type": "investigate",
+            "identifier": "list_secrets",
+            "read_only": true,
+            "parameters": {
+                "location": {
+                    "description": "Location of the secret values",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "hashicorp vault location"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
                     "data_path": "action_result.parameter.location",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "hashicorp vault location"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.secret_values",
@@ -202,9 +279,44 @@
                 },
                 {
                     "data_path": "action_result.data.*.succeeded",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "column_name": "Succeeded",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]
