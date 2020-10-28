@@ -70,7 +70,7 @@ By default we provide various automated checks you can leverage to test your cha
 ### How to Run
 Submit a new comment on the pull request starting with the text: **!scan**
 
-If the command was processed, an _eyes_ reaction emoji will be added by the _github-actions_ bot. Then, the _phantom-apps-bot_ will post a google drive link to the results once they are ready.
+If the command was processed, an _eyes_ reaction emoji will be added by the _github-actions_ bot. Then, the _phantom-apps-bot_ will post a Google Drive link to the results once they are ready.
 
 There is a 30s rate limit for the scan command per pull request. If extra requests are sent during the rate limit window, the command will be processed (eyes emoji reaction) but there will be no results posted.
 
