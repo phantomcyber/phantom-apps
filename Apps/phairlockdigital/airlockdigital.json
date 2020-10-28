@@ -4,8 +4,8 @@
     "description": "This app provides investigative, containment, and management actions for Airlock Digital's Execution Control & Allow listing endpoint product",
     "type": "endpoint",
     "product_vendor": "Airlock",
-    "logo": "airlockdigital.svg",
-    "logo_dark": "airlockdigital_dark.svg",
+    "logo": "logo_airlockdigital.svg",
+    "logo_dark": "logo_airlockdigital_dark.svg",
     "product_name": "Airlock Digital",
     "product_version_regex": ".*",
     "publisher": "Domenico Perre & Airlock Digital Pty Ltd",
@@ -50,6 +50,7 @@
             "verbose": "This action will unblock hashes from one or more Blocklist policies. This is useful if you want to 'un-ban' a particular hash value.",
             "type": "correct",
             "identifier": "unblock_hash",
+            "undo": "block hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -126,11 +127,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -220,11 +227,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -335,13 +348,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 8
+                    "column_order": 8,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 9
+                    "column_order": 9,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -408,7 +427,7 @@
                     "column_name": "Audit Mode",
                     "column_order": 6,
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
@@ -426,7 +445,7 @@
                     "column_name": "Batch Scripts",
                     "column_order": 13,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -474,7 +493,7 @@
                     "column_name": "Command Scripts",
                     "column_order": 15,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -513,7 +532,7 @@
                     "column_name": "Enable Notifications",
                     "column_order": 7,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -534,7 +553,7 @@
                     "column_name": "Hash Db Version",
                     "column_order": 4,
                     "example_values": [
-                        "19"
+                        19
                     ]
                 },
                 {
@@ -543,7 +562,7 @@
                     "column_name": "Html Application Scripts",
                     "column_order": 19,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -552,7 +571,7 @@
                     "column_name": "Java Application Scripts",
                     "column_order": 20,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -561,7 +580,7 @@
                     "column_name": "Javascript",
                     "column_order": 17,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -597,7 +616,7 @@
                     "column_name": "Policy Version",
                     "column_order": 2,
                     "example_values": [
-                        "37"
+                        37
                     ]
                 },
                 {
@@ -606,7 +625,7 @@
                     "column_name": "Poll Time",
                     "column_order": 9,
                     "example_values": [
-                        "600"
+                        600
                     ]
                 },
                 {
@@ -615,7 +634,7 @@
                     "column_name": "Powershell Scripts",
                     "column_order": 14,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -624,7 +643,7 @@
                     "column_name": "Powershell Language Mode",
                     "column_order": 11,
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
@@ -633,7 +652,7 @@
                     "column_name": "Python Scripts",
                     "column_order": 22,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -642,7 +661,7 @@
                     "column_name": "Proxy Enabled",
                     "column_order": 23,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -669,7 +688,7 @@
                     "column_name": "Proxy Authentication",
                     "column_order": 26,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -717,7 +736,7 @@
                     "column_name": "Script Control Enabled",
                     "column_order": 12,
                     "example_values": [
-                        "2"
+                        2
                     ]
                 },
                 {
@@ -726,7 +745,7 @@
                     "column_name": "Trusted Upload",
                     "column_order": 10,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -735,7 +754,7 @@
                     "column_name": "Vb Scripts",
                     "column_order": 16,
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
@@ -744,7 +763,7 @@
                     "column_name": "Windows Installer Scripts",
                     "column_order": 18,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -753,7 +772,7 @@
                     "column_name": "Windows Script Component Scripts",
                     "column_order": 21,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -782,13 +801,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 44
+                    "column_order": 44,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Object Successful",
-                    "column_order": 45
+                    "column_order": 45,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -885,13 +910,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1011,13 +1042,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 8
+                    "column_order": 8,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1031,6 +1068,7 @@
             "verbose": "This action allows you to add hashes to a Blocklist policy. By adding a hash into a Blocklist policy that is approved, it has the result of blocking the hash on endpoints within your environment.",
             "type": "contain",
             "identifier": "block_hash",
+            "undo": "unblock hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -1114,13 +1152,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1228,7 +1272,7 @@
                     "column_name": "Device Status",
                     "column_order": 13,
                     "example_values": [
-                        "3"
+                        3
                     ]
                 },
                 {
@@ -1420,7 +1464,7 @@
                     "column_name": "Device Status",
                     "column_order": 1,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -1461,13 +1505,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 22
+                    "column_order": 22,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 23
+                    "column_order": 23,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1542,13 +1592,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1697,13 +1753,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 9
+                    "column_order": 9,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 10
+                    "column_order": 10,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {
@@ -1988,13 +2050,19 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "column_name": "Total Objects",
-                    "column_order": 27
+                    "column_order": 27,
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "column_name": "Total Objects Successful",
-                    "column_order": 28
+                    "column_order": 28,
+                    "example_values": [
+                        10
+                    ]
                 }
             ],
             "render": {

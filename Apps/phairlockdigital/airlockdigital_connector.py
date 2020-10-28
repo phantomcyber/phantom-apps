@@ -40,7 +40,7 @@ class AirlockDigitalConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -188,7 +188,7 @@ class AirlockDigitalConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "%s%s" % (self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -206,21 +206,11 @@ class AirlockDigitalConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
-
         url = AIRLOCK_LICENSE_GET_ENDPOINT
         self.save_progress("Connecting to endpoint")
+
         # make rest call
-        ret_val, response = self._make_rest_call(url, action_result, params=None, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, params=None, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -238,6 +228,7 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Optional values use get parameter
         blocklistid = param.get('blocklistid', '')
+        hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -245,62 +236,56 @@ class AirlockDigitalConnector(BaseConnector):
         # Empty arrays
         url_req = []
 
-        self.save_progress("File hash var: {}".format(param['hash']))
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
+        self.save_progress("File hash var: {}".format(hash_param))
 
         if (blocklistid == "" or None):
             self.save_progress("No blocklistid was specified, removing hash(es) from all blocklist packages")
             url = AIRLOCK_HASH_BLOCKLIST_REMOVE_ALL_ENDPOINT
             request_json = {
-                "hashes": [param['hash']]
+                "hashes": [hash_param]
             }
         else:
             self.save_progress("Removing hash(es) from specified blocklist packages")
             url = AIRLOCK_HASH_BLOCKLIST_REMOVE_ENDPOINT
             request_json = {
-                "hashes": [param['hash']],
+                "hashes": [hash_param],
                 "blocklistid": blocklistid
             }
 
-        # Parameter Dictionary to pass to the request
-        header_var = {
-           "X-APIKey": api_key
-        }
-        url_req.append({'url': url, 'header_var': header_var, 'request_type': 'blocklist'})
+        url_req.append({'url': url, 'header_var': self._header_var, 'request_type': 'blocklist'})
 
         # Make the request
-        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to unblock hash")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['hash'] = request_json['hashes']
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_disallow_hash(self, param):
-
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Optional values use get parameter
         applicationid = param.get('applicationid', '')
+        hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -308,49 +293,44 @@ class AirlockDigitalConnector(BaseConnector):
         # Empty arrays
         url_req = []
 
-        self.save_progress("File hash var: {}".format(param['hash']))
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
+        self.save_progress("File hash var: {}".format(hash_param))
 
         if (applicationid == "" or None):
             self.save_progress("No applicationid was specified, removing hash(es) from all application capture packages")
             url = AIRLOCK_HASH_APPLICATION_REMOVE_ALL_ENDPOINT
             request_json = {
-                "hashes": [param['hash']]
+                "hashes": [hash_param]
             }
         else:
             self.save_progress("Removing hash(es) from specified application capture packages")
             url = AIRLOCK_HASH_APPLICATION_REMOVE_ENDPOINT
             request_json = {
-                "hashes": [param['hash']],
+                "hashes": [hash_param],
                 "applicationid": applicationid
             }
 
-        # Parameter Dictionary to pass to the request
-        header_var = {
-           "X-APIKey": api_key
-        }
-        url_req.append({'url': url, 'header_var': header_var, 'request_type': 'application'})
+        url_req.append({'url': url, 'header_var': self._header_var, 'request_type': 'application'})
 
         # Make the request
-        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to unblock hash")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['hash'] = request_json['hashes']
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -365,42 +345,40 @@ class AirlockDigitalConnector(BaseConnector):
         # Empty arrays
         url_req = []
 
-        self.save_progress("File hash var: {}".format(param['hash']))
-        # Add config to init variable to get root API Key
-        config = self.get_config()
+        hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
+        self.save_progress("File hash var: {}".format(hash_param))
 
         url = AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT
         # Required values can be accessed directly
         request_json = {
-            "hashes": [param['hash']],
+            "hashes": [hash_param],
             "blocklistid": param['blocklistid']
         }
-        # Parameter Dictionary to pass to the request
-        header_var = {
-           "X-APIKey": api_key
-        }
-        url_req.append({'url': url, 'header_var': header_var, 'request_type': 'blocklist'})
+
+        url_req.append({'url': url, 'header_var': self._header_var, 'request_type': 'blocklist'})
 
         # Make the request for each
-        self.save_progress("Sending hash value to AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT")
-        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
+        self.save_progress("Sending hash value to {}".format(AIRLOCK_HASH_BLOCKLIST_ADD_ENDPOINT))
+        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to block hash")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['hash'] = request_json['hashes']
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -416,60 +394,54 @@ class AirlockDigitalConnector(BaseConnector):
         # Empty arrays
         url_req = []
 
-        self.save_progress("File hash var: {}".format(param['hash']))
-        # Add config to init variable to get root API Key
-        config = self.get_config()
+        hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
+        self.save_progress("File hash var: {}".format(hash_param))
 
         # We first need to populate the hash value into the airlock file repository, so it can be added into an appcap
         url = AIRLOCK_HASH_ADD_ENDPOINT
 
         # Required values can be accessed directly
         request_json = {
-           "hashes": [{"path": param['path'], "sha256": param['hash']}]
-        }
-        # Parameter Dictionary to pass to the request
-        header_var = {
-           "X-APIKey": api_key
+           "hashes": [{"path": param['path'], "sha256": hash_param}]
         }
 
-        url_req.append({'url': url, 'header_var': header_var, 'request_type': 'application'})
+        url_req.append({'url': url, 'header_var': self._header_var, 'request_type': 'application'})
 
         # Make the request to populate the application capture
         self.save_progress("Populating the Airlock repository with the specified hash value and path")
-        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, json=request_json, headers=self._header_var, method="post")
 
         url2 = AIRLOCK_HASH_APPLICATION_ADD_ENDPOINT
         # Required values can be accessed directly
         request_json = {
-            "hashes": [param['hash']],
+            "hashes": [hash_param],
             "applicationid": param['applicationid']
         }
-        # Parameter Dictionary to pass to the request
-        header_var = {
-           "X-APIKey": api_key
-        }
-        url_req.append({'url': url2, 'header_var': header_var, 'request_type': 'application'})
+
+        url_req.append({'url': url2, 'header_var': self._header_var, 'request_type': 'application'})
 
         # Now put the added hash value from the repo into the application capture
         self.save_progress("Linking the new repository entry with the specified Application Capture")
-        ret_val, response = self._make_rest_call(url2, action_result, json=request_json, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url2, action_result, json=request_json, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to add hash to application capture")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['hash'] = request_json['hashes']
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -485,19 +457,8 @@ class AirlockDigitalConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         policy_type = param['policy_type']
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
         # Response array
         resp_arr = []
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
 
         # If policy type is blocklist
         if policy_type == 'blocklist':
@@ -524,43 +485,46 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Make the request
         self.save_progress("Making request to URL: {} with request type of {}.".format(url, policy_type))
-        ret_val, response = self._make_rest_call(url, action_result, headers=header_var, method=req_method)
+        ret_val, response = self._make_rest_call(url, action_result, headers=self._header_var, method=req_method)
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to list identifiers")
             return action_result.get_status()
 
         # Modify Baseline Requests to fit in the columns
-        if policy_type == 'baseline':
-            for i in response['response']['baselines']:
-                self.save_progress("Request Format {}".format(i))
-                resp_arr.append({"name": i['name'], "id": i['baselineid'], "type": "baseline"})
-        # Modify blocklist Request to fit in columns
-        if policy_type == 'blocklist':
-            self.save_progress("blocklist request {}.".format(response))
-            for i in response['response']['blocklists']:
-                self.save_progress("Request Format {}".format(i))
-                resp_arr.append({"name": i['name'], "id": i['blocklistid'], "type": "blocklist"})
-        # Modify application Request to fit in columns
-        if policy_type == 'application':
-            for i in response['response']['applications']:
-                self.save_progress("Request Format {}".format(i))
-                resp_arr.append({"name": i['name'], "id": i['applicationid'], "type": "application"})
-        # Modify group Request to fit in columns
-        if policy_type == 'group':
-            for i in response['response']['groups']:
-                self.save_progress("Request Format {}".format(i))
-                resp_arr.append({"name": i['name'], "id": i['groupid'], "parent": i['parent'], "type": "group"})
+        try:
+            if policy_type == 'baseline':
+                for i in response['response']['baselines']:
+                    self.save_progress("Request Format {}".format(i))
+                    resp_arr.append({"name": i['name'], "id": i['baselineid'], "type": "baseline"})
+            # Modify blocklist Request to fit in columns
+            if policy_type == 'blocklist':
+                self.save_progress("blocklist request {}.".format(response))
+                for i in response['response']['blocklists']:
+                    self.save_progress("Request Format {}".format(i))
+                    resp_arr.append({"name": i['name'], "id": i['blocklistid'], "type": "blocklist"})
+            # Modify application Request to fit in columns
+            if policy_type == 'application':
+                for i in response['response']['applications']:
+                    self.save_progress("Request Format {}".format(i))
+                    resp_arr.append({"name": i['name'], "id": i['applicationid'], "type": "application"})
+            # Modify group Request to fit in columns
+            if policy_type == 'group':
+                for i in response['response']['groups']:
+                    self.save_progress("Request Format {}".format(i))
+                    resp_arr.append({"name": i['name'], "id": i['groupid'], "parent": i['parent'], "type": "group"})
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
-        action_result.add_data(resp_arr)
+            # Add the response into the data section
+            action_result.add_data(resp_arr)
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['policy_type'] = policy_type
-        # Return the first response outcome
-        summary['result'] = response['error']
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            summary['policy_type'] = policy_type
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -576,40 +540,33 @@ class AirlockDigitalConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         group_id = param['group_id']
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
-
         # URL Group Request
         url = AIRLOCK_GROUP_POLICIES_ENDPOINT
 
-        # Put the group ID to request in the JSON blody
+        # Put the group ID to request in the JSON body
         json_body = {"groupid": group_id}
 
         # make rest call that iterates over each url
         # Make the request for each
         self.save_progress("Making request to URL: {}".format(url))
-        ret_val, response = self._make_rest_call(url, action_result, json=json_body, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, json=json_body, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to request group list")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -621,17 +578,6 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key
-        }
 
         # URL Group Request
         url = AIRLOCK_AGENT_MOVE_ENDPOINT
@@ -645,20 +591,24 @@ class AirlockDigitalConnector(BaseConnector):
         json_body = {"agentid": agent_id, "groupid": group_id}
         # Make the request for each
         self.save_progress("Making request to URL: {}".format(url))
-        ret_val, response = self._make_rest_call(url, action_result, headers=header_var, json=json_body, method="post")
+        ret_val, response = self._make_rest_call(url, action_result, headers=self._header_var, json=json_body, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.debug_print("Failed to move endpoint")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        # Return the first response outcome
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -683,16 +633,6 @@ class AirlockDigitalConnector(BaseConnector):
         if domain == "all":
             domain = ""
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key,
-        }
         # If optional parameters are set, then add them to the header_var dictionary
         # Create an iterator to identify the correct header field
         x = 0
@@ -722,12 +662,12 @@ class AirlockDigitalConnector(BaseConnector):
         if len(param_var.keys()) >= 1:
             if param_var["hostname"] != "all":
                 self.save_progress("Requested parameters: {}".format(param_var))
-                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, json=param_var, headers=header_var, method="post")
+                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, json=param_var, headers=self._header_var, method="post")
             else:
                 param_var.pop('hostname')
                 self.save_progress("Requested parameters: {}".format(param_var))
                 self.save_progress("All has been specified in hostname, so returning all hosts")
-                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, headers=header_var, method="post")
+                ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -735,13 +675,15 @@ class AirlockDigitalConnector(BaseConnector):
             self.debug_print('Failed to list endpoints for Airlock Digital')
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
-        action_result.add_data(response['response']['agents'])
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['result'] = response['error']
+        try:
+            action_result.add_data(response['response']['agents'])
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -759,21 +701,11 @@ class AirlockDigitalConnector(BaseConnector):
         # Required values can be accessed directly
         otpid = param['otpid']
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key,
-        }
         param_var = {
             "otpid": otpid
         }
         # make rest call
-        ret_val, response = self._make_rest_call(AIRLOCK_OTP_REVOKE_ENDPOINT, action_result, params=param_var, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(AIRLOCK_OTP_REVOKE_ENDPOINT, action_result, params=param_var, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -806,17 +738,6 @@ class AirlockDigitalConnector(BaseConnector):
         # Optional values should use the .get() function
         duration = param['duration']
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
-
-        # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key,
-        }
-
         param_var = {
             "agentid": agentid,
             "purpose": purpose,
@@ -824,7 +745,7 @@ class AirlockDigitalConnector(BaseConnector):
         }
 
         # make rest call
-        ret_val, response = self._make_rest_call(AIRLOCK_OTP_RETRIEVE_ENDPOINT, action_result, params=param_var, headers=header_var, method="post")
+        ret_val, response = self._make_rest_call(AIRLOCK_OTP_RETRIEVE_ENDPOINT, action_result, params=param_var, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -832,14 +753,18 @@ class AirlockDigitalConnector(BaseConnector):
             self.debug_print("Failed to retrieve OTP for Airlock Digital")
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['result'] = response['error']
+
+        try:
+            # Return the first response outcome
+            summary['result'] = response['error']
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -853,19 +778,11 @@ class AirlockDigitalConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
-        hash_var = param['hash']
-        hash_var = [hash_var]
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in its own variable.
-        api_key = config.get('apiKey')
+        hash_var = [self._handle_py_ver_compat_for_input_str(param['hash'])]
 
         # Parameter Dictionary to pass to the request
-        header_var = {
-            "X-APIKey": api_key,
-            "Content-Type": "application/json"
-        }
+        header_var = self._header_var
+        header_var["Content-Type"] = "application/json"
 
         data_var = {
             "hashes": hash_var
@@ -944,7 +861,11 @@ class AirlockDigitalConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config.get('base_url')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
+        self._api_key = config.get('apiKey')
+        self._header_var = {
+            "X-APIKey": self._api_key
+        }
 
         # Fetching the Python major version
         try:
