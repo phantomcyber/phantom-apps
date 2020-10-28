@@ -1,7 +1,7 @@
 {
     "appid": "f2b8357e-53fa-4b2b-bd03-2218f7dec281",
     "name": "Axonius Cybersecurity Asset Management",
-    "description": "This app integrates with the Axonius Cybersecurity Asset Management Platform to enrich asset data for investigations.",
+    "description": "This app integrates with the Axonius Cybersecurity Asset Management Platform to enrich asset data for investigations",
     "type": "identity management",
     "product_vendor": "Axonius",
     "logo": "axoniuscybersecurityassetmanagement.png",
@@ -57,7 +57,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using supplied configuration.",
             "verbose": "",
             "type": "test",
             "read_only": true,
@@ -68,7 +68,7 @@
         {
             "action": "devices by sq",
             "identifier": "devices_by_sq",
-            "description": "Get devices by saved query",
+            "description": "Get devices by saved query.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -155,7 +155,7 @@
         {
             "action": "devices by hostname",
             "identifier": "devices_by_hostname",
-            "description": "Get devices by hostname",
+            "description": "Get devices by hostname.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -246,7 +246,7 @@
         {
             "action": "devices by ip",
             "identifier": "devices_by_ip",
-            "description": "Get devices by IP address",
+            "description": "Get devices by IP address.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -336,7 +336,7 @@
         {
             "action": "devices by mac",
             "identifier": "devices_by_mac",
-            "description": "Get devices by MAC address",
+            "description": "Get devices by MAC address.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -424,7 +424,7 @@
         {
             "action": "users by sq",
             "identifier": "users_by_sq",
-            "description": "Get users by saved query",
+            "description": "Get users by saved query.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -502,7 +502,7 @@
         {
             "action": "users by mail",
             "identifier": "users_by_mail",
-            "description": "Get users by email address",
+            "description": "Get users by email address.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
@@ -580,7 +580,7 @@
         {
             "action": "users by username",
             "identifier": "users_by_username",
-            "description": "Get users by username",
+            "description": "Get users by username.",
             "verbose": "",
             "type": "investigate",
             "read_only": false,
