@@ -1404,6 +1404,9 @@
                 {
                     "data_path": "action_result.data.*.*.groupid",
                     "data_type": "string",
+                    "contains": [
+                        "airlockdigital groupid"
+                    ],
                     "column_name": "Group ID",
                     "column_order": 9,
                     "example_values": [
