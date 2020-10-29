@@ -397,7 +397,9 @@ class ProofpointConnector(BaseConnector):
         mins = self.get_config()['initial_ingestion_window']
 
         try:
-            mins = int(mins)
+            ret_val, mins = self._validate_integer(action_result, mins, INITIAL_INGESTION_WINDOW_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
         except:
             return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, initial_ingestion_window, must be an integer between 1 and 60")
 
@@ -465,7 +467,7 @@ class ProofpointConnector(BaseConnector):
 
     def get_campaign_details(self, param):
         action_result = self.add_action_result(ActionResult(param))
-        campaign_id = param.get('campaign_id')
+        campaign_id = self._handle_py_ver_compat_for_input_str(param.get('campaign_id'))
 
         campaign_url = PP_API_PATH_CAMPAIGN.format(campaign_id)
 
