@@ -58,6 +58,16 @@
     },
     "actions": [
         {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "whois domain",
             "description": "Execute a whois lookup on the given domain",
             "verbose": "This action accepts URLs also. It will extract the domain name from the URL before making the action query. It also tries to strip out the subdomain if any.",

@@ -39,6 +39,7 @@ class WhoisConnector(BaseConnector):
     # actions supported by this script
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_WHOIS_IP = "whois_ip"
+    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
 
     def __init__(self):
 
@@ -144,6 +145,27 @@ class WhoisConnector(BaseConnector):
         # throttle the queries when done in quick succession, which leads
         # to a 'Connection reset by peer' error.
         time.sleep(1)
+
+    def _test_connectivity(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ip = WHOIS_TEST_CONNECTIVITY_IP
+        try:
+            obj_whois = IPWhois(ip)
+            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
+        except IPDefinedError:
+            self.save_progress("Test Connectivity Passed")
+            return action_result.set_status(phantom.APP_SUCCESS)
+        except Exception:
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR)
+
+        if whois_response:
+            self.save_progress("Test Connectivity Passed")
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        self.save_progress("Test Connectivity Failed")
+        return action_result.set_status(phantom.APP_ERROR)
 
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
@@ -340,6 +362,8 @@ class WhoisConnector(BaseConnector):
             result = self._whois_domain(param)
         elif (action == self.ACTION_ID_WHOIS_IP):
             result = self._whois_ip(param)
+        elif(action == self.ACTION_ID_TEST_CONNECTIVITY):
+            result = self._test_connectivity(param)
         else:
             result = self.unknown_action()
 
