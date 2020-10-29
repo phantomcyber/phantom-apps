@@ -1057,7 +1057,10 @@
             },
             "output": [{
                     "data_path": "action_result.parameter.alert_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "irondefense alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.constraint.limit",
@@ -1087,7 +1090,10 @@
                         "0c740a2c-a566-4c95-a8be-5f48082de2b2"
                     ],
                     "column_name": "Alert ID",
-                    "column_order": 2
+                    "column_order": 2,
+                    "contains": [
+                        "irondefense alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.events.*.bytes_in",
@@ -1193,7 +1199,10 @@
                         "0c740a2c-a566-4c95-a8be-5f48082de2b2"
                     ],
                     "column_name": "Event ID",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense event id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.events.*.iron_dome_shared_time",
@@ -1460,20 +1469,6 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.sort_field",
-                    "data_type": "string",
-                    "example_values": [
-                        "Created"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sort_order",
-                    "data_type": "string",
-                    "example_values": [
-                        "Descending"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.status",
                     "data_type": "string"
                 },
@@ -1704,12 +1699,20 @@
                     "description": "The ID of the event to retrieve",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "irondefense event id"
+                    ],
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.event_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "irondefense event id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.context.*.columns.*.name",
@@ -1795,7 +1798,10 @@
                         "0c740a2c-a566-4c95-a8be-5f48082de2b2"
                     ],
                     "column_name": "Alert ID",
-                    "column_order": 2
+                    "column_order": 2,
+                    "contains": [
+                        "irondefense alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.event.app_domains",
@@ -1915,7 +1921,10 @@
                         "0c740a2c-a566-4c95-a8be-5f48082de2b2"
                     ],
                     "column_name": "Event ID",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense event id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.event.iron_dome_shared_time",

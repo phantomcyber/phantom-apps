@@ -105,11 +105,11 @@ class IronnetConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                    return action_result.set_status(phantom.APP_ERROR, INT_VALIDATION_ERR_MSG.format(key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, INT_VALIDATION_ERR_MSG.format(key)), None
 
             if parameter < 0:
                 return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
@@ -206,7 +206,7 @@ class IronnetConnector(BaseConnector):
         request = {
             'alert_id': self._handle_py_ver_compat_for_input_str(param.get('alert_id')),
             'comment': self._handle_py_ver_compat_for_input_str(param.get('comment')),
-            'share_comment_with_irondome': param.get('share_comment_with_irondome'),
+            'share_comment_with_irondome': param.get('share_comment_with_irondome', True),
             'analyst_severity': analyst_severity,
             'analyst_expectation': analyst_expectation
         }
@@ -256,7 +256,7 @@ class IronnetConnector(BaseConnector):
         request = {
             'alert_id': self._handle_py_ver_compat_for_input_str(param.get('alert_id')),
             'comment': self._handle_py_ver_compat_for_input_str(param.get('comment')),
-            'share_comment_with_irondome': param.get('share_comment_with_irondome'),
+            'share_comment_with_irondome': param.get('share_comment_with_irondome', True),
             'status': status}
 
         call_status = None
@@ -301,7 +301,7 @@ class IronnetConnector(BaseConnector):
         request = {
             'alert_id': self._handle_py_ver_compat_for_input_str(param.get('alert_id')),
             'comment': self._handle_py_ver_compat_for_input_str(param.get('comment')),
-            'share_comment_with_irondome': param.get('share_comment_with_irondome')
+            'share_comment_with_irondome': param.get('share_comment_with_irondome', True)
         }
 
         call_status = None
@@ -349,7 +349,7 @@ class IronnetConnector(BaseConnector):
             'ip': self._handle_py_ver_compat_for_input_str(param.get('ip', '')),
             'activity_start_time': fix_timestamp(self._handle_py_ver_compat_for_input_str(param['activity_start_time'])),
             'activity_end_time': fix_timestamp(self._handle_py_ver_compat_for_input_str(param.get('activity_end_time',
-            self._handle_py_ver_compat_for_input_str(param['activity_start_time'])))),
+                    self._handle_py_ver_compat_for_input_str(param['activity_start_time'])))),
         }
 
         self.save_progress("Request: {0}".format(request))
@@ -489,8 +489,9 @@ class IronnetConnector(BaseConnector):
                                     self.debug_print("Failed with status: {}".format(artifact_status))
                                     action_result.set_status(phantom.APP_ERROR, 'Alert Notification artifact creation failed: {}'.format(artifact_msg))
                                     return artifact_status
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
             self.save_progress("Filtering alert notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
@@ -558,8 +559,9 @@ class IronnetConnector(BaseConnector):
                                 self.debug_print("Failed with status: {}".format(artifact_status))
                                 action_result.set_status(phantom.APP_ERROR, 'Dome Notification artifact creation failed: {}'.format(artifact_msg))
                                 return artifact_status
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
             self.save_progress("Filtering dome notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
@@ -657,8 +659,9 @@ class IronnetConnector(BaseConnector):
                                     self.debug_print("Failed with status: {}".format(artifact_status))
                                     action_result.set_status(phantom.APP_ERROR, 'Event Notification artifact creation failed: {}'.format(artifact_msg))
                                     return artifact_status
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server")
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
             self.save_progress("Filtering event notifications was successful")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
@@ -688,6 +691,7 @@ class IronnetConnector(BaseConnector):
         except:
             message = "Please provide a valid value in the 'status' action parameter"
             return action_result.set_status(phantom.APP_ERROR, message)
+
         min_sev = 0
         max_sev = 1000
 
@@ -739,7 +743,7 @@ class IronnetConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
         request = {
@@ -779,7 +783,7 @@ class IronnetConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
         request = {
@@ -877,17 +881,17 @@ class IronnetConnector(BaseConnector):
         self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
         self._username = self._handle_py_ver_compat_for_input_str(config.get('username'))
         self._password = config.get('password')
-        self._verify_server_cert = config.get('verify_server_cert')
+        self._verify_server_cert = config.get('verify_server_cert', True)
 
         configuration = swagger_client.Configuration()
         configuration.host = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
         configuration.username = self._handle_py_ver_compat_for_input_str(config.get('username'))
         configuration.password = config.get('password')
-        configuration.verify_ssl = config.get('verify_server_cert')
+        configuration.verify_ssl = config.get('verify_server_cert', True)
         self._api_instance = swagger_client.IronApiApi(swagger_client.ApiClient(configuration))
 
         # Alert Notification Configs
-        self._enable_alert_notifications = config.get('enable_alert_notifications')
+        self._enable_alert_notifications = config.get('enable_alert_notifications', True)
         if self._enable_alert_notifications:
             alert_acts = self._handle_py_ver_compat_for_input_str(config.get('alert_notification_actions'))
             if alert_acts:
@@ -921,7 +925,7 @@ class IronnetConnector(BaseConnector):
                 return self.get_status()
 
         # Dome Notification Configs
-        self._enable_dome_notifications = config.get('enable_dome_notifications')
+        self._enable_dome_notifications = config.get('enable_dome_notifications', False)
         if self._enable_dome_notifications:
             dome_cats = self._handle_py_ver_compat_for_input_str(config.get('dome_categories'))
             if dome_cats:
@@ -933,7 +937,7 @@ class IronnetConnector(BaseConnector):
                 return self.get_status()
 
         # Event Notification Configs
-        self._enable_event_notifications = config.get('enable_event_notifications')
+        self._enable_event_notifications = config.get('enable_event_notifications', False)
         if self._enable_event_notifications:
             event_acts = self._handle_py_ver_compat_for_input_str(config.get('event_notification_actions'))
             if event_acts:
@@ -967,7 +971,7 @@ class IronnetConnector(BaseConnector):
             if(phantom.is_fail(ret_val)):
                 return self.get_status()
 
-            self._store_event_notifs_in_alert_containers = config.get('store_event_notifs_in_alert_containers')
+            self._store_event_notifs_in_alert_containers = config.get('store_event_notifs_in_alert_containers', True)
 
         return phantom.APP_SUCCESS
 
