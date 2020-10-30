@@ -46,8 +46,7 @@
             }
         ]
     },
-    "configuration": {},
-    "app_config": {
+    "configuration": {
         "update_days": {
             "data_type": "numeric",
             "order": 0,
@@ -60,7 +59,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the configuration for connectivity",
             "type": "test",
             "read_only": true,
             "parameters": {},

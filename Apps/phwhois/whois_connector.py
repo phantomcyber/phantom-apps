@@ -39,7 +39,7 @@ class WhoisConnector(BaseConnector):
     # actions supported by this script
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_WHOIS_IP = "whois_ip"
-    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
+    ACTION_ID_WHOIS_TEST_CONNECTIVITY = "test_connectivity"
 
     def __init__(self):
 
@@ -52,6 +52,8 @@ class WhoisConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
+        config = self.get_config()
+        self._update_days = int(config['update_days'])
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -78,6 +80,37 @@ class WhoisConnector(BaseConnector):
             return True
 
         return False
+
+    def _handle_test_connectivity(self, param):
+
+        ip = '1.1.1.1'
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        action_result.set_param({json_keys.APP_JSON_IP: ip})
+
+        self.debug_print("Validating/Querying IP '{0}'".format(ip))
+
+        self.save_progress("Querying...")
+
+        try:
+            obj_whois = IPWhois(ip)
+            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
+        except IPDefinedError as e_defined:
+            self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
+        except Exception as e:
+            self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(e)))
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+
+        if not whois_response:
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
+
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _whois_ip(self, param):
 
@@ -146,27 +179,6 @@ class WhoisConnector(BaseConnector):
         # to a 'Connection reset by peer' error.
         time.sleep(1)
 
-    def _test_connectivity(self, param):
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-        ip = WHOIS_TEST_CONNECTIVITY_IP
-        try:
-            obj_whois = IPWhois(ip)
-            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
-        except IPDefinedError:
-            self.save_progress("Test Connectivity Passed")
-            return action_result.set_status(phantom.APP_SUCCESS)
-        except Exception:
-            self.save_progress("Test Connectivity Failed")
-            return action_result.set_status(phantom.APP_ERROR)
-
-        if whois_response:
-            self.save_progress("Test Connectivity Passed")
-            return action_result.set_status(phantom.APP_SUCCESS)
-
-        self.save_progress("Test Connectivity Failed")
-        return action_result.set_status(phantom.APP_ERROR)
-
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
 
@@ -203,7 +215,7 @@ class WhoisConnector(BaseConnector):
 
         time_diff = current_time - last_time
 
-        app_config = self.get_app_config()
+        app_config = self.get_config()
         cache_exp_days = int(app_config[WHOIS_JSON_CACHE_EXP_DAYS])
 
         if (time_diff.days >= cache_exp_days):
@@ -362,8 +374,8 @@ class WhoisConnector(BaseConnector):
             result = self._whois_domain(param)
         elif (action == self.ACTION_ID_WHOIS_IP):
             result = self._whois_ip(param)
-        elif(action == self.ACTION_ID_TEST_CONNECTIVITY):
-            result = self._test_connectivity(param)
+        elif (action == self.ACTION_ID_WHOIS_TEST_CONNECTIVITY):
+            result = self._handle_test_connectivity(param)
         else:
             result = self.unknown_action()
 
