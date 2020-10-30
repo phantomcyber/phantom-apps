@@ -57,8 +57,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration.",
-            "verbose": "",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -68,8 +67,7 @@
         {
             "action": "devices by sq",
             "identifier": "devices_by_sq",
-            "description": "Get devices by saved query.",
-            "verbose": "",
+            "description": "Get devices by saved query",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -155,8 +153,7 @@
         {
             "action": "devices by hostname",
             "identifier": "devices_by_hostname",
-            "description": "Get devices by hostname.",
-            "verbose": "",
+            "description": "Get devices by hostname",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -246,8 +243,7 @@
         {
             "action": "devices by ip",
             "identifier": "devices_by_ip",
-            "description": "Get devices by IP address.",
-            "verbose": "",
+            "description": "Get devices by IP address",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -336,8 +332,7 @@
         {
             "action": "devices by mac",
             "identifier": "devices_by_mac",
-            "description": "Get devices by MAC address.",
-            "verbose": "",
+            "description": "Get devices by MAC address",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -424,8 +419,7 @@
         {
             "action": "users by sq",
             "identifier": "users_by_sq",
-            "description": "Get users by saved query.",
-            "verbose": "",
+            "description": "Get users by saved query",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -502,8 +496,7 @@
         {
             "action": "users by mail",
             "identifier": "users_by_mail",
-            "description": "Get users by email address.",
-            "verbose": "",
+            "description": "Get users by email address",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -580,8 +573,7 @@
         {
             "action": "users by username",
             "identifier": "users_by_username",
-            "description": "Get users by username.",
-            "verbose": "",
+            "description": "Get users by username",
             "type": "investigate",
             "read_only": false,
             "parameters": {
