@@ -87,7 +87,7 @@ class WhoisConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        action_result.set_param({json_keys.APP_JSON_IP: ip})
+        action_result.set_param({phantom.APP_JSON_IP: ip})
 
         self.debug_print("Validating/Querying IP '{0}'".format(ip))
 
