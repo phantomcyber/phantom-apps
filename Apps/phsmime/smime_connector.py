@@ -14,7 +14,9 @@ from smime_consts import *
 import requests
 import json
 import os
+import sys
 from M2Crypto import BIO, Rand, SMIME, X509
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -35,6 +37,59 @@ class SmimeConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _sign(self, action_result, message):
         # Make a MemoryBuffer of the message.
@@ -61,7 +116,11 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        message_body = bytes(str(param['message_body']).encode("utf-8"))
+        # message_body = bytes(str(param['message_body']).encode("utf-8"))
+        try:
+            message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please verify 'message_body' action parameter")
 
         # Optional values should use the .get() function
         # vault_id = param.get('vault_id', '')
@@ -70,24 +129,37 @@ class SmimeConnector(BaseConnector):
         try:
             s, p7 = self._sign(action_result, message_body)
         except Exception as e:
-            self.save_progress(SMIME_SIGN_ERR_MSG.format(err=str(e)))
-            return action_result.set_status(phantom.APP_ERROR, SMIME_SIGN_ERR_MSG.format(err=str(e)))
+            error_msg = self._get_error_message_from_exception(e)
+            self.save_progress(SMIME_SIGN_ERR_MSG.format(err=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_SIGN_ERR_MSG.format(err=error_msg))
 
         # Recreate buf.
-        buf = BIO.MemoryBuffer(message_body)
+        try:
+            buf = BIO.MemoryBuffer(message_body)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message, Details: {}".format(err))
 
         # Output p7 in mail-friendly format.
-        out = BIO.MemoryBuffer()
-        s.write(out, p7, buf)
+        try:
+            out = BIO.MemoryBuffer()
+            s.write(out, p7, buf)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. Details: {}".format(err))
 
         self.save_progress(SMIME_SIGN_OK_MSG)
 
         # Add the response into the data section
-        action_result.add_data({
-            'SMIME': {
-                'message': out.read()
-            }
-        })
+        try:
+            action_result.add_data({
+                'SMIME': {
+                    'message': out.read()
+                }
+            })
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -105,7 +177,11 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        message_body = bytes(str(param['message_body']).encode("utf-8"))
+        # message_body = bytes(str(param['message_body']).encode("utf-8"))
+        try:
+            message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please verify 'message_body' action parameter")
 
         self.save_progress(SMIME_ENCRYPT_PROGRESS_MSG)
         try:
@@ -130,21 +206,30 @@ class SmimeConnector(BaseConnector):
             p7 = s.encrypt(tmp)
 
         except Exception as e:
-            self.save_progress(SMIME_ENCRYPT_ERR_MSG.format(err=str(e)))
-            return action_result.set_status(phantom.APP_ERROR, SMIME_ENCRYPT_ERR_MSG.format(err=str(e)))
+            error_msg = self._get_error_message_from_exception(e)
+            self.save_progress(SMIME_ENCRYPT_ERR_MSG.format(err=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_ENCRYPT_ERR_MSG.format(err=error_msg))
 
         # Output p7 in mail-friendly format.
-        out = BIO.MemoryBuffer()
-        s.write(out, p7)
+        try:
+            out = BIO.MemoryBuffer()
+            s.write(out, p7)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. Details: {}".format(err))
 
         self.save_progress(SMIME_ENCRYPT_OK_MSG)
 
         # Add the response into the data section
-        action_result.add_data({
-            'SMIME': {
-                'message': out.read()
-            }
-        })
+        try:
+            action_result.add_data({
+                'SMIME': {
+                    'message': out.read()
+                }
+            })
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -162,15 +247,27 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        encrypted_message = bytes(
-            str(param['encrypted_message']).encode("utf-8"))
+        # encrypted_message = bytes(
+        #     str(param['encrypted_message']).encode("utf-8"))
+        try:
+            encrypted_message = bytes(self._handle_py_ver_compat_for_input_str(param['encrypted_message']))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please verify 'encrypted_message' action parameter")
 
         self.save_progress(SMIME_DECRYPT_PROGRESS_MSG)
 
-        buf = BIO.MemoryBuffer(encrypted_message)
+        try:
+            buf = BIO.MemoryBuffer(encrypted_message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. Details: {}".format(err))
 
         # Instantiate an SMIME object.
-        s = SMIME.SMIME()
+        try:
+            s = SMIME.SMIME()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. Details: {}".format(err))
 
         # Load the data, verify it.
         try:
@@ -185,21 +282,26 @@ class SmimeConnector(BaseConnector):
             # Decrypt p7. 'out' now contains a PKCS #7 signed blob.
             out = s.decrypt(p7)
         except Exception as e:
-            if "wrong content type" in str(e):
+            err_msg = self._get_error_message_from_exception(e)
+            if "wrong content type" in err_msg:
                 self.save_progress(SMIME_DECRYPT_ERR2_MSG)
                 return action_result.set_status(phantom.APP_ERROR, SMIME_DECRYPT_ERR2_MSG)
 
-            self.save_progress(SMIME_DECRYPT_ERR_MSG.format(err=str(e)))
-            return action_result.set_status(phantom.APP_ERROR, SMIME_DECRYPT_ERR_MSG.format(err=str(e)))
+            self.save_progress(SMIME_DECRYPT_ERR_MSG.format(err=err_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_DECRYPT_ERR_MSG.format(err=err_msg))
 
         self.save_progress(SMIME_DECRYPT_OK_MSG)
 
         # Add the response into the data section
-        action_result.add_data({
-            'SMIME': {
-                'message': out
-            }
-        })
+        try:
+            action_result.add_data({
+                'SMIME': {
+                    'message': out
+                }
+            })
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -217,47 +319,74 @@ class SmimeConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        signed_message = bytes(str(param['signed_message']).encode("utf-8"))
+        # signed_message = bytes(str(param['signed_message']).encode("utf-8"))
+        try:
+            signed_message = bytes(self._handle_py_ver_compat_for_input_str(param['signed_message']))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please verify 'signed_message' action parameter")
 
         self.save_progress(SMIME_VERIFY_PROGRESS_MSG)
 
-        buf = BIO.MemoryBuffer(signed_message)
+        try:
+            buf = BIO.MemoryBuffer(signed_message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. Details: {}".format(err))
 
         # Instantiate an SMIME object.
-        s = SMIME.SMIME()
+        try:
+            s = SMIME.SMIME()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. Details: {}".format(err))
 
-        # Load the signer's cert.
-        x509 = X509.load_cert_string(self._keys['public'])
-        sk = X509.X509_Stack()
-        sk.push(x509)
-        s.set_x509_stack(sk)
+        try:
+            # Load the signer's cert.
+            x509 = X509.load_cert_string(self._keys['public'])
+            sk = X509.X509_Stack()
+            sk.push(x509)
+            s.set_x509_stack(sk)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.save_progress(SMIME_VERIFY_ERR_MSG.format(err=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_VERIFY_ERR_MSG.format(err=error_msg))
 
-        # Load the signer's CA cert. In this case, because the signer's
-        # cert is self-signed, it is the signer's cert itself.
-        st = X509.X509_Store()
-        st.add_x509(x509)
-        s.set_x509_store(st)
+        try:
+            # Load the signer's CA cert. In this case, because the signer's
+            # cert is self-signed, it is the signer's cert itself.
+            st = X509.X509_Store()
+            st.add_x509(x509)
+            s.set_x509_store(st)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.save_progress(SMIME_VERIFY_ERR_MSG.format(err=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_VERIFY_ERR_MSG.format(err=error_msg))
 
         # Load the data, verify it.
         try:
             p7, data = SMIME.smime_load_pkcs7_bio(buf)
             v = s.verify(p7, data)
         except Exception as e:
-            if "wrong content type" in str(e):
+            error_msg = self._get_error_message_from_exception(e)
+            if "wrong content type" in error_msg:
                 self.save_progress(SMIME_VERIFY_ERR2_MSG)
                 return action_result.set_status(phantom.APP_ERROR, SMIME_VERIFY_ERR2_MSG)
 
-            self.save_progress(SMIME_VERIFY_ERR_MSG.format(err=str(e)))
-            return action_result.set_status(phantom.APP_ERROR, SMIME_VERIFY_ERR_MSG.format(err=str(e)))
+            self.save_progress(SMIME_VERIFY_ERR_MSG.format(err=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, SMIME_VERIFY_ERR_MSG.format(err=error_msg))
 
         self.save_progress(SMIME_VERIFY_OK_MSG)
 
-        # Add the response into the data section
-        action_result.add_data({
-            'SMIME': {
-                'message': v
-            }
-        })
+        try:
+            # Add the response into the data section
+            action_result.add_data({
+                'SMIME': {
+                    'message': v
+                }
+            })
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -291,11 +420,20 @@ class SmimeConnector(BaseConnector):
 
         config = self.get_config()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+
         # Load keys
-        self._keys = {
-            "private": str(config.get('private_key')),
-            "public": str(config.get('public_key'))
-        }
+        try:
+            self._keys = {
+                "private": self._handle_py_ver_compat_for_input_str(config.get('private_key')),
+                "public": self._handle_py_ver_compat_for_input_str(config.get('public_key'))
+            }
+        except:
+            return self.set_status(phantom.APP_ERROR, "Please verify asset config parameters")
 
         return phantom.APP_SUCCESS
 
@@ -333,8 +471,9 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
+            login_url = SmimeConnector._get_phantom_base_url() + '/login'
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -344,10 +483,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login",
+            r2 = requests.post(login_url,
                                verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:

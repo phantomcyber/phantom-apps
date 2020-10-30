@@ -4,17 +4,17 @@
     "description": "This app provides support to S/MIME integrations",
     "type": "email",
     "product_vendor": "Splunk",
-    "logo": "smime.svg",
-    "logo_dark": "smime_dark.svg",
+    "logo": "logo_smime.svg",
+    "logo_dark": "logo_smime_dark.svg",
     "product_name": "S/MIME",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2019-12-06T22:45:54.000000Z",
     "package_name": "phantom_smime",
     "main_module": "smime_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -45,16 +45,18 @@
     "actions": [
         {
             "action": "sign email",
-            "identifier": "sign_email",
             "description": "Sign email message body",
-            "verbose": "Sign email message body",
             "type": "generic",
+            "identifier": "sign_email",
             "read_only": false,
             "parameters": {
                 "message_body": {
                     "description": "The message body to send signed",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "smime email message body"
+                    ],
                     "primary": true,
                     "order": 0
                 }
@@ -62,7 +64,10 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.message_body",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "smime email message body"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.SMIME.message",
@@ -71,14 +76,30 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "message",
+                    "column_name": "Message",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -88,16 +109,18 @@
         },
         {
             "action": "encrypt email",
-            "identifier": "encrypt_email",
-            "description": "Encrypt email message",
-            "verbose": "Encrypt email message body",
+            "description": "Encrypt email message body",
             "type": "generic",
+            "identifier": "encrypt_email",
             "read_only": false,
             "parameters": {
                 "message_body": {
                     "description": "The message body to encrypt",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "smime email message body"
+                    ],
                     "primary": true,
                     "order": 0
                 }
@@ -105,7 +128,10 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.message_body",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "smime email message body"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.SMIME.message",
@@ -114,14 +140,30 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "message",
+                    "column_name": "Message",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -131,17 +173,15 @@
         },
         {
             "action": "decrypt email",
-            "identifier": "decrypt_email",
-            "description": "Decrypt email message",
-            "verbose": "Decrypt email message body",
+            "description": "Decrypt email message body",
             "type": "generic",
+            "identifier": "decrypt_email",
             "read_only": false,
             "parameters": {
                 "encrypted_message": {
                     "description": "The encrypted message body to decrypt",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
                     "order": 0
                 }
             },
@@ -157,14 +197,30 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "message",
+                    "column_name": "Message",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -174,17 +230,15 @@
         },
         {
             "action": "verify email",
-            "identifier": "verify_email",
-            "description": "Verify signed email message",
-            "verbose": "Verify signed email message body",
+            "description": "Verify signed email message body",
             "type": "generic",
+            "identifier": "verify_email",
             "read_only": false,
             "parameters": {
                 "signed_message": {
                     "description": "The signed message body to verify",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
                     "order": 0
                 }
             },
@@ -200,14 +254,30 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "message",
+                    "column_name": "Message",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
