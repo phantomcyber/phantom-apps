@@ -28,7 +28,7 @@
             "description": "Airlock Digital REST API URL",
             "data_type": "string",
             "required": true,
-            "default": "https://[airlockservername.com]:3129/v1/",
+            "default": "https://[airlockservername.com]:3129/v1",
             "order": 1
         }
     },
@@ -371,7 +371,7 @@
         {
             "action": "list policy",
             "description": "List the policy configuration of a specified group",
-            "verbose": "This action will return the policy configurations that are applied to the specified group, the group in this action is referenced by the groupid.",
+            "verbose": "This action will return the policy configurations that are applied to the specified group, the group in this action is referenced by the Group ID.",
             "type": "investigate",
             "identifier": "list_policy",
             "read_only": true,

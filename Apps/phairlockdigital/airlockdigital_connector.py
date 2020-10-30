@@ -175,6 +175,21 @@ class AirlockDigitalConnector(BaseConnector):
 
         return error_text
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+        if parameter < 0:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
@@ -195,7 +210,9 @@ class AirlockDigitalConnector(BaseConnector):
                             url,
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
-
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
                                                    .format(self._get_error_message_from_exception(e))), resp_json)
@@ -630,6 +647,10 @@ class AirlockDigitalConnector(BaseConnector):
         groupid = param.get('groupid', '')
         os = param.get('os', '')
         status = param.get('status', '')
+        ret_val, status = self._validate_integer(self, status, 'status')
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+        status = str(status)
         if domain == "all":
             domain = ""
 
