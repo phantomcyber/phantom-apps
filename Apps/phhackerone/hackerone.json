@@ -2,19 +2,19 @@
     "appid": "2ab1b33f-1951-4dbd-862b-8347e511a6d5",
     "name": "HackerOne",
     "description": "This app interacts with HackerOne",
-    "publisher": "Mhike",
+    "publisher": "Splunk Community",
     "type": "generic",
-    "main_module": "hackerone_connector.py",
+    "main_module": "hackerone_connector.pyc",
     "app_version": "1.5.0",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hacker1",
-    "product_vendor": "Mhike",
+    "product_vendor": "HackerOne",
     "product_name": "HackerOne",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.5.15370",
+    "min_phantom_version": "4.8.24304",
     "logo": "logo_hackerone.svg",
     "logo_dark": "logo_hackerone_dark.svg",
-    "license": "Internal Use Only",
+    "license": "Copyright (c) 2020 Splunk Inc.",
     "configuration": {
         "api_identifier": {
             "data_type": "string",
@@ -37,20 +37,17 @@
         "state_filter": {
             "data_type": "string",
             "order": 3,
-            "description": "Filter for report state (to be used when polling)",
-            "required": false
+            "description": "Filter for report state (to be used when polling)"
         },
         "assignment_filter": {
             "data_type": "string",
             "order": 4,
-            "description": "Filter for report assignment (to be used when polling)",
-            "required": false
+            "description": "Filter for report assignment (to be used when polling)"
         },
         "full_comments": {
             "data_type": "boolean",
             "order": 5,
-            "description": "Collect comments for reports (to be used when polling, Much Slower)",
-            "required": false
+            "description": "Collect comments for reports (to be used when polling, Much Slower)"
         },
         "phantom_api_token": {
             "data_type": "password",
@@ -71,30 +68,34 @@
         },
         {
             "action": "get report",
-            "description": "Get hacker1 report with ID",
-            "verbose": "ToDo: add lengthy description here",
-            "type": "generic",
+            "description": "ID of report to get the report",
+            "type": "investigate",
             "identifier": "get_report",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "report_id": {
                     "data_type": "string",
                     "order": 0,
                     "description": "ID of report to update",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hackerone report id"
+                    ]
                 }
             },
             "output": [{
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.report_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "hackerone report id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
@@ -102,7 +103,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Reporter Name",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.reporter_username",
@@ -118,7 +121,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.assignee_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Assignee Name",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.assignee_type",
@@ -134,7 +139,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.severity_rating",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Severity Rating",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.severity_author_type",
@@ -206,7 +213,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.state",
@@ -271,29 +280,57 @@
                 {
                     "data_path": "action_result.data.*.source",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get reports",
-            "description": "Get H1 reports",
-            "verbose": "ToDo: add lengthy description here",
-            "type": "generic",
+            "description": "Get hackerone reports",
+            "type": "investigate",
             "identifier": "get_reports",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "state_filter": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Report State Filter",
-                    "required": false
+                    "description": "Report State Filter"
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "full_comments": {
                     "data_type": "boolean",
@@ -303,10 +340,6 @@
                 }
             },
             "output": [{
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.state_filter",
                     "data_type": "string"
                 },
@@ -316,39 +349,72 @@
                 },
                 {
                     "data_path": "action_result.parameter.full_comments",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reports",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Reports",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.count",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
-
         {
             "action": "get updated reports",
-            "description": "Get updated H1 reports",
-            "verbose": "ToDo: add lengthy description here",
-            "type": "generic",
+            "description": "Get updated hackerone reports",
+            "type": "investigate",
             "identifier": "get_updated_reports",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "state_filter": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Report State Filter",
-                    "required": false
+                    "description": "Report State Filter"
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "full_comments": {
                     "data_type": "boolean",
@@ -359,15 +425,10 @@
                 "range": {
                     "data_type": "numeric",
                     "order": 3,
-                    "description": "How many minutes back to get changed reports from",
-                    "required": false
+                    "description": "How many minutes back to get changed reports from"
                 }
             },
             "output": [{
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.state_filter",
                     "data_type": "string"
                 },
@@ -377,7 +438,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.full_comments",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.range",
@@ -385,19 +450,51 @@
                 },
                 {
                     "data_path": "action_result.data.*.reports",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Reports",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.count",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "update tracking id",
-            "description": "Update H1 report with tracking ID",
-            "verbose": "ToDo: add lengthy description here",
+            "description": "Update hackerone report with tracking ID",
             "type": "generic",
             "identifier": "update_id",
             "read_only": false,
@@ -406,7 +503,11 @@
                     "data_type": "string",
                     "order": 0,
                     "description": "ID of report to update",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hackerone report id"
+                    ]
                 },
                 "tracking_id": {
                     "description": "ID of tracking ticket",
@@ -416,24 +517,59 @@
                 }
             },
             "output": [{
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.report_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "hackerone report id"
+                    ],
+                    "column_name": "Report ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.tracking_id",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "unassign report",
-            "description": "Update H1 report with tracking ID",
-            "verbose": "ToDo: add lengthy description here",
+            "description": "Unassign hackerone report with tracking ID",
             "type": "generic",
             "identifier": "unassign",
             "read_only": false,
@@ -442,26 +578,66 @@
                     "data_type": "string",
                     "order": 0,
                     "description": "ID of report to unassign",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hackerone report id"
+                    ]
                 }
             },
             "output": [{
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string",
+                    "contains": [
+                        "hackerone report id"
+                    ],
+                    "column_name": "Report ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.report_id",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "on poll",
-            "description": "Consume hacker1 reports and generate containers for them",
+            "description": "Consume hackerone reports and generate containers for them",
             "type": "ingest",
             "identifier": "on_poll",
-            "read_only": false,
+            "read_only": true,
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"

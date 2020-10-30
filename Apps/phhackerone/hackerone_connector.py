@@ -1,5 +1,11 @@
+# File: hackerone_connector.py
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 import phantom.app as phantom
 from phantom.action_result import ActionResult
+from hackerone_consts import *
 import datetime
 import requests
 import json
@@ -28,10 +34,79 @@ class HackerOneConnector(phantom.BaseConnector):
         except:
             pass
         if self.is_polling_action:
-            self.debug_print( 'hacker1', message )
+            self.debug_print( 'hackerone', message )
             self.save_progress( message )
         else:
             self.save_progress( message )
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _get_auth( self ):
         u = self.get_config()['api_identifier']
@@ -66,7 +141,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( 'Finish: _get_phantom_data(): {0}'.format( datetime.datetime.now() ) )
                 return None
         except Exception as e:
-            self.__print( e )
+            err = self._get_error_message_from_exception(e)
+            self.__print( err )
             self.__print( 'Finish: _get_phantom_data(): {0}'.format( datetime.datetime.now() ) )
             return None
 
@@ -86,7 +162,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( 'Finish: _post_phantom_data(): {0}'.format( datetime.datetime.now() ) )
                 return None
         except Exception as e:
-            self.__print( e )
+            err = self._get_error_message_from_exception(e)
+            self.__print( err )
             return None
 
     def _delete_phantom_data( self, url ):
@@ -105,7 +182,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( 'Finish: _delete_phantom_data(): {0}'.format( datetime.datetime.now() ) )
                 return None
         except Exception as e:
-            self.__print( e )
+            err = self._get_error_message_from_exception(e)
+            self.__print( err )
             return None
 
     def _get_rest_data( self, url, url_params ):
@@ -129,7 +207,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( content )
                 return None
         except Exception as e:
-            print( e )
+            err = self._get_error_message_from_exception(e)
+            print( err )
             return None
 
     def _put_rest_data( self, url, dictionary ):
@@ -149,7 +228,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( 'Finish: _put_rest_data(): {0}'.format( datetime.datetime.now() ) )
                 return None
         except Exception as e:
-            self.__print( e )
+            err = self._get_error_message_from_exception(e)
+            self.__print( err )
             return None
 
     def _post_rest_data( self, url, dictionary ):
@@ -169,7 +249,8 @@ class HackerOneConnector(phantom.BaseConnector):
                 self.__print( 'Finish: _post_rest_data(): {0}'.format( datetime.datetime.now() ) )
                 return None
         except Exception as e:
-            self.__print( e )
+            err = self._get_error_message_from_exception(e)
+            self.__print( err )
             return None
 
     def _add_report_artifact( self, report ):
@@ -177,7 +258,7 @@ class HackerOneConnector(phantom.BaseConnector):
         artifact = {}
         artifact['container_id'] = self.get_container_id()
         artifact['label'] = 'Report'
-        artifact['name'] = 'Hacker1 Report - {0}'.format( report['id'] )
+        artifact['name'] = 'HackerOne Report - {0}'.format( report['id'] )
         artifact['source_data_identifier'] = report['id']
         artifact['severity'] = 'medium'
         artifact['cef'] = report
@@ -191,7 +272,7 @@ class HackerOneConnector(phantom.BaseConnector):
             artifact = {}
             artifact['container_id'] = self.get_container_id()
             artifact['label'] = 'Report'
-            artifact['name'] = 'Hacker1 Report - {0}'.format( cef['id'] )
+            artifact['name'] = 'HackerOne Report - {0}'.format( cef['id'] )
             artifact['source_data_identifier'] = '{0}-{1}'.format( cef['id'], self.get_container_id() )
             artifact['severity'] = 'medium'
             artifact['cef'] = cef
@@ -200,10 +281,9 @@ class HackerOneConnector(phantom.BaseConnector):
 
     def _update_tracking_id( self, param, action_result ):
         self.__print( '_update_tracking_id()' )
-        report_id = param.get( 'report_id' )
-        tracking_id = param.get( 'tracking_id' )
+        report_id = self._handle_py_ver_compat_for_input_str(param.get( 'report_id' ))
+        tracking_id = self._handle_py_ver_compat_for_input_str(param.get( 'tracking_id' ))
         try:
-            report_id = str(report_id)
             data = {
                 "data": {
                     "type": "issue-tracker-reference-id",
@@ -222,17 +302,16 @@ class HackerOneConnector(phantom.BaseConnector):
                 action_result.set_status( phantom.APP_ERROR, 'Failed to update tracking id. Status Code not 200' )
                 return phantom.APP_ERROR
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Exception thrown while updating tracking id' )
-            action_result.add_exception_details( e )
+            action_result.add_exception_details( err )
             action_result.set_status( phantom.APP_ERROR, 'Exception thrown while updating tracking id' )
             return phantom.APP_ERROR
 
     def _unassign_report( self, param, action_result ):
         self.__print( '_unassign_report()' )
-        report_id = param.get( 'report_id' )
+        report_id = self._handle_py_ver_compat_for_input_str(param.get( 'report_id' ))
         try:
-            report_id = param.get( 'report_id' )
-            report_id = str(report_id)
             data = {
                 "data": {
                     "type": "nobody"
@@ -248,8 +327,9 @@ class HackerOneConnector(phantom.BaseConnector):
                 action_result.set_status( phantom.APP_ERROR, 'Failed to remove report assignment' )
                 return phantom.APP_ERROR
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Exception thrown while updating tracking id' )
-            action_result.add_exception_details( e )
+            action_result.add_exception_details( err )
             action_result.set_status( phantom.APP_ERROR, 'Exception thrown while updating tracking id' )
             return phantom.APP_ERROR
 
@@ -374,13 +454,14 @@ class HackerOneConnector(phantom.BaseConnector):
                     break
             return report_set
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Exception thrown while gathering reports' )
-            self.__print( e )
+            self.__print( err )
             return None
 
     def _get_report( self, param, action_result ):
         try:
-            id = param.get( 'report_id' )
+            id = self._handle_py_ver_compat_for_input_str(param.get( 'report_id' ))
             report = self._get_complete_report( id )
             action_result.add_data( report )
             self._add_report_artifact( report )
@@ -388,21 +469,22 @@ class HackerOneConnector(phantom.BaseConnector):
             action_result.set_status( phantom.APP_SUCCESS, 'Successfully collected report' )
             return phantom.APP_SUCCESS
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Failed to get report' )
-            action_result.add_exception_details( e )
+            action_result.add_exception_details( err )
             action_result.set_status( phantom.APP_ERROR, 'Failed to get report' )
             return phantom.APP_ERROR
 
     def _get_reports( self, param, action_result ):
         try:
             config = self.get_config()
-            program = config['program_name']
+            program = self._handle_py_ver_compat_for_input_str(config['program_name'])
             try:
-                state = param.get( 'state_filter' )
+                state = self._handle_py_ver_compat_for_input_str(param.get( 'state_filter' ))
             except:
                 state = None
             try:
-                assignment = param.get( 'assignment_filter' )
+                assignment = self._handle_py_ver_compat_for_input_str(param.get( 'assignment_filter' ))
             except:
                 assignment = None
             add_comments = param.get( 'full_comments' )
@@ -413,25 +495,32 @@ class HackerOneConnector(phantom.BaseConnector):
             action_result.set_status( phantom.APP_SUCCESS, 'Successfully collected reports' )
             return phantom.APP_SUCCESS
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Failed to get reports' )
-            action_result.add_exception_details( e )
+            action_result.add_exception_details( err )
             action_result.set_status( phantom.APP_ERROR, 'Failed to get reports' )
             return phantom.APP_ERROR
 
     def _get_updated_reports( self, param, action_result ):
         try:
             config = self.get_config()
-            program = config['program_name']
+            program = self._handle_py_ver_compat_for_input_str(config['program_name'])
             try:
-                state = param.get( 'state_filter' )
+                state = self._handle_py_ver_compat_for_input_str(param.get( 'state_filter' ))
             except:
                 state = None
             try:
-                assignment = param.get( 'assignment_filter' )
+                assignment = self._handle_py_ver_compat_for_input_str(param.get( 'assignment_filter' ))
             except:
                 assignment = None
             add_comments = param.get( 'full_comments' )
-            minutes = int(param.get( 'range' ))
+            # Integer Validation for 'range' parameter
+            minutes = param.get( 'range' )
+            ret_val, minutes = self._validate_integer(action_result, minutes, RANGE_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            self.debug_print("There might be timezone variance. Please check for the timezone variance.")
             date = ( datetime.datetime.now() - datetime.timedelta(minutes=minutes) ).strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
             reports = self._get_filtered_reports( program, state, assignment, add_comments, date )
             action_result.add_data( {'reports': reports, 'count': len( reports )} )
@@ -440,8 +529,9 @@ class HackerOneConnector(phantom.BaseConnector):
             action_result.set_status( phantom.APP_SUCCESS, 'Successfully collected reports' )
             return phantom.APP_SUCCESS
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             self.__print( 'Failed to get reports' )
-            action_result.add_exception_details( e )
+            action_result.add_exception_details( err )
             action_result.set_status( phantom.APP_ERROR, 'Failed to get reports' )
             return phantom.APP_ERROR
 
@@ -449,40 +539,48 @@ class HackerOneConnector(phantom.BaseConnector):
         self.__print( '_test()' )
         try:
             config = self.get_config()
-            url_params = {'filter[program][]': config['program_name'], 'page[size]': 1}
+            url_params = {'filter[program][]': self._handle_py_ver_compat_for_input_str(config['program_name']), 'page[size]': 1}
             reports = self._get_rest_data( 'https://api.hackerone.com/v1/reports', url_params )
             if reports:
-                self.__print( 'Successfully connected to Hacker1' )
-                action_result.set_status( phantom.APP_SUCCESS, 'Successfully connected to Hacker1' )
+                self.__print( 'Successfully connected to HackerOne' )
+                action_result.set_status( phantom.APP_SUCCESS, 'Successfully connected to HackerOne' )
                 return phantom.APP_SUCCESS
             else:
-                self.__print( 'Failed to get reports' )
-                action_result.set_status( phantom.APP_ERROR, 'Failed to connect to hacker1' )
+                self.__print( 'Failed to connect to HackerOne' )
+                action_result.set_status( phantom.APP_ERROR, 'Failed to connect to HackerOne' )
                 return phantom.APP_ERROR
         except Exception as e:
-            self.__print( 'Failed to get reports' )
-            action_result.add_exception_details( e )
-            action_result.set_status( phantom.APP_ERROR, 'Failed to connect to hacker1' )
+            err = self._get_error_message_from_exception(e)
+            self.__print( 'Failed to connect to HackerOne' )
+            action_result.add_exception_details( err )
+            action_result.set_status( phantom.APP_ERROR, 'Failed to connect to HackerOne' )
             return phantom.APP_ERROR
 
     def _on_poll( self, param ):
         self.__print( '_on_poll()' )
+        login_url = HackerOneConnector._get_phantom_base_url()
         config = self.get_config()
-        hours = int(param.get( 'container_count' ))
+        # Integer Validation for 'container_count' parameter
+        hours = param.get( 'container_count' )
+        ret_val, hours = self._validate_integer(action_result, hours, CONTAINER_COUNT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         date = None
         if self.is_poll_now():
+            self.debug_print("There might be timezone variance. Please check for the timezone variance.")
             date = ( datetime.datetime.now() - datetime.timedelta(hours=hours) ).strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
         else:
             m = param.get( 'start_time' )
             s = m / 1000
             date = datetime.datetime.fromtimestamp( s ).strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
-        program = config['program_name']
+        program = self._handle_py_ver_compat_for_input_str(config['program_name'])
         try:
-            state = config['state_filter']
+            state = self._handle_py_ver_compat_for_input_str(config['state_filter'])
         except:
             state = None
         try:
-            assignment = config['assignment_filter']
+            assignment = self._handle_py_ver_compat_for_input_str(config['assignment_filter'])
         except:
             assignment = None
         add_comments = config['full_comments']
@@ -492,17 +590,17 @@ class HackerOneConnector(phantom.BaseConnector):
             for report in reports:
                 existing_container = None
                 container_name = 'H1 {0}: {1}'.format( report['id'], report['title'] )
-                endpoint = 'https://127.0.0.1/rest/container?_filter_name__startswith="H1 {0}"'.format( report['id'] )
+                endpoint = login_url + '/rest/container?_filter_name__startswith="H1 {0}"'.format( report['id'] )
                 containers = self._get_phantom_data( endpoint )
                 if containers['count'] > 0:
                     existing_container = containers['data'][0]['id']
                 container = {}
-                container['source_data_identifier'] = 'Hacker1 Report - {0}'.format( report['id'] )
+                container['source_data_identifier'] = 'HackerOne Report - {0}'.format( report['id'] )
                 container['name'] = container_name
                 artifacts = []
                 artifact = {}
                 artifact['label'] = 'report'
-                artifact['name'] = 'Hacker1 Report - {0}'.format( report['id'] )
+                artifact['name'] = 'HackerOne Report - {0}'.format( report['id'] )
                 artifact['source_data_identifier'] = '{0}-{1}'.format( report['id'], self.get_container_id() )
                 artifact['severity'] = 'medium'
                 artifact['cef'] = report
@@ -512,7 +610,7 @@ class HackerOneConnector(phantom.BaseConnector):
                         artifact = {}
                         artifact['label'] = 'report comment'
                         artifact['name'] = 'Comment - {0}'.format( comment['id'] )
-                        artifact['source_data_identifier'] = 'Hacker1 report - {0}: Comment - {1}'.format( report['id'], comment['id'] )
+                        artifact['source_data_identifier'] = 'HackerOne report - {0}: Comment - {1}'.format( report['id'], comment['id'] )
                         artifact['severity'] = 'medium'
                         artifact['cef'] = comment
                         artifacts.append( artifact )
@@ -523,7 +621,7 @@ class HackerOneConnector(phantom.BaseConnector):
                         artifact = {}
                         artifact['label'] = 'report attachment'
                         artifact['name'] = 'Attachment - {0}'.format( attachment['id'] )
-                        artifact['source_data_identifier'] = 'Hacker1 report - {0}: Attachment - {1}'.format( report['id'], attachment['id'] )
+                        artifact['source_data_identifier'] = 'HackerOne report - {0}: Attachment - {1}'.format( report['id'], attachment['id'] )
                         artifact['severity'] = 'medium'
                         artifact['cef'] = attachment
                         artifacts.append( artifact )
@@ -533,7 +631,7 @@ class HackerOneConnector(phantom.BaseConnector):
                     container['artifacts'] = artifacts
                     self.save_container( container )
                 else:
-                    endpoint = 'https://127.0.0.1/rest/container/{0}/artifacts?page_size=0'.format( existing_container )
+                    endpoint = login_url + '/rest/container/{0}/artifacts?page_size=0'.format( existing_container )
                     container_artifacts = self._get_phantom_data( endpoint )['data']
                     duplicates = {}
                     for container_artifact in container_artifacts:
@@ -544,8 +642,9 @@ class HackerOneConnector(phantom.BaseConnector):
                                 artifact['cef']['updated'] = True
                                 artifact['container_id'] = existing_container
                                 artifact['run_automation'] = True
+                                self.debug_print("There might be timezone variance. Please check for the timezone variance.")
                                 artifact['source_data_identifier'] = '{0}-{1}'.format( report['id'], datetime.datetime.now().strftime( '%Y-%m-%d-%H-%M-%S' ) )
-                                endpoint = 'https://127.0.0.1/rest/artifact/{0}'.format( duplicates[artifact['name']] )
+                                endpoint = login_url + '/rest/artifact/{0}'.format( duplicates[artifact['name']] )
                                 self._delete_phantom_data( endpoint )
                                 status, message, artid = self.save_artifact( artifact )
                                 self.__print( status )
@@ -558,8 +657,8 @@ class HackerOneConnector(phantom.BaseConnector):
             self.set_status( phantom.APP_SUCCESS, 'Successfully stored report data' )
             return phantom.APP_SUCCESS
         else:
-            self.__print( 'Failed to connect to Hacker1' )
-            self.set_status( phantom.APP_ERROR, 'Failed to connect to Hacker1' )
+            self.__print( 'Failed to connect to HackerOne' )
+            self.set_status( phantom.APP_ERROR, 'Failed to connect to HackerOne' )
             return phantom.APP_ERROR
 
     def handle_action(self, param):
