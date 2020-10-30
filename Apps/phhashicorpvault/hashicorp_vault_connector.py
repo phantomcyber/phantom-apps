@@ -119,7 +119,7 @@ class AppConnectorHashicorpVault(phantom.BaseConnector):
                 return RetVal(
                     action_result.set_status(
                         phantom.APP_ERROR,
-                        "Error in getting the Hashicorp Vault Client. Details: {0}".format(err)
+                        "Error in getting the Hashicorp Vault Client. {0}".format(err)
                     ), None
                 )
         else:
@@ -142,7 +142,7 @@ class AppConnectorHashicorpVault(phantom.BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, 'Failed to connect to Hashicorp Vault')
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, 'Error in authenticating Hashicorp Vault Client Details: {0}'.format(err))
+                return action_result.set_status(phantom.APP_ERROR, 'Error in authenticating Hashicorp Vault Client. {0}'.format(err))
         else:
             self.save_progress('Failed to create Hashicorp Vault client')
             return action_result.set_status(phantom.APP_ERROR, 'Failed to create Hashicorp Vault client')
@@ -169,13 +169,13 @@ class AppConnectorHashicorpVault(phantom.BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "Failed to add the secret to Hashicorp Vault")
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                self.save_progress("Error occurred while storing the secret in Hashicorp vault. Details: {}".format(err))
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while storing the secret in Hashicorp vault. Details: {}".format(err))
+                self.save_progress("Error occurred while storing the secret in Hashicorp vault. {}".format(err))
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while storing the secret in Hashicorp vault. {}".format(err))
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.save_progress("Please verify 'secret_json' action parameter. Details: {}".format(err))
-            return action_result.set_status(phantom.APP_ERROR, "Please verify 'secret_json' action parameter. Details: {}".format(err))
+            self.save_progress("Please verify 'secret_json' action parameter. {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Please verify 'secret_json' action parameter. {}".format(err))
 
     def _get_secret(self, param, action_result):
         ret_val, hvac_client = self._create_vault_client(action_result)
@@ -197,14 +197,14 @@ class AppConnectorHashicorpVault(phantom.BaseConnector):
                         return action_result.set_status(phantom.APP_ERROR, "No secret value retrieved from Hashicorp Vault for the specified path")
                 except Exception as e:
                     err = self._get_error_message_from_exception(e)
-                    return action_result.set_status(phantom.APP_ERROR, "Error in getting secret value from the API response. Details:{}".format(err))
+                    return action_result.set_status(phantom.APP_ERROR, "Error in getting secret value from the API response. {}".format(err))
             else:
                 self.save_progress("Error in retrieving secret value from Hashicorp Vault")
                 return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secret value from Hashicorp Vault")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.save_progress("Error in retrieving secret value from Hashicorp Vault. Details: {}".format(err))
-            return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secret value from Hashicorp Vault. Details: {}".format(err))
+            self.save_progress("Error in retrieving secret value from Hashicorp Vault. {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secret value from Hashicorp Vault. {}".format(err))
 
     def _list_secrets(self, param, action_result):
         ret_val, hvac_client = self._create_vault_client(action_result)
@@ -226,14 +226,14 @@ class AppConnectorHashicorpVault(phantom.BaseConnector):
                         return action_result.set_status(phantom.APP_ERROR, "No secrets retrieved from Hashicorp Vault for the specified path")
                 except Exception as e:
                     err = self._get_error_message_from_exception(e)
-                    return action_result.set_status(phantom.APP_ERROR, "Error in getting secrets from the API response. Details:{}".format(err))
+                    return action_result.set_status(phantom.APP_ERROR, "Error in getting secrets from the API response. {}".format(err))
             else:
                 self.save_progress("Error in retrieving secrets from Hashicorp Vault")
                 return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secrets from Hashicorp Vault")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.save_progress("Error in retrieving secrets from Hashicorp Vault. Details: {}".format(err))
-            return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secrets from Hashicorp Vault. Details: {}".format(err))
+            self.save_progress("Error in retrieving secrets from Hashicorp Vault. {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error in retrieving secrets from Hashicorp Vault. {}".format(err))
 
     def handle_action(self, param):
         action = self.get_action_identifier()
