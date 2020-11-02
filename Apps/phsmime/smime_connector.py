@@ -138,7 +138,7 @@ class SmimeConnector(BaseConnector):
             buf = BIO.MemoryBuffer(message_body)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message, Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. {}".format(err))
 
         # Output p7 in mail-friendly format.
         try:
@@ -146,7 +146,7 @@ class SmimeConnector(BaseConnector):
             s.write(out, p7, buf)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. {}".format(err))
 
         self.save_progress(SMIME_SIGN_OK_MSG)
 
@@ -159,7 +159,7 @@ class SmimeConnector(BaseConnector):
             })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. {}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -216,7 +216,7 @@ class SmimeConnector(BaseConnector):
             s.write(out, p7)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while writing the message in mail-friendly format. {}".format(err))
 
         self.save_progress(SMIME_ENCRYPT_OK_MSG)
 
@@ -229,7 +229,7 @@ class SmimeConnector(BaseConnector):
             })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. {}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -260,14 +260,14 @@ class SmimeConnector(BaseConnector):
             buf = BIO.MemoryBuffer(encrypted_message)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. {}".format(err))
 
         # Instantiate an SMIME object.
         try:
             s = SMIME.SMIME()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. {}".format(err))
 
         # Load the data, verify it.
         try:
@@ -301,7 +301,7 @@ class SmimeConnector(BaseConnector):
             })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. {}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -331,14 +331,14 @@ class SmimeConnector(BaseConnector):
             buf = BIO.MemoryBuffer(signed_message)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating MemoryBuffer of the message. {}".format(err))
 
         # Instantiate an SMIME object.
         try:
             s = SMIME.SMIME()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. Details: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while instantiating SMime object. {}".format(err))
 
         try:
             # Load the signer's cert.
@@ -386,7 +386,7 @@ class SmimeConnector(BaseConnector):
             })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. Details:{}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding data to the 'action_result'. {}".format(err))
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
