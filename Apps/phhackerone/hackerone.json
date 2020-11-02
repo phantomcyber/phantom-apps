@@ -1,7 +1,7 @@
 {
     "appid": "2ab1b33f-1951-4dbd-862b-8347e511a6d5",
     "name": "HackerOne",
-    "description": "This app interacts with HackerOne",
+    "description": "This app integrates with HackerOne to support various generic and investigative actions",
     "publisher": "Splunk Community",
     "type": "generic",
     "main_module": "hackerone_connector.pyc",
@@ -317,7 +317,7 @@
         },
         {
             "action": "get reports",
-            "description": "Get hackerone reports",
+            "description": "Get HackerOne reports",
             "type": "investigate",
             "identifier": "get_reports",
             "read_only": true,
@@ -401,7 +401,7 @@
         },
         {
             "action": "get updated reports",
-            "description": "Get updated hackerone reports",
+            "description": "Get updated HackerOne reports",
             "type": "investigate",
             "identifier": "get_updated_reports",
             "read_only": true,
@@ -494,7 +494,7 @@
         },
         {
             "action": "update tracking id",
-            "description": "Update hackerone report with tracking ID",
+            "description": "Update HackerOne report with tracking ID",
             "type": "generic",
             "identifier": "update_id",
             "read_only": false,
@@ -569,7 +569,7 @@
         },
         {
             "action": "unassign report",
-            "description": "Unassign hackerone report with tracking ID",
+            "description": "Unassign HackerOne report with tracking ID",
             "type": "generic",
             "identifier": "unassign",
             "read_only": false,
@@ -634,7 +634,7 @@
         },
         {
             "action": "on poll",
-            "description": "Consume hackerone reports and generate containers for them",
+            "description": "Consume HackerOne reports and generate containers for them",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
