@@ -29,3 +29,4 @@ TYPE_ERR_MSG = "Error occurred while connecting to the Airlock Digital Server. P
 # validate integer
 VALID_INT_MSG = "Please provide a valid integer value in the {}"
 NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {}"
+STATUS_INT_PARAM = "'status' action parameter"
