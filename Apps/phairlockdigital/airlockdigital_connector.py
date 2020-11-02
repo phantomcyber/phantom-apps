@@ -73,7 +73,7 @@ class AirlockDigitalConnector(BaseConnector):
             try:
                 resp_json = json.loads(self._handle_py_ver_compat_for_input_str(r.text).replace("\\", "\\\\"))
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}"
                               .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
@@ -176,14 +176,14 @@ class AirlockDigitalConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(key)), None
 
         if parameter < 0:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+            return action_result.set_status(phantom.APP_ERROR, NON_NEG_INT_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -252,7 +252,7 @@ class AirlockDigitalConnector(BaseConnector):
 
         self.save_progress("File hash var: {}".format(hash_param))
 
-        if (blocklistid == "" or None):
+        if not blocklistid:
             self.save_progress("No blocklistid was specified, removing hash(es) from all blocklist packages")
             url = AIRLOCK_HASH_BLOCKLIST_REMOVE_ALL_ENDPOINT
             request_json = {

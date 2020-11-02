@@ -50,7 +50,6 @@
             "verbose": "This action will unblock hashes from one or more Blocklist policies. This is useful if you want to 'un-ban' a particular hash value.",
             "type": "correct",
             "identifier": "unblock_hash",
-            "undo": "block hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -64,7 +63,7 @@
                     "order": 0
                 },
                 "blocklistid": {
-                    "description": "Remove hash(es) from a specific blocklist by specifying the id, or leave this black to remove it from all blocklists",
+                    "description": "Remove hash(es) from a specific blocklist by specifying the id, or leave this blank to remove it from all blocklists",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -164,7 +163,7 @@
                     "order": 0
                 },
                 "applicationid": {
-                    "description": "Remove hash(es) from a specific Application Capture by specifying the id, or leave this black to remove it from all Application Captures",
+                    "description": "Remove hash(es) from a specific Application Capture by specifying the id, or leave this blank to remove it from all Application Captures",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -247,8 +246,8 @@
         },
         {
             "action": "list identifiers",
-            "description": "Gathers a list of identifiers which are required for referencing groups, applications, baselines or blocklists in other actions",
-            "verbose": "This action gathers the identifiers which reference the groups, applications, baselines or blocklists within Airlock. These identifiers are required to call other actions within Phantom in order to interact with the Airlock Server.",
+            "description": "Gathers a list of identifiers which are required for referencing groups, applications, baselines, or blocklists in other actions",
+            "verbose": "This action gathers the identifiers which reference the groups, applications, baselines, or blocklists within Airlock. These identifiers are required to call other actions within the Phantom in order to interact with the Airlock Server.",
             "type": "investigate",
             "identifier": "list_identifiers",
             "read_only": true,
@@ -830,7 +829,7 @@
             "read_only": false,
             "parameters": {
                 "group_id": {
-                    "description": "Destination group id, can be obtained from the list identifiers endpoint",
+                    "description": "A destination Group ID can be obtained from the list identifiers endpoint",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -840,7 +839,7 @@
                     "order": 0
                 },
                 "agent_id": {
-                    "description": "Agent id, can be obtained from the list endpoints action",
+                    "description": "Agent ID can be obtained from the list endpoints action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -959,7 +958,7 @@
                     "order": 1
                 },
                 "path": {
-                    "description": "Specify a file path which represents the hash of the file you are adding. If you don't want to do this, use the default however this parameter is required for population of file repository entries in Airlock. Note that the path must be escaped",
+                    "description": "Specify a file path that represents the hash of the file you are adding. If you don't want to do this, use the default however this parameter is required for the population of file repository entries in Airlock. Note that the path must be escaped",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1068,7 +1067,6 @@
             "verbose": "This action allows you to add hashes to a Blocklist policy. By adding a hash into a Blocklist policy that is approved, it has the result of blocking the hash on endpoints within your environment.",
             "type": "contain",
             "identifier": "block_hash",
-            "undo": "unblock hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -1554,7 +1552,7 @@
                     "contains": [
                         "airlockdigital otpid"
                     ],
-                    "column_name": "Otp ID",
+                    "column_name": "OTP ID",
                     "column_order": 0,
                     "example_values": [
                         "f56142c9-fdc7-4abe-9974-4ba813dd1002"
@@ -1712,7 +1710,7 @@
                 {
                     "data_path": "action_result.data.*.response.otpcode",
                     "data_type": "string",
-                    "column_name": "Otpcode",
+                    "column_name": "OTP Code",
                     "column_order": 5,
                     "example_values": [
                         "12847518751"
@@ -1724,7 +1722,7 @@
                     "contains": [
                         "airlockdigital otpid"
                     ],
-                    "column_name": "Otp ID",
+                    "column_name": "OTP ID",
                     "column_order": 6,
                     "example_values": [
                         "f56142c9-fdc7-4abe-9974-4ba813dd1002"
