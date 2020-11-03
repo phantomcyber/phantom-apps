@@ -179,14 +179,14 @@ class AirlockDigitalConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(STATUS_INT_PARAM)), None
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(STATUS_INT_PARAM)), None
+                return action_result.set_status(phantom.APP_ERROR, VALID_INT_MSG.format(key)), None
 
         if parameter < 0:
-            return action_result.set_status(phantom.APP_ERROR, NON_NEG_INT_MSG.format(STATUS_INT_PARAM)), None
+            return action_result.set_status(phantom.APP_ERROR, NON_NEG_INT_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -647,7 +647,7 @@ class AirlockDigitalConnector(BaseConnector):
         groupid = param.get('groupid', '')
         os = param.get('os', '')
         status = param.get('status', '')
-        ret_val, status = self._validate_integer(self, status, 'status')
+        ret_val, status = self._validate_integer(self, status, STATUS_INT_PARAM)
         if phantom.is_fail(ret_val):
             return self.get_status()
         status = str(status)
