@@ -30,6 +30,6 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 TYPE_ERR_MSG = "Error occurred while connecting to the Airlock Digital Server. Please check the asset configuration and|or the action parameters"
 
 # validate integer
-VALID_INT_MSG = "Please provide a valid integer value in the {}"
-NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {}"
+ERR_VALID_INT_MSG = "Please provide a valid integer value in the {}"
+ERR_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {}"
 STATUS_INT_PARAM = "'status' action parameter"
