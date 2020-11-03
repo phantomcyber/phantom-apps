@@ -253,7 +253,7 @@
             "read_only": true,
             "parameters": {
                 "policy_type": {
-                    "description": "The type can be group, application, baseline or blocklist",
+                    "description": "The type can be group, application, baseline, or blocklist",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -376,7 +376,7 @@
             "read_only": true,
             "parameters": {
                 "group_id": {
-                    "description": "The group id of the group you want to retrieve policy configuration from",
+                    "description": "The Group ID of the group you want to retrieve policy configuration from",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -483,7 +483,7 @@
                     "column_name": "Blocklist Name",
                     "column_order": 35,
                     "example_values": [
-                        "Microsoft recommended block rules"
+                        "Some recommended block rules"
                     ]
                 },
                 {
@@ -717,7 +717,7 @@
                     "column_name": "Publisher Name",
                     "column_order": 33,
                     "example_values": [
-                        "Microsoft Windows Publisher"
+                        "Some Windows Publisher"
                     ]
                 },
                 {
@@ -948,7 +948,7 @@
                     "order": 0
                 },
                 "applicationid": {
-                    "description": "Allow hash(es) in a specific Application Capture by specifying the id",
+                    "description": "Allow hash(es) in a specific Application Capture by specifying the ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1529,7 +1529,7 @@
         {
             "action": "otp revoke",
             "description": "One Time Password Revoke",
-            "verbose": "Revoke an active OTP code by specifying the 'otpcode' you want to revoke.",
+            "verbose": "Revoke an active OTP code by specifying the 'otpid' you want to revoke.",
             "type": "generic",
             "identifier": "otp_revoke",
             "read_only": false,
@@ -1632,7 +1632,7 @@
                     "order": 0
                 },
                 "purpose": {
-                    "description": "Message about why you are requesting the OTP Code",
+                    "description": "Purpose of requesting the OTP Code",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1908,7 +1908,7 @@
                     "column_name": "Publisher",
                     "column_order": 5,
                     "example_values": [
-                        "Microsoft Corporation"
+                        "Some Corporation"
                     ]
                 },
                 {
@@ -2026,12 +2026,6 @@
                     "column_order": 23
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string",
-                    "column_name": "Summary",
-                    "column_order": 24
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -2046,6 +2040,12 @@
                     "data_type": "string",
                     "column_name": "Message",
                     "column_order": 26
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 24
                 },
                 {
                     "data_path": "summary.total_objects",
