@@ -1,9 +1,8 @@
 # File: symantecmanagementcenter_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
-
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -11,8 +10,10 @@ from phantom.action_result import ActionResult
 
 import requests
 import json
+import sys
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
+from symantecmanagementcenter_consts import *
 
 
 class RetVal(tuple):
@@ -31,9 +32,67 @@ class SymantecManagementCenterConnector(BaseConnector):
 
     def _validate_url(self, url):
         if not ('http' in url.lower() or 'https' in url.lower()):
-            url = 'http://' + url
+            url = 'http://{}'.format(url)
 
         return phantom.is_url(url.strip())
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+
+                input_str = UnicodeDammit(
+                    input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(
+                "Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
@@ -62,7 +121,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(
             status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -73,18 +132,18 @@ class SymantecManagementCenterConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Unable to parse JSON response. Error: {0}".format(
-                        str(e))), None)
+                    "Unable to parse JSON response. Error: {0}".format(err), None))
 
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}'))
+            r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -129,7 +188,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         if config.get('api_token'):
             headers = {"X-Auth-Token": config.get('api_token')}
         else:
-            auth = (config.get('username'), config.get('password'))
+            auth = (self._handle_py_ver_compat_for_input_str(config.get('username')), config.get('password'))
 
         if method == 'post':
             headers['Accept'] = 'application/json'
@@ -156,11 +215,12 @@ class SymantecManagementCenterConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
         except Exception as e:
-            self.debug_print("In rest call. {0}".format(str(e)))
+            err = self._get_error_message_from_exception(e)
+            self.debug_print("In rest call. {0}".format(err))
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(str(e.message)), resp_json))
+                    "Error Connecting to server. Details: {0}".format(err), resp_json))
 
         return self._process_response(r, action_result)
 
@@ -169,7 +229,6 @@ class SymantecManagementCenterConnector(BaseConnector):
         self.save_progress("Connecting to Symantec Management Center endpoint")
 
         success = self._handle_get_version(param)
-
         if not (success):
             self.save_progress("Test Connectivity Failed")
         else:
@@ -203,22 +262,24 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if with_detail and not (param.get('name') or param.get('reference_id') or param.get('uuid')):
+        if with_detail and not (self._handle_py_ver_compat_for_input_str(param.get('name')) or self._handle_py_ver_compat_for_input_str(
+         param.get('reference_id')) or self._handle_py_ver_compat_for_input_str(param.get('uuid'))):
             return action_result.set_status(
-                                    phantom.APP_ERROR, '"get policy" requires one of the following parameters to be supplied: policy name, policy uuid, policy reference id')
+                phantom.APP_ERROR, '"get policy" requires one of the following parameters to be supplied: policy name, policy uuid, policy reference id')
 
         try:
             response = self.get_policy_info(param, with_detail, action_result)
-        except Exception as err:
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return action_result.set_status(
                 phantom.APP_ERROR,
-                ('Unable to retrieve policy info: ' + err.message))
+                ('Unable to retrieve policy info: {}'.format(err)))
 
         action_result.add_data(response)
 
         return action_result.set_status(
             phantom.APP_SUCCESS,
-            'Successfully retrieved ' + str(len(response['policies'])) + ' policies')
+            'Successfully retrieved {0} policies'.format(len(response['policies'])))
 
     def get_policy_info(self, param, with_detail, action_result):
         reference_id = param.get('reference_id')
@@ -226,19 +287,19 @@ class SymantecManagementCenterConnector(BaseConnector):
         uuid = param.get('uuid')
         content_type = param.get('content_type')
 
-        self.debug_print('testdonkey', str([reference_id, name, uuid, content_type]))
+        self.debug_print('testdonkey', str([reference_id, name, uuid, content_type]))  # bb
 
         if reference_id:
-            reference_id = UnicodeDammit(reference_id).unicode_markup.encode('utf-8')
+            reference_id = self._handle_py_ver_compat_for_input_str( reference_id)
 
         if name:
-            name = UnicodeDammit(name).unicode_markup.encode('utf-8')
+            name = self._handle_py_ver_compat_for_input_str(name)
 
         if uuid:
-            uuid = UnicodeDammit(uuid).unicode_markup.encode('utf-8')
+            uuid = self._handle_py_ver_compat_for_input_str(uuid)
 
         if content_type:
-            content_type = UnicodeDammit(content_type).unicode_markup.encode('utf-8')
+            content_type = self._handle_py_ver_compat_for_input_str(content_type)
 
         params = {}
 
@@ -259,7 +320,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
 
         if (phantom.is_fail(ret_val)):
-            raise Exception('Could not retrieve policy information. Details: {0}'.format(str(response) if response else 'No details'))
+            raise Exception('Could not retrieve policy information. Details: {0}'.format(str(response) if response else 'No details'))  # bb
 
         if uuid:
             response = [response]
@@ -272,7 +333,7 @@ class SymantecManagementCenterConnector(BaseConnector):
     def _get_policy_details(self, policies, action_result):
         for policy in policies:
             ret_val, response = self._make_rest_call(
-                '/api/policies/' + policy['uuid'] + '/content', action_result)
+                '/api/policies/{}/content'.format(policy['uuid']), action_result)
 
             if phantom.is_fail(ret_val):
                 raise Exception('Could not retrieve policy details for: {0}/{1}'.format(policy['name'], policy['uuid']))
@@ -330,57 +391,66 @@ class SymantecManagementCenterConnector(BaseConnector):
         action_name = self.get_action_name()
         run_id = self.get_app_run_id()
 
-        url = param.get('url')
-        ip = param.get('ip')
+        url = self._handle_py_ver_compat_for_input_str(param.get('url'))
+        ip = self._handle_py_ver_compat_for_input_str(param.get('ip'))
 
         content = url or ip
-        content = content.lower().replace('http://',
-                                           '').replace('https://', '')  
+        try:
+            content = content.lower().replace('http://',
+                                              '').replace('https://', '')
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide input in either URL or IP action parameter.")
 
         if not(content):
             return action_result.set_status(
                 phantom.APP_ERROR, 'An IP or URL must be provided.'
             )
 
-        category = param.get('category')
+        category = self._handle_py_ver_compat_for_input_str(param.get('category'))
         add_category = param.get('add_category')
 
         comment = 'Added by Phantom - Container ({0}) Action Name ({1}) Run ID ({2})'.format(
             container_id, action_name, run_id) + (
-                ' - ' + param.get('comment') if param.get('comment') else '')
-        uuid = param['uuid']
+                ' - ' + self._handle_py_ver_compat_for_input_str(param.get('comment')) if param.get('comment') else '')
+        uuid = self._handle_py_ver_compat_for_input_str(param['uuid'])
 
         try:
             policy_details = self.get_policy_info(param, True, action_result)
-        except Exception as err:
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return action_result.set_status(
                 phantom.APP_ERROR,
-                ('Unable to retrieve policy info: ' + str(err)))
+                ('Unable to retrieve policy info: {}'.format(err)))
 
         if len(policy_details) < 1:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                ('Unable to find policy with uuid of ' + uuid))
+                ('Unable to find policy with uuid of {}'.format(uuid)))
 
         policy_details = policy_details['policies'][0]
-
-        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
-            message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB, URL_LIST'.format(policy_details['contentType'])
-            return action_result.set_status(phantom.APP_ERROR, message)
+        try:
+            if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+                message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB, URL_LIST'.format(
+                    policy_details['contentType'])
+                return action_result.set_status(phantom.APP_ERROR, message)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "An error occured while processing policy details response from server.")
 
         if policy_details['contentType'] == 'IP_LIST':
             if ip is None:
                 return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no IP was provided.')
-        else: 
+        else:
             if url is None:
                 return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit requires a URL, but none was provided.')
 
         message = None
 
         try:
-            policy_details, message = self._edit_policy_details(policy_details, content, category, uuid, 'add', action_result, add_category=add_category, comment=comment)
-        except Exception as err:
-            return action_result.set_status(phantom.APP_ERROR, ('Unable to edit policy. Error: {0}'.format(err.message)))
+            policy_details, message = self._edit_policy_details(
+                policy_details, content, category, uuid, 'add', action_result, add_category=add_category, comment=comment)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, ('Unable to edit policy. Error: {0}'.format(err)))
 
         summary = {'app_run_id': run_id, 'action_name': action_name}
 
@@ -403,14 +473,13 @@ class SymantecManagementCenterConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
 
         if phantom.is_fail(ret_val):
-            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))
+            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))  # bb
 
         policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
-
         action_result.add_data([policy_details])
 
         return policy_details, message
-    
+
     def _edit_ip_list_content(self, policy_details, ip, category, uuid, edit_type, action_result, add_category, comment):
         message = None
 
@@ -423,9 +492,9 @@ class SymantecManagementCenterConnector(BaseConnector):
             message = 'IP removed from policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
         else:
             if len([ipobj for ipobj
-                in policy_details['policy_details']['content']['ipAddresses']
-                if ipobj['ipAddress'] == ip
-            ]) == 0:
+                    in policy_details['policy_details']['content']['ipAddresses']
+                    if ipobj['ipAddress'] == ip
+                    ]) == 0:
                 policy_details['policy_details']['content']['ipAddresses'].append(
                     {
                         "description": comment,
@@ -446,10 +515,9 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         return post_data, message
 
-
     def _edit_url_list_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
         message = None
-        
+
         if edit_type == 'remove':
             policy_details['policy_details']['content']['urls'] = [
                 urlobj for urlobj
@@ -459,9 +527,9 @@ class SymantecManagementCenterConnector(BaseConnector):
             message = 'URL removed from policy ({0} - UUID: {1})'.format(policy_details['name'], policy_details['uuid'])
         else:
             if len([urlobj for urlobj
-                in policy_details['policy_details']['content']['urls']
-                if urlobj['url'].lower() == url.lower()
-            ]) == 0:
+                    in policy_details['policy_details']['content']['urls']
+                    if urlobj['url'].lower() == url.lower()
+                    ]) == 0:
                 policy_details['policy_details']['content']['urls'].append(
                     {
                         "description": comment,
@@ -484,7 +552,7 @@ class SymantecManagementCenterConnector(BaseConnector):
 
     def _edit_local_category_db_content(self, policy_details, url, category, uuid, edit_type, action_result, add_category, comment):
         message = None
-        
+
         if edit_type == 'remove' and not (url):
             cat_num = len(
                 policy_details['policy_details']['content']['categories'])
@@ -494,9 +562,9 @@ class SymantecManagementCenterConnector(BaseConnector):
             ]
             if cat_num != len(
                     policy_details['policy_details']['content']['categories']):
-                message = 'Category (' + category + ') removed'
+                message = 'Category ({}) removed'.format(category)
             else:
-                message = 'Category (' + category + ') was not found'
+                message = 'Category ({}) was not found'.format(category)
         else:
             for p_category in policy_details['policy_details']['content']['categories']:
                 if (category == p_category['name'] or (edit_type == 'remove' and not (category))):
@@ -508,7 +576,7 @@ class SymantecManagementCenterConnector(BaseConnector):
 
                         if not (message):
                             p_category['entries'].append({'url': url, 'comment': comment, 'type': 'url'})
-                            message = 'URL (' + url + ') added to category (' + category + ')'
+                            message = 'URL ({0}) added to category ({1})'.format(url, category)
                             break
                     elif edit_type == 'remove':
                         cat_len = len(p_category['entries'])
@@ -531,7 +599,7 @@ class SymantecManagementCenterConnector(BaseConnector):
                                 'comment': comment
                             }]
                         })
-                    message = 'Added category (' + category + ') and url (' + url + ')'
+                    message = 'Added category ({0}) and url ({1})'.format(category, url)
                 else:
                     e = 'Category ({0}) does not exist. {1}'.format(category, 'If you would like to add it, use the "add_category" parameter' if edit_type == 'Add' else '')
                     raise Exception(e)
@@ -554,25 +622,30 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        url = param.get('url')
-        ip = param.get('ip')
-        category = param.get('category')
-        uuid = param.get('uuid')
+        url = self._handle_py_ver_compat_for_input_str(param.get('url'))
+        ip = self._handle_py_ver_compat_for_input_str(param.get('ip'))
+        category = self._handle_py_ver_compat_for_input_str(param.get('category'))
+        uuid = self._handle_py_ver_compat_for_input_str(param.get('uuid'))
 
         content = url or ip
-        content = content.lower().replace('http://',
-                                           '').replace('https://', '')                     
-
+        try:
+            content = content.lower().replace('http://',
+                                              '').replace('https://', '')
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide input in either URL or IP action parameter.")
         try:
             policy_details = self.get_policy_info(param, True, action_result)
-        except Exception as err:
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to retrieve policy info: {0}'.format(err.message))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to retrieve policy info: {0}'.format(err))
 
         policy_details = policy_details['policies'][0]
-
-        if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
-            message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB, URL_LIST, or IP_LIST'.format(policy_details['contentType'])
-            return action_result.set_status(phantom.APP_ERROR, message)
+        try:
+            if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+                message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB, URL_LIST, or IP_LIST'.format(policy_details['contentType'])
+                return action_result.set_status(phantom.APP_ERROR, message)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "An error occured while processing policy details response from server.")
 
         if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
             if not (url or category):
@@ -591,9 +664,11 @@ class SymantecManagementCenterConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a URL_LISTS Shared Object, but no URL was provided.')
 
         try:
-            policy_details, message = self._edit_policy_details(policy_details, content, category, uuid, 'remove', action_result, add_category=False)
-        except Exception as err:
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to edit policy: {0}'.format(err.message or ''))
+            policy_details, message = self._edit_policy_details(
+                policy_details, content, category, uuid, 'remove', action_result, add_category=False)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to edit policy: {0}'.format(err or ''))
 
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
@@ -663,8 +738,12 @@ class SymantecManagementCenterConnector(BaseConnector):
         # Optional values should use the .get() function
         optional_config_name = config.get('optional_config_name')
         """
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
-        self._base_url = UnicodeDammit(config.get('base_url')).unicode_markup.encode('utf-8')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
 
         return phantom.APP_SUCCESS
 

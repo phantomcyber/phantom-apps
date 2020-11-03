@@ -8,13 +8,13 @@
     "logo_dark": "logo_symantecmanagementcenter_dark.svg",
     "product_name": "Symantec Management Center",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2019-2020 Splunk Inc.",
     "app_version": "1.0.2",
     "utctime_updated": "2019-09-05T20:54:48.000000Z",
     "package_name": "phantom_symantecmanagementcenter",
     "main_module": "symantecmanagementcenter_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -26,34 +26,29 @@
         "api_token": {
             "description": "API Token",
             "data_type": "password",
-            "required": false,
             "order": 1
         },
         "username": {
             "description": "Username",
             "data_type": "string",
-            "required": false,
             "order": 2
         },
         "password": {
             "description": "Password",
             "data_type": "password",
-            "required": false,
             "order": 3
         },
         "verify_server_cert": {
             "description": "Verify server certificate",
             "data_type": "boolean",
-            "required": false,
             "order": 4
         }
     },
-    "actions": [
-        {
+    "actions": [{
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -61,24 +56,12 @@
         },
         {
             "action": "get version",
-            "identifier": "get_version",
             "description": "Get Symantec Management Center version",
-            "read_only": true,
             "type": "investigate",
+            "identifier": "get_version",
+            "read_only": true,
             "parameters": {},
-            "render": {
-                "type": "table"
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "data_type": "string"
-                },
-                {
+            "output": [{
                     "data_path": "action_result.data.*.buildNumber",
                     "data_type": "string",
                     "column_name": "Build Number",
@@ -103,6 +86,14 @@
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -112,42 +103,38 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "list policies",
-            "identifier": "list_policies",
-            "description": "Get Symantec Management Center policies",
-            "read_only": true,
+            "description": "List Symantec Management Center policies",
             "type": "investigate",
+            "identifier": "list_policies",
+            "read_only": true,
             "parameters": {
                 "content_type": {
                     "description": "Content-type of the policies",
                     "data_type": "string",
-                    "required": false,
                     "order": 0
                 }
             },
-            "render": {
-                "type": "table"
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "data_type": "string"
-                },
-                {
+            "output": [{
                     "data_path": "action_result.parameter.content_type",
                     "data_type": "string"
                 },
@@ -160,7 +147,7 @@
                 {
                     "data_path": "action_result.data.*.policies.*.contentType",
                     "data_type": "string",
-                    "column_name": "Content-type",
+                    "column_name": "Content Type",
                     "column_order": 1
                 },
                 {
@@ -195,8 +182,16 @@
                     "contains": [
                         "symantecmc policy uuid"
                     ],
-                    "column_name": "UUID",
+                    "column_name": "Uuid",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -208,26 +203,34 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get policy",
-            "identifier": "get_policy",
             "description": "Get Symantec Management Center policy",
-            "read_only": true,
             "type": "investigate",
+            "identifier": "get_policy",
+            "read_only": true,
             "parameters": {
                 "uuid": {
                     "description": "UUID",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "symantecmc policy uuid"
@@ -237,29 +240,15 @@
                 "name": {
                     "description": "Policy name",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "reference_id": {
                     "description": "Policy reference ID",
                     "data_type": "string",
-                    "required": false,
                     "order": 2
                 }
             },
-            "render": {
-                "type": "table"
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "data_type": "string"
-                },
-                {
+            "output": [{
                     "data_path": "action_result.parameter.name",
                     "data_type": "string"
                 },
@@ -283,7 +272,7 @@
                 {
                     "data_path": "action_result.data.*.policies.*.contentType",
                     "data_type": "string",
-                    "column_name": "Content-type",
+                    "column_name": "Content Type",
                     "column_order": 6
                 },
                 {
@@ -367,8 +356,16 @@
                     "contains": [
                         "symantecmc policy uuid"
                     ],
-                    "column_name": "UUID",
+                    "column_name": "Uuid",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -380,27 +377,35 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "add listitem",
-            "identifier": "add_url",
-            "description": "Add url/category to local database file URL list shared object.",
+            "description": "Add url/category to local database file URL list shared object",
             "verbose": "Category is not relevant when adding URL to URL list shared object. IP and URL cannot be provided in the same action call. IP is only usable with IP list shared objects.",
             "type": "generic",
+            "identifier": "add_url",
             "read_only": false,
             "parameters": {
                 "url": {
                     "description": "URL to add to local database file or URL list shared object",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "url",
@@ -411,7 +416,6 @@
                 "ip": {
                     "description": "IP to remove from local database file or IP list shared object",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "ip"
@@ -431,7 +435,6 @@
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "category": {
@@ -441,24 +444,15 @@
                     "contains": [
                         "symantecmc category name"
                     ],
-                    "required": false,
                     "order": 4
                 },
                 "add_category": {
                     "description": "Add category",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 5
                 }
             },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
+            "output": [{
                     "data_path": "action_result.parameter.add_category",
                     "data_type": "boolean"
                 },
@@ -504,6 +498,16 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.action_name",
                     "data_type": "string"
                 },
@@ -517,11 +521,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -531,16 +541,15 @@
         },
         {
             "action": "remove listitem",
-            "identifier": "remove_url",
             "description": "Remove url/category from local database file or URL list shared object",
             "verbose": "Category is not relevant when removing URL from URL list shared object. IP and URL cannot be provided in the same action call. IP is only usable with IP list shared objects.",
             "type": "generic",
+            "identifier": "remove_url",
             "read_only": false,
             "parameters": {
                 "url": {
                     "description": "URL to remove from local database file or URL list shared object",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "url",
@@ -551,7 +560,6 @@
                 "ip": {
                     "description": "IP to remove from local database file or IP list shared object",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "ip"
@@ -575,24 +583,15 @@
                     "contains": [
                         "symantecmc category name"
                     ],
-                    "required": false,
                     "order": 3
                 },
                 "delete_all": {
                     "description": "Delete all occurences of URL",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 4
                 }
             },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
+            "output": [{
                     "data_path": "action_result.parameter.category",
                     "data_type": "string",
                     "contains": [
@@ -634,6 +633,16 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -643,11 +652,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
