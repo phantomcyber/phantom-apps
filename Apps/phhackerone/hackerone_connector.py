@@ -28,11 +28,11 @@ class HackerOneConnector(BaseConnector):
             message = str(object)
         except:
             pass
+
         if self.is_polling_action:
             self.debug_print('HackerOne', message)
-            self.save_progress(message)
         else:
-            self.save_progress(message)
+            self.debug_print(message)
 
     def _validate_integer(self, action_result, parameter, key):
         if parameter is not None:
@@ -200,11 +200,11 @@ class HackerOneConnector(BaseConnector):
             else:
                 self.__print(code)
                 self.__print(content)
-                return None
+                return None, None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             print(err)
-            return None
+            return None, None
 
     def _put_rest_data(self, url, dictionary):
         self.__print('Start: _put_rest_data(): {0}'.format(datetime.datetime.now()))
@@ -293,7 +293,7 @@ class HackerOneConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated tracking id')
             else:
                 self.__print('Failed to update tracking id.')
-                return action_result.set_status(phantom.APP_ERROR, 'Failed to update tracking id.')
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to update tracking id')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.__print('Exception occurred while updating tracking id')
@@ -423,7 +423,7 @@ class HackerOneConnector(BaseConnector):
             report_set = []
             self.__print('get rest data')
             reports, links = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
-            self.__print(len(reports))
+            self.__print(len(reports) if reports else 0)
             self.__print('Entering paging')
             while True:
                 self.__print('loop')
@@ -452,6 +452,9 @@ class HackerOneConnector(BaseConnector):
         try:
             id = self._handle_unicode_for_input_str(param.get('report_id'))
             report = self._get_complete_report(id)
+            if not report:
+                self.__print('No report found')
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to get report')
             action_result.add_data(report)
             self._add_report_artifact(report)
             self.__print('Successfully collected report')
@@ -468,8 +471,11 @@ class HackerOneConnector(BaseConnector):
             program = self._handle_unicode_for_input_str(config['program_name'])
             state = self._handle_unicode_for_input_str(param.get('state_filter'))
             assignment = self._handle_unicode_for_input_str(param.get('assignment_filter'))
-            add_comments = param.get('full_comments')
+            add_comments = param.get('full_comments', False)
             reports = self._get_filtered_reports(program, state, assignment, add_comments, None)
+            if not reports:
+                self.__print('No reports found')
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get reports")
             action_result.add_data({'reports': reports, 'count': len(reports)})
             self._add_report_artifacts(reports)
             self.__print('Successfully collected reports')
@@ -486,7 +492,7 @@ class HackerOneConnector(BaseConnector):
             program = self._handle_unicode_for_input_str(config['program_name'])
             state = self._handle_unicode_for_input_str(param.get('state_filter'))
             assignment = self._handle_unicode_for_input_str(param.get('assignment_filter'))
-            add_comments = param.get('full_comments')
+            add_comments = param.get('full_comments', False)
             # Integer Validation for 'range' parameter
             minutes = param.get('range')
             ret_val, minutes = self._validate_integer(action_result, minutes, RANGE_KEY)
@@ -496,6 +502,9 @@ class HackerOneConnector(BaseConnector):
             self.debug_print("There might be timezone variance. Please check for the timezone variance.")
             date = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
+            if not reports:
+                self.__print('No reports found')
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
             action_result.add_data({'reports': reports, 'count': len(reports)})
             self._add_report_artifacts(reports)
             self.__print('Successfully collected reports')
@@ -511,7 +520,7 @@ class HackerOneConnector(BaseConnector):
         try:
             config = self.get_config()
             url_params = {'filter[program][]': self._handle_unicode_for_input_str(config['program_name']), 'page[size]': 1}
-            reports = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
+            reports, _ = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
             if reports:
                 self.__print('Successfully connected to HackerOne')
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully connected to HackerOne')
@@ -551,10 +560,11 @@ class HackerOneConnector(BaseConnector):
             assignment = config['assignment_filter']
         except:
             assignment = None
-        add_comments = config['full_comments']
+        add_comments = config.get('full_comments', False)
         reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
         if reports is not None:
             self.__print('{0} reports were returned'.format(len(reports)))
+            self.save_progress('{0} reports were returned'.format(len(reports)))
             for report in reports:
                 existing_container = None
                 container_name = 'H1 {0}: {1}'.format(report['id'], report['title'])
@@ -622,9 +632,11 @@ class HackerOneConnector(BaseConnector):
                             artifact['container_id'] = existing_container
                             self.save_artifact(artifact)
                 self.__print('Successfully stored report container')
+                self.save_progress('Successfully stored report container')
             return self.set_status(phantom.APP_SUCCESS, 'Successfully stored report data')
         else:
             self.__print('Failed to connect to HackerOne')
+            self.save_progress('Failed to connect to HackerOne')
             return self.set_status(phantom.APP_ERROR, 'Failed to connect to HackerOne')
 
     def handle_action(self, param):

@@ -17,42 +17,42 @@
     "license": "Copyright (c) 2020 Splunk Inc.",
     "configuration": {
         "api_identifier": {
+            "description": "HackerOne Identifier",
             "data_type": "string",
             "order": 0,
-            "description": "HackerOne Identifier",
             "required": true
         },
         "api_token": {
+            "description": "HackerOne API Token",
             "data_type": "password",
             "order": 1,
-            "description": "HackerOne API Token",
             "required": true
         },
         "program_name": {
+            "description": "HackerOne Program Name",
             "data_type": "string",
             "order": 2,
-            "description": "HackerOne Program Name",
             "required": true
         },
         "state_filter": {
+            "description": "Filter for report state (to be used when polling)",
             "data_type": "string",
-            "order": 3,
-            "description": "Filter for report state (to be used when polling)"
+            "order": 3
         },
         "assignment_filter": {
+            "description": "Filter for report assignment (to be used when polling)",
             "data_type": "string",
-            "order": 4,
-            "description": "Filter for report assignment (to be used when polling)"
+            "order": 4
         },
         "full_comments": {
+            "description": "Collect comments for reports (to be used when polling, Much Slower)",
             "data_type": "boolean",
-            "order": 5,
-            "description": "Collect comments for reports (to be used when polling, Much Slower)"
+            "order": 5
         },
         "phantom_api_token": {
+            "description": "Phantom API token for updating existing containers",
             "data_type": "password",
             "order": 6,
-            "description": "Phantom API token for updating existing containers",
             "required": true
         }
     },
@@ -74,9 +74,9 @@
             "read_only": true,
             "parameters": {
                 "report_id": {
+                    "description": "ID of report to update",
                     "data_type": "string",
                     "order": 0,
-                    "description": "ID of report to update",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -323,9 +323,10 @@
             "read_only": true,
             "parameters": {
                 "state_filter": {
+                    "description": "Report State Filter",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Report State Filter"
+                    "order": 0
+
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
@@ -333,9 +334,9 @@
                     "order": 1
                 },
                 "full_comments": {
+                    "description": "Collect comments for reports (Much Slower)",
                     "data_type": "boolean",
                     "order": 2,
-                    "description": "Collect comments for reports (Much Slower)",
                     "required": true
                 }
             },
@@ -357,13 +358,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.reports",
-                    "data_type": "string",
-                    "column_name": "Reports",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.count",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
@@ -407,9 +408,9 @@
             "read_only": true,
             "parameters": {
                 "state_filter": {
+                    "description": "Report State Filter",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Report State Filter"
+                    "order": 0
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
@@ -417,15 +418,15 @@
                     "order": 1
                 },
                 "full_comments": {
+                    "description": "Collect comments for reports (Much Slower)",
                     "data_type": "boolean",
                     "order": 2,
-                    "description": "Collect comments for reports (Much Slower)",
                     "required": true
                 },
                 "range": {
+                    "description": "How many minutes back to get changed reports from",
                     "data_type": "numeric",
-                    "order": 3,
-                    "description": "How many minutes back to get changed reports from"
+                    "order": 3
                 }
             },
             "output": [{
@@ -450,13 +451,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.reports",
-                    "data_type": "string",
-                    "column_name": "Reports",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.count",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
@@ -500,9 +501,9 @@
             "read_only": false,
             "parameters": {
                 "report_id": {
+                    "description": "ID of report to update",
                     "data_type": "string",
                     "order": 0,
-                    "description": "ID of report to update",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -575,9 +576,9 @@
             "read_only": false,
             "parameters": {
                 "report_id": {
+                    "description": "ID of report to unassign",
                     "data_type": "string",
                     "order": 0,
-                    "description": "ID of report to unassign",
                     "required": true,
                     "primary": true,
                     "contains": [
