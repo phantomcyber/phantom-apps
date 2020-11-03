@@ -647,9 +647,10 @@ class AirlockDigitalConnector(BaseConnector):
         groupid = param.get('groupid', '')
         os = param.get('os', '')
         status = param.get('status', '')
-        ret_val, status = self._validate_integer(self, status, STATUS_INT_PARAM)
-        if phantom.is_fail(ret_val):
-            return self.get_status()
+        if status:
+            ret_val, status = self._validate_integer(self, status, STATUS_INT_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
         status = str(status)
         if domain == "all":
             domain = ""
