@@ -42,7 +42,7 @@ class ProofpointConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._username = self._handle_py_ver_compat_for_input_str(config['username'])
+        self._username = config['username']
         self._password = config['password']
         self._headers = {
             'X-Requested-With': 'REST API',
@@ -50,13 +50,11 @@ class ProofpointConnector(BaseConnector):
             'Accept': 'application/json'
         }
 
-        self._auth = (self._username, self._password)
-
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, ERROR_FETCHING_PYTHON_VERSION)
 
         return phantom.APP_SUCCESS
 
@@ -64,19 +62,18 @@ class ProofpointConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
-    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+    def _handle_py_ver_compat_for_input_str(self, input_str):
         """
         This method returns the encoded|original string based on the Python version.
         :param input_str: Input string to be processed
-        :param always_encode: Used if the string needs to be encoded for python 3
         :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
         """
 
         try:
-            if input_str and (self._python_version == 2 or always_encode):
+            if input_str and self._python_version == 2:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+            self.debug_print(PY_2TO3_ERROR_MSG)
 
         return input_str
 
@@ -110,11 +107,11 @@ class ProofpointConnector(BaseConnector):
 
         try:
             if error_code in ERROR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
+                error_text = ERROR_MSG_FORMAT_WITHOUT_CODE.format(error_msg)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                error_text = ERROR_MSG_FORMAT_WITH_CODE.format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -123,14 +120,14 @@ class ProofpointConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERROR_MSG.format(key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERROR_MSG.format(key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_NEGATIVE_INTEGER_ERROR_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -138,7 +135,7 @@ class ProofpointConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, EMPTY_RESPONSE_MSG.format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -154,10 +151,10 @@ class ProofpointConnector(BaseConnector):
             split_lines = [ x.strip() for x in split_lines if x.strip() ]
             error_text = ('\n').join(split_lines)
         except:
-            error_text = 'Cannot parse error details'
+            error_text = HTML_RESPONSE_PARSE_ERROR_MSG
 
         error_text = self._get_error_message_from_exception(error_text)
-        message = 'Status Code: {0}. Data from server:\n{1}\n'.format(status_code, error_text)
+        message = SERVER_ERROR_MSG.format(status_code, error_text)
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -168,13 +165,20 @@ class ProofpointConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to parse JSON response. Error: {0}').format(error_msg)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, JSON_PARSE_ERROR_MSG.format(error_msg)), None)
         else:
             if 200 <= r.status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        error_msg = self._get_error_message_from_exception(r.text.replace('{', '{{').replace('}', '}}'))
-        message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, error_msg)
+        message = None
+
+        # Check for message in error
+        if resp_json.get('message'):
+            message = SERVER_ERROR_MSG.format(r.status_code, self._handle_py_ver_compat_for_input_str(resp_json['message']))
+
+        if not message:
+            error_msg = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
+            message = SERVER_ERROR_MSG.format(r.status_code, error_msg)
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
@@ -200,9 +204,8 @@ class ProofpointConnector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
-        error_msg = self._get_error_message_from_exception(r.text.replace('{', '{{').replace('}', '}}'))
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, error_msg)
+        error_msg = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
+        message = SERVER_ERROR_CANT_PROCESS_RESPONSE_MSG.format(r.status_code, error_msg)
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, action_result, endpoint, method='get', **kwargs):
@@ -212,20 +215,22 @@ class ProofpointConnector(BaseConnector):
 
         # Create a URL to connect to
         url = '{0}{1}'.format(PP_API_BASE_URL, endpoint)
+        url = url.decode('utf-8')
+        self._username = self._handle_py_ver_compat_for_input_str(self._username)
+        self._auth = (self._username, self._password)
 
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Invalid method: {0}').format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Invalid method: {0}'.format(method)), resp_json)
 
         try:
             res = request_func(url, auth=self._auth, headers=self._headers, **kwargs)
         except requests.exceptions.ConnectionError:
-            error_msg = 'Error Details: Connection Refused from the Server'
-            return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, CONNECTION_REFUSED_ERROR_MSG), resp_json)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(error_msg)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, SERVER_CONNECTION_ERROR_MSG.format(error_msg)), resp_json)
 
         return self._process_response(res, action_result)
 
@@ -396,15 +401,12 @@ class ProofpointConnector(BaseConnector):
 
         mins = self.get_config()['initial_ingestion_window']
 
-        try:
-            ret_val, mins = self._validate_integer(action_result, mins, INITIAL_INGESTION_WINDOW_KEY)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, initial_ingestion_window, must be an integer between 1 and 60")
+        ret_val, mins = self._validate_integer(action_result, mins, INITIAL_INGESTION_WINDOW_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not (1 <= mins <= 60):
-            return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, initial_ingestion_window, must be an integer between 1 and 60")
+            return action_result.set_status(phantom.APP_ERROR, "Asset configuration parameter, 'initial_ingestion_window', must be an integer between 1 and 60")
 
         start_at = ((datetime.utcnow() - timedelta(minutes=mins))
                     .replace(microsecond=0).isoformat() + 'Z')
@@ -421,7 +423,7 @@ class ProofpointConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             if "The sinceTime parameter gives a time too far into the past" in action_result.get_message():
-                action_result.append_to_message("It is possible the Phantom clock has drifted. Please re-sync it or consider lowering initial_ingestion_window")
+                action_result.append_to_message("It is possible the Phantom clock has drifted. Please re-sync it or consider lowering 'initial_ingestion_window' action parameter")
             return action_result.get_status()
 
         config = self.get_config()
