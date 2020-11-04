@@ -483,7 +483,7 @@
                     "column_name": "Blocklist Name",
                     "column_order": 35,
                     "example_values": [
-                        "Some recommended block rules"
+                        "Recommended block rules"
                     ]
                 },
                 {
@@ -717,7 +717,7 @@
                     "column_name": "Publisher Name",
                     "column_order": 33,
                     "example_values": [
-                        "Some Windows Publisher"
+                        "Publisher"
                     ]
                 },
                 {
@@ -823,7 +823,7 @@
         {
             "action": "move endpoints",
             "description": "Moves an endpoint from one group to another",
-            "verbose": "This action moves an enforcement agent registration from one group within Airlock to another. This requires the destination group ID to be referenced in the request as the 'target'. The source group does not need to be specified.",
+            "verbose": "This action moves an enforcement agent registration from one group within Airlock to another. This requires the destination Group ID to be referenced in the request as the 'target'. The source group does not need to be specified.",
             "type": "generic",
             "identifier": "move_endpoints",
             "read_only": false,
@@ -1908,7 +1908,7 @@
                     "column_name": "Publisher",
                     "column_order": 5,
                     "example_values": [
-                        "Some Corporation"
+                        "Corporation"
                     ]
                 },
                 {

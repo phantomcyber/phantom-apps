@@ -498,7 +498,7 @@ class AirlockDigitalConnector(BaseConnector):
             req_method = "post"
 
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid policy type, please provide policy type either application, baseline, group or blocklist")
+            return action_result.set_status(phantom.APP_ERROR, "Invalid policy type, please provide policy type either application, baseline, group, or blocklist")
 
         # Make the request
         self.save_progress("Making request to URL: {} with request type of {}.".format(url, policy_type))
@@ -648,9 +648,9 @@ class AirlockDigitalConnector(BaseConnector):
         os = param.get('os', '')
         status = param.get('status', '')
         if status:
-            ret_val, status = self._validate_integer(self, status, STATUS_INT_PARAM)
+            ret_val, status = self._validate_integer(action_result, status, STATUS_INT_PARAM)
             if phantom.is_fail(ret_val):
-                return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(STATUS_INT_PARAM))
+                return action_result.get_status()
             status = str(status)
         if domain == "all":
             domain = ""
