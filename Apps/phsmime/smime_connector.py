@@ -427,13 +427,10 @@ class SmimeConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         # Load keys
-        try:
-            self._keys = {
-                "private": self._handle_py_ver_compat_for_input_str(config.get('private_key')),
-                "public": self._handle_py_ver_compat_for_input_str(config.get('public_key'))
-            }
-        except:
-            return self.set_status(phantom.APP_ERROR, "Please verify asset config parameters")
+        self._keys = {
+            "private": self._handle_py_ver_compat_for_input_str(config.get('private_key')),
+            "public": self._handle_py_ver_compat_for_input_str(config.get('public_key'))
+        }
 
         return phantom.APP_SUCCESS
 
