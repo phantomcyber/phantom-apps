@@ -120,7 +120,7 @@ class SmimeConnector(BaseConnector):
         try:
             message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify 'message_body' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'message_body' action parameter")
 
         # Optional values should use the .get() function
         # vault_id = param.get('vault_id', '')
@@ -181,7 +181,7 @@ class SmimeConnector(BaseConnector):
         try:
             message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify 'message_body' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'message_body' action parameter")
 
         self.save_progress(SMIME_ENCRYPT_PROGRESS_MSG)
         try:
@@ -252,7 +252,7 @@ class SmimeConnector(BaseConnector):
         try:
             encrypted_message = bytes(self._handle_py_ver_compat_for_input_str(param['encrypted_message']))
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify 'encrypted_message' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'encrypted_message' action parameter")
 
         self.save_progress(SMIME_DECRYPT_PROGRESS_MSG)
 
@@ -323,7 +323,7 @@ class SmimeConnector(BaseConnector):
         try:
             signed_message = bytes(self._handle_py_ver_compat_for_input_str(param['signed_message']))
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify 'signed_message' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'signed_message' action parameter")
 
         self.save_progress(SMIME_VERIFY_PROGRESS_MSG)
 
