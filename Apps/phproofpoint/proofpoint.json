@@ -885,11 +885,7 @@
                     "data_type": "string",
                     "description": "List of URL(s) to decode, comma separated",
                     "required": true,
-                    "contains": [
-                        "url"
-                    ],
-                    "order": 0,
-                    "allow_list": true
+                    "order": 0
                 }
             },
             "render": {
@@ -898,10 +894,7 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.clusterName",

@@ -26,7 +26,7 @@ class RetVal(tuple):
 
 class ProofpointConnector(BaseConnector):
     def __init__(self):
-        # Call the EmailConnector init first
+        # Call the BaseConnectors init first
         super(ProofpointConnector, self).__init__()
 
         self._pp_conn = None
@@ -215,7 +215,8 @@ class ProofpointConnector(BaseConnector):
 
         # Create a URL to connect to
         url = '{0}{1}'.format(PP_API_BASE_URL, endpoint)
-        url = url.decode('utf-8')
+        if self._python_version == 2:
+            url = self._handle_py_ver_compat_for_input_str(url).decode('utf-8')
         self._username = self._handle_py_ver_compat_for_input_str(self._username)
         self._auth = (self._username, self._password)
 
@@ -427,19 +428,19 @@ class ProofpointConnector(BaseConnector):
             return action_result.get_status()
 
         config = self.get_config()
-        if config.get('ingest_permitted_clicks') and 'clicksPermitted' in data:
+        if config.get('ingest_permitted_clicks', True) and 'clicksPermitted' in data:
             self.save_progress('Processing {} permitted clicks'
                                .format(len(data['clicksPermitted'])))
             self._process_clicks(data['clicksPermitted'], 'permitted')
-        if config.get('ingest_blocked_clicks') and 'clicksBlocked' in data:
+        if config.get('ingest_blocked_clicks', True) and 'clicksBlocked' in data:
             self.save_progress('Processing {} blocked clicks'
                                .format(len(data['clicksBlocked'])))
             self._process_clicks(data['clicksBlocked'], 'blocked')
-        if (config.get('ingest_delivered_messages') and 'messagesDelivered' in data):
+        if (config.get('ingest_delivered_messages', True) and 'messagesDelivered' in data):
             self.save_progress('Processing {} delivered messages'
                                .format(len(data['messagesDelivered'])))
             self._process_messages(data['messagesDelivered'], 'delivered')
-        if config.get('ingest_blocked_messages') and 'messagesBlocked' in data:
+        if config.get('ingest_blocked_messages', True) and 'messagesBlocked' in data:
             self.save_progress('Processing {} blocked messages'
                                .format(len(data['messagesBlocked'])))
             self._process_messages(data['messagesBlocked'], 'blocked')
@@ -486,17 +487,17 @@ class ProofpointConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(param))
         campaign_id = param.get('campaign_id')
         threat_id = param.get('threat_id')
-        include_campaign_forensics = param.get('include_campaign_forensics')
+        include_campaign_forensics = param.get('include_campaign_forensics', False)
 
         if not campaign_id and not threat_id:
             return action_result.set_status(phantom.APP_ERROR,
                                             ('Campaign ID or Threat ID must'
-                                             ' be specified.'))
+                                             ' be specified'))
 
         if campaign_id and threat_id:
             return action_result.set_status(phantom.APP_ERROR,
                                             ('Only one of Campaign ID or '
-                                             'Threat ID must be specified.'))
+                                             'Threat ID must be specified'))
 
         params = {}
         if campaign_id:
@@ -523,7 +524,7 @@ class ProofpointConnector(BaseConnector):
 
         params = {}
         url_list = []
-        url = param['url']
+        url = self._handle_py_ver_compat_for_input_str(param['url'])
 
         # The Decode API allows for multiple values. Split the parameter by ,
         url_list = [x.strip() for x in url.split(',')]
