@@ -145,21 +145,24 @@
             "order": 15
         }
     },
-    "actions": [{
+    "actions": [
+		{
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
-            "output": [{
+            "output": [
+				{
                 "data_path": "action_result.status",
                 "data_type": "string",
                 "example_values": [
                     "success",
                     "failed"
-                ]
-            }],
+					]
+				}
+			],
             "render": {
                 "type": "table",
                 "title": "cofense triage"
@@ -173,7 +176,8 @@
             "identifier": "on_poll",
             "read_only": true,
             "parameters": {},
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
@@ -319,7 +323,8 @@
                     "order": 11
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -597,7 +602,8 @@
                     "order": 14
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -853,7 +859,8 @@
                     "order": 4
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1053,7 +1060,8 @@
                     "order": 2
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1201,7 +1209,8 @@
                     "order": 1
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1392,7 +1401,8 @@
                     "order": 8
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1544,7 +1554,8 @@
                     ]
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1674,7 +1685,8 @@
                     ]
                 }
             },
-            "output": [{
+            "output": [
+				{
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
