@@ -102,7 +102,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         return RetVal(
             action_result.set_status(
                 phantom.APP_ERROR,
-                "Empty response and no information in the header"), None)
+                "Status Code: {}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -111,6 +111,8 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -119,7 +121,7 @@ class SymantecManagementCenterConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(
-            status_code, error_text)
+            status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -143,7 +145,7 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}'))
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -173,7 +175,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         # Everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}'))
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -229,7 +231,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         self.save_progress("Connecting to Symantec Management Center endpoint")
 
         success = self._handle_get_version(param)
-        if not (success):
+        if not success:
             self.save_progress("Test Connectivity Failed")
         else:
             self.save_progress("Test Connectivity Passed")
@@ -265,7 +267,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         if with_detail and not (self._handle_py_ver_compat_for_input_str(param.get('name')) or self._handle_py_ver_compat_for_input_str(
          param.get('reference_id')) or self._handle_py_ver_compat_for_input_str(param.get('uuid'))):
             return action_result.set_status(
-                phantom.APP_ERROR, '"get policy" requires one of the following parameters to be supplied: policy name, policy uuid, policy reference id')
+                phantom.APP_ERROR, '"get policy" requires one of the following parameters to be supplied: "policy_name", "policy_uuid", "policy_reference_id"')
 
         try:
             response = self.get_policy_info(param, with_detail, action_result)
@@ -282,25 +284,12 @@ class SymantecManagementCenterConnector(BaseConnector):
             'Successfully retrieved {0} policies'.format(len(response['policies'])))
 
     def get_policy_info(self, param, with_detail, action_result):
-        reference_id = param.get('reference_id')
-        name = param.get('name')
-        uuid = param.get('uuid')
-        content_type = param.get('content_type')
+        reference_id = self._handle_py_ver_compat_for_input_str(param.get('reference_id'))
+        name = self._handle_py_ver_compat_for_input_str(param.get('name'))
+        uuid = self._handle_py_ver_compat_for_input_str(param.get('uuid'))
+        content_type = self._handle_py_ver_compat_for_input_str(param.get('content_type'))
 
-        self.debug_print('testdonkey', str([reference_id, name, uuid, content_type]))  # bb
-
-        if reference_id:
-            reference_id = self._handle_py_ver_compat_for_input_str( reference_id)
-
-        if name:
-            name = self._handle_py_ver_compat_for_input_str(name)
-
-        if uuid:
-            uuid = self._handle_py_ver_compat_for_input_str(uuid)
-
-        if content_type:
-            content_type = self._handle_py_ver_compat_for_input_str(content_type)
-
+        self.debug_print("Parameters received in 'get_policy_info': {}".format([reference_id, name, uuid, content_type]))
         params = {}
 
         endpoint = '/api/policies'
@@ -320,7 +309,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
 
         if (phantom.is_fail(ret_val)):
-            raise Exception('Could not retrieve policy information. Details: {0}'.format(str(response) if response else 'No details'))  # bb
+            raise Exception('Could not retrieve policy information. Details: {0}'.format(self._handle_py_ver_compat_for_input_str(response) if response else 'No details'))
 
         if uuid:
             response = [response]
@@ -395,17 +384,13 @@ class SymantecManagementCenterConnector(BaseConnector):
         ip = self._handle_py_ver_compat_for_input_str(param.get('ip'))
 
         content = url or ip
-        try:
-            content = content.lower().replace('http://',
-                                              '').replace('https://', '')
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide input in either URL or IP action parameter.")
-
         if not(content):
             return action_result.set_status(
-                phantom.APP_ERROR, 'An IP or URL must be provided.'
+                phantom.APP_ERROR, "Please provide input in either 'url' or 'ip' action parameter"
             )
 
+        content = content.lower().replace('http://',
+                                              '').replace('https://', '')
         category = self._handle_py_ver_compat_for_input_str(param.get('category'))
         add_category = param.get('add_category')
 
@@ -427,21 +412,21 @@ class SymantecManagementCenterConnector(BaseConnector):
                 phantom.APP_ERROR,
                 ('Unable to find policy with uuid of {}'.format(uuid)))
 
-        policy_details = policy_details['policies'][0]
         try:
-            if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+            policy_details = policy_details['policies'][0]
+            if policy_details['contentType'] not in CONTENT_TYPES:
                 message = 'Unable to edit policy, wrong content type. Received content-type:{0}, expecting LOCAL_CATEGORY_DB, URL_LIST'.format(
                     policy_details['contentType'])
                 return action_result.set_status(phantom.APP_ERROR, message)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "An error occured while processing policy details response from server.")
+            return action_result.set_status(phantom.APP_ERROR, "An error occurred while processing policy details response from server")
 
         if policy_details['contentType'] == 'IP_LIST':
             if ip is None:
-                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no IP was provided.')
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no "ip" was provided')
         else:
             if url is None:
-                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit requires a URL, but none was provided.')
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit requires a "url", but none was provided')
 
         message = None
 
@@ -473,7 +458,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
 
         if phantom.is_fail(ret_val):
-            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, str(response)))  # bb
+            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, self._handle_py_ver_compat_for_input_str(response)))
 
         policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
         action_result.add_data([policy_details])
@@ -628,11 +613,13 @@ class SymantecManagementCenterConnector(BaseConnector):
         uuid = self._handle_py_ver_compat_for_input_str(param.get('uuid'))
 
         content = url or ip
-        try:
-            content = content.lower().replace('http://',
+        if not(content):
+            return action_result.set_status(
+                phantom.APP_ERROR, "Please provide input in either 'url' or 'ip' action parameter"
+            )
+
+        content = content.lower().replace('http://',
                                               '').replace('https://', '')
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide input in either URL or IP action parameter.")
         try:
             policy_details = self.get_policy_info(param, True, action_result)
         except Exception as e:
@@ -641,27 +628,27 @@ class SymantecManagementCenterConnector(BaseConnector):
 
         policy_details = policy_details['policies'][0]
         try:
-            if policy_details['contentType'] not in ['LOCAL_CATEGORY_DB', 'URL_LIST', 'IP_LIST']:
+            if policy_details['contentType'] not in CONTENT_TYPES:
                 message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB, URL_LIST, or IP_LIST'.format(policy_details['contentType'])
                 return action_result.set_status(phantom.APP_ERROR, message)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "An error occured while processing policy details response from server.")
+            return action_result.set_status(phantom.APP_ERROR, "An error occurred while processing policy details response from server")
 
         if policy_details['contentType'] == 'LOCAL_CATEGORY_DB':
             if not (url or category):
-                return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a url and/or category be supplied')
+                return action_result.set_status(phantom.APP_ERROR, '"remove listitem" requires a "url" and/or "category" be supplied')
 
             if url and not (category or param.get('delete_all')):
-                return action_result.set_status(phantom.APP_ERROR, 'If no category is provided, delete_all must be checked')
+                return action_result.set_status(phantom.APP_ERROR, 'If no "category" is provided, "delete_all" must be checked')
 
             if category and not (url or param.get('delete_all')):
-                return action_result.set_status(phantom.APP_ERROR, 'If no url is provided, delete_all must be checked to delete entire category')
+                return action_result.set_status(phantom.APP_ERROR, 'If no "url" is provided, "delete_all" must be checked to delete entire category')
         elif policy_details['contentType'] == 'IP_LIST':
             if ip is None:
-                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no IP was provided.')
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a IP_LIST Shared Object, but no "ip" was provided')
         else:
             if url is None:
-                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a URL_LISTS Shared Object, but no URL was provided.')
+                return action_result.set_status(phantom.APP_ERROR, 'The policy you are attempting to edit is a URL_LISTS Shared Object, but no "url" was provided')
 
         try:
             policy_details, message = self._edit_policy_details(
@@ -741,7 +728,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
 

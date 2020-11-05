@@ -44,7 +44,8 @@
             "order": 4
         }
     },
-    "actions": [{
+    "actions": [
+        {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
@@ -61,7 +62,8 @@
             "identifier": "get_version",
             "read_only": true,
             "parameters": {},
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.data.*.buildNumber",
                     "data_type": "string",
                     "column_name": "Build Number",
@@ -134,7 +136,8 @@
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.content_type",
                     "data_type": "string"
                 },
@@ -164,11 +167,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.replaceVariables",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.shared",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.tenant",
@@ -182,7 +193,7 @@
                     "contains": [
                         "symantecmc policy uuid"
                     ],
-                    "column_name": "Uuid",
+                    "column_name": "UUID",
                     "column_order": 5
                 },
                 {
@@ -248,7 +259,8 @@
                     "order": 2
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string"
                 },
@@ -298,6 +310,10 @@
                 {
                     "data_path": "action_result.data.*.policies.*.policy_details.content.categories.*.entries.*.url",
                     "data_type": "string",
+                    "contains": [
+                        "url",
+                        "url list"
+                    ],
                     "column_name": "URL",
                     "column_order": 7
                 },
@@ -338,11 +354,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.replaceVariables",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.shared",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.policies.*.tenant",
@@ -356,7 +380,7 @@
                     "contains": [
                         "symantecmc policy uuid"
                     ],
-                    "column_name": "Uuid",
+                    "column_name": "UUID",
                     "column_order": 5
                 },
                 {
@@ -452,9 +476,14 @@
                     "order": 5
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.add_category",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.category",
@@ -586,12 +615,13 @@
                     "order": 3
                 },
                 "delete_all": {
-                    "description": "Delete all occurences of URL",
+                    "description": "Delete all occurrences of URL",
                     "data_type": "boolean",
                     "order": 4
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.category",
                     "data_type": "string",
                     "contains": [
@@ -602,7 +632,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.delete_all",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip",
