@@ -146,7 +146,7 @@
         }
     },
     "actions": [
-		{
+        {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
@@ -154,15 +154,15 @@
             "read_only": true,
             "parameters": {},
             "output": [
-				{
-                "data_path": "action_result.status",
-                "data_type": "string",
-                "example_values": [
-                    "success",
-                    "failed"
-					]
-				}
-			],
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
             "render": {
                 "type": "table",
                 "title": "cofense triage"
@@ -177,7 +177,7 @@
             "read_only": true,
             "parameters": {},
             "output": [
-				{
+                {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
@@ -324,7 +324,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -603,7 +603,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -860,7 +860,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1061,7 +1061,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1210,7 +1210,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1402,7 +1402,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1555,7 +1555,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1686,7 +1686,7 @@
                 }
             },
             "output": [
-				{
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
