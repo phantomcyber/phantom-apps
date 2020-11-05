@@ -232,7 +232,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err), resp_json))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -1073,6 +1073,12 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._base_url = self._unicode_string_handler(config.get('base_url'))
         self._port = config.get('port')
         self._username = self._unicode_string_handler(config.get('username'))
@@ -1087,12 +1093,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             self._auth = None
         else:
             self._auth = (self._username, self._password)
-
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
