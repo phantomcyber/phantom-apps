@@ -63,7 +63,7 @@
                     "order": 0
                 },
                 "blocklistid": {
-                    "description": "Remove hash(es) from a specific blocklist by specifying the id, or leave this blank to remove it from all blocklists",
+                    "description": "Remove hash(es) from a specific blocklist by specifying the ID, or leave this blank to remove it from all blocklists",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -163,7 +163,7 @@
                     "order": 0
                 },
                 "applicationid": {
-                    "description": "Remove hash(es) from a specific Application Capture by specifying the id, or leave this blank to remove it from all Application Captures",
+                    "description": "Remove hash(es) from a specific Application Capture by specifying the ID, or leave this blank to remove it from all Application Captures",
                     "data_type": "string",
                     "primary": true,
                     "contains": [

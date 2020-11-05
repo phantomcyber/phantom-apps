@@ -203,7 +203,7 @@ class AirlockDigitalConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = "%s%s" % (self._base_url, endpoint)
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -883,17 +883,17 @@ class AirlockDigitalConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
-        self._api_key = config.get('apiKey')
-        self._header_var = {
-            "X-APIKey": self._api_key
-        }
-
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
+        self._api_key = config.get('apiKey')
+        self._header_var = {
+            "X-APIKey": self._api_key
+        }
 
         return phantom.APP_SUCCESS
 
