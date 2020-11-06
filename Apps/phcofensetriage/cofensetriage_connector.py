@@ -440,7 +440,7 @@ class CofenseTriageConnector(BaseConnector):
         ret_val = Vault.add_attachment(file_location=tmp.name, container_id=self.get_container_id(), file_name=filename)
         try:
             if (ret_val['succeeded'] is not True):
-                return "Error: Vaulting file error; {}".format(ret_val['message']), None, None
+                return "Error: Vault file error; {}".format(ret_val['message']), None, None
         except:
             return "Error: Unable to perform Vault operation", None, None
 
@@ -448,7 +448,7 @@ class CofenseTriageConnector(BaseConnector):
         fileinfo = Vault.get_file_info(vault_id=vault_id, file_name=None, container_id=self.get_container_id())
 
         if len(fileinfo) == 0:
-            return "Error: Vaulting file error, newly vaulted file not found; {}".format(vault_id), None, None
+            return "Error: Vault file error, newly vaulted file not found; {}".format(vault_id), None, None
         fileinfo = fileinfo[0]
 
         summary = {
