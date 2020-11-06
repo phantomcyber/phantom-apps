@@ -1,9 +1,3 @@
-# !/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
-
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
