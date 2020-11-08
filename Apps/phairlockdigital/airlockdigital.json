@@ -1176,7 +1176,7 @@
             "action": "list endpoints",
             "description": "List all the registered agents",
             "verbose": "This endpoint will simply return a listing of registered agents from the Airlock Server. This list can be filtered based on certain criteria.",
-            "type": "investigative",
+            "type": "investigate",
             "identifier": "list_endpoints",
             "read_only": true,
             "parameters": {
@@ -1780,7 +1780,7 @@
             "action": "lookup hash",
             "description": "Lookup SHA256 hash",
             "verbose": "Query the Airlock file repository by specifying the hash value(s) you would like to lookup. NOTE: Only SHA256 hashes are supported.",
-            "type": "investigative",
+            "type": "investigate",
             "identifier": "lookup_hash",
             "read_only": true,
             "parameters": {
