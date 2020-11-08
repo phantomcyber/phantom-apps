@@ -214,7 +214,6 @@ class DetectionOnDemandConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
@@ -262,8 +261,8 @@ class DetectionOnDemandConnector(BaseConnector):
 
         # Required values can be accessed directly
         vault_id = param['vault_id']
-        password = param.get('password', None)
-        command_param = param.get('param', None)
+        password = param.get('password')
+        command_param = param.get('param')
 
         try:
             file_info = Vault.get_file_info(vault_id=vault_id)[0]

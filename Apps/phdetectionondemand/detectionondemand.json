@@ -26,7 +26,7 @@
             "order": 0
         },
         "api_token": {
-            "description": "Your API token for accessing the Detection on Demand API",
+            "description": "An API token for accessing the Detection on Demand API",
             "data_type": "password",
             "required": true,
             "order": 1
@@ -79,7 +79,8 @@
                     "order": 2
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "contains": [
@@ -99,10 +100,12 @@
                 {
                     "data_path": "action_result.parameter.password",
                     "data_type": "string"
-                }, {
+                },
+                {
                     "data_path": "action_result.parameter.param",
                     "data_type": "string"
-                }, {
+                },
+                {
                     "data_path": "action_result.data.*.report_id",
                     "data_type": "string",
                     "example_values": [
@@ -113,23 +116,31 @@
                     ],
                     "column_name": "Report ID",
                     "column_order": 0
-                }, {
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
                         "success",
                         "failed"
                     ]
-                }, {
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                }, {
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
                         1
                     ]
-                }, {
+                },
+                {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
@@ -194,6 +205,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -272,6 +287,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -330,7 +349,8 @@
                     "order": 3
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "string",
                     "contains": [
@@ -430,6 +450,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
