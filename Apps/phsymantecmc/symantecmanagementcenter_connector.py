@@ -384,7 +384,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         ip = self._handle_py_ver_compat_for_input_str(param.get('ip'))
 
         content = url or ip
-        if not(content):
+        if not content:
             return action_result.set_status(
                 phantom.APP_ERROR, "Please provide input in either 'url' or 'ip' action parameter"
             )
@@ -458,7 +458,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/api/policies/{0}/content'.format(uuid), action_result, method='post', data=json.dumps(post_data))
 
         if phantom.is_fail(ret_val):
-            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, self._handle_py_ver_compat_for_input_str(response)))
+            raise Exception('Unable to {0} url/category. Details: {1}'.format(edit_type, self._handle_py_ver_compat_for_input_str(response) if response else 'No details'))
 
         policy_details['policy_details']['revisionInfo'] = response['revisionInfo']
         action_result.add_data([policy_details])
@@ -559,7 +559,7 @@ class SymantecManagementCenterConnector(BaseConnector):
                                 message = 'URL: ({0}). Already exists in the category: ({1})'.format(url, category)
                                 break
 
-                        if not (message):
+                        if not message:
                             p_category['entries'].append({'url': url, 'comment': comment, 'type': 'url'})
                             message = 'URL ({0}) added to category ({1})'.format(url, category)
                             break
@@ -613,7 +613,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         uuid = self._handle_py_ver_compat_for_input_str(param.get('uuid'))
 
         content = url or ip
-        if not(content):
+        if not content:
             return action_result.set_status(
                 phantom.APP_ERROR, "Please provide input in either 'url' or 'ip' action parameter"
             )
