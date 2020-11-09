@@ -1,656 +1,639 @@
 {
-  "appid": "e928b888-0e37-4b53-8de2-c0531fb0eb59",
-  "name": "Digital Guardian ARC",
-  "description": "This app allows for ingest and investigation using Digital Guardian ARC.",
-  "type": "siem",
-  "product_vendor": "Digital Guardian",
-  "logo": "DG-Whitelogo.png",
-  "logo_dark": "DG-Whitelogo.png",
-  "product_name": "Digital Guardian",
-  "product_version_regex": ".*",
-  "publisher": "Digital Guardian",
-  "license": "Copyright (c) Digital Guardian, 2019",
-  "app_version": "1.0.0",
-  "utctime_updated": "2019-10-13T13:03:29.499585Z",
-  "package_name": "phantom_digitalguardianarc",
-  "main_module": "digitalguardianarc_connector.py",
-  "min_phantom_version": "4.5.15922",
-  "app_wizard_version": "1.0.0",
-  "configuration": {
-    "auth_url": {
-      "description": "Authorization Server",
-      "data_type": "string",
-      "required": true,
-      "value_list": [],
-      "default": "",
-      "order": 0
+    "appid": "e928b888-0e37-4b53-8de2-c0531fb0eb59",
+    "name": "Digital Guardian ARC",
+    "description": "This app allows for ingestion and investigation using Digital Guardian ARC",
+    "type": "siem",
+    "product_vendor": "Digital Guardian",
+    "logo": "logo_digitalguardianarc.svg",
+    "logo_dark": "logo_digitalguardianarc_dark.svg",
+    "product_name": "Digital Guardian",
+    "product_version_regex": ".*",
+    "publisher": "Digital Guardian",
+    "license": "Copyright (c) Digital Guardian, 2019 - 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-10-13T13:03:29.499585Z",
+    "package_name": "phantom_digitalguardianarc",
+    "main_module": "digitalguardianarc_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "auth_url": {
+            "description": "Authorization Server",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "arc_url": {
+            "description": "ARC URL",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "client_secret": {
+            "description": "Client Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "export_profile": {
+            "description": "Export Profile GUID",
+            "data_type": "string",
+            "required": true,
+            "order": 4
+        }
     },
-    "arc_url": {
-      "description": "ARC URL",
-      "data_type": "string",
-      "required": true,
-      "value_list": [],
-      "default": "",
-      "order": 1
-    },
-    "client_id": {
-      "description": "Client ID",
-      "data_type": "string",
-      "required": true,
-      "value_list": [],
-      "default": "",
-      "order": 2
-    },
-    "client_secret": {
-      "description": "Client Secret",
-      "data_type": "password",
-      "required": true,
-      "order": 3
-    },
-    "export_profile": {
-      "description": "Export Profile GUID",
-      "data_type": "string",
-      "required": true,
-      "value_list": [],
-      "default": "",
-      "order": 4
-    }
-  },
-  "actions": [
-    {
-      "action": "test connectivity",
-      "identifier": "test_connectivity",
-      "description": "Validate the asset configuration for connectivity using supplied configuration",
-      "verbose": "",
-      "type": "test",
-      "read_only": true,
-      "parameters": {},
-      "output": [],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "add watchlist entry",
-      "description": "Add Watchlist Entry",
-      "verbose": "Add entry to an ARC Watchlist",
-      "identifier": "add_watchlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "watchlist_name": {
-          "description": "Watchlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "atac_test",
-          "required": true,
-          "primary": true
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
-        "watchlist_entry": {
-          "description": "Entry value to be added to ARC watchlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.exe",
-          "order": 1
+        {
+            "action": "add watchlist entry",
+            "description": "Add an entry to an ARC Watchlist",
+            "type": "correct",
+            "identifier": "add_watchlist_entry",
+            "undo": "remove watchlist entry",
+            "read_only": false,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "atac_test",
+                    "required": true
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be added to ARC watchlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.exe",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Add Entry to Watchlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Add Entry to Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove watchlist entry",
+            "description": "Remove entry to an ARC Watchlist",
+            "type": "contain",
+            "identifier": "remove_watchlist_entry",
+            "undo": "add watchlist entry",
+            "read_only": false,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "atac_test",
+                    "required": true
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be removed from ARC watchlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.exe",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from Watchlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Remove Entry to Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check watchlist entry",
+            "description": "Check entry to an ARC Watchlist",
+            "type": "investigate",
+            "identifier": "check_watchlist_entry",
+            "read_only": true,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "atac_test",
+                    "required": true
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be checked in a ARC watchlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.exe",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Entry in ARC Watchlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Entry in Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add componentlist entry",
+            "description": "Add an entry to componentlist",
+            "type": "correct",
+            "identifier": "add_componentlist_entry",
+            "undo": "remove componentlist entry",
+            "read_only": false,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "demo-approved-sites",
+                    "required": true
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be added to Componentlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.com",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Componentlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Add Entry to componentlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Add Entry to Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove componentlist entry",
+            "description": "Remove entry to componentlist",
+            "type": "contain",
+            "identifier": "remove_componentlist_entry",
+            "undo": "add componentlist entry",
+            "read_only": false,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "demo-approved-sites",
+                    "required": true
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be removed from Componentlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.com",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Component List Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from componentlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Remove Entry to Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check componentlist entry",
+            "description": "Check entry to componentlist",
+            "type": "investigate",
+            "identifier": "check_componentlist_entry",
+            "read_only": true,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "default": "demo-approved-sites",
+                    "required": true
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be checked in Componentlist",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "abc.com",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Component List Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from componentlist action succeeded."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Entry to be check in a Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Ingest alerts from ARC into Phantom as events",
+            "verbose": "The default start_time is past 5 days. The default end_time is now.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Container IDs to limit the ingestion to",
+                    "allow_list": true
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Start of time range, in epoch time (milliseconds)"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "End of time range, in epoch time (milliseconds)"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Maximum number of container records to query for"
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "order": 4,
+                    "description": "Maximum number of artifact records to query for"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
         }
-      },
-      "render": {
-        "width": 12,
-        "title": "Add Entry to Watchlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_name",
-          "data_type": "string",
-          "column_name": "Watchlist Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.exe"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Add Entry to Watchlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "remove watchlist entry",
-      "description": "Remove Watchlist Entry",
-      "verbose": "Remove entry to an ARC Watchlist",
-      "identifier": "remove_watchlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "watchlist_name": {
-          "description": "Watchlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "atac_test",
-          "required": true,
-          "primary": true
-        },
-        "watchlist_entry": {
-          "description": "Entry value to be removed from ARC watchlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.exe",
-          "order": 1
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Remove Entry to Watchlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_name",
-          "data_type": "string",
-          "column_name": "Watchlist Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.exe"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Remove Entry from Watchlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "check watchlist entry",
-      "description": "Check Watchlist Entry",
-      "verbose": "Check entry to an ARC Watchlist",
-      "identifier": "check_watchlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "watchlist_name": {
-          "description": "Watchlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "atac_test",
-          "required": true,
-          "primary": true
-        },
-        "watchlist_entry": {
-          "description": "Entry value to be checked in a ARC watchlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.exe",
-          "order": 1
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Entry in Watchlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_name",
-          "data_type": "string",
-          "column_name": "Watchlist Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.watchlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.exe"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Entry in ARC Watchlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "add componentlist entry",
-      "description": "Add componentlist Entry",
-      "verbose": "Add entry to componentlist",
-      "identifier": "add_componentlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "componentlist_name": {
-          "description": "Componentlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "demo-approved-sites",
-          "required": true,
-          "primary": true
-        },
-        "componentlist_entry": {
-          "description": "Entry value to be added to Componentlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.com",
-          "order": 1
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Add Entry to Componentlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_name",
-          "data_type": "string",
-          "column_name": "Componentlist Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.com"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Add Entry to componentlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "remove componentlist entry",
-      "description": "Remove componentlist Entry",
-      "verbose": "Remove entry to componentlist",
-      "identifier": "remove_componentlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "componentlist_name": {
-          "description": "Componentlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "demo-approved-sites",
-          "required": true,
-          "primary": true
-        },
-        "componentlist_entry": {
-          "description": "Entry value to be removed from Componentlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.com",
-          "order": 1
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Remove Entry to Componentlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_name",
-          "data_type": "string",
-          "column_name": "Component List Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.com"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Remove Entry from componentlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "check componentlist entry",
-      "description": "Check componentlist Entry",
-      "verbose": "Check entry to componentlist",
-      "identifier": "check_componentlist_entry",
-      "type": "contains",
-      "read_only": false,
-      "parameters": {
-        "componentlist_name": {
-          "description": "Componentlist Name",
-          "data_type": "string",
-          "order": 0,
-          "default": "demo-approved-sites",
-          "required": true,
-          "primary": true
-        },
-        "componentlist_entry": {
-          "description": "Entry value to be checked in Componentlist",
-          "data_type": "string",
-          "required": true,
-          "primary": true,
-          "default": "abc.com",
-          "order": 1
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Entry to be check in a Componentlist",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "example_values": [
-            "success"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_name",
-          "data_type": "string",
-          "column_name": "Component List Name",
-          "column_order": 0,
-          "example_values": [
-            "Global - Webmail Domains"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.componentlist_entry",
-          "data_type": "string",
-          "column_name": "entry",
-          "column_order": 0,
-          "example_values": [
-            "abc.com"
-          ]
-        },
-        {
-          "data_path": "action_result.data",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1,
-          "example_values": [
-            "Remove Entry from componentlist action succeeded."
-          ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric",
-          "example_values": [
-            1
-          ]
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "on poll",
-      "description": "Ingest alerts from ARC into Phantom as events.",
-      "verbose": "The default start_time is past 5 days. The default end_time is now.",
-      "type": "ingest",
-      "identifier": "on_poll",
-      "read_only": true,
-      "parameters": {
-        "container_id": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Container IDs to limit the ingestion to",
-          "allow_list": true
-        },
-        "start_time": {
-          "data_type": "numeric",
-          "order": 1,
-          "description": "Start of time range, in epoch time (milliseconds)"
-        },
-        "end_time": {
-          "data_type": "numeric",
-          "order": 2,
-          "description": "End of time range, in epoch time (milliseconds)"
-        },
-        "container_count": {
-          "data_type": "numeric",
-          "order": 3,
-          "description": "Maximum number of container records to query for"
-        },
-        "artifact_count": {
-          "data_type": "numeric",
-          "order": 4,
-          "description": "Maximum number of artifact records to query for"
-        }
-      },
-      "output": [],
-      "versions": "EQ(*)"
-    }
-  ]
+    ]
 }

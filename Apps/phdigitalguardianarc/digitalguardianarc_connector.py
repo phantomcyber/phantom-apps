@@ -6,7 +6,8 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from digitalguardianarc_consts import DG_CLIENT_HEADER, DG_HEADER_URL
+from digitalguardianarc_consts import *
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -39,32 +40,31 @@ class DigitalGuardianArcConnector(BaseConnector):
         return RetVal(
             action_result.set_status(
                 phantom.APP_ERROR,
-                'Empty response and no information in the header'), None)
+                'Status Code: {0}. Empty response and no information in the header'.format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
         # An html response, treat it like an error
 
         status_code = response.status_code
-        self.save_progress("{0}".format(response.status_code))
 
         try:
-            self.save_progress("1")
             soup = BeautifulSoup(response.text, 'html.parser')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-            self.save_progress("1a")
-        except Exception, e:
-            error_text = 'Cannot parse error details ' + e
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            error_text = 'Cannot parse error details {}'.format(err)
 
         message = '''Status Code: {0}. Data from server:{1}'''.format(
-            status_code, error_text)
-        self.save_progress("2")
+            status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
-        self.save_progress("2")
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -75,12 +75,13 @@ class DigitalGuardianArcConnector(BaseConnector):
 
         try:
             resp_json = r.json()
-        except Exception, e:
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    'Unable to parse JSON response. Error: {0}'.format(
-                        str(e))), None)
+                    'Unable to parse JSON response. {0}'.format(
+                        err)), None)
 
         # Please specify the status codes here
 
@@ -89,9 +90,8 @@ class DigitalGuardianArcConnector(BaseConnector):
 
         # You should process the error returned in the json
 
-        message = \
-            'Error from server. Status Code: {0} Data from server: {1}'.format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+        message = 'Error from server. Status Code: {0} Data from server: {1}'.format(
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                       None)
@@ -101,8 +101,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
 
         try:
-            if hasattr(action_result, 'add_debug_data') and \
-                    (self.get_action_identifier() != 'get-file' or not 200 <= response.status_code < 399):
+            if hasattr(action_result, 'add_debug_data') and (self.get_action_identifier() != 'get-file' or not 200 <= response.status_code < 399):
                 action_result.add_debug_data(
                     {'r_status_code': response.status_code})
                 action_result.add_debug_data({'r_text': response.text})
@@ -119,19 +118,18 @@ class DigitalGuardianArcConnector(BaseConnector):
             message = (
                 "Can't process response from server. Status Code: {0} Data from server: {1}"
             ).format(response.status_code,
-                     response.text.replace('{', '{{').replace('}', '}}'))
+                     self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
             self.save_progress(('{}').format(message))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                           None)
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             exc_tb = sys.exc_info()
             self.save_progress(
-                ('exception_line={} {}').format(exc_tb.tb_lineno, e))
+                ('exception_line={} {}').format(exc_tb.tb_lineno, err))
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR,
-                                         ('Error: {}').format(e)), None)
-
-        return
+                                         ('Error: {}').format(err)), None)
 
     def _make_rest_call(self, endpoint, action_result, method='get', **kwargs):
 
@@ -159,14 +157,69 @@ class DigitalGuardianArcConnector(BaseConnector):
             r = request_func(url,
                              verify=config.get('verify_server_cert', False),
                              **kwargs)
-        except Exception, e:
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    'Error Connecting to server. Details: {0}'.format(str(e))),
+                    'Error connecting to server. {0}'.format(err)),
                 resp_json)
 
         return self._process_response(r, action_result)
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _handle_test_connectivity(self, param):
 
@@ -180,13 +233,14 @@ class DigitalGuardianArcConnector(BaseConnector):
         # The status and progress messages are more important.
 
         self.save_progress('Connecting to DG ARC')
-        self.requestApiToken()
+        ret_val, message = self.requestApiToken()
+        if phantom.is_fail(ret_val):
+            self.save_progress('Test Connectivity Failed')
+            return action_result.set_status(phantom.APP_ERROR, message)
         self.save_progress('Got API Token')
 
         # make rest call
-        self.save_progress("Client Headers: {0}".format(self._client_headers))
-        (ret_val) = \
-            self._make_rest_call('watchlists', action_result,
+        ret_val, _ = self._make_rest_call('watchlists', action_result,
                                  params=None,
                                  headers=self._client_headers)
 
@@ -195,7 +249,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
 
-            self.save_progress('Test Connectivity Failed.')
+            self.save_progress('Test Connectivity Failed')
             return action_result.get_status()
 
         # Return success
@@ -212,65 +266,80 @@ class DigitalGuardianArcConnector(BaseConnector):
         response_status, export_list = self.get_export(
             action_result=action_result)
         if phantom.is_fail(response_status):
-            self.debug_print('failed poll')
-            return action_result.set_status(phantom.APP_ERROR,
-                                            action_result.get_message())
+            self.debug_print('On Poll Failed')
+            return action_result.get_status()
         if export_list:
             self.save_progress('Ingesting data')
         else:
             self.save_progress('No export data found')
             return action_result.set_status(phantom.APP_SUCCESS,
-                                            action_result.get_message())
+                                            'No export data found')
         for entry in export_list:
-            if not entry['dg_alert.dg_detection_source'] == 'alert' and entry[
-                    'dg_tags']:
-                comm = entry['dg_alarm_name'].find(',')
-                if comm == -1:
-                    comm = 100
-                name = ('{alarm_name}-{id}').format(
-                    alarm_name=entry['dg_alarm_name'][0:comm],
-                    id=entry['dg_guid'])
-                if name != oldname:
-                    container_id = self.create_container(name, entry)
-                    oldname = name
-                    if container_id:
-                        (artifacts_creation_status,
-                         artifacts_creation_msg) = self.create_artifacts(
-                             alert=entry, container_id=container_id)
-                        if phantom.is_fail(artifacts_creation_status):
-                            self.debug_print((
-                                'Error while creating artifacts for container with ID {container_id}. {error_msg}'
-                            ).format(container_id=container_id,
-                                     error_msg=artifacts_creation_msg))
-                            self._state['first_run'] = False
+            try:
+                if not entry['dg_alert.dg_detection_source'] == 'alert' and entry[
+                        'dg_tags']:
+                    comm = entry['dg_alarm_name'].find(',')
+                    if comm == -1:
+                        comm = 100
+                    name = ('{alarm_name}-{id}').format(
+                        alarm_name=entry['dg_alarm_name'][0:comm],
+                        id=entry['dg_guid'])
+                    if name != oldname:
+                        container_id = self.create_container(name, entry)
+                        oldname = name
+                        if container_id:
+                            (artifacts_creation_status,
+                            artifacts_creation_msg) = self.create_artifacts(
+                                alert=entry, container_id=container_id)
+                            if phantom.is_fail(artifacts_creation_status):
+                                self.debug_print((
+                                    'Error while creating artifacts for container with ID {container_id}. {error_msg}'
+                                ).format(container_id=container_id,
+                                        error_msg=artifacts_creation_msg))
+                                self._state['first_run'] = False
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                self.debug_print("Error occurred while processing export list response from server. {}".format(err))
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def get_export(self, action_result):
         self.save_progress('Getting ARC Export data')
-        self.requestApiToken()
-        full_url = self._arc_url + 'export_profiles/' + \
-            self._export_profile + '/export_and_ack'
-        request_response = requests.post(url=full_url,
-                                         headers=self._client_headers,
-                                         verify=False)
+        ret_val, message = self.requestApiToken()
+        if phantom.is_fail(ret_val):
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        full_url = self._arc_url.strip("/") + '/export_profiles/' + self._export_profile + '/export_and_ack'
+        try:
+            request_response = requests.post(url=full_url,
+                                            headers=self._client_headers,
+                                            verify=False)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), None)
         request_status = request_response.status_code
-        if phantom.is_fail(request_status):
-            return (action_result.get_status(), None)
-        headerField = []
-        jsonText = json.loads(request_response.text)
-        if jsonText['total_hits'] == 0:
-            return (phantom.APP_SUCCESS, None)
-        for field in jsonText['fields']:
-            headerField.append(field['name'])
-        exportdata = []
-        for data in jsonText['data']:
-            entryLine = {}
-            headerPosition = 0
-            for dataValue in data:
-                entryLine[headerField[headerPosition]] = dataValue
-                headerPosition += 1
-            exportdata.append(entryLine)
-        return (phantom.APP_SUCCESS, exportdata)
+        if 200 <= request_status <= 399:
+            headerField = []
+            try:
+                jsonText = json.loads(request_response.text)
+                if jsonText['total_hits'] == 0:
+                    return (phantom.APP_SUCCESS, None)
+                for field in jsonText['fields']:
+                    headerField.append(field['name'])
+                exportdata = []
+                for data in jsonText['data']:
+                    entryLine = {}
+                    headerPosition = 0
+                    for dataValue in data:
+                        entryLine[headerField[headerPosition]] = dataValue
+                        headerPosition += 1
+                    exportdata.append(entryLine)
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS), exportdata)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response. {0}'.format(err)), None)
+        else:
+            data = self._handle_py_ver_compat_for_input_str(request_response.text.replace('{', '{{').replace('}', '}}'))
+            message = 'Error from server. Status Code: {0} Data from server: {1}'.format(request_status, data)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def create_container(self, name, items):
         container_dict = dict()
@@ -296,9 +365,10 @@ class DigitalGuardianArcConnector(BaseConnector):
                     'Error while creating container for alert {alert_name}. {error_message}'
                 ).format(alert_name=items['dg_alarm_name'],
                          error_message=container_creation_msg))
-                return
+                return None
             else:
                 return container_id
+        return None
 
     def create_artifacts(self, alert, container_id):
         """ This function is used to create artifacts in given container using export data.
@@ -474,243 +544,305 @@ class DigitalGuardianArcConnector(BaseConnector):
         else:
             try:
                 input_dict_str = json.dumps(input_dict, sort_keys=True)
-                self.debug_print('Handled exception in _create_dict_hash',
-                                 str(input_dict_str))
+                self.debug_print("Input dictionary is {}".format(self._handle_py_ver_compat_for_input_str(input_dict_str)))
+                return input_dict_str
             except Exception as e:
-                print str(e)
-                self.debug_print('Handled exception in _create_dict_hash', e)
+                err = self._get_error_message_from_exception(e)
+                self.debug_print("Handled exception in '_create_dict_hash'", err)
                 return
 
-    def get_watchlist_id(self, watchListName):
-        self.requestApiToken()
-        action_result = self.add_action_result(
-            ActionResult(dict(watchListName)))
+    def get_watchlist_id(self, watchListName, action_result):
+        ret_val, message = self.requestApiToken()
+        if phantom.is_fail(ret_val):
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-        full_url = self._arc_url + 'watchlists/'
-        response = requests.get(url=full_url,
-                                headers=self._client_headers,
-                                verify=False)
-        jsonText = json.loads(response.text)
-        list_id = ''
-        if 200 <= response.status_code <= 299:
-            for jText in jsonText:
-                if str(jText['display_name']).lower() == watchListName.lower():
-                    list_id = jText['name']
-                    return (list_id)
-        else:
-            return action_result.set_status(
-                phantom.APP_ERROR, ('Web Response Error: {0}').format(r))
+        full_url = self._arc_url.strip("/") + '/watchlists/'
+        try:
+            response = requests.get(url=full_url,
+                                    headers=self._client_headers,
+                                    verify=False)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), None)
+        try:
+            jsonText = json.loads(response.text)
+            list_id = ''
+            if 200 <= response.status_code <= 299:
+                for jText in jsonText:
+                    if self._handle_py_ver_compat_for_input_str(jText['display_name']).lower() == watchListName.lower():
+                        list_id = jText['name']
+                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), list_id)
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find watch list {}".format(watchListName)), None)
+            else:
+                data = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+                message = 'Error from server. Status Code: {0} Data from server: {1}'.format(response.status_code, data)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
 
-    def _check_watchlist_id(self, watchlist_name, watchlist_entry):
-        watch_list_id = self.get_watchlist_id(watchlist_name)
-        full_url = self._arc_url + 'watchlists/'
-        r = requests.get(url=full_url + watch_list_id + '/values?limit=100000',
-                         headers=self._client_headers,
-                         verify=False)
-        if 200 <= r.status_code <= 299:
+    def _check_watchlist_id(self, watch_list_id, watchlist_entry, action_result):
+        full_url = self._arc_url.strip("/") + '/watchlists/'
+        try:
+            r = requests.get(url=full_url + watch_list_id + '/values?limit=100000',
+                            headers=self._client_headers,
+                            verify=False)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), None)
+        try:
+            if 200 <= r.status_code <= 299:
+                jsonText = json.loads(r.text)
+                entryExists = False
+                for jText in jsonText:
+                    if self._handle_py_ver_compat_for_input_str(jText['value_name']).lower() == watchlist_entry.lower():
+                        entryExists = True
+                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), jText['value_id'])
+                if not entryExists:
+                    return RetVal(action_result.set_status(phantom.APP_SUCCESS), '')
+            else:
+                data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
+                message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
+
+    def get_list_id(self, list_name, list_type, action_result):
+        ret_val, message = self.requestApiToken()
+        if phantom.is_fail(ret_val):
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        full_url = self._arc_url.strip("/") + '/lists/' + list_type
+        try:
+            r = requests.get(url=full_url,
+                            headers=self._client_headers,
+                            verify=False)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), None)
+        try:
             jsonText = json.loads(r.text)
-            entryExists = False
-            for jText in jsonText:
-                if str(jText['value_name']).lower() == watchlist_entry.lower():
-                    entryExists = True
-                    return (jText['value_id'])
-        if not entryExists:
-            return ''
-
-    def get_list_id(self, list_name, list_type):
-        self.requestApiToken()
-        full_url = self._arc_url + 'lists/' + list_type
-        r = requests.get(url=full_url,
-                         headers=self._client_headers,
-                         verify=False)
-        jsonText = json.loads(r.text)
-        list_id = ""
-        if 200 <= r.status_code <= 299:
-            for jText in jsonText:
-                if str(jText['name']).lower() == list_name.lower():
-                    list_id = jText['id']
-                    return list_id
-        else:
-            return ''
+            list_id = ""
+            if 200 <= r.status_code <= 299:
+                for jText in jsonText:
+                    if self._handle_py_ver_compat_for_input_str(jText['name']).lower() == list_name.lower():
+                        list_id = jText['id']
+                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), list_id)
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find list {}".format(list_name)), None)
+            else:
+                data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
+                message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
 
     def _add_watchlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        watchlist_name = param['watchlist_name']
-        watchlist_entry = param['watchlist_entry']
-        msg_string = (watchlist_entry + ' to watchlist=' + watchlist_name)
+        watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
+        watchlist_entry = self._handle_py_ver_compat_for_input_str(param['watchlist_entry'])
+        msg_string = "{0} to watchlist={1}".format(watchlist_entry, watchlist_name)
         # self.save_progress(('Watchlistname={} Watchlistentry={}').format(watchlist_name, watchlist_entry))
-        watch_list_id = self.get_watchlist_id(watchlist_name)
+        ret_val, watch_list_id = self.get_watchlist_id(watchlist_name, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if watch_list_id:
-            watch_list_entry_json = '[{"value_name":"' + \
-                watchlist_entry + '"}]'
-            full_url = self._arc_url + 'watchlists/'
-            r = requests.post(url=full_url + watch_list_id + '/values/',
-                              data=watch_list_entry_json,
-                              headers=self._client_headers,
-                              verify=False)
+            watch_list_entry_json = '[{"value_name":"' + watchlist_entry + '"}]'
+            full_url = self._arc_url.strip("/") + '/watchlists/'
+            try:
+                r = requests.post(url=full_url + watch_list_id + '/values/',
+                                data=watch_list_entry_json,
+                                headers=self._client_headers,
+                                verify=False)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return (action_result.set_status(phantom.APP_SUCCESS,
-                                                 'added ' + msg_string), None)
+                return action_result.set_status(phantom.APP_SUCCESS,
+                                                 'Successfully added {0}'.format(msg_string))
             else:
-                return (action_result.set_status(phantom.APP_ERROR,
-                                                 'Failed add ' + msg_string),
-                        None)
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 'Failed to add {0}'.format(msg_string))
         return action_result.set_status(
-            phantom.APP_ERROR, 'Could not find watch_list = ' + watchlist_name)
+            phantom.APP_ERROR, 'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _remove_watchlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        watchlist_name = param['watchlist_name']
-        watchlist_entry = param['watchlist_entry']
-        msg_string = (watchlist_entry + ' from watchlist=' + watchlist_name)
-        watch_list_id = self.get_watchlist_id(watchlist_name)
+        watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
+        watchlist_entry = self._handle_py_ver_compat_for_input_str(param['watchlist_entry'])
+        msg_string = '{0} from watchlist={1}'.format(watchlist_entry, watchlist_name)
+        ret_val, watch_list_id = self.get_watchlist_id(watchlist_name, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if watch_list_id:
-            watch_list_value_id = self._check_watchlist_id(
-                watchlist_name, watchlist_entry)
+            ret_val, watch_list_value_id = self._check_watchlist_id(watch_list_id, watchlist_entry, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             if watch_list_value_id != '':
-                full_url = self._arc_url + 'watchlists/'
-                r = requests.delete(url=full_url + watch_list_id + '/values/' + watch_list_value_id,
-                                    headers=self._client_headers,
-                                    verify=False)
+                full_url = self._arc_url.strip("/") + '/watchlists/'
+                try:
+                    r = requests.delete(url=full_url + watch_list_id + '/values/' + watch_list_value_id,
+                                        headers=self._client_headers,
+                                        verify=False)
+                except Exception as e:
+                    err = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
                 if 200 <= r.status_code <= 299:
-                    return (action_result.set_status(phantom.APP_SUCCESS,
-                                                     'removed ' + msg_string),
-                            None)
+                    return action_result.set_status(phantom.APP_SUCCESS,
+                                                     'Successfully removed {0}'.format(msg_string))
                 else:
-                    return (action_result.set_status(
+                    return action_result.set_status(
                         phantom.APP_ERROR,
-                        'Failed to remove ' + msg_string), None)
+                        'Failed to remove {0}'.format(msg_string))
             else:
-                return (action_result.set_status(
+                return action_result.set_status(
                     phantom.APP_ERROR,
-                    'Could not find entry ' + msg_string), None)
+                    'Could not find entry {0}'.format(msg_string))
         else:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                'Could not find watch_list = ' + watchlist_name)
+                'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _check_watchlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        watchlist_name = param['watchlist_name']
-        watchlist_entry = param['watchlist_entry']
-        msg_string = (watchlist_entry + ' from watchlist=' + watchlist_name)
-        watch_list_id = self.get_watchlist_id(watchlist_name)
+        watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
+        watchlist_entry = self._handle_py_ver_compat_for_input_str(param['watchlist_entry'])
+        msg_string = '{0} from watchlist={1}'.format(watchlist_entry, watchlist_name)
+        ret_val, watch_list_id = self.get_watchlist_id(watchlist_name, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if watch_list_id:
-            watch_list_value_id = self._check_watchlist_id(
-                watchlist_name, watchlist_entry)
+            ret_val, watch_list_value_id = self._check_watchlist_id(watch_list_id, watchlist_entry, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             if watch_list_value_id != '':
-                return (action_result.set_status(phantom.APP_SUCCESS,
-                                                 'Found ' + msg_string), None)
+                return action_result.set_status(phantom.APP_SUCCESS,
+                                                 'Successfully found {0}'.format(msg_string))
             else:
-                return (action_result.set_status(
+                return action_result.set_status(
                     phantom.APP_SUCCESS,
-                    'Failed to find entry ' + msg_string), None)
+                    'Failed to find entry {0}'.format(msg_string))
         else:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                'Could not find watch_list = ' + watchlist_name)
+                'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _add_componentlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        componentlist_name = param['componentlist_name']
-        componentlist_entry = param['componentlist_entry']
-        msg_string = componentlist_entry + \
-            ' to componentlist=' + componentlist_name
-        list_id = self.get_list_id(componentlist_name, 'component_list')
+        componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
+        componentlist_entry = self._handle_py_ver_compat_for_input_str(param['componentlist_entry'])
+        msg_string = '{0} to componentlist={1}'.format(componentlist_entry, componentlist_name)
+        ret_val, list_id = self.get_list_id(componentlist_name, 'component_list', action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
-            component_list_entry_json = '{"items":["' + \
-                componentlist_entry + '"]}'
-            full_url = self._arc_url + 'remediation/lists/'
-            r = requests.put(url=full_url + list_id + '/append',
-                             headers=self._client_headers,
-                             data=component_list_entry_json,
-                             verify=False)
+            component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
+            full_url = self._arc_url.strip("/") + '/remediation/lists/'
+            try:
+                r = requests.put(url=full_url + list_id + '/append',
+                                headers=self._client_headers,
+                                data=component_list_entry_json,
+                                verify=False)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return (action_result.set_status(phantom.APP_SUCCESS,
-                                                 'added ' + msg_string), None)
+                return action_result.set_status(phantom.APP_SUCCESS,
+                                                 'Successfully added {0}'.format(msg_string))
             else:
-                return (action_result.set_status(
+                return action_result.set_status(
                     phantom.APP_ERROR,
-                    'Failed add ' + msg_string + ' Return Status ' + r.text),
-                    None)
+                    'Failed to add {0}'.format(msg_string))
         return action_result.set_status(
             phantom.APP_ERROR,
-            'Could not find component_list = ' + componentlist_name)
+            'Could not find component_list = {0}'.format(componentlist_name))
 
     def _remove_componentlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        componentlist_name = param['componentlist_name']
-        componentlist_entry = param['componentlist_entry']
-        msg_string = componentlist_entry + \
-            ' to componentlist=' + componentlist_name
-        list_id = self.get_list_id(componentlist_name, 'component_list')
+        componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
+        componentlist_entry = self._handle_py_ver_compat_for_input_str(param['componentlist_entry'])
+        msg_string = '{0} to componentlist={1}'.format(componentlist_entry, componentlist_name)
+        ret_val, list_id = self.get_list_id(componentlist_name, 'component_list', action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
-            component_list_entry_json = '{"items":["' + \
-                componentlist_entry + '"]}'
-            full_url = self._arc_url + 'remediation/lists/'
-            r = requests.post(url=full_url + list_id + '/delete',
-                              headers=self._client_headers,
-                              data=component_list_entry_json,
-                              verify=False)
+            component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
+            full_url = self._arc_url.strip("/") + '/remediation/lists/'
+            try:
+                r = requests.post(url=full_url + list_id + '/delete',
+                                headers=self._client_headers,
+                                data=component_list_entry_json,
+                                verify=False)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return (action_result.set_status(phantom.APP_SUCCESS,
-                                                 'removed ' + msg_string),
-                        None)
+                return action_result.set_status(phantom.APP_SUCCESS,
+                                                 'Successfully removed {0}'.format(msg_string))
             else:
-                return (action_result.set_status(
-                    phantom.APP_ERROR, 'Failed remove ' + msg_string), None)
+                return action_result.set_status(
+                    phantom.APP_ERROR, 'Failed to remove {0}'.format(msg_string))
         return action_result.set_status(
             phantom.APP_ERROR,
-            'Could not find component_list = ' + componentlist_name)
+            'Could not find component_list = {0}'.format(componentlist_name))
 
     def _check_componentlist_entry(self, param):
         self.save_progress(('In action handler for: {0}').format(
             self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
-        componentlist_name = param['componentlist_name']
-        componentlist_entry = param['componentlist_entry']
-        msg_string = componentlist_entry + \
-            ' in componentlist=' + componentlist_name
-        list_id = self.get_list_id(componentlist_name, 'component_list')
+        componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
+        componentlist_entry = self._handle_py_ver_compat_for_input_str(param['componentlist_entry'])
+        msg_string = '{0} in componentlist={1}'.format(componentlist_entry, componentlist_name)
+        ret_val, list_id = self.get_list_id(componentlist_name, 'component_list', action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if list_id:
-            full_url = self._arc_url + 'lists/'
-            r = requests.get(url=full_url + list_id + '/values?limit=100000',
-                             headers=self._client_headers,
-                             verify=False)
-            jsonText = json.loads(r.text)
-            entryExists = False
-            if 200 <= r.status_code <= 299:
-                for jText in jsonText:
-                    entryExists = True
-                    if str(jText['content_value']).lower() == componentlist_entry.lower():
-                        return (action_result.set_status(
-                            phantom.APP_SUCCESS, 'Found ' + msg_string), None)
-            if not entryExists:
-                return (action_result.set_status(
-                    phantom.APP_SUCCESS,
-                    'Failed to find entry ' + msg_string), None)
+            full_url = self._arc_url.strip("/") + '/lists/'
+            try:
+                r = requests.get(url=full_url + list_id + '/values?limit=100000',
+                                headers=self._client_headers,
+                                verify=False)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
+            try:
+                jsonText = json.loads(r.text)
+                entryExists = False
+                if 200 <= r.status_code <= 299:
+                    for jText in jsonText:
+                        entryExists = True
+                        if self._handle_py_ver_compat_for_input_str(jText['content_value']).lower() == componentlist_entry.lower():
+                            return action_result.set_status(
+                                phantom.APP_SUCCESS, 'Successfully found {0}'.format(msg_string))
+                if not entryExists:
+                    return action_result.set_status(
+                        phantom.APP_SUCCESS,
+                        'Failed to find entry {0}'.format(msg_string))
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response from the server. {0}'.format(err))
         else:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                'Could not find component_list = ' + componentlist_name)
+                'Could not find component_list = {0}'.format(componentlist_name))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -744,12 +876,18 @@ class DigitalGuardianArcConnector(BaseConnector):
         self.debug_print(('action=initialize state={}').format(self._state))
 
         config = self.get_config()
-        self._auth_url = config['auth_url']
-        self._arc_url = config['arc_url']
-        self._client_id = config['client_id']
+        self._auth_url = self._handle_py_ver_compat_for_input_str(config['auth_url'])
+        self._arc_url = self._handle_py_ver_compat_for_input_str(config['arc_url'])
+        self._client_id = self._handle_py_ver_compat_for_input_str(config['client_id'])
         self._client_secret = config['client_secret']
-        self._export_profile = config['export_profile']
+        self._export_profile = self._handle_py_ver_compat_for_input_str(config['export_profile'])
         self._client_headers = DG_CLIENT_HEADER
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -771,11 +909,16 @@ class DigitalGuardianArcConnector(BaseConnector):
             'urn:pingidentity.com:oauth2:grant_type:validate_bearer',
             'token': self._api_key,
         }
-        api_key_response = requests.post(url=self._auth_url + '/as/introspect.oauth2',
-                                         headers=DG_HEADER_URL,
-                                         data=payload,
-                                         verify=False)
-        response_json = api_key_response.json()
+        try:
+            api_key_response = requests.post(url='{}/as/introspect.oauth2'.format(self._auth_url.strip("/")),
+                                            headers=DG_HEADER_URL,
+                                            data=payload,
+                                            verify=False)
+            response_json = api_key_response.json()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
+            return False
         if api_key_response.status_code == 200 and response_json['active']:
             return True
         return False
@@ -789,24 +932,31 @@ class DigitalGuardianArcConnector(BaseConnector):
                 'grant_type': 'client_credentials',
                 'scope': 'client',
             }
-            api_key_response = requests.post(url=self._auth_url + '/as/token.oauth2',
-                                             headers=DG_HEADER_URL,
-                                             data=payload,
-                                             verify=False)
-            response_json = api_key_response.json()
+            try:
+                api_key_response = requests.post(url=self._auth_url.strip("/") + '/as/token.oauth2',
+                                                headers=DG_HEADER_URL,
+                                                data=payload,
+                                                verify=False)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return (phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
+            try:
+                response_json = api_key_response.json()
 
-            if api_key_response.status_code == 200:
-                self._api_key = response_json['access_token']
-                self._client_headers.update(
-                    {'Authorization': 'Bearer ' + self._api_key})
-                self._client_headers['Authorization'] = 'Bearer ' \
-                    + self._api_key
-            else:
-                return (phantom.APP_ERROR, api_key_response.text)
-
+                if api_key_response.status_code == 200:
+                    self._api_key = response_json['access_token']
+                    self._client_headers.update(
+                        {'Authorization': 'Bearer {}'.format(self._api_key)})
+                    self._client_headers['Authorization'] = 'Bearer {}'.format(self._api_key)
+                    return (phantom.APP_SUCCESS, None)
+                else:
+                    return (phantom.APP_ERROR, self._handle_py_ver_compat_for_input_str(api_key_response.text))
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return (phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err))
         else:
-            self._client_headers['Authorization'] = 'Bearer ' \
-                + self._api_key
+            self._client_headers['Authorization'] = 'Bearer {}'.format(self._api_key)
+            return (phantom.APP_SUCCESS, None)
 
 
 if __name__ == '__main__':
@@ -837,9 +987,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            login_url = \
-                DigitalGuardianArcConnector._get_phantom_base_url() \
-                + '/login'
+            login_url = DigitalGuardianArcConnector._get_phantom_base_url() + '/login'
 
             print 'Accessing the Login page'
             r = requests.get(login_url, verify=False)
@@ -860,9 +1008,8 @@ if __name__ == '__main__':
                                data=data,
                                headers=headers)
             session_id = r2.cookies['sessionid']
-        except Exception, e:
-            print 'Unable to get session id from the platform. Error: ' \
-                + str(e)
+        except Exception as e:
+            print 'Unable to get session id from the platform. Error: ' + str(e)
             exit(1)
 
     with open(args.input_test_json) as f:
