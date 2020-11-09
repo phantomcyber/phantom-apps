@@ -153,7 +153,7 @@ class ProofpointConnector(BaseConnector):
         except:
             error_text = HTML_RESPONSE_PARSE_ERROR_MSG
 
-        error_text = self._get_error_message_from_exception(error_text)
+        error_text = self._handle_py_ver_compat_for_input_str(error_text)
         message = SERVER_ERROR_MSG.format(status_code, error_text)
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -529,6 +529,8 @@ class ProofpointConnector(BaseConnector):
         # The Decode API allows for multiple values. Split the parameter by ,
         url_list = [x.strip() for x in url.split(',')]
         url_list = list(filter(None, url_list))
+        if not url_list:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'url' action parameter")
 
         # Add the URL(s) to the json
         params['urls'] = url_list
