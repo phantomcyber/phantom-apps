@@ -1408,6 +1408,8 @@ class TaniumThreatResponseConnector(BaseConnector):
             alert['path'] = details['match']['properties']['fullpath']
             alert['event_type'] = details['match']['type']
             alert['md5'] = details['match']['properties']['md5']
+            alert['sha1'] = details['match']['properties']['sha1']
+            alert['sha256'] = details['match']['properties']['sha256']
             action_result.add_data(alert)
 
         action_result.update_summary({'total_alerts': len(response)})

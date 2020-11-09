@@ -3416,6 +3416,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "contains": [
+                      "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                      "sha256"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.alertedAt",
                     "data_type": "string"
                 },
