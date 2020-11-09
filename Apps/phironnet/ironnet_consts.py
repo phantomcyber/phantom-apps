@@ -1,4 +1,3 @@
-# File: ironnet_consts.py
 
 MIN_SEVERITY_KEY = "'min_severity' action parameter"
 MAX_SEVERITY_KEY = "'max_severity' action parameter"

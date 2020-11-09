@@ -11,10 +11,12 @@
     "publisher": "IronNet",
     "license": "Copyright (c) IronNet, 2020",
     "pip_dependencies": {
-        "wheel": [{
+        "wheel": [
+            {
             "module": "swagger_client",
             "input_file": "wheels/swagger_client-1.0.0-py2-none-any.whl"
-        }]
+            }
+        ]
     },
     "app_version": "1.0.1",
     "utctime_updated": "2020-02-19T19:55:57.000000Z",
@@ -152,7 +154,8 @@
             "order": 21
         }
     },
-    "actions": [{
+    "actions": [
+        {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
@@ -217,7 +220,8 @@
                     "order": 4
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "column_name": "Alert ID",
@@ -343,7 +347,8 @@
                     "order": 3
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "column_name": "Alert ID",
@@ -443,7 +448,8 @@
                     "order": 2
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "column_name": "Alert ID",
@@ -557,7 +563,8 @@
                     "order": 5
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.activity_end_time",
                     "data_type": "string",
                     "example_values": [
@@ -653,7 +660,8 @@
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "column_name": "Alert ID",
@@ -1055,7 +1063,8 @@
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "contains": [
@@ -1452,7 +1461,8 @@
                     "order": 5
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string"
                 },

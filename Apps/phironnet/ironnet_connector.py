@@ -1,5 +1,4 @@
 # -----------------------------------------
-# File: ironnet_connector.py
 # IronNet Phantom Connector
 # -----------------------------------------
 
@@ -178,11 +177,11 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
         if phantom.is_success(call_status):
             return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity to IronAPI Passed")
         else:
-            self.save_progress("Error occurred in Test Connectivity: {}".format(action_result.get_message()))
+            self.save_progress("Error occurred in Test Connectivity. {}".format(action_result.get_message()))
             return action_result.set_status(phantom.APP_ERROR, "Test Connectivity to IronAPI Failed")
 
     def _handle_irondefense_rate_alert(self, param):
@@ -229,7 +228,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Alert rating was successful")
@@ -237,8 +236,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Alert rating was successful")
         else:
-            self.debug_print("Alert rating failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Alert rating failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Alert rating failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Alert rating failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_set_alert_status(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -277,16 +276,16 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
         if phantom.is_success(call_status):
             self.debug_print("Setting alert status was successful")
             # Add the response into the data section
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Setting alert status was successful")
         else:
-            self.debug_print("Setting alert status failed. Error: {}".format(
+            self.debug_print("Setting alert status failed. {}".format(
                 action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Setting alert status failed. Error: {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Setting alert status failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_comment_on_alert(self, param):
         self.save_progress("In action handler for: {0}".format(
@@ -322,7 +321,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Adding comment to alert was successful")
@@ -330,8 +329,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Adding comment to alert was successful")
         else:
-            self.debug_print("Adding comment to alert failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Adding comment failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Adding comment to alert failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Adding comment failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_report_observed_bad_activity(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -372,7 +371,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Reporting bad activity to IronDefense was successful")
@@ -380,8 +379,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Reporting bad activity to IronDefense was successful")
         else:
-            self.debug_print("Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Reporting bad activity to IronDefense failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Reporting bad activity to IronDefense failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Reporting bad activity to IronDefense failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_get_alert_irondome_info(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -414,7 +413,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving IronDome alert info was successful")
@@ -422,8 +421,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Retrieving IronDome alert info was successful")
         else:
-            self.debug_print("Retrieving IronDome alert info failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Retrieving IronDome alert info failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Retrieving IronDome alert info failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving IronDome alert info failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_get_alert_notifications(self):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -449,7 +448,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.save_progress("Fetching alert notifications was successful")
@@ -524,7 +523,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.save_progress("Fetching dome notifications was successful")
@@ -593,7 +592,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if response.status != 200:
             call_status = phantom.APP_ERROR
@@ -728,7 +727,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving alerts was successful")
@@ -736,8 +735,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Retrieving alerts was successful")
         else:
-            self.debug_print("Retrieving alerts failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Retrieving alerts failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Retrieving alerts failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving alerts failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_get_events(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -768,7 +767,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving events was successful")
@@ -776,8 +775,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Retrieving events was successful")
         else:
-            self.debug_print("Retrieving events failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Retrieving events failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Retrieving events failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving events failed. {}".format(action_result.get_message()))
 
     def _handle_irondefense_get_event(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -808,7 +807,7 @@ class IronnetConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             call_status = phantom.APP_ERROR
-            action_result.set_status(call_status, 'A server error has occurred: {}'.format(err))
+            action_result.set_status(call_status, err)
 
         if phantom.is_success(call_status):
             self.debug_print("Retrieving event was successful")
@@ -816,8 +815,8 @@ class IronnetConnector(BaseConnector):
             action_result.add_data(response_data)
             return action_result.set_status(phantom.APP_SUCCESS, "Retrieving event was successful")
         else:
-            self.debug_print("Retrieving event failed. Error: {}".format(action_result.get_message()))
-            return action_result.set_status(phantom.APP_ERROR, "Retrieving event failed. Error: {}".format(action_result.get_message()))
+            self.debug_print("Retrieving event failed. {}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, "Retrieving event failed. {}".format(action_result.get_message()))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
