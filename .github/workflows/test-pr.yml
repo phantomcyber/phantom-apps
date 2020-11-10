@@ -33,4 +33,5 @@ jobs:
           curl -k -X POST 'https://${{ secrets.APPS_TEST_SERVER_URI }}/pull_request/' \
                -H 'Authorization: Bearer ${{ secrets.APPS_TEST_SERVER_API_KEY }}' \
                -d 'id=${{ github.event.issue.number }}' \
+               -d 'requester=${{ github.event.comment.user.login }}' \
                --max-time 60
