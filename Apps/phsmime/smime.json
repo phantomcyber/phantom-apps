@@ -30,8 +30,8 @@
     },
     "configuration": {
         "private_key": {
-            "data_type": "file",
             "description": "Private Key .pem file",
+            "data_type": "file",
             "required": true,
             "order": 0
         },
