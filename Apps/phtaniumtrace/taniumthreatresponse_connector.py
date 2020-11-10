@@ -1407,9 +1407,15 @@ class TaniumThreatResponseConnector(BaseConnector):
             details = json.loads(alert['details'])
             alert['path'] = details['match']['properties']['fullpath']
             alert['event_type'] = details['match']['type']
-            alert['md5'] = details['match']['properties']['md5']
-            alert['sha1'] = details['match']['properties']['sha1']
-            alert['sha256'] = details['match']['properties']['sha256']
+            md5 = details['match']['properties']['md5']
+            if md5:
+                alert['md5'] = md5
+            sha1 = details['match']['properties'].get('sha1')
+            if sha1:
+                alert['sha1'] = sha1
+            sha256 = details['match']['properties'].get('sha256')
+            if sha256:
+                alert['sha256'] = sha256
             action_result.add_data(alert)
 
         action_result.update_summary({'total_alerts': len(response)})
