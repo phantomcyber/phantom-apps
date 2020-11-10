@@ -1,34 +1,32 @@
 {
     "appid": "611b0c66-9ef7-4295-a6cd-a466cf0618c7",
     "name": "Terraform Cloud",
-    "description": "perform generic actions to manage runs, plans, and applies on Terraform Cloud",
+    "description": "Perform generic and investigative actions to manage runs, plans, and applies on Terraform Cloud",
     "type": "devops",
     "product_vendor": "HashiCorp",
     "logo": "logo_terraform.svg",
     "logo_dark": "logo_terraform_dark.svg",
     "product_name": "Terraform Cloud",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
-    "license": "Copyright (c) Splunk, 2020",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.10",
     "utctime_updated": "2019-12-12T17:12:59.854486Z",
     "package_name": "phantom_terraformcloud",
     "main_module": "terraformcloud_connector.py",
-    "min_phantom_version": "4.8.23319",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "python_version": "3",
     "configuration": {
         "base_url": {
             "description": "Terraform URL (e.g. https://app.terraform.io)",
             "data_type": "string",
-            "required": false,
             "default": "https://app.terraform.io",
             "order": 0
         },
         "ph1": {
             "description": "Placeholder",
             "data_type": "ph",
-            "required": false,
             "order": 1
         },
         "token": {
@@ -41,10 +39,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -52,9 +49,9 @@
         },
         {
             "action": "list workspaces",
-            "identifier": "list_workspaces",
             "description": "Lists workspaces in the organization",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "list_workspaces",
             "read_only": true,
             "parameters": {
                 "organization_name": {
@@ -70,24 +67,15 @@
                 "page_num": {
                     "description": "Page number of workspace list",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 1
                 },
                 "page_size": {
                     "description": "Number of workspaces to return per page (100 is default)",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.organization_name",
                     "data_type": "string",
@@ -105,27 +93,6 @@
                 {
                     "data_path": "action_result.parameter.page_size",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.pagination.prev-page",
@@ -597,6 +564,36 @@
                     "contains": [
                         "url"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -606,9 +603,9 @@
         },
         {
             "action": "list runs",
-            "identifier": "list_runs",
             "description": "Lists runs for a workspace",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "list_runs",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -624,24 +621,15 @@
                 "page_num": {
                     "description": "Page number of runs returned",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 1
                 },
                 "page_size": {
                     "description": "Number of runs to return per page (20 is default)",
                     "data_type": "numeric",
-                    "required": false,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -659,27 +647,6 @@
                 {
                     "data_path": "action_result.parameter.page_size",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.pagination.prev-page",
@@ -1084,6 +1051,36 @@
                     "contains": [
                         "url"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1093,10 +1090,10 @@
         },
         {
             "action": "create run",
-            "identifier": "create_run",
             "description": "Create a run which will perform a plan and apply",
-            "verbose": "NOTE: this endpoint must be accessed using either a <b>user token</b> or <b>team token</b>. A run performs a plan and apply, using a configuration version and the workspace\u2019s current variables. You can specify a configuration version when creating a run; if you don\u2019t provide one, the run defaults to the workspace\u2019s most recently used version. (A configuration version is \u201cused\u201d when it is created or used for a run in this workspace.)",
+            "verbose": "NOTE: this endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace\u2019s current variables. You can specify a configuration version when creating a run; if you don\u2019t provide one, the run defaults to the workspace\u2019s most recently used version. (A configuration version is \u201cused\u201d when it is created or used for a run in this workspace.).",
             "type": "generic",
+            "identifier": "create_run",
             "read_only": false,
             "parameters": {
                 "workspace_id": {
@@ -1112,30 +1109,21 @@
                 "configuration_version": {
                     "description": "Configuration version to use for this run. If blank, latest config is used",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "message": {
                     "description": "Message to be associated with this run",
                     "data_type": "string",
-                    "required": false,
                     "default": "Queued manually via the Terraform Enterprise API",
                     "order": 2
                 },
                 "is_destroy": {
                     "description": "Specify if this plan is a destroy plan, which will destroy all provisioned resources",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 3
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
                 {
                     "data_path": "action_result.parameter.configuration_version",
                     "data_type": "string"
@@ -1156,7 +1144,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -1175,14 +1181,14 @@
         },
         {
             "action": "create workspace",
-            "identifier": "create_workspace",
             "description": "Create a workspace within Terraform",
-            "verbose": "Workspace creation is restricted to members of the owners team, the owners team API token, and the organization API token. The organization must already exist in the system, and the user must have permissions to create new workspaces.",
+            "verbose": "Workspace creation is restricted to members of the owner's team, the owner's team API token, and the organization API token. The organization must already exist in the system, and the user must have permission to create new workspaces.",
             "type": "generic",
+            "identifier": "create_workspace",
             "read_only": false,
             "parameters": {
                 "organization_name": {
-                    "description": "Name of the organization to create the workspace in",
+                    "description": "Name of the organization to create the workspace within Terraform",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1213,7 +1219,6 @@
                 "vcs_repo_id": {
                     "description": "Reference to your VSC repo in the format :org/:repo",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "terraform vcs repo id"
@@ -1223,7 +1228,6 @@
                 "vcs_token_id": {
                     "description": "",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "terraform vcs token id"
@@ -1251,13 +1255,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.organization_name",
                     "data_type": "string",
                     "column_name": "Organization Name",
@@ -1274,6 +1271,9 @@
                     "data_type": "string",
                     "column_name": "Workspace Name",
                     "column_order": 1,
+                    "contains": [
+                        "terraform workspace name"
+                    ],
                     "example_values": [
                         "test_workspace"
                     ]
@@ -1583,10 +1583,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.workspace_id",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "ws-1jIskLtjsp"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1594,6 +1595,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Workspace id: ws-1jIskLtjsp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.workspace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-1jIskLtjsp"
                     ]
                 },
                 {
@@ -1618,10 +1626,10 @@
         },
         {
             "action": "apply run",
-            "identifier": "apply_run",
             "description": "Applies a run that is paused waiting for confirmation after a plan",
             "verbose": "This includes runs in the 'needs confirmation' and 'policy checked' states. This action is only required for runs that can't be auto-applied. (Plans can be auto-applied if the auto-apply setting is enabled on the workspace, the plan is not a destroy plan, and the plan was not queued by a user without write permissions.)<br>This endpoint queues the request to perform an apply; the apply might not happen immediately.<br>This endpoint represents an action as opposed to a resource. As such, the endpoint does not return any object in the response body.",
             "type": "generic",
+            "identifier": "apply_run",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -1637,25 +1645,43 @@
                 "comment": {
                     "description": "An optional comment about the run",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "column_name": "Run ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "terraform run id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -1674,10 +1700,10 @@
         },
         {
             "action": "get apply",
-            "identifier": "get_apply",
             "description": "Get details of an apply",
             "verbose": "There is no endpoint to list applies. You can find the ID for an apply in the relationships.apply property of a run object.",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "get_apply",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -1685,43 +1711,21 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
+                    "contains": [
+                        "terraform apply id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
                     "example_values": [
                         "apply-Kasd12SWa9AhS6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -1825,52 +1829,22 @@
                     "example_values": [
                         "/api/v2/applies/apply-Kasd12SWa9AhS6"
                     ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get plan",
-            "identifier": "get_plan",
-            "description": "Get details and status of plan of a run in Terraform",
-            "verbose": "There is no endpoint to list plans. You can find the ID for a plan in the relationships.plan property of a run object.",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {
-                "id": {
-                    "description": "The ID of the plan to show",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "order": 0
-                }
-            },
-            "output": [
+                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "column_name": "Plan ID",
-                    "column_order": 0,
-                    "example_values": [
-                        "plan-iB6dV91zqE5pNCey"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1884,6 +1858,44 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get plan",
+            "description": "Get details and status of plan of a run in Terraform",
+            "verbose": "There is no endpoint to list plans. You can find the ID for a plan in the relationships.plan property of a run object.",
+            "type": "investigate",
+            "identifier": "get_plan",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the plan to show",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Plan ID",
+                    "column_order": 0,
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "example_values": [
+                        "plan-iB6dV91zqE5pNCey"
                     ]
                 },
                 {
@@ -1986,6 +1998,36 @@
                     "example_values": [
                         "/api/v2/plans/plan-iB6dV91zqE5pNCey"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1995,9 +2037,9 @@
         },
         {
             "action": "get run",
-            "identifier": "get_run",
             "description": "This endpoint is used for showing details of a specific run",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "get_run",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -2013,38 +2055,13 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
                     "example_values": [
                         "run-B45D8uRipKCtvpYd"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -2383,84 +2400,22 @@
                     "example_values": [
                         "/api/v2/runs/run-B45D8uRipKCtvpYd"
                     ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get workspace",
-            "identifier": "get_workspace",
-            "description": "Get details of a workspace",
-            "verbose": "Details on a workspace can be retrieved from two endpoints, which behave identically. One refers to a workspace by its ID, and the other by its name and organization.",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {
-                "id": {
-                    "description": "The ID of the workspace to show",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": true,
-                    "contains": [
-                        "terraform workspace id"
-                    ],
-                    "order": 0
                 },
-                "organization_name": {
-                    "description": "The name of the organization to retrieve workspace details",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": true,
-                    "contains": [
-                        "terraform organization name"
-                    ],
-                    "order": 1
-                },
-                "workspace_name": {
-                    "description": "The name of the workspace to retrieve details",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": true,
-                    "contains": [
-                        "terraform workspace name"
-                    ],
-                    "order": 2
-                }
-            },
-            "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.organization_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Phantom"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.workspace_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "test_workspace"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2474,6 +2429,76 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get workspace",
+            "description": "Get details of a workspace",
+            "verbose": "Details on a workspace can be retrieved from two endpoints, which behave identically. One refers to a workspace by its ID, and the other by its name and organization.",
+            "type": "investigate",
+            "identifier": "get_workspace",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the workspace to show",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "order": 0
+                },
+                "organization_name": {
+                    "description": "The name of the organization to retrieve workspace details",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "order": 1
+                },
+                "workspace_name": {
+                    "description": "The name of the workspace to retrieve details",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.organization_name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "example_values": [
+                        "Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.workspace_name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
                     ]
                 },
                 {
@@ -2641,10 +2666,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.attributes.vcs-repo.branch",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.attributes.actions.is-destroyable",
@@ -2811,6 +2833,36 @@
                     "data_type": "string",
                     "example_values": [
                         "/api/v2/organizations/Phantom/workspaces/test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],

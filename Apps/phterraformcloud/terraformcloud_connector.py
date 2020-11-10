@@ -1,8 +1,7 @@
 # File: terraformcloud_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2020 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
@@ -12,7 +11,8 @@ from phantom.action_result import ActionResult
 from terraformcloud_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -39,7 +39,7 @@ class TerraformCloudConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -48,6 +48,9 @@ class TerraformCloudConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -68,7 +71,7 @@ class TerraformCloudConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -111,6 +114,75 @@ class TerraformCloudConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except Exception:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+        if parameter < 0:
+            return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _make_rest_call(self, endpoint, action_result, method="get", headers=None, **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
@@ -121,7 +193,7 @@ class TerraformCloudConnector(BaseConnector):
         _headers = {
             "authorization": "Bearer {}".format(self._auth_token)
         }
-        
+
         if headers:
             _headers.update(headers)
 
@@ -131,7 +203,7 @@ class TerraformCloudConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -140,7 +212,7 @@ class TerraformCloudConnector(BaseConnector):
                             headers=_headers,
                             **kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -148,13 +220,13 @@ class TerraformCloudConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("Connecting to acount details endpoint...")
-        
+        self.save_progress("Connecting to account details endpoint...")
+
         # make rest call
         ret_val, response = self._make_rest_call(TERRAFORM_ENDPOINT_ACCOUNT_DETAILS, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
@@ -169,8 +241,15 @@ class TerraformCloudConnector(BaseConnector):
 
         organization_name = param['organization_name']
         page_num = param.get('page_num', 1)
+        ret_val, page_num = self._validate_integer(action_result, page_num, PAGE_NUM_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         page_size = param.get('page_size', 100)
-        
+        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         params = {
             'page[num]': page_num,
             'page[size]': page_size
@@ -185,11 +264,8 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
-        action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -201,8 +277,15 @@ class TerraformCloudConnector(BaseConnector):
 
         workspace_id = param['id']
         page_num = param.get('page_num', 1)
+        ret_val, page_num = self._validate_integer(action_result, page_num, PAGE_NUM_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         page_size = param.get('page_size', 20)
-        
+        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         params = {
             'page[num]': page_num,
             'page[size]': page_size
@@ -215,11 +298,8 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
-        action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -255,7 +335,7 @@ class TerraformCloudConnector(BaseConnector):
                 }
             }
         }
-        
+
         headers = {
             'Content-Type': 'application/vnd.api+json'
         }
@@ -265,11 +345,8 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
-        action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -294,7 +371,7 @@ class TerraformCloudConnector(BaseConnector):
         if param.get('vcs_repo_id'):
             # both repo id and token id are required
             if not param.get('vcs_token_id'):
-                return action_result.set_status(phantom.APP_ERROR, "IF a VCS repo is to be linked to this workspace, both the repository ID and the token ID are required.")
+                return action_result.set_status(phantom.APP_ERROR, "If a VCS repo is to be linked to this workspace, both the repository ID and the token ID are required")
 
             post_data['attributes']['vcs-repo'] = {
                 'identifier': param.get('vcs_repo_id'),
@@ -318,7 +395,7 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
+
         resp_data = response.get('data', {})
 
         action_result.add_data(resp_data)
@@ -340,7 +417,7 @@ class TerraformCloudConnector(BaseConnector):
 
         if comment:
             params['comment'] = comment
-        
+
         headers = {
             'Content-Type': 'application/vnd.api+json'
         }
@@ -352,11 +429,8 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
-        action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -375,11 +449,8 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
-        action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -398,7 +469,7 @@ class TerraformCloudConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
+
         action_result.add_data(response.get('data', {}))
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -411,14 +482,14 @@ class TerraformCloudConnector(BaseConnector):
 
         id = param['id']
 
-        endpoint = TERRAFORM_ENDPOINT_RUNS + "/" + id
+        endpoint = "{}/{}".format(TERRAFORM_ENDPOINT_RUNS, id)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
+
         action_result.add_data(response.get('data', {}))
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -429,19 +500,23 @@ class TerraformCloudConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if param.get('id'):
-            endpoint = TERRAFORM_ENDPOINT_GET_WORKSPACE_BY_ID.format(id=param.get('id'))
-        elif param.get('organization_name') and param.get('workspace_name'):
-            endpoint = TERRAFORM_ENDPOINT_WORKSPACES.format(organization_name=param.get('organization_name')) + "/" + param.get('workspace_name')
+        id = param.get('id')
+        organization_name = param.get('organization_name')
+        workspace_name = param.get('workspace_name')
+
+        if id:
+            endpoint = TERRAFORM_ENDPOINT_GET_WORKSPACE_BY_ID.format(id=id)
+        elif organization_name and workspace_name:
+            endpoint = TERRAFORM_ENDPOINT_WORKSPACES.format(organization_name=organization_name) + "/" + workspace_name
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Both the organization name and workspace name must be provided.")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide both the organization name and workspace name")
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-            
+
         action_result.add_data(response.get('data', {}))
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -462,7 +537,7 @@ class TerraformCloudConnector(BaseConnector):
             ret_val = self._handle_list_workspaces(param)
 
         elif action_id == 'list_runs':
-            ret_val = self._handle_list_runs(param)        
+            ret_val = self._handle_list_runs(param)
 
         elif action_id == 'create_run':
             ret_val = self._handle_create_run(param)
@@ -481,7 +556,7 @@ class TerraformCloudConnector(BaseConnector):
 
         elif action_id == 'get_run':
             ret_val = self._handle_get_run(param)
-        
+
         elif action_id == 'get_workspace':
             ret_val = self._handle_get_workspace(param)
 
@@ -495,6 +570,12 @@ class TerraformCloudConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         # base URL
         self._base_url = config.get('base_url', TERRAFORM_DEFAULT_URL).strip('/')
@@ -541,7 +622,7 @@ if __name__ == '__main__':
         try:
             login_url = TerraformCloudConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -554,7 +635,7 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
