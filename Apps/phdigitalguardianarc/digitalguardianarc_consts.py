@@ -29,6 +29,8 @@ DG_INITIAL_SKIP_VALUE = 0
 DG_UPDATE_SKIP_VALUE = 5000
 DG_DEFAULT_LIMIT = 50
 DG_LIST_NAME = 'list_name'
+
+# Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"

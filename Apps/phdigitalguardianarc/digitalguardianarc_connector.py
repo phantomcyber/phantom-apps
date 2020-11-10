@@ -30,10 +30,6 @@ class DigitalGuardianArcConnector(BaseConnector):
         self._api_key = None
         self._client_headers = {}
 
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
-
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
@@ -61,7 +57,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             error_text = 'Cannot parse error details {}'.format(err)
 
-        message = '''Status Code: {0}. Data from server:{1}'''.format(
+        message = "Status Code: {0}. Data from server:{1}".format(
             status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
@@ -107,19 +103,18 @@ class DigitalGuardianArcConnector(BaseConnector):
                 action_result.add_debug_data({'r_text': response.text})
                 action_result.add_debug_data({'r_headers': response.headers})
             if 'json' in response.headers.get('Content-Type', ''):
-                self.save_progress('action=process_json_response')
+                self.save_progress("Action: 'process_json_response'")
                 return self._process_json_response(response, action_result)
             if 'html' in response.headers.get('Content-Type', ''):
-                self.save_progress('action=process_html_response')
+                self.save_progress("Action: 'process_html_response'")
                 return self._process_html_response(response, action_result)
             if not response.text:
-                self.save_progress('action=process_empty_response')
+                self.save_progress("Action: 'process_empty_response'")
                 return self._process_empty_response(response, action_result)
             message = (
                 "Can't process response from server. Status Code: {0} Data from server: {1}"
             ).format(response.status_code,
                      self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
-            self.save_progress(('{}').format(message))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message),
                           None)
         except Exception as e:
@@ -149,10 +144,8 @@ class DigitalGuardianArcConnector(BaseConnector):
 
         # Create a URL to connect to
 
-        # url = self._arc_url + endpoint
         url = "%s/rest/1.0/%s" % (self._arc_url.strip("/"), endpoint)
         try:
-            # auth=(username, password)  # basic authentication
             self.save_progress("Connecting to URL: {0}".format(url))
             r = request_func(url,
                              verify=config.get('verify_server_cert', False),
@@ -216,7 +209,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -240,15 +233,12 @@ class DigitalGuardianArcConnector(BaseConnector):
         self.save_progress('Got API Token')
 
         # make rest call
+        self.save_progress("Client Headers: {0}".format(self._client_headers))
         ret_val, _ = self._make_rest_call('watchlists', action_result,
                                  params=None,
                                  headers=self._client_headers)
 
         if phantom.is_fail(ret_val):
-
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-
             self.save_progress('Test Connectivity Failed')
             return action_result.get_status()
 
@@ -257,14 +247,10 @@ class DigitalGuardianArcConnector(BaseConnector):
         self.save_progress('Test Connectivity Passed')
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR,'Action not yet implemented')
-
     def _handle_on_poll(self, param):
         oldname = ''
         action_result = self.add_action_result(ActionResult(dict(param)))
-        response_status, export_list = self.get_export(
-            action_result=action_result)
+        response_status, export_list = self.get_export(action_result)
         if phantom.is_fail(response_status):
             self.debug_print('On Poll Failed')
             return action_result.get_status()
@@ -316,12 +302,12 @@ class DigitalGuardianArcConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), None)
         request_status = request_response.status_code
-        if 200 <= request_status <= 399:
+        if 200 <= request_status <= 299:
             headerField = []
             try:
                 jsonText = json.loads(request_response.text)
                 if jsonText['total_hits'] == 0:
-                    return (phantom.APP_SUCCESS, None)
+                    return RetVal(action_result.set_status(phantom.APP_SUCCESS), None)
                 for field in jsonText['fields']:
                     headerField.append(field['name'])
                 exportdata = []
@@ -684,7 +670,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             ret_val, watch_list_value_id = self._check_watchlist_id(watch_list_id, watchlist_entry, action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
-            if watch_list_value_id != '':
+            if watch_list_value_id:
                 full_url = self._arc_url.strip("/") + '/watchlists/'
                 try:
                     r = requests.delete(url=full_url + watch_list_id + '/values/' + watch_list_value_id,
@@ -724,7 +710,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             ret_val, watch_list_value_id = self._check_watchlist_id(watch_list_id, watchlist_entry, action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
-            if watch_list_value_id != '':
+            if watch_list_value_id:
                 return action_result.set_status(phantom.APP_SUCCESS,
                                                  'Successfully found {0}'.format(msg_string))
             else:
@@ -871,9 +857,9 @@ class DigitalGuardianArcConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
 
-        self.debug_print('action=initialize status=start')
+        self.debug_print("Action: 'initialize' Status: start")
         self._state = self.load_state()
-        self.debug_print(('action=initialize state={}').format(self._state))
+        self.debug_print(("Action: 'initialize' State: {}").format(self._state))
 
         config = self.get_config()
         self._auth_url = self._handle_py_ver_compat_for_input_str(config['auth_url'])

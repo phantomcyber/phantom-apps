@@ -1,7 +1,7 @@
 {
     "appid": "e928b888-0e37-4b53-8de2-c0531fb0eb59",
     "name": "Digital Guardian ARC",
-    "description": "This app allows for ingestion and investigation using Digital Guardian ARC",
+    "description": "This App integrates with Digital Guardian ARC to provide various ingestion and investigative actions",
     "type": "siem",
     "product_vendor": "Digital Guardian",
     "logo": "logo_digitalguardianarc.svg",
@@ -13,7 +13,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2019-10-13T13:03:29.499585Z",
     "package_name": "phantom_digitalguardianarc",
-    "main_module": "digitalguardianarc_connector.py",
+    "main_module": "digitalguardianarc_connector.pyc",
     "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -61,7 +61,7 @@
         },
         {
             "action": "add watchlist entry",
-            "description": "Add an entry to an ARC Watchlist",
+            "description": "Add entry to ARC Watchlist",
             "type": "correct",
             "identifier": "add_watchlist_entry",
             "undo": "remove watchlist entry",
@@ -75,7 +75,7 @@
                     "required": true
                 },
                 "watchlist_entry": {
-                    "description": "Entry value to be added to ARC watchlist",
+                    "description": "Entry value to be added to ARC Watchlist",
                     "data_type": "string",
                     "required": true,
                     "default": "abc.exe",
@@ -83,14 +83,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.watchlist_name",
                     "data_type": "string",
@@ -103,7 +95,7 @@
                 {
                     "data_path": "action_result.parameter.watchlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Watchlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
@@ -114,8 +106,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -123,8 +119,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Add Entry to Watchlist action succeeded."
+                        "Add Entry to Watchlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -143,7 +143,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Add Entry to Watchlist",
+                "title": "Add Entry to ARC Watchlist",
                 "type": "table",
                 "height": 5
             },
@@ -151,7 +151,7 @@
         },
         {
             "action": "remove watchlist entry",
-            "description": "Remove entry to an ARC Watchlist",
+            "description": "Remove entry from ARC Watchlist",
             "type": "contain",
             "identifier": "remove_watchlist_entry",
             "undo": "add watchlist entry",
@@ -165,7 +165,7 @@
                     "required": true
                 },
                 "watchlist_entry": {
-                    "description": "Entry value to be removed from ARC watchlist",
+                    "description": "Entry value to be removed from ARC Watchlist",
                     "data_type": "string",
                     "required": true,
                     "default": "abc.exe",
@@ -173,14 +173,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.watchlist_name",
                     "data_type": "string",
@@ -193,7 +185,7 @@
                 {
                     "data_path": "action_result.parameter.watchlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Watchlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
@@ -204,8 +196,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -213,8 +209,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from Watchlist action succeeded."
+                        "Remove Entry from Watchlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -233,7 +233,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Remove Entry to Watchlist",
+                "title": "Remove Entry from ARC Watchlist",
                 "type": "table",
                 "height": 5
             },
@@ -241,7 +241,7 @@
         },
         {
             "action": "check watchlist entry",
-            "description": "Check entry to an ARC Watchlist",
+            "description": "Check for the entry in ARC Watchlist",
             "type": "investigate",
             "identifier": "check_watchlist_entry",
             "read_only": true,
@@ -254,7 +254,7 @@
                     "required": true
                 },
                 "watchlist_entry": {
-                    "description": "Entry value to be checked in a ARC watchlist",
+                    "description": "Entry value to be checked in ARC Watchlist",
                     "data_type": "string",
                     "required": true,
                     "default": "abc.exe",
@@ -262,14 +262,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.watchlist_name",
                     "data_type": "string",
@@ -282,7 +274,7 @@
                 {
                     "data_path": "action_result.parameter.watchlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Watchlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
@@ -293,8 +285,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -302,8 +298,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Entry in ARC Watchlist action succeeded."
+                        "Entry in ARC Watchlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -322,7 +322,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Entry in Watchlist",
+                "title": "Check Entry in ARC Watchlist",
                 "type": "table",
                 "height": 5
             },
@@ -330,7 +330,7 @@
         },
         {
             "action": "add componentlist entry",
-            "description": "Add an entry to componentlist",
+            "description": "Add entry to Componentlist",
             "type": "correct",
             "identifier": "add_componentlist_entry",
             "undo": "remove componentlist entry",
@@ -353,14 +353,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.componentlist_name",
                     "data_type": "string",
                     "column_name": "Componentlist Name",
@@ -372,7 +364,7 @@
                 {
                     "data_path": "action_result.parameter.componentlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Componentlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
@@ -383,8 +375,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -392,8 +388,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Add Entry to componentlist action succeeded."
+                        "Add Entry to Componentlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -420,7 +420,7 @@
         },
         {
             "action": "remove componentlist entry",
-            "description": "Remove entry to componentlist",
+            "description": "Remove entry from Componentlist",
             "type": "contain",
             "identifier": "remove_componentlist_entry",
             "undo": "add componentlist entry",
@@ -443,17 +443,9 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.componentlist_name",
                     "data_type": "string",
-                    "column_name": "Component List Name",
+                    "column_name": "Componentlist Name",
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
@@ -462,7 +454,7 @@
                 {
                     "data_path": "action_result.parameter.componentlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Componentlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
@@ -473,8 +465,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -482,8 +478,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from componentlist action succeeded."
+                        "Remove Entry from Componentlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -502,7 +502,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Remove Entry to Componentlist",
+                "title": "Remove Entry from Componentlist",
                 "type": "table",
                 "height": 5
             },
@@ -510,7 +510,7 @@
         },
         {
             "action": "check componentlist entry",
-            "description": "Check entry to componentlist",
+            "description": "Check entry in Componentlist",
             "type": "investigate",
             "identifier": "check_componentlist_entry",
             "read_only": true,
@@ -532,17 +532,9 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.componentlist_name",
                     "data_type": "string",
-                    "column_name": "Component List Name",
+                    "column_name": "Componentlist Name",
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
@@ -551,7 +543,7 @@
                 {
                     "data_path": "action_result.parameter.componentlist_entry",
                     "data_type": "string",
-                    "column_name": "Entry",
+                    "column_name": "Componentlist Entry",
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
@@ -562,8 +554,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -571,8 +567,12 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from componentlist action succeeded."
+                        "Remove Entry from Componentlist action succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -591,7 +591,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Entry to be check in a Componentlist",
+                "title": "Check Entry in Componentlist",
                 "type": "table",
                 "height": 5
             },
@@ -600,7 +600,7 @@
         {
             "action": "on poll",
             "description": "Ingest alerts from ARC into Phantom as events",
-            "verbose": "The default start_time is past 5 days. The default end_time is now.",
+            "verbose": "The default start_time is past 5 days and default end_time is now.",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
