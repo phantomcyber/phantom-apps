@@ -69,13 +69,13 @@
         },
         {
             "action": "get report",
-            "description": "ID of report to get the report",
+            "description": "Get a report by ID",
             "type": "investigate",
             "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "report_id": {
-                    "description": "ID of report to update",
+                    "description": "ID of report to get",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
@@ -298,6 +298,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -381,6 +385,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -478,6 +486,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -554,6 +566,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -617,6 +633,10 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {

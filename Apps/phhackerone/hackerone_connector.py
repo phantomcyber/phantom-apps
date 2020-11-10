@@ -309,7 +309,7 @@ class HackerOneConnector(BaseConnector):
                     "type": "nobody"
                 }
             }
-            url = "https://api.hackerone.com/v1/reports/" + report_id + "/assignee"
+            url = "https://api.hackerone.com/v1/reports/{0}/assignee".format(report_id)
             if self._put_rest_data(url, data):
                 self.__print('Successfully removed report assignment')
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully removed report assignment')
