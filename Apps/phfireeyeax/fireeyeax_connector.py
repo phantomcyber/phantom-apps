@@ -237,21 +237,7 @@ class FireeyeAxConnector(BaseConnector):
                     headers=self._header,
                     **kwargs
                 )
-                """
-                # Debug data. Keep in here for now
-                for key, value in kwargs.items():
-                    print("%s == %s" % (key, value))
 
-                print("\n\n")
-                print(r.text)
-                print("\n\n")
-                print(r.headers)
-                print("\n\n")
-                print(r.json())
-                print("\n\n")
-                print(r.content)
-                print("\n\n")
-                """
             except Exception as e:
                 return RetVal(
                     action_result.set_status(
