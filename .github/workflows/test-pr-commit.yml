@@ -1,6 +1,9 @@
 name: Test Pull Request Commit
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - 'Apps/**'
 
 jobs:
   test-pull-request-commit:
