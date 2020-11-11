@@ -1527,8 +1527,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "otp revoke",
-            "description": "One Time Password Revoke",
+            "action": "revoke otp",
+            "description": "Revoke the One Time Password",
             "verbose": "Revoke an active OTP code by specifying the 'otpid' you want to revoke.",
             "type": "generic",
             "identifier": "otp_revoke",
@@ -1614,8 +1614,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "otp retrieve",
-            "description": "One Time Password Retrieve",
+            "action": "retrieve otp",
+            "description": "Retrieve the One Time Password",
             "verbose": "Retrieve an OTP code for a particular computer (agent) within Airlock. You must specify the OTP 'duration' and unique 'agentid' to retrieve the code. Unique 'agentid' parameters can be obtained from the /agent/find endpoint.",
             "type": "generic",
             "identifier": "otp_retrieve",
