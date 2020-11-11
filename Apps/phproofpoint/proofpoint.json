@@ -78,7 +78,7 @@
         {
             "action": "on poll",
             "description": "Callback action for the On Poll ingest functionality",
-            "verbose": "For 'start_time' parameter default is past 10 days and for 'end_time' parameter default is now.",
+            "verbose": "For the 'start_time' parameter, the default is the past 10 days and for the 'end_time' parameter, the default is now.",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
