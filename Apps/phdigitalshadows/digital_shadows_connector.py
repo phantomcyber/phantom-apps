@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Digital Shadows Ltd.
+# Copyright (c) 2020 Digital Shadows Ltd.
 #
 
 import phantom.app as phantom
@@ -10,12 +10,12 @@ import json
 from digital_shadows_consts import DS_ACTION_NOT_SUPPORTED
 
 from ds_test_connectivity_connector import DSTestConnectivityConnector
-from ds_lookup_username_connector import DSLookupUsernameConnector
+# from ds_lookup_username_connector import DSLookupUsernameConnector
 from ds_on_poll_connector import DSOnPollConnector
 from ds_incidents_connector import DSIncidentsConnector
 from ds_intelligence_incidents_connector import DSIntelligenceIncidentsConnector
 from ds_databreach_connector import DSDataBreachConnector
-from ds_infrastructure_connector import DSInfrastructureConnector
+# from ds_infrastructure_connector import DSInfrastructureConnector
 from ds_search_entities_connector import DSSearchEntitiesConnector
 
 
@@ -26,13 +26,10 @@ class DigitalShadowsConnector(BaseConnector):
 
     def handle_action(self, param):
         action_id = self.get_action_identifier()
-        self.save_progress("Ingesting handle action in" + str(param))
+        self.save_progress("Ingesting handle action in: " + str(param))
         if action_id == 'test_connectivity':
             test_connectivity_connector = DSTestConnectivityConnector(self)
             return test_connectivity_connector.test_connectivity()
-        elif action_id == 'get_user':
-            lookup_username_connector = DSLookupUsernameConnector(self)
-            return lookup_username_connector.lookup_username(param)
         elif action_id == 'get_incident_by_id':
             incidents_connector = DSIncidentsConnector(self)
             return incidents_connector.get_incident_by_id(param)
@@ -75,15 +72,6 @@ class DigitalShadowsConnector(BaseConnector):
         elif action_id == 'post_breach_record_review':
             databreach_connector = DSDataBreachConnector(self)
             return databreach_connector.post_breach_record_review(param)
-        elif action_id == 'get_infrastructure_ip_ports':
-            infrastructure_connector = DSInfrastructureConnector(self)
-            return infrastructure_connector.get_infrastructure_ip_ports(param)
-        elif action_id == 'get_infrastructure_ssl':
-            infrastructure_connector = DSInfrastructureConnector(self)
-            return infrastructure_connector.get_infrastructure_ssl(param)
-        elif action_id == 'get_infrastructure_vulnerabilities':
-            infrastructure_connector = DSInfrastructureConnector(self)
-            return infrastructure_connector.get_infrastructure_vulnerabilities(param)
         elif action_id == 'search_entities':
             search_entities_connector = DSSearchEntitiesConnector(self)
             return search_entities_connector.search_entities(param)

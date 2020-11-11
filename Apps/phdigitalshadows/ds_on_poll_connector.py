@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Digital Shadows Ltd.
+# Copyright (c) 2020 Digital Shadows Ltd.
 #
 from urllib.parse import urlparse
 from datetime import datetime
@@ -20,6 +20,8 @@ from dsapi.service.incident_service import IncidentService
 from dsapi.service.intelligence_incident_service import IntelligenceIncidentService
 
 from dsapi.config import ds_api_host
+# from bs4 import UnicodeDammit
+import json
 
 
 class DSOnPollConnector(object):
@@ -31,10 +33,10 @@ class DSOnPollConnector(object):
         self._connector = connector
         # self._connector.save_progress("interval"+str(self))
         config = connector.get_config()
-        self._connector.save_progress("Config : " + str(config))
+        # self._connector.save_progress("Config : " + str(config))
         self._ds_api_key = config[DS_API_KEY_CFG]
         self._ds_api_secret_key = config[DS_API_SECRET_KEY_CFG]
-        self._poll_interval = config['ingest']['interval_mins']
+        self._poll_interval = config['ingest'].get('interval_mins')
         self._container_label = config['ingest']['container_label']
         self._history_days_interval = config['history_days_interval']
         self._global_incident = config['global_incident']
@@ -51,6 +53,7 @@ class DSOnPollConnector(object):
         # self._connector.save_progress("Ingesting param"+str(param))
         self._connector.debug_print(param)
         action_result = ActionResult(dict(param))
+        self._connector.add_action_result(action_result)
 
         start_time, end_time = self._phantom_daterange(param)
 
@@ -86,10 +89,14 @@ class DSOnPollConnector(object):
                 incident_service = IncidentService(self._ds_api_key, self._ds_api_secret_key)
 
                 incident_view = IncidentService.incidents_view(date_range=date_range, date_range_field='published', statuses=['READ', 'UNREAD'], types=incident_types)
-                self._connector.save_progress("incident req view" + str(incident_view))
-                incident_pages = incident_service.find_all_pages(view=incident_view)
-                j = 0
-                incident_total = len(incident_pages)
+                self._connector.save_progress("incident req view: {}".format(json.dumps(incident_view, ensure_ascii=False)))
+                try:
+                    incident_pages = incident_service.find_all_pages(view=incident_view)
+                    j = 0
+                    incident_total = len(incident_pages)
+                except StopIteration:
+                    error_message = 'No Incident objects retrieved from the Digital Shadows API in page groups'
+                    return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
                 for incident_page in incident_pages:
                     for incident in incident_page:
                         # self._connector.save_progress("incident: " + str(incident))
@@ -115,10 +122,14 @@ class DSOnPollConnector(object):
                 intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
                 intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_range,
                                                                               date_range_field='published', types=incident_types)
-                self._connector.save_progress('intelligence_incident_view: ' + str(intelligence_incident_view))
-                intelligence_incident_pages = intelligence_incident_service.find_all_pages(view=intelligence_incident_view)
-                k = 0
-                intelligence_incident_total = len(intelligence_incident_pages)
+                self._connector.save_progress('intelligence_incident_view: {}'.format(json.dumps(intelligence_incident_view, ensure_ascii=False)))
+                try:
+                    intelligence_incident_pages = intelligence_incident_service.find_all_pages(view=intelligence_incident_view)
+                    k = 0
+                    intelligence_incident_total = len(intelligence_incident_pages)
+                except StopIteration:
+                    error_message = 'No IntelligenceIncident objects retrieved from the Digital Shadows API in page groups'
+                    return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
                 # self._connector.save_progress('intelligence_incident_pages: ' + str(intelligence_incident_pages))
 
                 for intelligence_incident_page in intelligence_incident_pages:
@@ -243,7 +254,7 @@ class DSOnPollConnector(object):
         container['custom_fields']['IncidentType'] = str(intelligence_incident.payload['type'])
         if 'subType' in intelligence_incident.payload:
             container['custom_fields']['IncidentSubType'] = str(intelligence_incident.payload['subType'])
-        container['custom_fields']['IncidentURL'] = 'https://portal-digitalshadows.com/client/intelligence/incident/{}'.format(str(intelligence_incident.payload['id']))
+        container['custom_fields']['IncidentURL'] = 'https://portal-digitalshadows.com/client/intelligence/incident/{}'.format(intelligence_incident.payload['id'])
         container['severity'] = self._ds_to_phantom_severity_transform(intelligence_incident.payload['severity'])
         container['source_data_identifier'] = intelligence_incident.id
         container['start_time'] = intelligence_incident.payload['published']
@@ -271,7 +282,7 @@ class DSOnPollConnector(object):
         artifact['run_automation'] = False
         artifact['cef'] = dict()
         artifact['cef']['externalId'] = intelligence_incident.id
-        artifact['cef']['deviceAddress'] = 'https://portal-digitalshadows.com/client/intelligence/incident/{}'.format(str(intelligence_incident.id))
+        artifact['cef']['deviceAddress'] = 'https://portal-digitalshadows.com/client/intelligence/incident/{}'.format(intelligence_incident.id)
         artifact['cef']['   Title'] = intelligence_incident.payload['title']
         # artifact['cef']['   Type'] = intelligence_incident.payload['type'].title().replace('_', ' ')
         artifact['cef']['deviceEventCategory'] = intelligence_incident.payload['type']
@@ -347,7 +358,7 @@ class DSOnPollConnector(object):
         container['custom_fields']['IncidentType'] = str(incident.payload['type'])
         if 'subType' in incident.payload:
             container['custom_fields']['IncidentSubType'] = str(incident.payload['subType'])
-        container['custom_fields']['IncidentURL'] = 'https://www.portal-digitalshadows.com/client/incidents/{}'.format(str(incident.payload['id']))
+        container['custom_fields']['IncidentURL'] = 'https://www.portal-digitalshadows.com/client/incidents/{}'.format(incident.payload['id'])
         container['severity'] = self._ds_to_phantom_severity_transform(incident.payload['severity'])
         container['source_data_identifier'] = incident.id
         container['start_time'] = incident.payload['published']
@@ -375,7 +386,7 @@ class DSOnPollConnector(object):
         artifact['run_automation'] = False
         artifact['cef'] = dict()
         artifact['cef']['externalId'] = incident.id
-        artifact['cef']['deviceAddress'] = 'https://www.portal-digitalshadows.com/client/incidents/{}'.format(str(incident.payload['id']))
+        artifact['cef']['deviceAddress'] = 'https://www.portal-digitalshadows.com/client/incidents/{}'.format(incident.payload['id'])
         artifact['cef']['   Title'] = incident.payload['title']
         # artifact['cef']['   Type'] = incident.payload['type'].title().replace('_', ' ')
         artifact['cef']['deviceEventCategory'] = incident.payload['type']

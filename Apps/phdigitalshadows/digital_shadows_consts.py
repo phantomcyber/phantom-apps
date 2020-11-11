@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Digital Shadows Ltd.
+# Copyright (c) 2020 Digital Shadows Ltd.
 #
 
 # Must match json configuration object in digital_shadows.json

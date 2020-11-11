@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Digital Shadows Ltd.
+# Copyright (c) 2020 Digital Shadows Ltd.
 #
 
 import phantom.app as phantom
@@ -9,6 +9,7 @@ from phantom.action_result import ActionResult
 from digital_shadows_consts import DS_API_KEY_CFG, DS_API_SECRET_KEY_CFG
 
 from dsapi.service.search_entities_service import SearchEntitiesService
+# from bs4 import UnicodeDammit
 
 
 class DSSearchEntitiesConnector(object):
@@ -65,10 +66,14 @@ class DSSearchEntitiesConnector(object):
                                                         until=end_date, query_string=query)
         """
         search_view = search_service.search_entity_view(dateRange=date_range, query_string=query, types=type)
-        self._connector.save_progress("View: " + str(search_view))
-        search_entity_pages = search_service.find_all_pages(view=search_view)
-        # self._connector.save_progress("entity: " + str(search_entity_pages))
-        entity_total = len(search_entity_pages)
+        self._connector.save_progress("View: {}".format(search_view))
+        try:
+            search_entity_pages = search_service.find_all_pages(view=search_view)
+            # self._connector.save_progress("entity: " + str(search_entity_pages))
+            entity_total = len(search_entity_pages)
+        except StopIteration:
+            error_message = 'No Search Entity objects retrieved from the Digital Shadows API in page groups'
+            return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
         if entity_total > 0:
             summary = {
                 'entity_count': entity_total,

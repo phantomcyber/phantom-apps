@@ -29,7 +29,7 @@ class DSPaginationGroupingIterator(object):
         self._provider = provider
         self._cls = cls
 
-        self._page = self._provider.__next__()
+        self._page = next(self._provider)
 
     def current_page_offset(self):
         return int(self._page['current_page']['offset'])
@@ -43,9 +43,9 @@ class DSPaginationGroupingIterator(object):
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def next(self):
         if self._page is None:
-            self._page = self._provider.__next__()
+            self._page = next(self._provider)
 
         ds_model_group = []
         for ds_model_json in self._page['content']:

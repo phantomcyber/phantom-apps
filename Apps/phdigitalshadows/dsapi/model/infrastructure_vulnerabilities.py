@@ -2,7 +2,7 @@
 # Copyright (c) 2017 Digital Shadows Ltd.
 #
 
-from .ds_model import DSModel
+from ds_model import DSModel
 
 
 class InfrastructureVulnerabilities(DSModel):
@@ -25,4 +25,4 @@ class InfrastructureVulnerabilities(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), int), json)
+        return cls(cast(json.get('id'), long), json)

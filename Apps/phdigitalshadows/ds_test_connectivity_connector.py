@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Digital Shadows Ltd.
+# Copyright (c) 2020 Digital Shadows Ltd.
 #
 
 import phantom.app as phantom
@@ -10,6 +10,7 @@ from digital_shadows_consts import DS_TEST_CONNECTIVITY_MSG_PASS
 from digital_shadows_consts import DS_TEST_CONNECTIVITY_MSG_FAIL
 
 from dsapi.service.ds_base_service import DSBaseService
+# from bs4 import UnicodeDammit
 
 
 class DSTestConnectivityConnector(object):
@@ -29,6 +30,6 @@ class DSTestConnectivityConnector(object):
 
         ds_service = DSBaseService(self._ds_api_key, self._ds_api_secret_key)
         if ds_service.valid_credentials():
-            return self._connector.set_status_save_progress(phantom.APP_SUCCESS, DS_TEST_CONNECTIVITY_MSG_PASS)
+            return self._connector.set_status(phantom.APP_SUCCESS, DS_TEST_CONNECTIVITY_MSG_PASS)
         else:
-            return self._connector.set_status_save_progress(phantom.APP_ERROR, DS_TEST_CONNECTIVITY_MSG_FAIL)
+            return self._connector.set_status(phantom.APP_ERROR, DS_TEST_CONNECTIVITY_MSG_FAIL)

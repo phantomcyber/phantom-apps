@@ -2,7 +2,7 @@
 # Copyright (c) 2017 Digital Shadows Ltd.
 #
 
-from .ds_model import DSModel
+from ds_model import DSModel
 
 
 class Infrastructure(DSModel):
@@ -71,12 +71,12 @@ class Infrastructure(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), int),
+        return cls(cast(json.get('id'), long),
                    json.get('ipAddress'),
                    json.get('portNumber'),
                    json.get('transport'),
                    json.get('discoveredOpen'),
-                   cast(json.get('incident').get('id'), int),
+                   cast(json.get('incident').get('id'), long),
                    json.get('incident').get('scope'),
                    json.get('incident').get('type'),
                    json.get('incident').get('subType'),
