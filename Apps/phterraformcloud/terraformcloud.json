@@ -1092,7 +1092,7 @@
         {
             "action": "create run",
             "description": "Create a run which will perform a plan and apply",
-            "verbose": "NOTE: this endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace's current variables. You can specify a configuration version when creating a run; if you don't provide one, the run defaults to the workspace's most recently used version. (A configuration version is 'used' when it is created or used for a run in this workspace.).",
+            "verbose": "NOTE: This endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace's current variables. You can specify a configuration version when creating a run; if you don't provide one, the run defaults to the workspace's most recently used version. (A configuration version is 'used' when it is created or used for a run in this workspace.).",
             "type": "generic",
             "identifier": "create_run",
             "read_only": false,
@@ -1397,6 +1397,9 @@
                 {
                     "data_path": "action_result.data.*.attributes.name",
                     "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
                     "example_values": [
                         "test_workspace"
                     ]
