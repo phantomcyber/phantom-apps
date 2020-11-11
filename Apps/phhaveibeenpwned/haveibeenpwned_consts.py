@@ -23,3 +23,9 @@ HAVEIBEENPWNED_BAD_RESPONSE_CODES = {400: "Bad Request - the account does not co
                                      401: "Unauthorized - Access denied due to improperly formed hibp-api-key"}
 HAVEIBEENPWNED_STATUS_CODE_NO_DATA = 404
 HAVEIBEENPWNED_TOTAL_BREACHES = "total_breaches"
+
+ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
+ACTION_ID_LOOKUP_EMAIL = "lookup_email"
+ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
+
+TEST_CONNECTIVITY_EMAIL = "test@gmail.com"
