@@ -16,10 +16,10 @@ TERRAFORM_ENDPOINT_APPLY_RUN = "/runs/{run_id}/actions/apply"
 TERRAFORM_ENDPOINT_PLANS = "/plans/{id}"
 
 # exception handling
-ERROR_CODE_MSG = "Error code unavailable"
-ERROR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
-TYPE_ERR_MSG = "Error occurred while connecting to the Airlock Digital Server. Please check the asset configuration and|or the action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Terraform Cloud Server. Please check the asset configuration and|or the action parameters"
 
 # validate integer
 ERR_VALID_INT_MSG = "Please provide a valid integer value in the {}"

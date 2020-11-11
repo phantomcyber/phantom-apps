@@ -148,7 +148,7 @@ class TerraformCloudConnector(BaseConnector):
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -178,8 +178,8 @@ class TerraformCloudConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
 
-        if parameter < 0:
-            return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -507,9 +507,9 @@ class TerraformCloudConnector(BaseConnector):
         if id:
             endpoint = TERRAFORM_ENDPOINT_GET_WORKSPACE_BY_ID.format(id=id)
         elif organization_name and workspace_name:
-            endpoint = TERRAFORM_ENDPOINT_WORKSPACES.format(organization_name=organization_name) + "/" + workspace_name
+            endpoint = "{}/{}".format(TERRAFORM_ENDPOINT_WORKSPACES.format(organization_name=organization_name), workspace_name)
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide both the organization name and workspace name")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide 'id' or both the 'organization name' and 'workspace name' action parameters")
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
@@ -579,7 +579,7 @@ class TerraformCloudConnector(BaseConnector):
 
         # base URL
         self._base_url = config.get('base_url', TERRAFORM_DEFAULT_URL).strip('/')
-        self._base_url += TERRAFORM_BASE_API_ENDPOINT
+        self._base_url = "{}{}".format(self._base_url, TERRAFORM_BASE_API_ENDPOINT)
 
         # token
         self._auth_token = config["token"]

@@ -67,11 +67,13 @@
                 "page_num": {
                     "description": "Page number of workspace list",
                     "data_type": "numeric",
+                    "default": 1,
                     "order": 1
                 },
                 "page_size": {
                     "description": "Number of workspaces to return per page (100 is default)",
                     "data_type": "numeric",
+                    "default": 100,
                     "order": 2
                 }
             },
@@ -83,7 +85,7 @@
                         "terraform organization name"
                     ],
                     "example_values": [
-                        "Phantom"
+                        "Organization"
                     ]
                 },
                 {
@@ -273,12 +275,6 @@
                 {
                     "data_path": "action_result.data.*.data.*.relationships.organization.data.id",
                     "data_type": "string",
-                    "contains": [
-                        "terraform organization name"
-                    ],
-                    "example_values": [
-                        "Phantom"
-                    ],
                     "column_name": "Organization ID",
                     "column_order": 0
                 },
@@ -354,7 +350,7 @@
                     "data_path": "action_result.data.*.data.*.attributes.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is a test from Phantom"
+                        "This is a test description"
                     ],
                     "column_name": "Description",
                     "column_order": 4
@@ -514,6 +510,9 @@
                 {
                     "data_path": "action_result.data.*.data.*.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
                     "example_values": [
                         "ws-X9wL9pBZQdE6gjsp"
                     ],
@@ -524,7 +523,7 @@
                     "data_path": "action_result.data.*.data.*.links.self",
                     "data_type": "string",
                     "example_values": [
-                        "/api/v2/organizations/Phantom/workspaces/test_workspace"
+                        "/api/v2/organizations/TestOrg/workspaces/test_workspace"
                     ]
                 },
                 {
@@ -535,7 +534,7 @@
                     "data_path": "action_result.data.*.links.self",
                     "data_type": "string",
                     "example_values": [
-                        "https://app.terraform.io/api/v2/organizations/Phantom/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
                     ],
                     "contains": [
                         "url"
@@ -549,7 +548,7 @@
                     "data_path": "action_result.data.*.links.last",
                     "data_type": "string",
                     "example_values": [
-                        "https://app.terraform.io/api/v2/organizations/Phantom/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
                     ],
                     "contains": [
                         "url"
@@ -559,7 +558,7 @@
                     "data_path": "action_result.data.*.links.first",
                     "data_type": "string",
                     "example_values": [
-                        "https://app.terraform.io/api/v2/organizations/Phantom/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
                     ],
                     "contains": [
                         "url"
@@ -621,11 +620,13 @@
                 "page_num": {
                     "description": "Page number of runs returned",
                     "data_type": "numeric",
+                    "default": 1,
                     "order": 1
                 },
                 "page_size": {
                     "description": "Number of runs to return per page (20 is default)",
                     "data_type": "numeric",
+                    "default": 20,
                     "order": 2
                 }
             },
@@ -1091,7 +1092,7 @@
         {
             "action": "create run",
             "description": "Create a run which will perform a plan and apply",
-            "verbose": "NOTE: this endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace\u2019s current variables. You can specify a configuration version when creating a run; if you don\u2019t provide one, the run defaults to the workspace\u2019s most recently used version. (A configuration version is \u201cused\u201d when it is created or used for a run in this workspace.).",
+            "verbose": "NOTE: this endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace's current variables. You can specify a configuration version when creating a run; if you don't provide one, the run defaults to the workspace's most recently used version. (A configuration version is 'used' when it is created or used for a run in this workspace.).",
             "type": "generic",
             "identifier": "create_run",
             "read_only": false,
@@ -1120,6 +1121,7 @@
                 "is_destroy": {
                     "description": "Specify if this plan is a destroy plan, which will destroy all provisioned resources",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 3
                 }
             },
@@ -1130,7 +1132,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.is_destroy",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.message",
@@ -1167,11 +1173,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1226,7 +1238,7 @@
                     "order": 4
                 },
                 "vcs_token_id": {
-                    "description": "",
+                    "description": "Token ID of the VSC repo",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1280,13 +1292,17 @@
                 },
                 {
                     "data_path": "action_result.parameter.auto_apply",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is a test from Phantom"
+                        "This is a test description"
                     ]
                 },
                 {
@@ -1298,7 +1314,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.queue_all_runs",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vcs_repo_id",
@@ -1341,7 +1361,7 @@
                     "data_path": "action_result.data.*.attributes.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is a test from Phantom"
+                        "This is a test description"
                     ]
                 },
                 {
@@ -1520,7 +1540,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.attributes.vcs-repo.ingress-submodules",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.attributes.vcs-repo.oauth-token-id",
@@ -1536,11 +1560,14 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "Workspace ID",
-                    "column_order": 2,
+                    "contains": [
+                        "terraform workspace id"
+                    ],
                     "example_values": [
                         "ws-1jIskLtjsp"
-                    ]
+                    ],
+                    "column_name": "Workspace ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.links.self",
@@ -1686,11 +1713,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1701,7 +1734,7 @@
         {
             "action": "get apply",
             "description": "Get details of an apply",
-            "verbose": "There is no endpoint to list applies. You can find the ID for an apply in the relationships.apply property of a run object.",
+            "verbose": "There is no endpoint to list applies. You can find the ID for an apply in the 'relationships.apply' property of a run object.",
             "type": "investigate",
             "identifier": "get_apply",
             "read_only": true,
@@ -2488,7 +2521,7 @@
                         "terraform organization name"
                     ],
                     "example_values": [
-                        "Phantom"
+                        "Organization"
                     ]
                 },
                 {
@@ -2512,7 +2545,7 @@
                     "data_path": "action_result.data.*.relationships.organization.data.id",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Organization"
                     ],
                     "contains": [
                         "terraform organization name"
@@ -2596,6 +2629,9 @@
                 {
                     "data_path": "action_result.data.*.attributes.name",
                     "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
                     "example_values": [
                         "test_workspace"
                     ],
@@ -2623,7 +2659,7 @@
                     "data_path": "action_result.data.*.attributes.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is a test from Phantom"
+                        "This is a test description"
                     ],
                     "column_name": "Description",
                     "column_order": 4
@@ -2832,7 +2868,7 @@
                     "data_path": "action_result.data.*.links.self",
                     "data_type": "string",
                     "example_values": [
-                        "/api/v2/organizations/Phantom/workspaces/test_workspace"
+                        "/api/v2/organizations/TestOrg/workspaces/test_workspace"
                     ]
                 },
                 {
