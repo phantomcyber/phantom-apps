@@ -64,6 +64,15 @@
 <h2>How to use Run Query Action</h2>
   <ul>
     <li>The <b>Run Query</b> action uses <b>Tanium's Interact Question Bar</b> to ask questions to retrieve information from endpoints. For example, you can ask a question that determines whether any endpoints are missing critical security patches.</li>
+    <li>Parameter Information:
+        <br>
+        These parameters modify questions asked using one of the two modes of operation below.
+        <ul>
+            <li><b>wait_for_results_processing:</b> Some long running sensors return intermediate results with the contents "results currently unavailable", and then <a href="https://docs.tanium.com/interact/interact/results.html#:~:text=Results%20Currently%20Unavailable">later the sensor fills in the results</a>. This option instructs the App to wait until the results are returned to Tanium and return the final results. The waiting is still timeboudned by the <b>timeout_seconds</b> setting. </li>
+            <li><b>return_when_n_results_available:</b> When set, the Tanium REST App will return results to the playbook as soon as `N` results are returned, even if the <b>Consider question results complete at (% out of 100)</b> percentage has not been met. This is useful in scenarios where the playbook expects to get at most `N` results, and wants to return as soon as this occurs.</li>
+            <li><b>wait_for_n_results_available:</b> When set, the Tanium REST App will wait (up to the <b>timeout_seconds</b> timeout) until at least `n` results are returned. This is helpul in situations where the Tanium server is under high utilization. Sometimes the App will estimate that 100% of hosts have reported results, even when there are a few stragglers left. If the playbook auther knows that it should be getting `N` results, this will wait past the <b>Consider question results complete at (% out of 100)</b> percentage.</li>
+        </ul>   
+    </li>
     <li>Two modes of operation are supported for the run query action:</li>
     <br>
     <ul>

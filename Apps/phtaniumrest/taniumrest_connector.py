@@ -9,6 +9,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from taniumrest_consts import *
 
+import ast
 import os
 import sys
 import requests
@@ -250,6 +251,12 @@ class TaniumRestConnector(BaseConnector):
             headers.update({'session': str(self._session_id), 'Content-Type': 'application/json'})
 
             ret_val, resp_json = self._make_rest_call(url, action_result, verify=verify, headers=headers, params=params, data=data, json=json, method=method)
+        elif msg and ("404" in msg and "result_data/question" in endpoint):
+            # Issue seen in Tanium 7.3.314.4103. Sometimes it returns a 404 for a sensor and says that the sensor doesn't exist even though it does
+            # A short sleep and resubmit fixes the issue
+            self.debug_print("Encountered tanium `REST Object Not Found Exception: SensorNotFound: The requested sensor was not found` error")
+            sleep(5)
+            ret_val, resp_json = self._make_rest_call(url, action_result, verify=verify, headers=headers, params=params, data=data, json=json, method=method)
 
         if phantom.is_fail(ret_val):
             self.debug_print("REST API Call Failure! Failed call to Tanium API endpoint {0} with error code {1}".format(url, msg))
@@ -361,7 +368,7 @@ class TaniumRestConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, "Unexpected API response")
             return None
 
-    def _execute_action_support(self, param, action_result):
+    def _execute_action_support(self, param, action_result): # noqa: 901
         action_grp = self._handle_py_ver_compat_for_input_str(self._python_version, param['action_group'])
         package_name = self._handle_py_ver_compat_for_input_str(self._python_version, param['package_name'])
         action_name = param['action_name']
@@ -471,26 +478,37 @@ class TaniumRestConnector(BaseConnector):
             package_spec.update({"parameters": [package_param]})
 
         if group_name:
-            endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
-            ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
+            group_as_obj = None
+            try:
+                # Check to see if we are getting a group from a previous parse call. It
+                # is passed in as an str repreeentation of the python object
+                group_as_obj = ast.literal_eval(group_name)
+            except SyntaxError:
+                pass
 
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
+            if group_as_obj:
+                data["target_group"] = group_as_obj
+            else:
+                endpoint = "{}/{}".format("/api/v2/groups/by-name", group_name)
+                ret_val, response = self._make_rest_call_helper(action_result, endpoint, verify=self._verify, params=None, headers=None)
 
-            response_data = response.get("data")
+                if (phantom.is_fail(ret_val)):
+                    return action_result.get_status()
 
-            if not response_data:
-                return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
-                        Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
+                response_data = response.get("data")
 
-            resp_data = self._get_response_data(response_data, action_result, "group")
+                if not response_data:
+                    return action_result.set_status(phantom.APP_ERROR, "No group exists with name {}. \
+                            Also, please verify that your account has sufficient permissions to access the groups".format(group_name))
 
-            if resp_data is None:
-                return action_result.get_status()
+                resp_data = self._get_response_data(response_data, action_result, "group")
 
-            group_id = resp_data.get("id")
-            group_name = resp_data.get("name")
-            data["target_group"] = {"source_id": group_id, "name": str(group_name)}
+                if resp_data is None:
+                    return action_result.get_status()
+
+                group_id = resp_data.get("id")
+                group_name = resp_data.get("name")
+                data["target_group"] = {"source_id": group_id, "name": str(group_name)}
 
         # Get the action group details
         endpoint = TANIUMREST_GET_ACTION_GROUP.format(action_group=action_grp)
@@ -546,7 +564,53 @@ class TaniumRestConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _question_result(self, timeout_seconds, results_percentage, endpoint, action_result):
+    def _determine_num_results_complete(self, data):
+        """
+
+        :param data: The object returned from a call to get question responses
+        :return: tuple of num_complete, num_incomplete
+        """
+        self.debug_print("Data: ")
+        self.debug_print(data)
+        mr_tested = data.get("result_sets", [])[0].get("mr_tested")
+        estimated_total = data.get("result_sets", [])[0].get("estimated_total")
+
+        results = data.get("result_sets", [])
+        num_complete = 0
+        num_incomplete = 0
+
+        if len(results) > 0:
+            rows = results[0].get("rows", [])
+            if len(rows) > 0:
+                self.debug_print("MR Tested/Estimated Totoal: {}/{}".format(mr_tested, estimated_total))
+                self.debug_print("Rows in determine_num_results")
+                self.debug_print(json.dumps(rows, indent=2))
+
+            for row in rows:
+                row_data_elements = row.get("data", [])
+                incomplete_entry_found = False
+                # data section is a list of lists
+                for row_data_element in row_data_elements:
+                    for results_entry in row_data_element:
+                        results_text = results_entry.get("text", '')
+
+                        if results_text == "[current results unavailable]" or \
+                                results_text == "[current result unavailable]" or \
+                                results_text == "[results currently unavailable]":
+                            incomplete_entry_found = True
+                            num_incomplete += 1
+                            break
+
+                    if incomplete_entry_found:
+                        break
+                else:
+                    num_complete += 1
+
+        self.debug_print("Returning {}, {} (num_complete, num_incomplete)".format(num_complete, num_incomplete))
+        return num_complete, num_incomplete
+
+    def _question_result(self, timeout_seconds, results_percentage, endpoint, action_result,
+                         wait_for_results_processing=None, return_when_n_results_available=None, wait_for_n_results_available=None):
 
         max_range = int(timeout_seconds / WAIT_SECONDS) + (1 if timeout_seconds % WAIT_SECONDS == 0 else 2)
 
@@ -567,18 +631,42 @@ class TaniumRestConnector(BaseConnector):
             # Checking to see if all the results have been returned by the question. Keeps questioning until all results have been returned.
             question_id = os.path.basename(endpoint)
             self.debug_print("Checking if Tanium question ID {} has completed and returned all results . . .".format(question_id))
-            mr_tested = response.get("data", {}).get("result_sets", [])[0].get("mr_tested")
-            estimated_total = response.get("data", {}).get("result_sets", [])[0].get("estimated_total")
+            data = response.get("data", {})
+            mr_tested = data.get("result_sets", [])[0].get("mr_tested")
+            estimated_total = data.get("result_sets", [])[0].get("estimated_total")
             if mr_tested and estimated_total:
                 percentage_returned = float(mr_tested) / float(estimated_total) * 100
-                self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total, percentage_returned, results_percentage))
-                if int(percentage_returned) < int(results_percentage):
+                self.debug_print("mr_tested: {} | est_total: {} | perc_returned: {} | results_perc: {}".format(mr_tested, estimated_total,
+                                                                                                               percentage_returned, results_percentage))
+
+                # incomplete is when a sensor returns the value `[current results unavailable]`
+                num_results_complete, num_results_incomplete = self._determine_num_results_complete(data)
+                if wait_for_results_processing:
+                    num_results = num_results_complete
+                else:
+                    num_results = num_results_complete + num_results_incomplete
+
+                if wait_for_results_processing and num_results_incomplete > 0:
+                    # doesn't matter what percentage of results are complete, keep going until
+                    # all results are complete or timeout
+                    self.debug_print("Number of results incomplete: {}".format(num_results_incomplete))
+                    continue
+                elif return_when_n_results_available and num_results >= return_when_n_results_available:
+                    self.debug_print("wait_for_results_proceessing is {}: Returning results because NRC ({}) > RWNRA ({})".format(wait_for_results_processing,
+                                                                                                                                    num_results_complete,
+                                                                                                                                    return_when_n_results_available))
+                    return response
+                elif wait_for_n_results_available and num_results_complete < wait_for_n_results_available:
+                    self.debug_print("Waiting for {} results to finish before completing".format(wait_for_n_results_available))
+                    continue
+                elif int(percentage_returned) < int(results_percentage):
                     self.debug_print("Tanium question ID {} is {}% done out of {}%. Fetching more results . . .".format(question_id, percentage_returned, results_percentage))
                     continue
+                # else: return results if `columns` field present
             else:
                 continue
 
-            if response.get("data", {}).get("result_sets", [])[0].get("columns"):
+            if data.get("result_sets", [])[0].get("columns"):
                 return response
 
         else:
@@ -716,6 +804,30 @@ class TaniumRestConnector(BaseConnector):
         is_saved_question = param.get('is_saved_question', False)
         summary = action_result.update_summary({})
 
+        # parse extra question options
+        wait_for_results_processing = param.get('wait_for_results_processing', None)
+        return_when_n_results_available = param.get('return_when_n_results_available', None)
+        wait_for_n_results_available = param.get('wait_for_n_results_available', None)
+
+        if wait_for_results_processing is not None:
+            if type(wait_for_results_processing) != bool:
+                raise Exception("Invalid value supplied for wait_for_results_processing")
+
+        if return_when_n_results_available is not None:
+            return_when_n_results_available = int(return_when_n_results_available)
+            if return_when_n_results_available < 0:
+                raise Exception("Value {} is not valid for paramter return_when_n_results_available".format(return_when_n_results_available))
+
+        if wait_for_n_results_available is not None:
+            wait_for_n_results_available = int(wait_for_n_results_available)
+            if wait_for_n_results_available < 0:
+                raise Exception("Value {} is not valid for paramter wait_for_n_results_available".format(wait_for_n_results_available))
+
+        if return_when_n_results_available is not None and \
+                wait_for_n_results_available is not None and \
+                return_when_n_results_available < wait_for_n_results_available:
+            raise Exception("return_when_n_results_available cannot be less than wait_for_n_results_available")
+
         if is_saved_question:
             endpoint = TANIUMREST_GET_SAVED_QUESTION.format(saved_question=query_text)
 
@@ -739,7 +851,8 @@ class TaniumRestConnector(BaseConnector):
 
             endpoint = TANIUMREST_GET_SAVED_QUESTION_RESULT.format(saved_question_id=saved_question_id)
 
-            response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result)
+            response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result, wait_for_results_processing,
+                                             return_when_n_results_available, wait_for_n_results_available)
 
             if response is None:
                 return action_result.get_status()
@@ -752,7 +865,8 @@ class TaniumRestConnector(BaseConnector):
                 return action_result.get_status()
 
             self.save_progress(json.dumps(question_data))
-            response = self._ask_question(question_data, action_result, timeout_seconds=timeout_seconds)
+            response = self._ask_question(question_data, action_result, timeout_seconds, wait_for_results_processing,
+                                          return_when_n_results_available, wait_for_n_results_available)
             if action_result.get_status() == phantom.APP_ERROR:
                 return action_result.get_status()
             action_result.add_data(response)
@@ -768,6 +882,49 @@ class TaniumRestConnector(BaseConnector):
         summary['number_of_rows'] = row_count
 
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_question_results(self, param):
+
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        question_id = param.get('question_id')
+        summary = action_result.update_summary({})
+
+        response = self._get_question_results(question_id, action_result)
+        if action_result.get_status() == phantom.APP_ERROR:
+            return action_result.get_status()
+        action_result.add_data(response)
+
+        result_sets = response.get("data", {}).get("result_sets")
+        if result_sets:
+            row_count = result_sets[0].get("row_count")
+        else:
+            row_count = 0
+
+        summary['number_of_rows'] = row_count
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_question_results(self, question_id, action_result):
+        self.save_progress("Getting results for question {}".format(question_id))
+
+        ret_val, response = self._make_rest_call_helper(action_result, "/api/v2/result_data/question/{}".format(question_id),
+                                                        verify=self._verify,
+                                                        params=None,
+                                                        headers=None,
+                                                        json=None,
+                                                        method="get")
+
+        if (phantom.is_fail(ret_val)):
+            action_result.set_status(phantom.APP_ERROR, "Getting question results failed")
+            return
+
+        action_result.set_status(phantom.APP_SUCCESS)
+        return response
 
     def _parameterize_query(self, query, action_result):
         """ Creates a data structure to send a parameterized sensor query to Tanium """
@@ -798,7 +955,11 @@ class TaniumRestConnector(BaseConnector):
                 return
 
             self.save_progress("Parameter Definition:\n" + resp_data.get("parameter_definition", ""))
-            parameter_definition = json.loads(resp_data.get("parameter_definition", ""))
+
+            raw_parameter_definition = resp_data.get("parameter_definition", "")
+            parameter_definition = None
+            if raw_parameter_definition != "":
+                parameter_definition = json.loads(raw_parameter_definition)
 
             if parameter_definition:
                 # Parameterized Sensor
@@ -905,7 +1066,7 @@ class TaniumRestConnector(BaseConnector):
 
         return data
 
-    def _ask_question(self, data, action_result, timeout_seconds=None):
+    def _ask_question(self, data, action_result, timeout_seconds=None, wait_for_results_processing=None, return_when_n_results_available=None, wait_for_n_results_available=None):
         # Post prepared data to questions endpoint and poll for results
         # config = self.get_config()
         if timeout_seconds:
@@ -924,7 +1085,8 @@ class TaniumRestConnector(BaseConnector):
         # Get results of Question
         endpoint = "{}/{}".format("/api/v2/result_data/question", question_id)
 
-        response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result)
+        response = self._question_result(timeout_seconds, int(self._percentage), endpoint, action_result, wait_for_results_processing,
+                                         return_when_n_results_available, wait_for_n_results_available)
 
         if response is None:
             action_result.set_status(phantom.APP_ERROR, "Failed to get results")
@@ -958,6 +1120,9 @@ class TaniumRestConnector(BaseConnector):
 
         elif action_id == 'run_query':
             ret_val = self._handle_run_query(param)
+
+        elif action_id == 'get_question_results':
+            ret_val = self._handle_get_question_results(param)
 
         elif action_id == 'parse_question':
             ret_val = self._handle_parse_question(param)
