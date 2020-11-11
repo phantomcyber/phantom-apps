@@ -72,12 +72,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "atac_test",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be added to ARC Watchlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
                     "default": "abc.exe",
                     "order": 1
                 }
@@ -90,6 +98,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
                     ]
                 },
                 {
@@ -99,6 +110,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
                     ]
                 },
                 {
@@ -162,12 +176,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "atac_test",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be removed from ARC Watchlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
                     "default": "abc.exe",
                     "order": 1
                 }
@@ -180,6 +202,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
                     ]
                 },
                 {
@@ -189,6 +214,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
                     ]
                 },
                 {
@@ -251,12 +279,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "atac_test",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be checked in ARC Watchlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
                     "default": "abc.exe",
                     "order": 1
                 }
@@ -269,6 +305,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
                     ]
                 },
                 {
@@ -278,6 +317,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
                     ]
                 },
                 {
@@ -341,12 +383,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "demo-approved-sites",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be added to Componentlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
                     "default": "abc.com",
                     "order": 1
                 }
@@ -359,6 +409,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
                     ]
                 },
                 {
@@ -368,6 +421,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
                     ]
                 },
                 {
@@ -431,12 +487,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "demo-approved-sites",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be removed from Componentlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
                     "default": "abc.com",
                     "order": 1
                 }
@@ -449,6 +513,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
                     ]
                 },
                 {
@@ -458,6 +525,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
                     ]
                 },
                 {
@@ -520,12 +590,20 @@
                     "data_type": "string",
                     "order": 0,
                     "default": "demo-approved-sites",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be checked in Componentlist",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
                     "default": "abc.com",
                     "order": 1
                 }
@@ -538,6 +616,9 @@
                     "column_order": 0,
                     "example_values": [
                         "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
                     ]
                 },
                 {
@@ -547,6 +628,9 @@
                     "column_order": 1,
                     "example_values": [
                         "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
                     ]
                 },
                 {

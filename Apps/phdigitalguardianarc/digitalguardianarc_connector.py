@@ -293,7 +293,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         ret_val, message = self.requestApiToken()
         if phantom.is_fail(ret_val):
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-        full_url = self._arc_url.strip("/") + '/export_profiles/' + self._export_profile + '/export_and_ack'
+        full_url = '{0}/export_profiles/{1}/export_and_ack'.format(self._arc_url.strip("/"), self._export_profile)
         try:
             request_response = requests.post(url=full_url,
                                             headers=self._client_headers,
@@ -542,7 +542,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-        full_url = self._arc_url.strip("/") + '/watchlists/'
+        full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
         try:
             response = requests.get(url=full_url,
                                     headers=self._client_headers,
@@ -568,9 +568,9 @@ class DigitalGuardianArcConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
 
     def _check_watchlist_id(self, watch_list_id, watchlist_entry, action_result):
-        full_url = self._arc_url.strip("/") + '/watchlists/'
+        full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
         try:
-            r = requests.get(url=full_url + watch_list_id + '/values?limit=100000',
+            r = requests.get(url='{0}{1}/values?limit=100000'.format(full_url, watch_list_id),
                             headers=self._client_headers,
                             verify=False)
         except Exception as e:
@@ -598,7 +598,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         ret_val, message = self.requestApiToken()
         if phantom.is_fail(ret_val):
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-        full_url = self._arc_url.strip("/") + '/lists/' + list_type
+        full_url = '{0}/lists/{1}'.format(self._arc_url.strip("/"), list_type)
         try:
             r = requests.get(url=full_url,
                             headers=self._client_headers,
@@ -637,9 +637,9 @@ class DigitalGuardianArcConnector(BaseConnector):
             return action_result.get_status()
         if watch_list_id:
             watch_list_entry_json = '[{"value_name":"' + watchlist_entry + '"}]'
-            full_url = self._arc_url.strip("/") + '/watchlists/'
+            full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
             try:
-                r = requests.post(url=full_url + watch_list_id + '/values/',
+                r = requests.post(url='{0}{1}/values/'.format(full_url, watch_list_id),
                                 data=watch_list_entry_json,
                                 headers=self._client_headers,
                                 verify=False)
@@ -671,9 +671,9 @@ class DigitalGuardianArcConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
             if watch_list_value_id:
-                full_url = self._arc_url.strip("/") + '/watchlists/'
+                full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
                 try:
-                    r = requests.delete(url=full_url + watch_list_id + '/values/' + watch_list_value_id,
+                    r = requests.delete(url='{0}{1}/values/{2}'.format(full_url, watch_list_id, watch_list_value_id),
                                         headers=self._client_headers,
                                         verify=False)
                 except Exception as e:
@@ -736,9 +736,9 @@ class DigitalGuardianArcConnector(BaseConnector):
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
             component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
-            full_url = self._arc_url.strip("/") + '/remediation/lists/'
+            full_url = '{0}/remediation/lists/'.format(self._arc_url.strip("/"))
             try:
-                r = requests.put(url=full_url + list_id + '/append',
+                r = requests.put(url='{0}{1}/append'.format(full_url, list_id),
                                 headers=self._client_headers,
                                 data=component_list_entry_json,
                                 verify=False)
@@ -770,9 +770,9 @@ class DigitalGuardianArcConnector(BaseConnector):
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
             component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
-            full_url = self._arc_url.strip("/") + '/remediation/lists/'
+            full_url = '{0}/remediation/lists/'.format(self._arc_url.strip("/"))
             try:
-                r = requests.post(url=full_url + list_id + '/delete',
+                r = requests.post(url='{0}{1}/delete'.format(full_url, list_id),
                                 headers=self._client_headers,
                                 data=component_list_entry_json,
                                 verify=False)
@@ -801,9 +801,9 @@ class DigitalGuardianArcConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         if list_id:
-            full_url = self._arc_url.strip("/") + '/lists/'
+            full_url = '{0}/lists/'.format(self._arc_url.strip("/"))
             try:
-                r = requests.get(url=full_url + list_id + '/values?limit=100000',
+                r = requests.get(url='{0}{1}/values?limit=100000'.format(full_url, list_id),
                                 headers=self._client_headers,
                                 verify=False)
             except Exception as e:
@@ -861,6 +861,12 @@ class DigitalGuardianArcConnector(BaseConnector):
         self._state = self.load_state()
         self.debug_print(("Action: 'initialize' State: {}").format(self._state))
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
+
         config = self.get_config()
         self._auth_url = self._handle_py_ver_compat_for_input_str(config['auth_url'])
         self._arc_url = self._handle_py_ver_compat_for_input_str(config['arc_url'])
@@ -869,11 +875,6 @@ class DigitalGuardianArcConnector(BaseConnector):
         self._export_profile = self._handle_py_ver_compat_for_input_str(config['export_profile'])
         self._client_headers = DG_CLIENT_HEADER
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -919,10 +920,17 @@ class DigitalGuardianArcConnector(BaseConnector):
                 'scope': 'client',
             }
             try:
-                api_key_response = requests.post(url=self._auth_url.strip("/") + '/as/token.oauth2',
+                url = '{0}/as/token.oauth2'.format(self._auth_url.strip("/"))
+                api_key_response = requests.post(url=url,
                                                 headers=DG_HEADER_URL,
                                                 data=payload,
                                                 verify=False)
+            except requests.exceptions.InvalidSchema:
+                error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+                return (phantom.APP_ERROR, error_message)
+            except requests.exceptions.InvalidURL:
+                error_message = 'Error connecting to server. Invalid URL %s' % (url)
+                return (phantom.APP_ERROR, error_message)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 return (phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
