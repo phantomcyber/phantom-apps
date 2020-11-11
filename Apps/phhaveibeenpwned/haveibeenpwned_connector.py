@@ -18,10 +18,6 @@ import simplejson as json
 
 
 class HaveIBeenPwnedConnector(BaseConnector):
-    ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
-    ACTION_ID_LOOKUP_EMAIL = "lookup_email"
-    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
-    TEST_CONNECTIVITY_EMAIL = "test@gmail.com"
 
     def __init__(self):
         super(HaveIBeenPwnedConnector, self).__init__()
@@ -77,7 +73,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         self.save_progress("Connecting to the Have I Been Pwned server")
 
-        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=self.TEST_CONNECTIVITY_EMAIL)
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=TEST_CONNECTIVITY_EMAIL)
 
         ret_val, response = self._make_rest_call(endpoint, truncate=True)
 
@@ -141,11 +137,11 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
-        if (action == self.ACTION_ID_LOOKUP_DOMAIN):
+        if (action == ACTION_ID_LOOKUP_DOMAIN):
             ret_val = self._lookup_domain(params)
-        elif (action == self.ACTION_ID_LOOKUP_EMAIL):
+        elif (action == ACTION_ID_LOOKUP_EMAIL):
             ret_val = self._lookup_email(params)
-        elif (action == self.ACTION_ID_TEST_CONNECTIVITY):
+        elif (action == ACTION_ID_TEST_CONNECTIVITY):
             ret_val = self._handle_test_connectivity(params)
 
         return ret_val
