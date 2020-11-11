@@ -432,6 +432,32 @@ class OktaConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS, OKTA_DISABLE_USER_SUCC)
 
+    def _handle_clear_user_sessions(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        user_id = param['id']
+
+        # make rest call
+        ret_val, response = self._make_rest_call('/users/{}/sessions'.format(user_id), action_result, method='delete')
+
+        if (phantom.is_fail(ret_val)):
+            message = action_result.get_message()
+            if "Empty response and no information in the header" == message:
+                # This occurs because the delet call in the Okta API only returns a 204 success
+                return action_result.set_status(phantom.APP_SUCCESS, OKTA_CLEAR_USER_SESSIONS_SUCC)
+            return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS, OKTA_CLEAR_USER_SESSIONS_SUCC)
+
     def _handle_enable_user(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -787,6 +813,9 @@ class OktaConnector(BaseConnector):
 
         elif action_id == 'send_push_notification':
             ret_val = self._handle_send_push_notification(param)
+
+        elif action_id == 'clear_user_sessions':
+            ret_val = self._handle_clear_user_sessions(param)
 
         return ret_val
 

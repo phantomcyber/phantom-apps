@@ -13,7 +13,7 @@
     "min_phantom_version": "4.6.19142",
     "product_name": "Okta",
     "app_wizard_version": "1.0.0",
-    "app_version": "2.0.0",
+    "app_version": "2.0.1",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud tested 2-24-2020"
@@ -1460,6 +1460,82 @@
                 }
             ],
             "identifier": "disable_user",
+            "type": "contain",
+            "verbose": ""
+        },
+        {
+            "read_only": false,
+            "description": "Clears the specified user's sessions",
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Id of user to clear sessions for",
+                    "data_type": "string",
+                    "contains": [
+                        "okta user id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            },
+            "action": "clear user sessions",
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "okta user id"
+                    ],
+                    "example_values": [
+                        "00uby4va2hynIj0mS0h7"
+                    ],
+                    "column_order": 0,
+                    "column_name": "User ID"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "column_order": 1,
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully cleared user sessions"
+                    ],
+                    "data_type": "string",
+                    "column_name": "Message"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ],
+            "identifier": "clear_user_sessions",
             "type": "contain",
             "verbose": ""
         },

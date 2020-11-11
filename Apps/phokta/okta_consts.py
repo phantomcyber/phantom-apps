@@ -40,6 +40,7 @@ OKTA_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed."
 
 OKTA_INVALID_USER_MSG = "Kindly provide valid user_id."
 
+OKTA_CLEAR_USER_SESSIONS_SUCC = "Successfully cleared user sessions"
 # DO NOT MODIFY!
 # A fixed field used by Okta to the integration
 OKTA_APP_USER_AGENT_BASE = "SplunkPhantom/"
