@@ -33,10 +33,7 @@ class DigitalGuardianArcConnector(BaseConnector):
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
-        return RetVal(
-            action_result.set_status(
-                phantom.APP_ERROR,
-                'Status Code: {0}. Empty response and no information in the header'.format(response.status_code)), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Status Code: {0}. Empty response and no information in the header'.format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -62,8 +59,7 @@ class DigitalGuardianArcConnector(BaseConnector):
 
         message = message.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message),
-                      None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
 
@@ -73,11 +69,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Unable to parse JSON response. {0}'.format(
-                        err)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response. {0}'.format(err)), None)
 
         # Please specify the status codes here
 
@@ -89,8 +81,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         message = 'Error from server. Status Code: {0} Data from server: {1}'.format(
                 r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message),
-                      None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, response, action_result):
 
@@ -115,16 +106,12 @@ class DigitalGuardianArcConnector(BaseConnector):
                 "Can't process response from server. Status Code: {0} Data from server: {1}"
             ).format(response.status_code,
                      self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
-            return RetVal(action_result.set_status(phantom.APP_ERROR, message),
-                          None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             exc_tb = sys.exc_info()
-            self.save_progress(
-                ('exception_line={} {}').format(exc_tb.tb_lineno, err))
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR,
-                                         ('Error: {}').format(err)), None)
+            self.save_progress(('exception_line={} {}').format(exc_tb.tb_lineno, err))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error: {}').format(err)), None)
 
     def _make_rest_call(self, endpoint, action_result, method='get', **kwargs):
 
@@ -137,10 +124,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(
-                action_result.set_status(phantom.APP_ERROR,
-                                         'Invalid method: {0}'.format(method)),
-                resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Invalid method: {0}'.format(method)), resp_json)
 
         # Create a URL to connect to
 
@@ -152,11 +136,7 @@ class DigitalGuardianArcConnector(BaseConnector):
                              **kwargs)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Error connecting to server. {0}'.format(err)),
-                resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -258,8 +238,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             self.save_progress('Ingesting data')
         else:
             self.save_progress('No export data found')
-            return action_result.set_status(phantom.APP_SUCCESS,
-                                            'No export data found')
+            return action_result.set_status(phantom.APP_SUCCESS, 'No export data found')
         for entry in export_list:
             try:
                 if not entry['dg_alert.dg_detection_source'] == 'alert' and entry[
@@ -275,13 +254,11 @@ class DigitalGuardianArcConnector(BaseConnector):
                         oldname = name
                         if container_id:
                             (artifacts_creation_status,
-                            artifacts_creation_msg) = self.create_artifacts(
-                                alert=entry, container_id=container_id)
+                            artifacts_creation_msg) = self.create_artifacts(alert=entry, container_id=container_id)
                             if phantom.is_fail(artifacts_creation_status):
                                 self.debug_print((
                                     'Error while creating artifacts for container with ID {container_id}. {error_msg}'
-                                ).format(container_id=container_id,
-                                        error_msg=artifacts_creation_msg))
+                                ).format(container_id=container_id, error_msg=artifacts_creation_msg))
                                 self._state['first_run'] = False
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
@@ -349,8 +326,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             if phantom.is_fail(container_creation_status):
                 self.save_progress((
                     'Error while creating container for alert {alert_name}. {error_message}'
-                ).format(alert_name=items['dg_alarm_name'],
-                         error_message=container_creation_msg))
+                ).format(alert_name=items['dg_alarm_name'], error_message=container_creation_msg))
                 return None
             else:
                 return container_id
@@ -469,10 +445,8 @@ class DigitalGuardianArcConnector(BaseConnector):
                 temp_dict['label'] = artifact_name
                 temp_dict['type'] = 'host'
                 temp_dict['container_id'] = container_id
-                temp_dict['severity'] = self.convert_to_phantom_severity(
-                    alert['dg_alarm_sev'])
-                temp_dict['source_data_identifier'] = self.create_dict_hash(
-                    temp_dict)
+                temp_dict['severity'] = self.convert_to_phantom_severity(alert['dg_alarm_sev'])
+                temp_dict['source_data_identifier'] = self.create_dict_hash(temp_dict)
                 temp_dict['tenant'] = self._client_id
 
                 operation = alert['dg_utype'][:4]
@@ -489,8 +463,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             cef_types = {}
             artifact_name = '{} Artifact'.format('Alarm Detail')
             # artifact_name = '{} Artifact'.format(alert.get('dg_alarm_name'))
-            for (artifact_key,
-                 artifact_tuple) in specific_alert_mapping.get(cat).items():
+            for (artifact_key, artifact_tuple) in specific_alert_mapping.get(cat).items():
                 if alert.get(artifact_tuple[0]):
                     cef[artifact_key] = alert[artifact_tuple[0]]
                     cef_types[artifact_key] = artifact_tuple[1]
@@ -502,15 +475,12 @@ class DigitalGuardianArcConnector(BaseConnector):
                 temp_dict['label'] = artifact_name
                 temp_dict['type'] = 'host'
                 temp_dict['container_id'] = container_id
-                temp_dict['severity'] = self.convert_to_phantom_severity(
-                    alert['dg_alarm_sev'])
-                temp_dict['source_data_identifier'] = self.create_dict_hash(
-                    temp_dict)
+                temp_dict['severity'] = self.convert_to_phantom_severity(alert['dg_alarm_sev'])
+                temp_dict['source_data_identifier'] = self.create_dict_hash(temp_dict)
                 temp_dict['tenant'] = self._client_id
                 artifacts_list.append(temp_dict)
 
-        create_artifact_status, create_artifact_msg, _ = self.save_artifacts(
-            artifacts_list)
+        create_artifact_status, create_artifact_msg, _ = self.save_artifacts(artifacts_list)
         if phantom.is_fail(create_artifact_status):
             return (phantom.APP_ERROR, create_artifact_msg)
         return (phantom.APP_SUCCESS, 'Artifacts created successfully')
@@ -531,7 +501,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             try:
                 input_dict_str = json.dumps(input_dict, sort_keys=True)
                 self.debug_print("Input dictionary is {}".format(self._handle_py_ver_compat_for_input_str(input_dict_str)))
-                return input_dict_str
+                return
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 self.debug_print("Handled exception in '_create_dict_hash'", err)
@@ -624,8 +594,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
 
     def _add_watchlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
@@ -636,7 +605,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         if watch_list_id:
-            watch_list_entry_json = '[{"value_name":"' + watchlist_entry + '"}]'
+            watch_list_entry_json = '[{"value_name":"%s"}]' % watchlist_entry
             full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
             try:
                 r = requests.post(url='{0}{1}/values/'.format(full_url, watch_list_id),
@@ -647,17 +616,14 @@ class DigitalGuardianArcConnector(BaseConnector):
                 err = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return action_result.set_status(phantom.APP_SUCCESS,
-                                                 'Successfully added {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully added {0}'.format(msg_string))
             else:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                 'Failed to add {0}'.format(msg_string))
-        return action_result.set_status(
-            phantom.APP_ERROR, 'Could not find watch_list = {0}'.format(watchlist_name))
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to add {0}'.format(msg_string))
+
+        return action_result.set_status(phantom.APP_ERROR, 'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _remove_watchlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
@@ -680,24 +646,16 @@ class DigitalGuardianArcConnector(BaseConnector):
                     err = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
                 if 200 <= r.status_code <= 299:
-                    return action_result.set_status(phantom.APP_SUCCESS,
-                                                     'Successfully removed {0}'.format(msg_string))
+                    return action_result.set_status(phantom.APP_SUCCESS, 'Successfully removed {0}'.format(msg_string))
                 else:
-                    return action_result.set_status(
-                        phantom.APP_ERROR,
-                        'Failed to remove {0}'.format(msg_string))
+                    return action_result.set_status(phantom.APP_ERROR, 'Failed to remove {0}'.format(msg_string))
             else:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Could not find entry {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_ERROR, 'Could not find entry {0}'.format(msg_string))
         else:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                'Could not find watch_list = {0}'.format(watchlist_name))
+            return action_result.set_status(phantom.APP_ERROR, 'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _check_watchlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
@@ -711,20 +669,14 @@ class DigitalGuardianArcConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
             if watch_list_value_id:
-                return action_result.set_status(phantom.APP_SUCCESS,
-                                                 'Successfully found {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully found {0}'.format(msg_string))
             else:
-                return action_result.set_status(
-                    phantom.APP_SUCCESS,
-                    'Failed to find entry {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Failed to find entry {0}'.format(msg_string))
         else:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                'Could not find watch_list = {0}'.format(watchlist_name))
+            return action_result.set_status(phantom.APP_ERROR, 'Could not find watch_list = {0}'.format(watchlist_name))
 
     def _add_componentlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
@@ -735,7 +687,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             return action_result.get_status()
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
-            component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
+            component_list_entry_json = '{"items":["%s"]}' % componentlist_entry
             full_url = '{0}/remediation/lists/'.format(self._arc_url.strip("/"))
             try:
                 r = requests.put(url='{0}{1}/append'.format(full_url, list_id),
@@ -746,19 +698,14 @@ class DigitalGuardianArcConnector(BaseConnector):
                 err = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return action_result.set_status(phantom.APP_SUCCESS,
-                                                 'Successfully added {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully added {0}'.format(msg_string))
             else:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Failed to add {0}'.format(msg_string))
-        return action_result.set_status(
-            phantom.APP_ERROR,
-            'Could not find component_list = {0}'.format(componentlist_name))
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to add {0}'.format(msg_string))
+
+        return action_result.set_status(phantom.APP_ERROR, 'Could not find component_list = {0}'.format(componentlist_name))
 
     def _remove_componentlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
@@ -769,7 +716,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             return action_result.get_status()
         self._client_headers["Content-Type"] = "application/json"
         if list_id:
-            component_list_entry_json = '{"items":["' + componentlist_entry + '"]}'
+            component_list_entry_json = '{"items":["%s"]}' % componentlist_entry
             full_url = '{0}/remediation/lists/'.format(self._arc_url.strip("/"))
             try:
                 r = requests.post(url='{0}{1}/delete'.format(full_url, list_id),
@@ -780,18 +727,14 @@ class DigitalGuardianArcConnector(BaseConnector):
                 err = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, 'Error connecting to server. {0}'.format(err))
             if 200 <= r.status_code <= 299:
-                return action_result.set_status(phantom.APP_SUCCESS,
-                                                 'Successfully removed {0}'.format(msg_string))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully removed {0}'.format(msg_string))
             else:
-                return action_result.set_status(
-                    phantom.APP_ERROR, 'Failed to remove {0}'.format(msg_string))
-        return action_result.set_status(
-            phantom.APP_ERROR,
-            'Could not find component_list = {0}'.format(componentlist_name))
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to remove {0}'.format(msg_string))
+
+        return action_result.set_status(phantom.APP_ERROR, 'Could not find component_list = {0}'.format(componentlist_name))
 
     def _check_componentlist_entry(self, param):
-        self.save_progress(('In action handler for: {0}').format(
-            self.get_action_identifier()))
+        self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.debug_print(param)
         componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
@@ -816,19 +759,14 @@ class DigitalGuardianArcConnector(BaseConnector):
                     for jText in jsonText:
                         entryExists = True
                         if self._handle_py_ver_compat_for_input_str(jText['content_value']).lower() == componentlist_entry.lower():
-                            return action_result.set_status(
-                                phantom.APP_SUCCESS, 'Successfully found {0}'.format(msg_string))
+                            return action_result.set_status(phantom.APP_SUCCESS, 'Successfully found {0}'.format(msg_string))
                 if not entryExists:
-                    return action_result.set_status(
-                        phantom.APP_SUCCESS,
-                        'Failed to find entry {0}'.format(msg_string))
+                    return action_result.set_status(phantom.APP_SUCCESS, 'Failed to find entry {0}'.format(msg_string))
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response from the server. {0}'.format(err))
         else:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                'Could not find component_list = {0}'.format(componentlist_name))
+            return action_result.set_status(phantom.APP_ERROR, 'Could not find component_list = {0}'.format(componentlist_name))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -939,8 +877,7 @@ class DigitalGuardianArcConnector(BaseConnector):
 
                 if api_key_response.status_code == 200:
                     self._api_key = response_json['access_token']
-                    self._client_headers.update(
-                        {'Authorization': 'Bearer {}'.format(self._api_key)})
+                    self._client_headers.update({'Authorization': 'Bearer {}'.format(self._api_key)})
                     self._client_headers['Authorization'] = 'Bearer {}'.format(self._api_key)
                     return (phantom.APP_SUCCESS, None)
                 else:
