@@ -157,30 +157,29 @@ class UrlhausConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            self.debug_print("MMMMMMMMMMMMMMM: ", error_msg)
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = error_msg
             else:
                 error_text = "Error Code: %s. Error Message: %s" % (error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -201,7 +200,7 @@ class UrlhausConnector(BaseConnector):
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -209,6 +208,12 @@ class UrlhausConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             return RetVal(
                 action_result.set_status(
@@ -408,12 +413,13 @@ class UrlhausConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
 
         return phantom.APP_SUCCESS
 
