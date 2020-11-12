@@ -200,21 +200,21 @@ class FlashpointConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = FLASHPOINT_ERROR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+                error_code = FLASHPOINT_ERROR_CODE_MSG
+                error_msg = FLASHPOINT_UNKNOWN_ERROR_MESSAGE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_code = FLASHPOINT_ERROR_CODE_MSG
+            error_msg = FLASHPOINT_UNKNOWN_ERROR_MESSAGE
 
         try:
             error_msg = FlashpointConnector._handle_py_ver_compat_for_input_str(self._python_version, error_msg)
         except TypeError:
             error_msg = FLASHPOINT_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
         except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+            error_msg = FLASHPOINT_UNKNOWN_ERROR_MESSAGE
 
         return error_code, error_msg
 
@@ -251,6 +251,12 @@ class FlashpointConnector(BaseConnector):
 
         try:
             r = request_func(url, params=params, headers=headers, data=data)
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error Code: {0}. Error Message: {1}".format(error_code, error_msg)), resp_json)

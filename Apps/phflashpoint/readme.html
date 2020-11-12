@@ -82,7 +82,7 @@
                                                 <li>Query = category:”Payload Delivery”</li>
                                             </ul>
                                         </li>
-                                        <li>Free text search(when using multiple words, use a + instead of space and for specific word search use “test text” (inverted double quotes) in the query action parameter.)
+                                        <li>Free text search(when using multiple words, use a + instead of space, and for specific word search use “test text” (inverted double quotes) in the query action parameter.)
                                             <ul style="list-style-type:none;">
                                                 <li> Query = gandcrab+ransomware </li>
                                                 <li> Query = “test text” </li>
@@ -100,7 +100,7 @@
                         </li>
                         <br>
                         <li>
-                            <b><u>Notes</u>-</b> The user will have to provide URL value in the "Attribute Types" action parameter and the URL value enclosed in double-quotes in the "Query" parameter if they want to search for an IoC having specific URL value. This does not work correctly if the user provides the URL value without double-quotes in the "Query" parameter. This is based on current API behavior of the Flashpoint.
+                            <b><u>Notes</u>-</b> The user will have to provide URL value in the "Attribute Types" action parameter and the URL value enclosed in double-quotes in the "Query" parameter if they want to search for an IoC having a specific URL value. This does not work correctly if the user provides the URL value without double-quotes in the "Query" parameter. This is based on the current API behavior of the Flashpoint.
                         </li>
                     </ul>
                 <br>
@@ -124,7 +124,7 @@
                                                 <li>Attribute Type = filename</li>
                                                 <li>Attribute Value= "PLEASE-CHECK”</li>
                                             </ul>
-                                            <u>Note</u>- In the above example, without the double quotes around the filename, it will search for every filename that matches 'PLEASE'. The hyphen/space will be considered as the end of search value and it will search for indicators matching the value until the first encountered hyphen/space.
+                                            <u>Note</u>- In the above example, without the double quotes around the filename, it will search for every filename that matches 'PLEASE'. The hyphen/space will be considered as the end of the search value and it will search for indicators matching the value until the first encountered hyphen/space.
                                         </li>
                                         <br>
                                         <li> Get indicator matching a specific source IP Address
@@ -153,7 +153,7 @@
                         </li>
                         <br>
                         <li>
-                            <b><u>Notes</u>-</b> This action is not working with the valid value of IoC type which consists of pipe symbol(|) in its name. In case of searching the IoC of that type, you can use [run query] or [list indicators] actions by providing appropriate query in the "Query" action parameter. Below are the examples:
+                            <b><u>Notes</u>-</b> This action is not working with the valid value of IoC type which consists of pipe symbol(|) in its name. In case of searching the IoC of that type, you can use [run query] or [list indicators] actions by providing an appropriate query in the "Query" action parameter. Below are the examples:
                             
                             <p><u>For [run query] action</u>:
                                 <br><br>Search for IoC value which consists of pipe symbol(|) in the IoC attribute type

@@ -14,7 +14,7 @@
     "utctime_updated": "2020-02-13T09:00:05.817664Z",
     "package_name": "phantom_flashpoint",
     "main_module": "flashpoint_connector.pyc",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "latest_tested_version": [
         "Cloud v4.5.23"
@@ -36,21 +36,18 @@
         "wait_timeout_period": {
             "description": "Retry Wait Period(in seconds)",
             "data_type": "numeric",
-            "required": false,
             "default": 5,
             "order": 2
         },
         "no_of_retries": {
             "description": "Number Of Retries",
             "data_type": "numeric",
-            "required": false,
             "default": 1,
             "order": 3
         },
-        "session_timeout":{
+        "session_timeout": {
             "description": "Session Timeout(in minutes)",
             "data_type": "numeric",
-            "required": false,
             "default": 2,
             "order": 4
         }
@@ -58,9 +55,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -68,28 +65,19 @@
         },
         {
             "action": "list reports",
-            "identifier": "list_reports",
             "description": "Fetch a list of all the intelligence reports from the Flashpoint Platform",
             "type": "investigate",
+            "identifier": "list_reports",
             "read_only": true,
             "parameters": {
                 "limit": {
                     "description": "Maximum number of reports to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
@@ -280,6 +268,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_reports",
                     "data_type": "numeric",
                     "example_values": [
@@ -319,9 +315,9 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
             "description": "Fetch a specific intelligence report from the Flashpoint Platform for the provided report ID",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "report_id": {
@@ -336,14 +332,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.report_id",
                     "data_type": "string",
@@ -537,6 +525,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -573,9 +569,9 @@
         },
         {
             "action": "list related reports",
-            "identifier": "list_related_reports",
             "description": "Fetch a list of all the related intelligence reports from the Flashpoint Platform for the provided report ID",
             "type": "investigate",
+            "identifier": "list_related_reports",
             "read_only": true,
             "parameters": {
                 "report_id": {
@@ -591,20 +587,11 @@
                 "limit": {
                     "description": "Maximum number of reports to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
@@ -805,6 +792,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_related_reports",
                     "data_type": "numeric",
                     "example_values": [
@@ -844,34 +839,24 @@
         },
         {
             "action": "get compromised credentials",
-            "identifier": "get_compromised_credentials",
             "description": "Fetch a list of all the Credential Sightings from the Flashpoint Platform",
             "type": "investigate",
+            "identifier": "get_compromised_credentials",
             "read_only": true,
             "parameters": {
                 "filter": {
                     "description": "Filtering the data of credentials sightings",
                     "data_type": "string",
-                    "required": false,
                     "order": 0
                 },
                 "limit": {
                     "description": "Maximum number of reports to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.filter",
                     "data_type": "string",
@@ -1146,6 +1131,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_results",
                     "data_type": "numeric",
                     "example_values": [
@@ -1181,9 +1174,9 @@
         },
         {
             "action": "run query",
-            "identifier": "run_query",
             "description": "Fetch the data by performing a universal search from the Flashpoint Platform",
             "type": "investigate",
+            "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "query": {
@@ -1199,20 +1192,11 @@
                 "limit": {
                     "description": "Maximum number of reports to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
@@ -1675,9 +1659,6 @@
                 },
                 {
                     "data_path": "action_result.data.*._source.Event.extends_uuid",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -2083,9 +2064,6 @@
                 },
                 {
                     "data_path": "action_result.data.*._source.body.text/html-sanitized",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -7838,9 +7816,6 @@
                         "file name"
                     ],
                     "data_path": "action_result.data.*._source.value.comment",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -7966,6 +7941,14 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_results",
                     "example_values": [
                         478
@@ -8001,15 +7984,14 @@
         },
         {
             "action": "list indicators",
-            "identifier": "list_indicators",
             "description": "Fetch a list of IoCs that occur in the context of an event from the Flashpoint Platform",
             "type": "investigate",
+            "identifier": "list_indicators",
             "read_only": true,
             "parameters": {
                 "attributes_types": {
                     "description": "Enable a search by attribute types(allows Comma-separated list)",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 0,
                     "contains": [
@@ -8019,7 +8001,6 @@
                 "query": {
                     "description": "Filter the results based on the field value or free text search",
                     "data_type": "string",
-                    "required": false,
                     "order": 1,
                     "primary": true,
                     "contains": [
@@ -8029,20 +8010,11 @@
                 "limit": {
                     "description": "Maximum number of indicators to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.attributes_types",
                     "data_type": "string",
@@ -8171,10 +8143,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.Attribute.value.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.Attribute.value.md5",
@@ -8653,9 +8622,6 @@
                 {
                     "data_path": "action_result.data.*.value.comment",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "url"
                     ]
@@ -9174,6 +9140,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_iocs",
                     "data_type": "numeric",
                     "example_values": [
@@ -9213,9 +9187,9 @@
         },
         {
             "action": "search indicators",
-            "identifier": "search_indicators",
             "description": "Fetch an IoC value of a specific attribute type from the list of available IoCs on the Flashpoint Platform",
             "type": "investigate",
+            "identifier": "search_indicators",
             "read_only": true,
             "parameters": {
                 "attribute_type": {
@@ -9241,20 +9215,11 @@
                 "limit": {
                     "description": "Maximum number of reports to be fetched (Default: 500)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 500,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.attribute_type",
                     "data_type": "string",
@@ -9379,10 +9344,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.Attribute.value.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.Attribute.value.md5",
@@ -9547,10 +9509,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.value.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.value.cookie",
@@ -10063,6 +10022,14 @@
                     ],
                     "contains": [
                         "fp attribute value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
