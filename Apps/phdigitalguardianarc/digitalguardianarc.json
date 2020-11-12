@@ -61,7 +61,7 @@
         },
         {
             "action": "add watchlist entry",
-            "description": "Add entry to ARC Watchlist",
+            "description": "Add an entry to ARC Watchlist",
             "type": "correct",
             "identifier": "add_watchlist_entry",
             "undo": "remove watchlist entry",
@@ -165,7 +165,7 @@
         },
         {
             "action": "remove watchlist entry",
-            "description": "Remove entry from ARC Watchlist",
+            "description": "Remove the entry from ARC Watchlist",
             "type": "contain",
             "identifier": "remove_watchlist_entry",
             "undo": "add watchlist entry",
@@ -372,7 +372,7 @@
         },
         {
             "action": "add componentlist entry",
-            "description": "Add entry to Componentlist",
+            "description": "Add an entry to Componentlist",
             "type": "correct",
             "identifier": "add_componentlist_entry",
             "undo": "remove componentlist entry",
@@ -476,7 +476,7 @@
         },
         {
             "action": "remove componentlist entry",
-            "description": "Remove entry from Componentlist",
+            "description": "Remove the entry from Componentlist",
             "type": "contain",
             "identifier": "remove_componentlist_entry",
             "undo": "add componentlist entry",
@@ -580,7 +580,7 @@
         },
         {
             "action": "check componentlist entry",
-            "description": "Check entry in Componentlist",
+            "description": "Check the entry in Componentlist",
             "type": "investigate",
             "identifier": "check_componentlist_entry",
             "read_only": true,
@@ -684,7 +684,7 @@
         {
             "action": "on poll",
             "description": "Ingest alerts from ARC into Phantom as events",
-            "verbose": "The default start_time is past 5 days and default end_time is now.",
+            "verbose": "The default start_time is the past 5 days and the default end_time is now.",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
