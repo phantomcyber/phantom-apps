@@ -55,7 +55,7 @@ class SymantecManagementCenterConnector(BaseConnector):
         return input_str
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -66,28 +66,27 @@ class SymantecManagementCenterConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(
-                    error_code, error_msg)
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
             self.debug_print("Error occurred while parsing error message")
             error_text = PARSE_ERR_MSG
@@ -626,8 +625,8 @@ class SymantecManagementCenterConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, 'Unable to retrieve policy info: {0}'.format(err))
 
-        policy_details = policy_details['policies'][0]
         try:
+            policy_details = policy_details['policies'][0]
             if policy_details['contentType'] not in CONTENT_TYPES:
                 message = 'Unable to edit policy, wrong content type. Received: {0}, expecting LOCAL_CATEGORY_DB, URL_LIST, or IP_LIST'.format(policy_details['contentType'])
                 return action_result.set_status(phantom.APP_ERROR, message)
