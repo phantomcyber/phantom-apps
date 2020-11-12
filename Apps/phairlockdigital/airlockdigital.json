@@ -821,7 +821,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "move endpoints",
+            "action": "move endpoint",
             "description": "Moves an endpoint from one group to another",
             "verbose": "This action moves an enforcement agent registration from one group within Airlock to another. This requires the destination Group ID to be referenced in the request as the 'target'. The source group does not need to be specified.",
             "type": "generic",

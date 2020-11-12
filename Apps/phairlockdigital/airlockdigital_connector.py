@@ -148,29 +148,29 @@ class AirlockDigitalConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -210,6 +210,12 @@ class AirlockDigitalConnector(BaseConnector):
                             url,
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
             error_message = 'Error Details: Connection Refused from the Server'
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
@@ -220,7 +226,6 @@ class AirlockDigitalConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url = AIRLOCK_LICENSE_GET_ENDPOINT
@@ -230,8 +235,6 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(url, action_result, params=None, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
@@ -240,14 +243,12 @@ class AirlockDigitalConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unblock_hash(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Optional values use get parameter
         blocklistid = param.get('blocklistid', '')
         hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Empty arrays
@@ -292,19 +293,15 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_disallow_hash(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Optional values use get parameter
         applicationid = param.get('applicationid', '')
         hash_param = self._handle_py_ver_compat_for_input_str(param['hash'])
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Empty arrays
@@ -349,14 +346,11 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_block_hash(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Empty arrays
@@ -397,15 +391,11 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_allow_hash(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Empty arrays
@@ -460,15 +450,11 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_identifiers(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -543,15 +529,12 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_policy(self, param):
         # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
@@ -585,15 +568,12 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_move_endpoints(self, param):
         # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # URL Group Request
@@ -627,15 +607,11 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_endpoints(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Optional values should use the .get() function
@@ -692,8 +668,6 @@ class AirlockDigitalConnector(BaseConnector):
                 ret_val, response = self._make_rest_call(AIRLOCK_AGENT_FIND_ENDPOINT, action_result, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.debug_print('Failed to list endpoints for Airlock Digital')
             return action_result.get_status()
 
@@ -707,19 +681,14 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_otp_revoke(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         otpid = param['otpid']
 
@@ -730,8 +699,6 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(AIRLOCK_OTP_REVOKE_ENDPOINT, action_result, params=param_var, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.debug_print("Failed to revoke OTP for Airlock Digital")
             return action_result.get_status()
 
@@ -742,15 +709,12 @@ class AirlockDigitalConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['status'] = action_result['error']
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_otp_retrieve(self, param):
         # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -770,8 +734,6 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(AIRLOCK_OTP_RETRIEVE_ENDPOINT, action_result, params=param_var, headers=self._header_var, method="post")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.debug_print("Failed to retrieve OTP for Airlock Digital")
             return action_result.get_status()
 
@@ -788,15 +750,12 @@ class AirlockDigitalConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_lookup_hash(self, param):
         # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
@@ -816,16 +775,12 @@ class AirlockDigitalConnector(BaseConnector):
         ret_val, response = self._make_rest_call(AIRLOCK_HASH_QUERY_ENDPOINT, action_result, headers=header_var, method="post", data=data_var)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.debug_print("Failed to lookup hash for Airlock Digital")
             return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -933,7 +888,7 @@ if __name__ == '__main__':
         try:
             login_url = AirlockDigitalConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -946,11 +901,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -966,6 +921,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
