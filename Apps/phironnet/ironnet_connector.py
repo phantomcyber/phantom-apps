@@ -104,19 +104,19 @@ class IronnetConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, INT_VALIDATION_ERR_MSG.format(key)), None
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, INT_VALIDATION_ERR_MSG.format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -127,28 +127,27 @@ class IronnetConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(
-                    error_code, error_msg)
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
             self.debug_print("Error occurred while parsing error message")
             error_text = PARSE_ERR_MSG
