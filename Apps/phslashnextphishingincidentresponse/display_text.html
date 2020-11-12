@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_text.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -99,41 +99,45 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 		{% for result in results %} <!-- Loop for each result -->
 
-		<section class="mb-20 mt-20">
-			<!-- Download Text section -->
-			<h2 class="mb-10">SlashNext Phishing Incident Response - Download Text</h2>
+			{% if not result.data %}
+				<h4 calss="wf-h4-style">No data found</h4>
+			{% else %}
+				<section class="mb-20 mt-20">
+					<!-- Download Text section -->
+					<h2 class="mb-10">SlashNext Phishing Incident Response - Download Text</h2>
 
-			<h3 class="mb-5">action = download text</h3>
-			<h3 class="mb-5">scan id = {{result.param.scanid}}</h3>
+					<h3 class="mb-5">action = download text</h3>
+					<h3 class="mb-5">scan id = {{result.param.scanid}}</h3>
 
-			{% if result.data.errorNo == 0 %} <!-- Download text success condition -->
+					{% if result.data.errorNo == 0 %} <!-- Download text success condition -->
 
-			<div class="full"><a href="javascript:;" class="bttn download-text" id="txtDwlBnt{{ forloop.counter }}">Download Text</a></div>
-			<script type="text/javascript">
-				function downloadTxt(txtData,txtName) {
-					return function() {
-						var element = document.createElement('a');
-						element.setAttribute('href', 'data:application/html;charset=utf-8,' + encodeURIComponent(txtData));
-						element.setAttribute('download', txtName);
-						element.style.display = 'none';
-						document.body.appendChild(element);
-						element.click();
-						document.body.removeChild(element);
-					};
-				};
-				var txtData = atob('{{result.data.textData.textBase64}}');
-				var txtName = 'snx_' + '{{result.param.scanid}}' +'.txt';
-				$("#txtDwlBnt" + "{{ forloop.counter }}").click(downloadTxt(txtData,txtName));
-			</script>
+						<div class="full"><a href="javascript:;" class="bttn download-text" id="txtDwlBnt{{ forloop.counter }}">Download Text</a></div>
+						<script type="text/javascript">
+							function downloadTxt(txtData,txtName) {
+								return function() {
+									var element = document.createElement('a');
+									element.setAttribute('href', 'data:application/html;charset=utf-8,' + encodeURIComponent(txtData));
+									element.setAttribute('download', txtName);
+									element.style.display = 'none';
+									document.body.appendChild(element);
+									element.click();
+									document.body.removeChild(element);
+								};
+							};
+							var txtData = atob('{{result.data.textData.textBase64}}');
+							var txtName = 'snx_' + '{{result.param.scanid}}' +'.txt';
+							$("#txtDwlBnt" + "{{ forloop.counter }}").click(downloadTxt(txtData,txtName));
+						</script>
 
-			{% elif result.data.errorNo == 1 %} <!-- Download text pending condition -->
-			<h3 class="mb-5">{{result.message}}</h3>
-			{% else %} <!-- Download text error condition -->
-			<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
-			<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
-			{% endif %} <!-- Download text success condition -->
+					{% elif result.data.errorNo == 1 %} <!-- Download text pending condition -->
+						<h3 class="mb-5">{{result.message}}</h3>
+					{% else %} <!-- Download text error condition -->
+						<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+						<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+					{% endif %} <!-- Download text success condition -->
 
-		</section>
+				</section>
+			{% endif %}
 
 		{% endfor %} <!-- Loop for each result end -->
 

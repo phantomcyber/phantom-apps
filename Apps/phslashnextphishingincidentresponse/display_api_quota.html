@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_api_quota.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -99,27 +99,31 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 		{% for result in results %} <!-- Loop for each result -->
 
-		<section class="mb-20 mt-20">
-			<!-- API Quota section -->
-			<h2 class="mb-10">SlashNext Phishing Incident Response - API Quota</h2>
+			{% if not result.data %}
+				<h4 calss="wf-h4-style">No data found</h4>
+			{% else %}
+				<section class="mb-20 mt-20">
+					<!-- API Quota section -->
+					<h2 class="mb-10">SlashNext Phishing Incident Response - API Quota</h2>
 
-			<h3 class="mb-5">action = api quota</h3>
+					<h3 class="mb-5">action = api quota</h3>
 
-			{% if result.data.errorNo == 0 %} <!-- API Quota success condition -->
-			<div class="mb-5 blockDiv">
-				<div class="blockRow blockRow3">
-					<div><label>Licensed Quota</label><span>{{result.data.quotaDetails.licensedQuota}}</span></div>
-					<div><label>Remaining Quota</label><span>{{result.data.quotaDetails.remainingQuota}}</span></div>
-					<div><label>Expiration Date</label><span>{{result.data.quotaDetails.expiryDate}}</span></div>
-				</div>
-			</div>
-			<h3 class="mb-5 cr-blue1">Note: {{result.data.quotaDetails.note}}</h3>
-			{% else %} <!-- API Quota error condition -->
-			<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
-			<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
-			{% endif %} <!-- API Quota success condition -->
+					{% if result.data.errorNo == 0 %} <!-- API Quota success condition -->
+						<div class="mb-5 blockDiv">
+							<div class="blockRow blockRow3">
+								<div><label>Licensed Quota</label><span>{{result.data.quotaDetails.licensedQuota}}</span></div>
+								<div><label>Remaining Quota</label><span>{{result.data.quotaDetails.remainingQuota}}</span></div>
+								<div><label>Expiration Date</label><span>{{result.data.quotaDetails.expiryDate}}</span></div>
+							</div>
+						</div>
+						<h3 class="mb-5 cr-blue1">Note: {{result.data.quotaDetails.note}}</h3>
+					{% else %} <!-- API Quota error condition -->
+						<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+						<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+					{% endif %} <!-- API Quota success condition -->
 
-		</section>
+				</section>
+			{% endif %}	
 
 		{% endfor %} <!-- Loop for each result end -->
 
