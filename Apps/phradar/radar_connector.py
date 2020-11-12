@@ -5,13 +5,11 @@
 
 import json
 import os
-import sys
 import requests
 from datetime import datetime
 import pytz
 from dateutil import parser
 from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
 from radar_consts import *
 
 # Phantom App imports
@@ -40,14 +38,9 @@ class RadarConnector(BaseConnector):
         # set asset config and env vars
         config = self.get_config()
         self._api_url = config.get("radar_api_url")
+        self._api_url = self._api_url.strip('/')
         self._verify_ssl = not os.getenv(ALLOW_SELF_SIGNED_CERTS)
         self._time_zone = config.get("time_zone", "UTC")
-
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         return phantom.APP_SUCCESS
 
@@ -72,10 +65,10 @@ class RadarConnector(BaseConnector):
             error_text = "\n".join(split_lines)
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
-            self.debug_print(f"action: {self.get_action_identifier()} - process HTML error: {err}")
+            self.debug_print(f"Action: {self.get_action_identifier()} - Process HTML error: {err}")
             error_text = "Cannot parse error details"
 
-        message = f"HTML Response Status Code: {status_code}: {error_text}\n"
+        message = f"HTML Response Status Code: {status_code} Data from server: {error_text}\n"
         message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -84,14 +77,13 @@ class RadarConnector(BaseConnector):
         try:
             resp_json = response.json()
             if response.links and response.links["ui"]:
-                if response.links["ui"]["url"]:
-                    resp_json["url"] = response.links["ui"]["url"]
+                resp_json["url"] = response.links["ui"]["url"]
         except ValueError as ex:
             err = self._get_error_message_from_exception(ex)
             if 200 <= response.status_code < 399:
                 return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
             else:
-                self.debug_print(f"action: {self.get_action_identifier()} - process JSON error: {err}")
+                self.debug_print(f"Action: {self.get_action_identifier()} - Process JSON error: {err}")
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err), None)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -135,12 +127,12 @@ class RadarConnector(BaseConnector):
         status_code = error_resp.status_code
         status_message = f"Error response: Status code: {status_code}"
         if status_code == 404:
-            return f"{status_message}. Message: not found. Please double check request parameters"
+            return f"{status_message}. Message: Not Found. Please double check request parameters"
         if status_code == 403:
-            return f"{status_message}. Message: forbidden. " \
+            return f"{status_message}. Message: Forbidden. " \
                 f"Please double check that your Radar API token, user, and permissions are configured correctly"
         if status_code == 401:
-            return f"{status_message}. Message: unauthorized. " \
+            return f"{status_message}. Message: Unauthorized. " \
                 f"Please double check your Radar API token"
 
         try:
@@ -156,27 +148,15 @@ class RadarConnector(BaseConnector):
             return f"{status_message}. Message: {resp_json['message']}"
         except (ValueError, KeyError) as ex:
             err = self._get_error_message_from_exception(ex)
-            self.debug_print(f"action: {self.get_action_identifier()} - process error response error: {err}")
+            self.debug_print(f"Action: {self.get_action_identifier()} - Process error response error: {err}")
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(f"Action: {self.get_action_identifier()} - Process error response error: {err}")
 
         return f"{status_message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
 
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except Exception:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
-
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -187,29 +167,22 @@ class RadarConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = TYPE_ERR_MSG
-        except:
-            error_msg = ERROR_MSG_UNAVAILABLE
-
-        try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
@@ -223,7 +196,7 @@ class RadarConnector(BaseConnector):
             resp_json = resp.json()
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
-            self.debug_print(f"action: {self.get_action_identifier()} - get system settings error: {err}")
+            self.debug_print(f"Action: {self.get_action_identifier()} - Get system settings error: {err}")
             return None
 
         return resp_json
@@ -247,20 +220,17 @@ class RadarConnector(BaseConnector):
             request_func = getattr(requests, method)
         except AttributeError as aex:
             err = self._get_error_message_from_exception(aex)
-            self.debug_print(f"action: {action} - {method} request attribute error: {err}")
+            self.debug_print(f"Action: {action} - {method} Request attribute error: {err}")
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
-            return self._process_response(resp, action_result)
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
-            self.debug_print(f"action: {action} - make REST call error: {err}")
-            try:
-                return RetVal(
+            self.debug_print(f"Action: {action} - Make REST call error: {err}")
+            return RetVal(
                     action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
-            except Exception:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to connect to the URL: {url}. Error Details: {err}"), resp_json)
+        return self._process_response(resp, action_result)
 
     def _payload_err(self, ex, action_result, data):
         err = self._get_error_message_from_exception(ex)
@@ -268,18 +238,21 @@ class RadarConnector(BaseConnector):
         self.debug_print((f"{msg}\nresponse data:", data))
         return action_result.set_status(phantom.APP_ERROR, msg)
 
-    def _validate_integer(self, action_result, parameter, key):
+    def _validate_incident_id_param(self, action_result, parameter):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+                    self.debug_print(VALID_INTEGER_MSG)
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG), None
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+                self.debug_print(VALID_INTEGER_MSG)
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG), None
 
-            if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+            if parameter <= 0:
+                self.debug_print(NON_NEGATIVE_INTEGER_MSG)
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -309,11 +282,7 @@ class RadarConnector(BaseConnector):
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-        name = param.get("name")
-        if not name:
-            self.debug_print(f"action: {action} - required 'name' param not present")
-            return action_result.set_status(phantom.APP_ERROR, "Incident name is not specified")
-
+        name = param["name"]
         description = param.get("description", "Privacy incident created by Splunk Phantom")
         self.debug_print("There might be timezone variance. Please check for the timezone variance")
         # use timezone set in asset configuration to set discovered date_time timezone
@@ -329,7 +298,7 @@ class RadarConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please configure base URL for Phantom appliance")
         container_path = ""
         container_id = self.get_container_id()
-        if container_id is not None:
+        if container_id:
             container_path = f"/mission/{container_id}"
 
         uri = f"{phantom_base_url}{container_path}"
@@ -381,9 +350,8 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        result, incident_id = self._validate_integer(action_result, incident_id, INCIDENT_ID_KEY)
+        result, incident_id = self._validate_incident_id_param(action_result, incident_id)
         if phantom.is_fail(result):
-            self.debug_print("'incident_id' must be integer")
             return action_result.get_status()
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}", action_result, method="get")
@@ -433,9 +401,8 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        result, incident_id = self._validate_integer(action_result, incident_id, INCIDENT_ID_KEY)
+        result, incident_id = self._validate_incident_id_param(action_result, incident_id)
         if phantom.is_fail(result):
-            self.debug_print("'incident_id' must be integer")
             return action_result.get_status()
 
         content = param.get("content", "")
@@ -455,7 +422,7 @@ class RadarConnector(BaseConnector):
             note["id"] = data["headers"]["Location"].split("/")[4]
         # return error for missing id from response headers
         except Exception:
-            self.debug_print(f" action: {action} - cannot parse 'id' from response headers: {data['headers']}")
+            self.debug_print(f" Action: {action} - Cannot parse 'id' from response headers: {data['headers']}")
             return action_result.set_status(phantom.APP_ERROR, "API Response payload is missing necessary fields: 'id'")
 
         note["incident_id"] = incident_id
@@ -474,9 +441,8 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         incident_id = param.get("incident_id")
-        result, incident_id = self._validate_integer(action_result, incident_id, INCIDENT_ID_KEY)
+        result, incident_id = self._validate_incident_id_param(action_result, incident_id)
         if phantom.is_fail(result):
-            self.debug_print("'incident_id' must be integer")
             return action_result.get_status()
 
         radar_val, data = self._make_rest_call(f"/incidents/{incident_id}/notes", action_result, method="get")

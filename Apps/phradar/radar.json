@@ -424,6 +424,7 @@
                 "description": {
                     "description": "A description of the privacy incident",
                     "data_type": "string",
+                    "default": "Privacy incident created by Splunk Phantom",
                     "order": 1
                 }
             },
