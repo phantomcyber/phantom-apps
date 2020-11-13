@@ -32,7 +32,8 @@
             "order": 1
         }
     },
-    "actions": [{
+    "actions": [
+        {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
@@ -171,7 +172,8 @@
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "example_values": [
@@ -249,7 +251,8 @@
                     "order": 0
                 }
             },
-            "output": [{
+            "output": [
+                {
                     "data_path": "action_result.parameter.md5_hash",
                     "data_type": "string",
                     "contains": [
