@@ -196,10 +196,10 @@ class ThirdpartytestConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        #reqparam1 = param['reqparam1']
+        # reqparam1 = param['reqparam1']
 
         # Optional values should use the .get() function
-        #optparam1 = param.get('optparam1', '')
+        # optparam1 = param.get('optparam1', '')
 
         # make rest call
         ret_val, response = self._make_rest_call(
