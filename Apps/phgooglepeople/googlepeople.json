@@ -1,0 +1,1165 @@
+{
+    "appid": "cfeed12d-b40f-477a-b9f9-59c37d12ebfe",
+    "name": "Google People",
+    "description": "This app integrates with Google People to support various generic and investigative actions",
+    "type": "identity management",
+    "product_vendor": "Google",
+    "logo": "logo_google.svg",
+    "logo_dark": "logo_google_dark.svg",
+    "product_name": "Google People",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-07-21T23:24:14.466184Z",
+    "package_name": "phantom_googlepeople",
+    "main_module": "googlepeople_connector.py",
+    "min_phantom_version": "4.9.33071",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google_auth-1.20.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client-4.1.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2-0.9.2-py2-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa-4.4.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-2.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-core",
+                "input_file": "wheels/google_api_core-1.22.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-cloud-bigquery",
+                "input_file": "wheels/google_cloud_bigquery-1.26.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-oauthlib",
+                "input_file": "wheels/google_auth_oauthlib-0.4.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip3_dependencies": {
+        "wheel": [
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google_auth-1.20.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client-4.1.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2-0.18.1-py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa-4.4.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-2.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-core",
+                "input_file": "wheels/google_api_core-1.22.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-cloud-bigquery",
+                "input_file": "wheels/google_cloud_bigquery-1.26.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-oauthlib",
+                "input_file": "wheels/google_auth_oauthlib-0.4.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "key_json": {
+            "description": "Contents of service account JSON file",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "login_email": {
+            "description": "Login email",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list other contacts",
+            "description": "lists all contacts that are not in a contact group",
+            "verbose": "This action lists all \"Other contacts\" which are contacts that are not in another contact group. These contacts are typically automatically created from interactions",
+            "type": "investigate",
+            "identifier": "list_other_contacts",
+            "read_only": true,
+            "parameters": {
+                "read_mask": {
+                    "description": "fields to be returned for each person, if empty default values will be used",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "names,EmailAddresses",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "number of contacts to include in response",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": 500,
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.read_mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,EmailAddresses"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 6 otherContactss"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "%EgcBAj0JPjcuGgECIgxwRmJmNytycjB4RT0="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6babaf04880e3563"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "OTHER_CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.givenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tim"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.familyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Drake"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tim Drake"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.unstructuredName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tim Drake"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayNameLastFirst",
+                    "data_type": "string",
+                    "example_values": [
+                        "Drake, Tim"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resourceName",
+                    "data_type": "string",
+                    "column_name": "Resource Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "otherContacts/c7758487217073173859"
+                    ],
+                    "contains": [
+                        "resource name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.value",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "tim.drake@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6babaf04880e3563"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "OTHER_CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_otherContacts_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "copy contact",
+            "description": "copy 'Other contact' to 'myContacts' group",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "copy_contact",
+            "read_only": false,
+            "parameters": {
+                "resource_name": {
+                    "description": "resource name of the \"Other contact\" to copy",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "order": 0
+                },
+                "copy_mask": {
+                    "description": "fields to be copied into the new contact",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [
+                        "resource name"
+                    ],
+                    "example_values": [
+                        "otherContacts/c8038824399000987793"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.copy_mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully copied 1 contact"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "%EgcBAj0JPjcuGgQBAgUHIgxkaU5rT3hHZm5BVT0="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "59b7075988160d30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "#diNkOxGfnAU="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.updateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-27T17:48:29.240Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.profileMetadata.userTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "GOOGLE_USER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.profileMetadata.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PERSON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PERSON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.memberships.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "59b7075988160d30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.memberships.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.memberships.*.contactGroupMembership.contactGroupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "myContacts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.memberships.*.contactGroupMembership.contactGroupResourceName",
+                    "data_type": "string",
+                    "column_name": "Contact Group Resource Name",
+                    "column_order": 2,
+                    "example_values": [
+                        "contactGroups/myContacts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resourceName",
+                    "data_type": "string",
+                    "column_name": "Resource Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "people/c6464643871230266672"
+                    ],
+                    "contains": [
+                        "resource name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.value",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "jerry@phantom.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "59b7075988160d30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_contacts_copied",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list directory",
+            "description": "lists all contacts and profiles in user's domain directory",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "list_directory",
+            "read_only": true,
+            "parameters": {
+                "read_mask": {
+                    "description": "fields to be returned for each person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "names,emailAddresses",
+                    "order": 0
+                },
+                "page_size": {
+                    "description": "number of responses to include",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.read_mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 7 peoples"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "%EgcBAj0JPjcuGgMBBwg="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resourceName",
+                    "data_type": "string",
+                    "column_name": "Resource Name",
+                    "column_order": 0,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "example_values": [
+                        "people/113211632970586460828"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.value",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "jason.todd@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "117111371020715649097"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "DOMAIN_PROFILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.verified",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_people_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user profile",
+            "description": "provides information about a person given account id",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "get_user_profile",
+            "read_only": true,
+            "parameters": {
+                "resource_name": {
+                    "description": "resource name of the person to provide info about",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "default": "",
+                    "order": 0
+                },
+                "person_fields": {
+                    "description": "fields to be returned for the person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [
+                        "resource name"
+                    ],
+                    "example_values": [
+                        "people/116919555361086422724"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.person_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved user profile"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "%EgcBAj0JPjcuGgQBAgUH",
+                        "%EgcBAj0JPjcuGgMBBQc="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "113211632970586460828"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.type",
+                    "data_type": "string",
+                    "column_name": "Source Type",
+                    "column_order": 3,
+                    "example_values": [
+                        "PROFILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.givenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.familyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayName",
+                    "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "Herman Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.unstructuredName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayNameLastFirst",
+                    "data_type": "string",
+                    "example_values": [
+                        "Edwards, Herman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resourceName",
+                    "data_type": "string",
+                    "column_name": "Resource Name",
+                    "column_order": 0,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "example_values": [
+                        "people/113211632970586460828",
+                        "people/116919555361086422724"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.resource_id_returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "people/113211632970586460828",
+                        "people/116919555361086422724"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.value",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 2,
+                    "example_values": [
+                        "richard.grayson@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "116919555361086422724"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.type",
+                    "data_type": "string",
+                    "column_name": "Email Address Source Type",
+                    "column_order": 4,
+                    "example_values": [
+                        "DOMAIN_PROFILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.verified",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list people",
+            "description": "lists authenticated user's contacts",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "list_people",
+            "read_only": true,
+            "parameters": {
+                "person_fields": {
+                    "description": "fields to be returned for each person",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "names,emailAddresses",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "page token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "number of connections to include in response",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 2
+                },
+                "request_sync_token": {
+                    "description": "whether response should include nextSyncToken",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 3
+                },
+                "sync_token": {
+                    "description": "sync token",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.person_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sync_token",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 1 users"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "%EgcBAj0JPjcuGgQBAgUHIgxYcEJzUVA3cmlaWT0="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resourceName",
+                    "data_type": "string",
+                    "column_name": "Resource Name",
+                    "column_order": 0,
+                    "contains": [
+                        "resource name"
+                    ],
+                    "example_values": [
+                        "people/c6275782728248360584"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.value",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "jerry@phantom.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "57180f240cc67e88"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_people_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
