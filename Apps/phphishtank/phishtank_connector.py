@@ -19,6 +19,7 @@ import time
 
 class PhishtankConnector(BaseConnector):
     ACTION_ID_WHOIS_DOMAIN = 'check_url'
+    # Test change
 
     def __init__(self):
         super(PhishtankConnector, self).__init__()
