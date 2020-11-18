@@ -225,12 +225,15 @@ class RadarConnector(BaseConnector):
 
         try:
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
+            return self._process_response(resp, action_result)
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
             self.debug_print(f"Action: {action} - Make REST call error: {err}")
-            return RetVal(
+            try:
+                return RetVal(
                     action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
-        return self._process_response(resp, action_result)
+            except Exception:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to connect to the URL: {url}. Error Details: {err}"), resp_json)
 
     def _payload_err(self, ex, action_result, data):
         err = self._get_error_message_from_exception(ex)
