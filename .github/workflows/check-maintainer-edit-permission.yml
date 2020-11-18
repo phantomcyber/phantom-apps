@@ -28,6 +28,16 @@ jobs:
               sha: context.payload.pull_request.base.sha
             })
 
+            // Merge the HEAD of the pull request into the new branch
+            await github.repos.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              base: new_branch,
+              head: context.payload.pull_request.head.ref.sha,
+              commit_message: `Merge commit for pull request ${context.issue.number}`
+            })
+
             // Update the PR with the new base branch
             await github.pulls.update({
               owner: context.repo.owner,
