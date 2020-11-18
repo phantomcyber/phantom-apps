@@ -17,11 +17,11 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |
-            var message = `Thank you for your submission!
+            var message = `@${{ github.event.pull_request.user.login }} Thank you for your submission!
 
             In order to speed up the review process we request pull request authors to grant us edit permission for the branch.
 
-            You can do this by editing the pull request and checking the box labeled "Allow edits from maintainers".
+            You can do this by checking the box on the right sidebar labeled as either "Allow edits from maintainers" or "Allow edits and access to secrets by maintainers".
 
             More information can be found on this page: [Allowing changes to a pull request from a fork](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)`
 
