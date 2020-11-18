@@ -677,15 +677,15 @@ class IronnetConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         request = {}
-        if 'alert_id' in param and self._handle_py_ver_compat_for_input_str(param['alert_id']).strip() != '':
-            request['alert_id'] = self._handle_py_ver_compat_for_input_str(param['alert_id']).strip().split(",")
-        if 'category' in param and self._handle_py_ver_compat_for_input_str(param['category']).strip() != '':
-            request['category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['category']).split(',')]
-        if 'sub_category' in param and self._handle_py_ver_compat_for_input_str(param['sub_category']).strip() != '':
-            request['sub_category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param['sub_category']).split(',')]
+        if 'alert_id' in param and self._handle_py_ver_compat_for_input_str(param.get('alert_id')).strip() != '':
+            request['alert_id'] = self._handle_py_ver_compat_for_input_str(param.get('alert_id')).strip().split(",")
+        if 'category' in param and self._handle_py_ver_compat_for_input_str(param.get('category')).strip() != '':
+            request['category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param.get('category')).split(',')]
+        if 'sub_category' in param and self._handle_py_ver_compat_for_input_str(param.get('sub_category')).strip() != '':
+            request['sub_category'] = [cat.strip().replace(" ", "_").upper() for cat in self._handle_py_ver_compat_for_input_str(param.get('sub_category')).split(',')]
         try:
-            if 'status' in param and self._handle_py_ver_compat_for_input_str(param['status']).strip() != '':
-                request['status'] = [status_mapping[status.strip().lower()]for status in self._handle_py_ver_compat_for_input_str(param['status']).split(',')]
+            if 'status' in param and self._handle_py_ver_compat_for_input_str(param.get('status')).strip() != '':
+                request['status'] = [status_mapping[status.strip().lower()]for status in self._handle_py_ver_compat_for_input_str(param.get('status')).split(',')]
         except:
             message = "Please provide a valid value in the 'status' action parameter"
             return action_result.set_status(phantom.APP_ERROR, message)
@@ -694,12 +694,12 @@ class IronnetConnector(BaseConnector):
         max_sev = 1000
 
         if 'min_severity' in param:
-            ret_val, min_sev = self._validate_integer(action_result, param['min_severity'], MIN_SEVERITY_KEY)
+            ret_val, min_sev = self._validate_integer(action_result, param.get('min_severity'), MIN_SEVERITY_KEY)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
         if 'max_severity' in param:
-            ret_val, max_sev = self._validate_integer(action_result, param['max_severity'], MAX_SEVERITY_KEY)
+            ret_val, max_sev = self._validate_integer(action_result, param.get('max_severity'), MAX_SEVERITY_KEY)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
