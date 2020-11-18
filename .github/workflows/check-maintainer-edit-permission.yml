@@ -9,7 +9,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    if: !github.event.pull_request.maintainer_can_modify
+    if: github.event.pull_request.maintainer_can_modify == false
 
     steps:
       - name: Alert the author to allow edit permission
