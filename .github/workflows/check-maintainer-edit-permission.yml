@@ -1,7 +1,7 @@
-name: Grant maintainer edit permission if not already granted
+name: Alert if maintainer edit permission has not been granted
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
 
 jobs:
@@ -14,14 +14,46 @@ jobs:
       && github.event.pull_request.maintainer_can_modify == false
 
     steps:
-      - name: Update the permission on the pull request
+      - name: Update base branch and alert with information
         uses: actions/github-script@v3.1.0
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |
+            var original_branch = context.payload.pull_request.base.ref
+            var new_branch = `pr-${context.issue.number}`
+
+            // Create a new branch off the original base/target branch
+            await github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/heads/${new_branch}`,
+              sha: context.payload.pull_request.head.sha
+            })
+
+            // Update the PR with the new base branch
             await github.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              maintainer_can_modify: true
+              base: new_branch
             })
+
+            var message = `@${context.payload.pull_request.user.login} Thank you for your submission!
+
+            We have not been granted edit permission for the source branch of this pull request, so the base branch has automatically been changed from \`${original_branch}\` to the local branch \`${new_branch}\`.
+
+            In order to speed up the review process we request pull request authors to grant us edit permission for the branch.
+
+            You can do this by checking the box on the right sidebar labeled as either "Allow edits from maintainers" or "Allow edits and access to secrets by maintainers".
+
+            If update the permission, you may change the base branch back to \`${original_branch}\`.
+
+            More information can be found on this page: [Allowing changes to a pull request from a fork](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)`
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            })
+
