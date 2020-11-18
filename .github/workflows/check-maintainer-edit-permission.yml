@@ -19,16 +19,26 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |
-            var original_branch = context.payload.pull_request.base.ref
-            var new_branch = `pr-${context.issue.number}`
+            const original_branch = context.payload.pull_request.base.ref
+            const new_branch = `pr-${context.issue.number}`
 
-            // Create a new branch off the original base/target branch
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/heads/${new_branch}`,
-              sha: context.payload.pull_request.head.sha
-            })
+            // Do nothing if the base branch has already been updated
+            if (original_branch == new_branch) {
+              return;
+            }
+
+            try {
+              // Create a new branch off the original base/target branch
+              // Fails if branch already exists
+              await github.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/heads/${new_branch}`,
+                sha: context.payload.pull_request.base.sha
+              })
+            } catch (e) {
+              github.log.debug(e)
+            }
 
             // Update the PR with the new base branch
             await github.pulls.update({
@@ -38,7 +48,16 @@ jobs:
               base: new_branch
             })
 
-            var message = `@${context.payload.pull_request.user.login} Thank you for your submission!
+            // Merge the head of the PR into the new branch
+            await github.repos.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: new_branch,
+              sha: context.payload.pull_request.head.sha,
+              commit_message: `Merge pull request ${context.issue.number}`
+            })
+
+            const message = `@${context.payload.pull_request.user.login} Thank you for your submission!
 
             We have not been granted edit permission for the source branch of this pull request, so the base branch has automatically been changed from \`${original_branch}\` to the local branch \`${new_branch}\`.
 
