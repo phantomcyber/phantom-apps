@@ -21,7 +21,7 @@ jobs:
             var new_branch = `pr-${context.issue.number}`
 
             // Create a new branch off the original base/target branch
-            github.git.createRef({
+            await github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: `refs/heads/${new_branch}`,
@@ -29,7 +29,7 @@ jobs:
             })
 
             // Update the PR with the new base branch
-            github.pulls.update({
+            await github.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
