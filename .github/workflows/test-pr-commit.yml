@@ -1,7 +1,7 @@
 name: Test Pull Request Commit
 
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - 'Apps/**'
 
@@ -15,8 +15,8 @@ jobs:
         run: |
           curl -k -X POST 'https://${{ secrets.APPS_TEST_SERVER_URI }}/pull_request/' \
                -H 'Authorization: Bearer ${{ secrets.APPS_TEST_SERVER_API_KEY }}' \
-               -d 'id=${{ github.event.pull_request.number }}' \
-               -d 'requester=${{ github.event.pull_request.user.login }}' \
+               -d 'id=${{ github.event.number }}' \
+               -d 'requester=${{ github.event.sender.login }}' \
                --retry 5 \
                --retry-delay 10 \
                --max-time 30
