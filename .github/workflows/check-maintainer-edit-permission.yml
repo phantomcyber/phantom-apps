@@ -23,5 +23,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              maintainer_can_modify: True
+              maintainer_can_modify: true
             })
