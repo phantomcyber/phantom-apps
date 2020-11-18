@@ -71,7 +71,7 @@
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "description": "Maximum number of reports to be fetched (Default: 500)",
+                    "description": "Maximum number of reports to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 0
@@ -82,7 +82,7 @@
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
                     "example_values": [
-                        "501"
+                        501
                     ]
                 },
                 {
@@ -276,17 +276,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_reports",
-                    "data_type": "numeric",
-                    "example_values": [
-                        501
-                    ]
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Total reports: 501"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_reports",
+                    "data_type": "numeric",
+                    "example_values": [
+                        501
                     ]
                 },
                 {
@@ -533,15 +533,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Successfully fetched report"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -585,7 +585,7 @@
                     ]
                 },
                 "limit": {
-                    "description": "Maximum number of reports to be fetched (Default: 500)",
+                    "description": "Maximum number of reports to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 1
@@ -596,7 +596,7 @@
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
                     "example_values": [
-                        "50"
+                        50
                     ]
                 },
                 {
@@ -800,17 +800,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_related_reports",
-                    "data_type": "numeric",
-                    "example_values": [
-                        50
-                    ]
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Total related reports: 50"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_related_reports",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
                     ]
                 },
                 {
@@ -850,7 +850,7 @@
                     "order": 0
                 },
                 "limit": {
-                    "description": "Maximum number of reports to be fetched (Default: 500)",
+                    "description": "Maximum number of reports to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 1
@@ -1139,17 +1139,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_results",
-                    "data_type": "numeric",
-                    "example_values": [
-                        4
-                    ]
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Total results: 4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
                     ]
                 },
                 {
@@ -1190,7 +1190,7 @@
                     ]
                 },
                 "limit": {
-                    "description": "Maximum number of reports to be fetched (Default: 500)",
+                    "description": "Maximum number of reports to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 1
@@ -7949,18 +7949,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_results",
-                    "example_values": [
-                        478
-                    ],
-                    "data_type": "numeric"
-                },
-                {
                     "data_path": "action_result.message",
                     "example_values": [
                         "Total results: 478"
                     ],
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_results",
+                    "example_values": [
+                        478
+                    ],
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -8008,7 +8008,7 @@
                     ]
                 },
                 "limit": {
-                    "description": "Maximum number of indicators to be fetched (Default: 500)",
+                    "description": "Maximum number of indicators to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 2
@@ -9148,17 +9148,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_iocs",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1000
-                    ]
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Total iocs: 1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_iocs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
                     ]
                 },
                 {
@@ -9213,7 +9213,7 @@
                     "order": 1
                 },
                 "limit": {
-                    "description": "Maximum number of reports to be fetched (Default: 500)",
+                    "description": "Maximum number of reports to be fetched (default: 500)",
                     "data_type": "numeric",
                     "default": 500,
                     "order": 2
@@ -10033,17 +10033,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_iocs",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Total iocs: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_iocs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
