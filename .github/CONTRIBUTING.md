@@ -43,13 +43,13 @@ If you've found a bug and wish to fix it, the first thing to do is
 
 *****Important Notes:**
 
-**1. Please make sure to check the 'Allow edits and access to secrets by maintainers' box so that a Splunk>Phantom developer can aid in the PR process.**
+1. **Please make sure to check the 'Allow edits and access to secrets by maintainers' box so that a Splunk>Phantom developer can aid in the PR process.**
 
-**1. Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
+1. **Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
 
-**1. A Splunk>Phantom developer may wish to create a new branch and ask you to perform your pull-request there for specific types of changes.**
+1. **A Splunk>Phantom developer may wish to create a new branch and ask you to perform your pull-request there for specific types of changes.**
 
-Remember:  One issue per branch. We will not accept any Pull Requests that affect more than one App or addresses more than one Issue at a time (unless the issue is a duplicate - discretion of our development team).
+1. **One issue per branch. We will not accept any Pull Requests that affect more than one App or addresses more than one Issue at a time (unless the issue is a duplicate - discretion of our development team).**
 
 ## Contributing New Apps
 
