@@ -9,15 +9,41 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    if: github.event.pull_request.maintainer_can_modify == false
+    if: |
+      github.event.pull_request.head.repo.fork == true
+      && github.event.pull_request.maintainer_can_modify == false
 
     steps:
-      - name: Alert the author to allow edit permission
-        uses: actions/github-script@0.4.0
+      - name: Update base branch and alert with information
+        uses: actions/github-script@v3.1.0
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |
-            var message = `@${{ github.event.pull_request.user.login }} Thank you for your submission!
+            const new_branch = `pr-${context.issue.number}`
+
+            try {
+              // Create a new branch off the original base/target branch
+              // Fails if branch already exists
+              await github.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/heads/${new_branch}`,
+                sha: context.payload.pull_request.base.sha
+              })
+
+              // Merge the head of the PR into the new branch
+              await github.repos.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: new_branch,
+                head: context.payload.pull_request.head.sha,
+                commit_message: `Merge pull request ${context.issue.number}`
+              })
+            } catch (e) {
+              github.log.debug(e)
+            }
+
+            const message = `@${context.payload.pull_request.user.login} Thank you for your submission!
 
             In order to speed up the review process we request pull request authors to grant us edit permission for the branch.
 
@@ -31,3 +57,4 @@ jobs:
               repo: context.repo.repo,
               body: message
             })
+
