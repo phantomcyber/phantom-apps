@@ -32,6 +32,11 @@ Of course before you do this, you should definitely check if there is already an
 
 ---
 
+## Feature Requests
+Have a feature or an app you'd like to see in Phantom? Head over to the [Splunk Ideas](https://ideas.splunk.com) portal to make your voice heard!
+
+---
+
 ## Contributing
 If you would like to contribute to our Apps directly, please have a look at our [Contribution Guide](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CONTRIBUTING.md)
 
