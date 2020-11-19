@@ -39,7 +39,7 @@ If you've found a bug and wish to fix it, the first thing to do is
 1. Create a branch for the issue
 1. Make your changes on your branch
 1. Thoroughly test your changes. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
-1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch.
+1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch that gives write access to the maintainers of the phantom-apps repo.
 
 *****Important Notes:**
 
