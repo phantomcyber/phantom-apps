@@ -151,7 +151,7 @@ class RadarConnector(BaseConnector):
             self.debug_print(f"Action: {self.get_action_identifier()} - Process error response error: {err}")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print(f"Action: {self.get_action_identifier()} - Process error response error: {err}")
+            self.debug_print(f"Action: {self.get_action_identifier()} - Error occurred: {err}")
 
         return f"{status_message}. Response: {error_resp.text.replace('{', '{{').replace('}', '}}')}"
 
@@ -225,12 +225,15 @@ class RadarConnector(BaseConnector):
 
         try:
             resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
+            return self._process_response(resp, action_result)
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
             self.debug_print(f"Action: {action} - Make REST call error: {err}")
-            return RetVal(
+            try:
+                return RetVal(
                     action_result.set_status(phantom.APP_ERROR, self._process_response_error_message(resp)), resp_json)
-        return self._process_response(resp, action_result)
+            except Exception:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to connect to the URL: {url}. Error Details: {err}"), resp_json)
 
     def _payload_err(self, ex, action_result, data):
         err = self._get_error_message_from_exception(ex)
@@ -284,7 +287,6 @@ class RadarConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param["name"]
         description = param.get("description", "Privacy incident created by Splunk Phantom")
-        self.debug_print("There might be timezone variance. Please check for the timezone variance")
         # use timezone set in asset configuration to set discovered date_time timezone
         discovered = datetime.now(pytz.timezone(self._time_zone))
         # get incident channel information
