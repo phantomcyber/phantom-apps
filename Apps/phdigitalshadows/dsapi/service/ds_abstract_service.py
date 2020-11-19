@@ -3,7 +3,7 @@
 #
 
 from abc import ABCMeta
-from httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment
+from ..httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment
 
 from dsapi.config.ds_proxy_config import DSProxyConfig
 

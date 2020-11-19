@@ -2,7 +2,7 @@
 # Copyright (c) 2017 Digital Shadows Ltd.
 #
 
-from ds_model import DSModel
+from .ds_model import DSModel
 
 
 class InfrastructureSSL(DSModel):
