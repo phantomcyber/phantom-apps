@@ -19,13 +19,7 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           script: |
-            const original_branch = context.payload.pull_request.base.ref
             const new_branch = `pr-${context.issue.number}`
-
-            // Do nothing if the base branch has already been updated
-            if (original_branch == new_branch) {
-              return;
-            }
 
             try {
               // Create a new branch off the original base/target branch
@@ -36,36 +30,24 @@ jobs:
                 ref: `refs/heads/${new_branch}`,
                 sha: context.payload.pull_request.base.sha
               })
+
+              // Merge the head of the PR into the new branch
+              await github.repos.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: new_branch,
+                head: context.payload.pull_request.head.sha,
+                commit_message: `Merge pull request ${context.issue.number}`
+              })
             } catch (e) {
               github.log.debug(e)
             }
 
-            // Update the PR with the new base branch
-            await github.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              base: new_branch
-            })
-
-            // Merge the head of the PR into the new branch
-            await github.repos.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              base: new_branch,
-              head: context.payload.pull_request.head.sha,
-              commit_message: `Merge pull request ${context.issue.number}`
-            })
-
             const message = `@${context.payload.pull_request.user.login} Thank you for your submission!
-
-            We have not been granted edit permission for the source branch of this pull request, so the base branch has automatically been changed from \`${original_branch}\` to the local branch \`${new_branch}\`.
 
             In order to speed up the review process we request pull request authors to grant us edit permission for the branch.
 
             You can do this by checking the box on the right sidebar labeled as either "Allow edits from maintainers" or "Allow edits and access to secrets by maintainers".
-
-            If update the permission, you may change the base branch back to \`${original_branch}\`.
 
             More information can be found on this page: [Allowing changes to a pull request from a fork](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)`
 
