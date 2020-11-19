@@ -15,15 +15,13 @@ from phantom.action_result import ActionResult
 from phantom.vault import Vault
 
 # Usage of the consts file is recommended
-# from cuckoo_consts import *
+from cuckoo_consts import *
 import math
 import time
 import json
 import requests
-from bs4 import BeautifulSoup
-
-
-POLL_SLEEP_SECS = 10
+from bs4 import BeautifulSoup, UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -48,6 +46,13 @@ class CuckooConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         config = self.get_config()
+        self._state = self.load_state()
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._host = config.get('server')
         self._port = config.get('port')
         self._use_https = config.get('use_https', False)
@@ -60,7 +65,11 @@ class CuckooConnector(BaseConnector):
         )
         self.save_progress(self._base_url)
 
-        self._cuckoo_timeout = int(config.get('timeout', 60))
+        self._cuckoo_timeout = config.get('timeout', 60)
+        # Validate 'timeout' configuration parameter
+        ret_val, self._cuckoo_timeout = self._validate_integer(self, self._cuckoo_timeout, "'timeout' configuration parameter")
+        if phantom.is_fail(ret_val):
+            return self.get_status()
 
         self.username = config.get('username')
         self.password = config.get('password')
@@ -70,7 +79,6 @@ class CuckooConnector(BaseConnector):
             self._auth = None
         self._version = None
 
-        self._state = self.load_state()
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -78,12 +86,80 @@ class CuckooConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_reponse(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -98,6 +174,9 @@ class CuckooConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -106,7 +185,7 @@ class CuckooConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+                self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -118,7 +197,8 @@ class CuckooConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -126,7 +206,7 @@ class CuckooConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -157,7 +237,7 @@ class CuckooConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -186,8 +266,18 @@ class CuckooConnector(BaseConnector):
                 params=params,
                 files=files
             )
+        except requests.exceptions.InvalidURL:
+            error_message = "Error connecting to server. Invalid URL: %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error connecting to server. Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -249,8 +339,15 @@ class CuckooConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return ret_val
 
-            result_data['task_status'] = response['task']
-            status = response['task']['status']
+            try:
+                result_data['task_status'] = response['task']
+            except KeyError:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching task status")
+            try:
+                status = response['task']['status']
+            except KeyError:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching status")
+
             if status in ('pending', 'running', 'completed'):
                 count += 1
                 time.sleep(POLL_SLEEP_SECS)
@@ -288,16 +385,29 @@ class CuckooConnector(BaseConnector):
                 phantom.APP_ERROR, "Invalid Vault ID"
             )
 
-        file_info = vault_info[0]
-        file_path = file_info['path']
+        try:
+            file_info = vault_info[0]
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while getting File Info. {}".format(err))
+
+        try:
+            file_path = file_info['path']
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while getting File Path")
+
         if not file_name:
-            file_name = file_info['name']
+            try:
+                file_name = file_info['name']
+            except KeyError:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while getting File Name")
 
         try:
             payload = open(file_path, 'rb')
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, "Error opening file", e
+                phantom.APP_ERROR, "Error opening file", err
             )
 
         files = {
@@ -363,7 +473,6 @@ class CuckooConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import pudb
     import argparse
 
@@ -389,8 +498,9 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
-            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
+            login_url = BaseConnector._get_phantom_base_url() + "/login"
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -400,17 +510,17 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
+            headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     if (len(sys.argv) < 2):
-        print ("No test json specified as input")
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -425,6 +535,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
