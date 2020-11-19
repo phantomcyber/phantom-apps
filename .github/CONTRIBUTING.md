@@ -43,7 +43,7 @@ If you've found a bug and wish to fix it, the first thing to do is
 
 *****Important Notes:**
 
-1. **Please make sure to check the 'Allow edits and access to secrets by maintainers' box so that a Splunk>Phantom developer can aid in the PR process.**
+1. **Please make sure to check the 'Allow edits and access to secrets by maintainers' box during your PR submission so that a Splunk>Phantom developer can aid in the PR process.**
 
 1. **Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
 
