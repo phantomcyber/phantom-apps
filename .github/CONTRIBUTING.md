@@ -41,11 +41,13 @@ If you've found a bug and wish to fix it, the first thing to do is
 1. Thoroughly test your changes. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
 1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch.
 
-**Note: Please make sure to check the 'Allow edits and access to secrets by maintainers' box so that a Splunk>Phantom developer can aid in the PR process.**
+**Important Notes:**
 
-**Note: Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
+**Please make sure to check the 'Allow edits and access to secrets by maintainers' box so that a Splunk>Phantom developer can aid in the PR process.**
 
-**Note: A Splunk>Phantom developer may wish to create a new branch and ask you to perform your pull-request there for specific types of changes.**
+**Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
+
+**A Splunk>Phantom developer may wish to create a new branch and ask you to perform your pull-request there for specific types of changes.**
 
 Remember:  One issue per branch. We will not accept any Pull Requests that affect more than one App or addresses more than one Issue at a time (unless the issue is a duplicate - discretion of our development team).
 
