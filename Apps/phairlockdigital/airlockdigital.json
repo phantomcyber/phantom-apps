@@ -283,7 +283,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "column_name": "ID",
                     "column_order": 2,
@@ -292,7 +292,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.name",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Name",
                     "column_order": 1,
@@ -301,7 +301,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.parent",
+                    "data_path": "action_result.data.*.parent",
                     "data_type": "string",
                     "column_name": "Parent Group",
                     "column_order": 3,
@@ -310,7 +310,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.type",
+                    "data_path": "action_result.data.*.type",
                     "data_type": "string",
                     "contains": [
                         "airlockdigital policytype"
@@ -1358,7 +1358,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.agentid",
+                    "data_path": "action_result.data.*.agentid",
                     "data_type": "string",
                     "contains": [
                         "airlockdigital agentid"
@@ -1370,7 +1370,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.clientversion",
+                    "data_path": "action_result.data.*.clientversion",
                     "data_type": "string",
                     "column_name": "Client Version",
                     "column_order": 6,
@@ -1379,7 +1379,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.domain",
+                    "data_path": "action_result.data.*.domain",
                     "data_type": "string",
                     "contains": [
                         "domain"
@@ -1391,7 +1391,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.freespace",
+                    "data_path": "action_result.data.*.freespace",
                     "data_type": "string",
                     "column_name": "Free Disk Space",
                     "column_order": 7,
@@ -1400,7 +1400,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.groupid",
+                    "data_path": "action_result.data.*.groupid",
                     "data_type": "string",
                     "contains": [
                         "airlockdigital groupid"
@@ -1412,7 +1412,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.hostname",
+                    "data_path": "action_result.data.*.hostname",
                     "data_type": "string",
                     "contains": [
                         "host name"
@@ -1424,7 +1424,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.ip",
+                    "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "contains": [
                         "ip"
@@ -1436,7 +1436,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.os",
+                    "data_path": "action_result.data.*.os",
                     "data_type": "string",
                     "contains": [
                         "airlockdigital operatingsystem"
@@ -1448,7 +1448,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.policyversion",
+                    "data_path": "action_result.data.*.policyversion",
                     "data_type": "string",
                     "column_name": "Policy Version",
                     "column_order": 11,
@@ -1457,7 +1457,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.status",
+                    "data_path": "action_result.data.*.status",
                     "data_type": "numeric",
                     "contains": [
                         "airlockdigital devicestatus"
@@ -1469,7 +1469,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.username",
+                    "data_path": "action_result.data.*.username",
                     "data_type": "string",
                     "contains": [
                         "user name"

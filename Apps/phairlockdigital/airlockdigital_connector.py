@@ -518,7 +518,8 @@ class AirlockDigitalConnector(BaseConnector):
                     resp_arr.append({"name": i['name'], "id": i['groupid'], "parent": i['parent'], "type": "group"})
 
             # Add the response into the data section
-            action_result.add_data(resp_arr)
+            for data in resp_arr:
+                action_result.add_data(data)
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
@@ -673,7 +674,8 @@ class AirlockDigitalConnector(BaseConnector):
 
         # Add the response into the data section
         try:
-            action_result.add_data(response['response']['agents'])
+            for agent in response['response']['agents']:
+                action_result.add_data(agent)
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['result'] = response['error']
