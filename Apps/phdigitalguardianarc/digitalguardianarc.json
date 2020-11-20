@@ -70,23 +70,23 @@
                 "watchlist_name": {
                     "description": "Watchlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "atac_test",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be added to ARC Watchlist",
                     "data_type": "string",
+                    "default": "abc.exe",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist entry"
                     ],
-                    "default": "abc.exe",
                     "order": 1
                 }
             },
@@ -174,23 +174,23 @@
                 "watchlist_name": {
                     "description": "Watchlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "atac_test",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be removed from ARC Watchlist",
                     "data_type": "string",
+                    "default": "abc.exe",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist entry"
                     ],
-                    "default": "abc.exe",
                     "order": 1
                 }
             },
@@ -277,23 +277,23 @@
                 "watchlist_name": {
                     "description": "Watchlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "atac_test",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "watchlist_entry": {
                     "description": "Entry value to be checked in ARC Watchlist",
                     "data_type": "string",
+                    "default": "abc.exe",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc watchlist entry"
                     ],
-                    "default": "abc.exe",
                     "order": 1
                 }
             },
@@ -381,23 +381,23 @@
                 "componentlist_name": {
                     "description": "Componentlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "demo-approved-sites",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be added to Componentlist",
                     "data_type": "string",
+                    "default": "abc.com",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist entry"
                     ],
-                    "default": "abc.com",
                     "order": 1
                 }
             },
@@ -485,23 +485,23 @@
                 "componentlist_name": {
                     "description": "Componentlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "demo-approved-sites",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be removed from Componentlist",
                     "data_type": "string",
+                    "default": "abc.com",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist entry"
                     ],
-                    "default": "abc.com",
                     "order": 1
                 }
             },
@@ -588,23 +588,23 @@
                 "componentlist_name": {
                     "description": "Componentlist Name",
                     "data_type": "string",
-                    "order": 0,
                     "default": "demo-approved-sites",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist name"
-                    ]
+                    ],
+                    "order": 0
                 },
                 "componentlist_entry": {
                     "description": "Entry value to be checked in Componentlist",
                     "data_type": "string",
+                    "default": "abc.com",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "digitalguardianarc componentlist entry"
                     ],
-                    "default": "abc.com",
                     "order": 1
                 }
             },
@@ -690,30 +690,30 @@
             "read_only": true,
             "parameters": {
                 "container_id": {
+                    "description": "Container IDs to limit the ingestion to",
                     "data_type": "string",
                     "order": 0,
-                    "description": "Container IDs to limit the ingestion to",
                     "allow_list": true
                 },
                 "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "order": 1,
-                    "description": "Start of time range, in epoch time (milliseconds)"
+                    "order": 1
                 },
                 "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "order": 2,
-                    "description": "End of time range, in epoch time (milliseconds)"
+                    "order": 2
                 },
                 "container_count": {
+                    "description": "Maximum number of container records to query for",
                     "data_type": "numeric",
-                    "order": 3,
-                    "description": "Maximum number of container records to query for"
+                    "order": 3
                 },
                 "artifact_count": {
+                    "description": "Maximum number of artifact records to query for",
                     "data_type": "numeric",
-                    "order": 4,
-                    "description": "Maximum number of artifact records to query for"
+                    "order": 4
                 }
             },
             "output": [],

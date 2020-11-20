@@ -1,3 +1,8 @@
+# File: digitalguardianarc_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
+
 DG_HEADER_URL = {'Content-Type': 'application/x-www-form-urlencoded', }
 DG_CLIENT_HEADER = {'Authorization': '', 'Accept': 'application/json'}
 
