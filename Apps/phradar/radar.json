@@ -410,7 +410,7 @@
         {
             "action": "create privacy incident",
             "description": "Create Radar privacy incident",
-            "verbose": "This action creates a privacy incident in Radar using phantom settings and asset configurations. The base URL for phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the phantom. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the phantom container. Action parameters are used to set the Radar incident name and description.",
+            "verbose": "This action creates a privacy incident in Radar using Splunk Phantom settings and asset configurations. The base URL for the Splunk Phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the Splunk Phantom. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated Splunk Phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the Splunk Phantom container. Action parameters are used to set the Radar incident name and description.",
             "type": "generic",
             "identifier": "create_privacy_incident",
             "read_only": false,
@@ -786,37 +786,37 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "column_name": "Note ID",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.*.content",
+                    "data_path": "action_result.data.*.content",
                     "data_type": "string",
                     "column_name": "Note Content",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.*.created_at",
+                    "data_path": "action_result.data.*.created_at",
                     "data_type": "string",
                     "column_name": "Created At",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.*.created_by",
+                    "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "column_name": "Created By",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.*.updated_at",
+                    "data_path": "action_result.data.*.updated_at",
                     "data_type": "string",
                     "column_name": "Updated At",
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.*.updated_by",
+                    "data_path": "action_result.data.*.updated_by",
                     "data_type": "string",
                     "column_name": "Updated By",
                     "column_order": 6

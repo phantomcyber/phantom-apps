@@ -475,7 +475,8 @@ class RadarConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while getting data from API Response. {}".format(err))
 
         self.save_progress("Adding data to action result")
-        action_result.add_data(notes)
+        for note in notes:
+            action_result.add_data(note)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched notes")
 
