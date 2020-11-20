@@ -1,3 +1,7 @@
+# File: hashicorp_vault_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 # Action Identifier constants
 ACTION_ID_TEST_ASSET_CONNECTIVITY = 'test_asset_connectivity'
 ACTION_ID_SET_SECRET = 'set_secret'
