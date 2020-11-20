@@ -1,4 +1,6 @@
-
+# File: ironnet_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 # Constants relating to '_validate_integer'
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {}"
