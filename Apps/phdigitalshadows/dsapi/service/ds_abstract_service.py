@@ -1,6 +1,8 @@
 #
 # Copyright (c) 2017 Digital Shadows Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 from abc import ABCMeta
 from ..httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment

@@ -1,6 +1,8 @@
 #
 # Copyright (c) 2020 Digital Shadows Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Must match json configuration object in digital_shadows.json
 DS_API_KEY_CFG = 'ds_api_key'

@@ -1,6 +1,8 @@
 #
 # Copyright (c) 2017 Digital Shadows Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 from .ds_base_service import DSBaseService
 from .ds_find_service import DSFindService
