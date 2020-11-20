@@ -4,18 +4,18 @@
     "description": "This app integrates with Google People to support various generic and investigative actions",
     "type": "identity management",
     "product_vendor": "Google",
-    "logo": "logo_google.svg",
-    "logo_dark": "logo_google_dark.svg",
+    "logo": "logo_googlepeople.svg",
+    "logo_dark": "logo_googlepeople_dark.svg",
     "product_name": "Google People",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-07-21T23:24:14.466184Z",
     "package_name": "phantom_googlepeople",
     "main_module": "googlepeople_connector.py",
-    "min_phantom_version": "4.9.33071",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -132,8 +132,6 @@
             "description": "Login email",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         }
     },
@@ -141,7 +139,6 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -151,47 +148,37 @@
         },
         {
             "action": "list other contacts",
-            "description": "lists all contacts that are not in a contact group",
-            "verbose": "This action lists all \"Other contacts\" which are contacts that are not in another contact group. These contacts are typically automatically created from interactions",
+            "description": "Lists all contacts that are not in a contact group",
+            "verbose": "This action lists all \"Other contacts\" which are contacts that are not in another contact group. These contacts are typically automatically created from interactions.",
             "type": "investigate",
             "identifier": "list_other_contacts",
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "fields to be returned for each person, if empty default values will be used",
+                    "description": "Fields to be returned for each person, if empty default values will be used",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "names,EmailAddresses",
+                    "default": "names,emailAddresses",
                     "order": 0
                 },
                 "page_token": {
-                    "description": "page token",
+                    "description": "Page token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "page_size": {
-                    "description": "number of contacts to include in response",
+                    "description": "Number of contacts to include in response",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "default": 500,
                     "order": 2
                 },
                 "request_sync_token": {
-                    "description": "whether response should include nextSyncToken",
+                    "description": "Whether response should include nextSyncToken",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "sync_token": {
-                    "description": "sync token",
+                    "description": "Sync Token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 }
             },
@@ -200,7 +187,7 @@
                     "data_path": "action_result.parameter.read_mask",
                     "data_type": "string",
                     "example_values": [
-                        "names,EmailAddresses"
+                        "names,emailAddresses"
                     ]
                 },
                 {
@@ -218,40 +205,13 @@
                     "data_path": "action_result.parameter.request_sync_token",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.sync_token",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved 6 otherContactss"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -276,9 +236,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.names.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -325,7 +286,7 @@
                         "otherContacts/c7758487217073173859"
                     ],
                     "contains": [
-                        "resource name"
+                        "googlepeople resource name"
                     ]
                 },
                 {
@@ -356,9 +317,25 @@
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 6 otherContactss"
                     ]
                 },
                 {
@@ -366,71 +343,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         6
-                    ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "copy contact",
-            "description": "copy 'Other contact' to 'myContacts' group",
-            "verbose": "",
-            "type": "generic",
-            "identifier": "copy_contact",
-            "read_only": false,
-            "parameters": {
-                "resource_name": {
-                    "description": "resource name of the \"Other contact\" to copy",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "contains": [
-                        "resource name"
-                    ],
-                    "order": 0
-                },
-                "copy_mask": {
-                    "description": "fields to be copied into the new contact",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "names,emailAddresses",
-                    "order": 1
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.resource_name",
-                    "data_type": "string",
-                    "contains": [
-                        "resource name"
-                    ],
-                    "example_values": [
-                        "otherContacts/c8038824399000987793"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.copy_mask",
-                    "data_type": "string",
-                    "example_values": [
-                        "names,emailAddresses"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully copied 1 contact"
                     ]
                 },
                 {
@@ -445,6 +357,54 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "copy contact",
+            "description": "Copy 'Other contact' to 'myContacts' group",
+            "type": "generic",
+            "identifier": "copy_contact",
+            "read_only": false,
+            "parameters": {
+                "resource_name": {
+                    "description": "Resource name of the \"Other contact\" to copy",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "googlepeople resource name"
+                    ],
+                    "order": 0
+                },
+                "copy_mask": {
+                    "description": "Fields to be copied into the new contact",
+                    "data_type": "string",
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [
+                        "googlepeople resource name"
+                    ],
+                    "example_values": [
+                        "otherContacts/c8038824399000987793"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.copy_mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
                     ]
                 },
                 {
@@ -542,7 +502,7 @@
                         "people/c6464643871230266672"
                     ],
                     "contains": [
-                        "resource name"
+                        "googlepeople resource name"
                     ]
                 },
                 {
@@ -573,13 +533,43 @@
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully copied 1 contact"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.total_contacts_copied",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
                         1
@@ -593,50 +583,35 @@
         },
         {
             "action": "list directory",
-            "description": "lists all contacts and profiles in user's domain directory",
-            "verbose": "",
+            "description": "Lists all contacts and profiles in the user's domain directory",
             "type": "investigate",
             "identifier": "list_directory",
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "fields to be returned for each person",
+                    "description": "Fields to be returned for each person",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "default": "names,emailAddresses",
                     "order": 0
                 },
                 "page_size": {
-                    "description": "number of responses to include",
+                    "description": "Number of responses to include",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "page_token": {
-                    "description": "page token",
+                    "description": "Page Token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 2
                 },
                 "request_sync_token": {
-                    "description": "whether response should include nextSyncToken",
+                    "description": "Whether response should include nextSyncToken",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 3
                 },
                 "sync_token": {
-                    "description": "sync token",
+                    "description": "Sync Token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 4
                 }
             },
@@ -660,40 +635,13 @@
                     "data_path": "action_result.parameter.request_sync_token",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.sync_token",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved 7 peoples"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -708,7 +656,7 @@
                     "column_name": "Resource Name",
                     "column_order": 0,
                     "contains": [
-                        "resource name"
+                        "googlepeople resource name"
                     ],
                     "example_values": [
                         "people/113211632970586460828"
@@ -742,16 +690,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.verified",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -769,76 +719,25 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_people_returned",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7
-                    ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get user profile",
-            "description": "provides information about a person given account id",
-            "verbose": "",
-            "type": "investigate",
-            "identifier": "get_user_profile",
-            "read_only": true,
-            "parameters": {
-                "resource_name": {
-                    "description": "resource name of the person to provide info about",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "contains": [
-                        "resource name"
-                    ],
-                    "default": "",
-                    "order": 0
-                },
-                "person_fields": {
-                    "description": "fields to be returned for the person",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "names,emailAddresses",
-                    "order": 1
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.resource_name",
-                    "data_type": "string",
-                    "contains": [
-                        "resource name"
-                    ],
-                    "example_values": [
-                        "people/116919555361086422724"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.person_fields",
-                    "data_type": "string",
-                    "example_values": [
-                        "names,emailAddresses"
-                    ]
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved user profile"
+                        "Successfully retrieved 7 peoples"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_people_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
                     ]
                 },
                 {
@@ -854,13 +753,60 @@
                     "example_values": [
                         1
                     ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user profile",
+            "description": "Provides information about a person given account ID",
+            "type": "investigate",
+            "identifier": "get_user_profile",
+            "read_only": true,
+            "parameters": {
+                "resource_name": {
+                    "description": "Resource name of the person to provide info about",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "googlepeople resource name"
+                    ],
+                    "order": 0
+                },
+                "person_fields": {
+                    "description": "Fields to be returned for the person",
+                    "data_type": "string",
+                    "default": "names,emailAddresses",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource_name",
+                    "data_type": "string",
+                    "contains": [
+                        "googlepeople resource name"
+                    ],
+                    "example_values": [
+                        "people/116919555361086422724"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.person_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "names,emailAddresses"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
                     "data_type": "string",
                     "example_values": [
-                        "%EgcBAj0JPjcuGgQBAgUH",
-                        "%EgcBAj0JPjcuGgMBBQc="
+                        "%EgcBAj0JPjcuGgQBAgUH"
                     ]
                 },
                 {
@@ -881,9 +827,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.names.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -929,19 +876,10 @@
                     "column_name": "Resource Name",
                     "column_order": 0,
                     "contains": [
-                        "resource name"
+                        "googlepeople resource name"
                     ],
                     "example_values": [
-                        "people/113211632970586460828",
-                        "people/116919555361086422724"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.resource_id_returned",
-                    "data_type": "string",
-                    "example_values": [
-                        "people/113211632970586460828",
-                        "people/116919555361086422724"
+                        "people/113211632970586460828"
                     ]
                 },
                 {
@@ -974,16 +912,54 @@
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.verified",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved user profile"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.resource_id_returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "people/113211632970586460828"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        true
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
@@ -994,50 +970,35 @@
         },
         {
             "action": "list people",
-            "description": "lists authenticated user's contacts",
-            "verbose": "",
+            "description": "Lists authenticated user's contacts",
             "type": "investigate",
             "identifier": "list_people",
             "read_only": true,
             "parameters": {
                 "person_fields": {
-                    "description": "fields to be returned for each person",
+                    "description": "Fields to be returned for each person",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "default": "names,emailAddresses",
                     "order": 0
                 },
                 "page_token": {
-                    "description": "page token",
+                    "description": "Page Token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "page_size": {
-                    "description": "number of connections to include in response",
+                    "description": "Number of connections to include in response",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 2
                 },
                 "request_sync_token": {
-                    "description": "whether response should include nextSyncToken",
+                    "description": "Whether response should include nextSyncToken",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 3
                 },
                 "sync_token": {
-                    "description": "sync token",
+                    "description": "Sync Token",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
                     "order": 4
                 }
             },
@@ -1061,40 +1022,13 @@
                     "data_path": "action_result.parameter.request_sync_token",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.sync_token",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved 1 users"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -1109,7 +1043,7 @@
                     "column_name": "Resource Name",
                     "column_order": 0,
                     "contains": [
-                        "resource name"
+                        "googlepeople resource name"
                     ],
                     "example_values": [
                         "people/c6275782728248360584"
@@ -1143,13 +1077,43 @@
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.metadata.primary",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 1 users"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.total_people_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
                         1
