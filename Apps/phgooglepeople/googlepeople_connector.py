@@ -8,6 +8,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 import phantom.utils as ph_utils
+from bs4 import UnicodeDammit
 
 # Usage of the consts file is recommended
 from googlepeople_consts import *
@@ -57,12 +58,81 @@ class GooglePeopleConnector(BaseConnector):
         self._key_dict = None
         self._state = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _create_client(self, action_result, scopes):
         credentials = None
         try:
             credentials = service_account.Credentials.from_service_account_info(self._key_dict, scopes=scopes)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to create load the key json", e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to get the credentials from the key json", e), None)
 
         if(self._login_email):
             try:
@@ -86,16 +156,14 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return ret_val
 
         self.save_progress("Getting list of connections for {}".format(self._login_email))
         try:
             client.people().connections().list(resourceName='people/me', personFields='names,emailAddresses').execute() # noqa
         except Exception as e:
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.set_status(phantom.APP_ERROR, "Error while listing connections", e)
 
         # Return success
@@ -103,7 +171,6 @@ class GooglePeopleConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_other_contacts(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         scopes = [GOOGLE_OTHER_CONTACTS_SCOPE_READ_ONLY]
 
@@ -121,9 +188,13 @@ class GooglePeopleConnector(BaseConnector):
 
         page_token = param.get('page_token')
         if (page_token):
-            kwargs.update({'pageToken': read_mask})
+            kwargs.update({'pageToken': page_token})
 
         page_size = param.get('page_size')
+        # Validate 'page_size' action parameter
+        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if (page_size):
             kwargs.update({'pageSize': page_size})
 
@@ -138,12 +209,12 @@ class GooglePeopleConnector(BaseConnector):
         try:
             response = client.otherContacts().list(**kwargs).execute()
         except Exception as e:
-            error_message = str(e)
+            error_message = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list other contacts.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to list other contacts")
 
         otherContacts = response.get('otherContacts', [])
-        num_otherContacts = len(response['otherContacts'])
+        num_otherContacts = len(otherContacts)
 
         for contact in otherContacts:
             action_result.add_data(contact)
@@ -180,7 +251,7 @@ class GooglePeopleConnector(BaseConnector):
 
         resource_name = param['resource_name']
         if(OTHER_CONTACTS_RESOURCE_NAME_PREFIX not in resource_name):
-            return action_result.set_status(phantom.APP_ERROR, "Resource name of contact to be copied must be an otherContact.")
+            return action_result.set_status(phantom.APP_ERROR, "Resource name of contact to be copied must be 'otherContact'")
 
         data = {}
 
@@ -191,9 +262,9 @@ class GooglePeopleConnector(BaseConnector):
         try:
             response = client.otherContacts().copyOtherContactToMyContactsGroup(resourceName=resource_name, body=data).execute()
         except Exception as e:
-            error_message = str(e)
+            error_message = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to copy contact.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to copy contact")
 
         action_result.add_data(response)
 
@@ -202,11 +273,8 @@ class GooglePeopleConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, 'Successfully copied 1 contact')
 
     def _handle_list_directory(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         scopes = [GOOGLE_DIRECTORY_SCPOPE_READ_ONLY]
 
@@ -223,6 +291,10 @@ class GooglePeopleConnector(BaseConnector):
             kwargs.update({'readMask': read_mask})
 
         page_size = param.get('page_size')
+        # Validate 'page_size' action parameter
+        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if (page_size):
             kwargs.update({'pageSize': page_size})
 
@@ -241,11 +313,10 @@ class GooglePeopleConnector(BaseConnector):
         try:
             response = client.people().listDirectoryPeople(**kwargs).execute()
         except Exception as e:
-            error_message = str(e)
+            error_message = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list directory.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to list directory")
 
-        # Add the response into the data section
         directoryPeople = response.get('people', [])
         num_directoryPeople = len(directoryPeople)
         summary = action_result.update_summary({'total_people_returned': num_directoryPeople})
@@ -268,11 +339,8 @@ class GooglePeopleConnector(BaseConnector):
         )
 
     def _handle_get_user_profile(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         scopes = [GOOGLE_PROFILE_SCOPE, GOOGLE_CONTACTS_SCOPE]
 
@@ -295,25 +363,24 @@ class GooglePeopleConnector(BaseConnector):
         try:
             response = client.people().get(resourceName=resource_name, **kwargs).execute()
         except Exception as e:
-            error_message = str(e)
+            error_message = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to get user profile.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to get user profile")
 
         action_result.add_data(response)
 
-        action_result.update_summary({'resource_id_returned': response['resourceName']})
+        try:
+            action_result.update_summary({'resource_id_returned': response['resourceName']})
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 
-        return action_result.set_status(
-            phantom.APP_SUCCESS,
-            "Successfully retrieved user profile"
-        )
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved user profile")
 
     def _handle_list_people(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         scopes = [GOOGLE_CONTACTS_SCOPE]
 
@@ -334,6 +401,10 @@ class GooglePeopleConnector(BaseConnector):
             kwargs.update({'pageToken': page_token})
 
         page_size = param.get('page_size')
+        # Validate 'page_size' action parameter
+        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         if (page_size):
             kwargs.update({'pageSize': page_size})
 
@@ -348,17 +419,22 @@ class GooglePeopleConnector(BaseConnector):
         try:
             response = client.people().connections().list(resourceName='people/me', **kwargs).execute()
         except Exception as e:
-            error_message = str(e)
+            error_message = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list people.")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to list people")
 
-        people = response['connections']
+        try:
+            people = response['connections']
 
-        for person in people:
-            action_result.add_data(person)
+            for person in people:
+                action_result.add_data(person)
 
-        num_people = response['totalItems']
-        summary = action_result.update_summary({'total_people_returned': num_people})
+            num_people = response['totalItems']
+            summary = action_result.update_summary({'total_people_returned': num_people})
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 
         next_page_token = response.get('nextPageToken')
         if (next_page_token):
@@ -405,19 +481,28 @@ class GooglePeopleConnector(BaseConnector):
     def initialize(self):
         config = self.get_config()
         self._state = self.load_state()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version.")
+
         key_json = config['key_json']
 
         try:
             key_dict = json.loads(key_json)
         except Exception as e:
-            return self.set_status(phantom.APP_ERROR, "Unable to load the key json", e)
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Contents of service account JSON file' asset parameter")
 
         self._key_dict = key_dict
 
         login_email = config['login_email']
 
         if (not ph_utils.is_email(login_email)):
-            return self.set_status(phantom.APP_ERROR, "Asset config 'login_email' failed validation")
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Login email' asset parameter")
 
         self._login_email = login_email
 
