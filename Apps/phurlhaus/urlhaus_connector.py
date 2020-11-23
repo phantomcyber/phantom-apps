@@ -72,7 +72,7 @@ class UrlhausConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
         message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -198,10 +198,8 @@ class UrlhausConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)),
                 resp_json
             )
-
         # Create a URL to connect to
         url = "{}{}".format(self._base_url, endpoint)
-
         try:
             r = request_func(
                 url,
@@ -419,7 +417,7 @@ class UrlhausConnector(BaseConnector):
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
-        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
+        self._base_url = config.get('base_url')
 
         return phantom.APP_SUCCESS
 
