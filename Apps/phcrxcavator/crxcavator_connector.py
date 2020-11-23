@@ -67,24 +67,24 @@ class CrxcavatorConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -134,6 +134,9 @@ class CrxcavatorConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -141,7 +144,7 @@ class CrxcavatorConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -158,14 +161,12 @@ class CrxcavatorConnector(BaseConnector):
                 ), None
             )
 
-        # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -177,16 +178,10 @@ class CrxcavatorConnector(BaseConnector):
             action_result.add_debug_data({'r_text': r.text})
             action_result.add_debug_data({'r_headers': r.headers})
 
-        # Process each 'Content-Type' of response separately
-
         # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML response, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
@@ -197,7 +192,7 @@ class CrxcavatorConnector(BaseConnector):
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -223,7 +218,6 @@ class CrxcavatorConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
@@ -231,20 +225,14 @@ class CrxcavatorConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
 
         self.save_progress("Connecting to endpoint")
         # make rest call
@@ -353,8 +341,6 @@ class CrxcavatorConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server for given extension ID")
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_submit_extension(self, param):
@@ -405,22 +391,13 @@ class CrxcavatorConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
 
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
+        self._base_url = config.get('base_url').strip("/")
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the phantom server's python major version.")
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the phantom server's python major version.")
 
         return phantom.APP_SUCCESS
 
