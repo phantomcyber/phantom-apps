@@ -1,0 +1,36 @@
+name: Test Pull Request
+
+on:
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  test-pull-request:
+
+    runs-on: ubuntu-latest
+
+    # Only run if test command is invoked from a pull request comment.
+    if: |
+      github.event_name == 'issue_comment' && github.event.action == 'created'
+      && github.event.issue.pull_request != null
+      && startsWith(github.event.comment.body, '!scan')
+
+    steps:
+      - name: Mark command as processed with a reaction
+        uses: actions/github-script@0.4.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            github.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            })
+
+      - name: Queue pull request
+        run: |
+          curl -k -X POST 'https://${{ secrets.APPS_TEST_SERVER_URI }}/pull_request/' \
+               -H 'Authorization: Bearer ${{ secrets.APPS_TEST_SERVER_API_KEY }}' \
+               -d 'id=${{ github.event.issue.number }}' \
+               --max-time 60
