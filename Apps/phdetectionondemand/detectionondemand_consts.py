@@ -1,3 +1,7 @@
+# File: detectionondemand_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Define your constants here
 DOD_API_AUTH_HEADER = 'feye-auth-key'
 

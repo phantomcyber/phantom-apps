@@ -1,3 +1,7 @@
+# File: detectionondemand_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
