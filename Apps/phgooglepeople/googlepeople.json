@@ -385,7 +385,7 @@
                 "copy_mask": {
                     "description": "Fields to be copied into the new contact",
                     "data_type": "string",
-                    "default": "names,emailAddresses",
+                    "default": "names,emailAddresses,phoneNumbers",
                     "order": 1
                 }
             },
@@ -404,7 +404,7 @@
                     "data_path": "action_result.parameter.copy_mask",
                     "data_type": "string",
                     "example_values": [
-                        "names,emailAddresses"
+                        "names,emailAddresses,phoneNumbers"
                     ]
                 },
                 {
