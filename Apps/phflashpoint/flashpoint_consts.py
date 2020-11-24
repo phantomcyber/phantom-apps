@@ -10,6 +10,8 @@
 # or in part, is forbidden except by express written permission
 # of Flashpoint.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # --
 
 # Define your constants here
@@ -34,16 +36,15 @@ FLASHPOINT_SESSION_TIMEOUT = 2
 FLASHPOINT_CONFIG_WAIT_TIMEOUT_PERIOD_KEY = "'Retry Wait Period(in seconds)' asset configuration"
 FLASHPOINT_CONFIG_NO_OF_RETRIES_KEY = "'Number Of Retries' asset configuration"
 FLASHPOINT_CONFIG_SESSION_TIMEOUT_KEY = "'Session Timeout(in minutes)' asset configuration"
-FLASHPOINT_ACTION_LIMIT_KEY = "'limit' action parameter"
+FLASHPOINT_ACTION_LIMIT_KEY = "'limit' action"
 
 # Error message constants
-FLASHPOINT_ERROR_VALID_INT_MSG = "Please provide a valid integer value in the {}"
-FLASHPOINT_ERROR_NON_NEG_VALID_INT_MSG = "Please provide a valid non-negative integer value in the {}"
-FLASHPOINT_NON_NEG_NON_ZERO_VALID_INT_MSG = "Please provide a valid non-zero positive integer value in {}"
+FLASHPOINT_ERROR_VALID_INT_MSG = "Please provide a valid integer value in the {parameter} parameter"
+FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or positive integer value in the {parameter} parameter"
+FLASHPOINT_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
 FLASHPOINT_ALREADY_DISABLE_SESSION_SCROLL_ERROR_MESSAGE = "Status code: 404"
 FLASHPOINT_ERROR_CODE_MSG = "Error code unavailable"
 FLASHPOINT_UNKNOWN_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
 FLASHPOINT_INVALID_COMMA_SEPARATED_LIST_ERROR = "Please provide valid comma-separated list of attribute types"
 FLASHPOINT_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Flashpoint server. Please check the asset configuration and|or the action parameters."
 FLASHPOINT_ERROR_SESSION_TIMEOUT_VALUE = "Please provide session timeout value between 1 and 60."
-FLASHPOINT_PARSE_ERROR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"

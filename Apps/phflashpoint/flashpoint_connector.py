@@ -10,6 +10,8 @@
 # or in part, is forbidden except by express written permission
 # of Flashpoint.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # --
 
 # Phantom App imports
@@ -501,8 +503,8 @@ class FlashpointConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), params, endpoint
         """
         # Validate the 'limit' action parameter
-        ret_val, limit = self._validate_integers(action_result, limit, FLASHPOINT_ACTION_LIMIT_KEY)
-        if phantom.is_fail(ret_val):
+        limit = self._validate_integers(action_result, limit, FLASHPOINT_ACTION_LIMIT_KEY)
+        if limit is None:
             return action_result.get_status(), None, None, None
 
         # Define per page limit
@@ -827,8 +829,8 @@ class FlashpointConnector(BaseConnector):
         """
 
         # Validate the 'limit' action parameter
-        ret_val, limit = self._validate_integers(action_result, limit, FLASHPOINT_ACTION_LIMIT_KEY)
-        if phantom.is_fail(ret_val):
+        limit = self._validate_integers(action_result, limit, FLASHPOINT_ACTION_LIMIT_KEY)
+        if limit is None:
             return action_result.get_status()
 
         # Call paginator to fetch data
@@ -979,23 +981,25 @@ class FlashpointConnector(BaseConnector):
         :param parameter: input parameter
         :return: integer value of the parameter
         """
+        try:
+            if not float(parameter).is_integer():
+                action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_VALID_INT_MSG.format(parameter=key))
+                return None
 
-        if parameter is not None:
-            try:
-                if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_VALID_INT_MSG.format(key)), None
-
-                parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_VALID_INT_MSG.format(key)), None
-
-            if parameter < 0:
-
-                return action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_NON_NEG_VALID_INT_MSG.format(key)), None
-            if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, FLASHPOINT_NON_NEG_NON_ZERO_VALID_INT_MSG.format(key)), None
-
-        return phantom.APP_SUCCESS, parameter
+            parameter = int(parameter)
+            if parameter <= 0:
+                if allow_zero:
+                    if parameter < 0:
+                        action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key))
+                        return None
+                else:
+                    action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_MSG.format(parameter=key))
+                    return None
+        except:
+            error_text = FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key) if allow_zero else FLASHPOINT_LIMIT_VALIDATION_MSG.format(parameter=key)
+            action_result.set_status(phantom.APP_ERROR, error_text)
+            return None
+        return parameter
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
@@ -1054,19 +1058,19 @@ class FlashpointConnector(BaseConnector):
         self._x_fp_integration_version = self.get_app_json().get('app_version')
 
         # Validate the 'wait_timeout_period' config parameter
-        ret_val, self._wait_timeout_period = self._validate_integers(
+        self._wait_timeout_period = self._validate_integers(
                                         self, config.get('wait_timeout_period', FLASHPOINT_DEFAULT_WAIT_TIMEOUT_PERIOD), FLASHPOINT_CONFIG_WAIT_TIMEOUT_PERIOD_KEY)
-        if phantom.is_fail(ret_val):
+        if self._wait_timeout_period is None:
             return self.get_status()
 
         # Validate the 'no_of_retries' config parameter
-        ret_val, self._no_of_retries = self._validate_integers(self, config.get('no_of_retries', FLASHPOINT_NUMBER_OF_RETRIES), FLASHPOINT_CONFIG_NO_OF_RETRIES_KEY, True)
-        if phantom.is_fail(ret_val):
+        self._no_of_retries = self._validate_integers(self, config.get('no_of_retries', FLASHPOINT_NUMBER_OF_RETRIES), FLASHPOINT_CONFIG_NO_OF_RETRIES_KEY, True)
+        if self._no_of_retries is None:
             return self.get_status()
 
         # Validate the 'session_timeout' config parameter
-        ret_val, self._session_timeout = self._validate_integers(self, config.get('session_timeout', FLASHPOINT_SESSION_TIMEOUT), FLASHPOINT_CONFIG_SESSION_TIMEOUT_KEY)
-        if phantom.is_fail(ret_val):
+        self._session_timeout = self._validate_integers(self, config.get('session_timeout', FLASHPOINT_SESSION_TIMEOUT), FLASHPOINT_CONFIG_SESSION_TIMEOUT_KEY)
+        if self._session_timeout is None:
             return self.get_status()
 
         if self._session_timeout > 60:
