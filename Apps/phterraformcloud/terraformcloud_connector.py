@@ -366,7 +366,7 @@ class TerraformCloudConnector(BaseConnector):
         }
 
         if param.get('description'):
-            post_data['attributes']['description'] = param['description']
+            post_data['attributes']['description'] = param.get('description')
 
         if param.get('vcs_repo_id'):
             # both repo id and token id are required
