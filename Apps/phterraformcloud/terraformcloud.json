@@ -1,7 +1,7 @@
 {
     "appid": "611b0c66-9ef7-4295-a6cd-a466cf0618c7",
     "name": "Terraform Cloud",
-    "description": "Perform generic and investigative actions to manage runs, plans, and applies on Terraform Cloud",
+    "description": "This app integrates with Terraform Cloud to perform generic and investigative actions to manage runs, plans, and applies",
     "type": "devops",
     "product_vendor": "HashiCorp",
     "logo": "logo_terraform.svg",
@@ -1904,8 +1904,8 @@
         },
         {
             "action": "get plan",
-            "description": "Get details and status of plan of a run in Terraform",
-            "verbose": "There is no endpoint to list plans. You can find the ID for a plan in the relationships.plan property of a run object.",
+            "description": "Get details and status of the plan of a run in Terraform",
+            "verbose": "There is no endpoint to list plans. You can find the ID for a plan in the 'relationships.plan' property of a run object.",
             "type": "investigate",
             "identifier": "get_plan",
             "read_only": true,
