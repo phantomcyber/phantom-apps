@@ -1,0 +1,484 @@
+{
+    "appid": "de5847c9-526f-4ab1-bea9-a61255d244dd",
+    "name": "Detection on Demand",
+    "description": "This app integrates with FireEye's Detection on Demand service to identify malicious files and hashes",
+    "type": "sandbox",
+    "product_vendor": "FireEye",
+    "logo": "logo_detectionondemand.svg",
+    "logo_dark": "logo_detectionondemand_dark.svg",
+    "product_name": "Detection on Demand",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "FireEye",
+    "license": "Copyright (c) FireEye, 2020",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-11-23T11:55:48.000000Z",
+    "package_name": "phantom_detectionondemand",
+    "main_module": "detectionondemand_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "The base url of the Detection on Demand API to connect to",
+            "data_type": "string",
+            "required": true,
+            "default": "https://feapi.marketplace.apps.fireeye.com",
+            "order": 0
+        },
+        "api_token": {
+            "description": "An API token for accessing the Detection on Demand API",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "description": "Execute a file in FireEye's various detection engines to determine what malicious behaviors, if any, the file exhibits",
+            "type": "generic",
+            "identifier": "detonate_file",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt",
+                        "txt",
+                        "vault id"
+                    ],
+                    "order": 0
+                },
+                "password": {
+                    "description": "Password to be used by the detection engine to decrypt a password protected file",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "param": {
+                    "description": "Command line parameter(s) to be used by detection engine when running the file. Mainly applicable to .exe files. For example, setting param to \"start -h localhost -p 5555\" will make the detection engine run a file named \"malicious.exe\" as \"malicious.exe start -h localhost -p 5555\"",
+                    "data_type": "string",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt",
+                        "txt",
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.param",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f7dd79d-1e94-473d-bef9-bd405a04336a"
+                    ],
+                    "contains": [
+                        "detectionondemand report id"
+                    ],
+                    "column_name": "Report ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "description": "Send a URL to Detection on Demand to scan for malicious behavior and artifacts",
+            "type": "generic",
+            "identifier": "detonate_url",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "The URL to analyze",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.test.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f7dd79d-1e94-473d-bef9-bd405a04336a"
+                    ],
+                    "contains": [
+                        "detectionondemand report id"
+                    ],
+                    "column_name": "Report ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup hash",
+            "description": "Search FireEye's hash database to see if there is already a report on the file",
+            "type": "investigate",
+            "identifier": "lookup_hash",
+            "read_only": true,
+            "parameters": {
+                "md5_hash": {
+                    "description": "The MD5 hash of the file to investigate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.md5_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "4ba739fd8c216809e485e7972597c995"
+                    ],
+                    "column_name": "MD5 Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.is_malicious",
+                    "data_type": "boolean",
+                    "column_name": "Is Malicious",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "contains": [
+                        "detectionondemand is malicious"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Get a detailed report on the execution results of a submitted file",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "parameters": {
+                "report_id": {
+                    "description": "ID of the report to view",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "detectionondemand report id"
+                    ],
+                    "order": 0
+                },
+                "presigned_url_expiry": {
+                    "description": "Number of hours to let the presigned URL be active for",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 72,
+                    "order": 1
+                },
+                "poll_interval": {
+                    "description": "Number of seconds to wait between each request to get the report",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 10,
+                    "order": 2
+                },
+                "poll_attempts": {
+                    "description": "Total number of attempts to fetch the report before failing",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 12,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "string",
+                    "contains": [
+                        "detectionondemand report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.presigned_url_expiry",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.poll_interval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.poll_attempts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "malware.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.urls",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.test.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URLs",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.is_malicious",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "contains": [
+                        "detectionondemand is malicious"
+                    ],
+                    "column_name": "Is Malicious",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.presigned_report_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://public-feapi.marketplace.apps.fireeye.com/reports/874da611-f82a-4331-afde-5943f4facb92?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXBvcnup67QiOiJlZWE4NmM1Yi01YWJiLTQ3MmItYWEwYi0zYjY3NDkxM2MwZmIiLCJleHAiOjE1ODc5MjM4ODJ9.qVx5iTZKBPsbRLIc1iIiLj3BI9nzimPaSB087AHPn1Y"
+                    ],
+                    "contains": [
+                        "detectionondemand presigned report url"
+                    ],
+                    "column_name": "Report Dashboard",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512e23daa92e6f178b3a6cdac4d507a"
+                    ],
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "MD5 Hash",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f7dd79d-1e94-473d-bef9-bd405a04336a"
+                    ],
+                    "contains": [
+                        "detectionondemand report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
