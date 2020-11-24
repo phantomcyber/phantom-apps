@@ -1,19 +1,19 @@
 
 	1. change to allow ingestion of both threat indicators and reports in a single asset
 
-	2. change to allow more than one filering option per asset. This will change the filtering
-	   from occuring at the api level to the app level. In other words instead of telling the api
+	2. change to allow more than one filtering option per asset. This will change the filtering
+	   from occurring at the API level to the app level. In other words instead of telling the API
 	   to only retrieved the desired results, we will retrieve all to the max_results limit and
 	   filter the results with our code in the app
 
-	3. change to check for previously ingested results. This is to resolve the annoynance of re-ingesting
+	3. change to check for previously ingested results. This is to resolve the annoyance of re-ingesting
 	   the last result because of limitations in the date filtering. The most likely implementation will
 	   be to setup a list of previously ingested items for comparison.
 
 	4. there is some interesting code used to evaluate the return of search_integrations from the cofense
 	   version of the app. I will try and move that code over to our app
 
-	5. There is the question of how to detect reports that may have change from uncategorized to processsed;
+	5. There is the question of how to detect reports that may have change from uncategorized to processed;
 
 		1. how to detect
 		2. does it make sense to reingest?
