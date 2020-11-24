@@ -10,7 +10,7 @@ import json
 
 
 def _adjust_keys(d, new_keys):
-    d = {new_keys[k] if k in new_keys else k: v for k, v in d.iteritems()}
+    d = {new_keys[k] if k in new_keys else k: v for k, v in d.items()}
 
 
 def _process_data(data):
@@ -18,7 +18,7 @@ def _process_data(data):
 
     # Ignore empty dicts
     report = data.get('report', {})
-    filtered_report = {k: v for k, v in report.iteritems() if v}
+    filtered_report = {k: v for k, v in report.items() if v}
     data['report'] = filtered_report
 
     # Convert lists to string for output
@@ -46,7 +46,7 @@ def _process_data(data):
             data['report']['strings'] = "\n".join(strings)
 
     # Creat dumped JSON string for 'other' values
-    for k, v in data['report'].iteritems():
+    for k, v in data['report'].items():
         if k not in ['info', 'debug', 'static', 'behavior', 'strings', 'target', 'static']:
             # JSON dump section
             data['report'][k] = json.dumps(v, separators=(',', ':'), sort_keys=True, indent=4)
