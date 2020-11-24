@@ -1,4 +1,5 @@
-# File: detectionondemand_connector.py
+# File: crxcavator_connector.py
+# Copyright (c) 2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -7,17 +8,17 @@ from __future__ import print_function, unicode_literals
 
 # Phantom App imports
 import phantom.app as phantom
-from phantom.vault import Vault
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-from detectionondemand_consts import *
+from crxcavator_consts import *
 import requests
-import time
 import json
+from bs4 import BeautifulSoup
+import re
+from bs4 import UnicodeDammit
 import sys
-from bs4 import BeautifulSoup, UnicodeDammit
 
 
 class RetVal(tuple):
@@ -26,31 +27,19 @@ class RetVal(tuple):
         return tuple.__new__(RetVal, (val1, val2))
 
 
-class DetectionOnDemandConnector(BaseConnector):
+class CrxcavatorConnector(BaseConnector):
 
     def __init__(self):
 
         # Call the BaseConnectors init first
-        super(DetectionOnDemandConnector, self).__init__()
+        super(CrxcavatorConnector, self).__init__()
 
         self._state = None
+
+        # Variable to hold a base_url in case the app makes REST calls
+        # Do note that the app json defines the asset config, so please
+        # modify this as you deem fit.
         self._base_url = None
-        self._api_token = None
-
-    def _validate_integer(self, action_result, parameter, key):
-        if parameter is not None:
-            try:
-                if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
-
-                parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
-
-            if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
-
-        return phantom.APP_SUCCESS, parameter
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -72,7 +61,6 @@ class DetectionOnDemandConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -106,13 +94,37 @@ class DetectionOnDemandConnector(BaseConnector):
 
         return error_text
 
+    def _dictify(self, data, key, prev_key=None):
+        if isinstance(data, dict):
+            for k in data.keys():
+                data[k] = self._dictify(data[k], k, key)
+            return data
+        elif isinstance(data, list):
+            for i, v in enumerate(data):
+                data[i] = self._dictify(v, None, key)
+            return data
+        else:
+            if prev_key is not None:
+                new_key = (prev_key[0:-1] if (prev_key.endswith('s') and len(prev_key) > 1) else prev_key)
+                return {new_key: data}
+            else:
+                return data
+
+    def replace_dict(self, d):
+        new = {}
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = self.replace_dict(v)
+            new[k.replace('.', '_')] = v
+        return new
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(response.status_code)
+                phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -122,11 +134,9 @@ class DetectionOnDemandConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-
             # Remove the script, style, footer and navigation part from the HTML message
             for element in soup(["script", "style", "footer", "nav"]):
                 element.extract()
-
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -134,7 +144,7 @@ class DetectionOnDemandConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -145,22 +155,18 @@ class DetectionOnDemandConnector(BaseConnector):
             resp_json = r.json()
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response: {}'.format(err)), None)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)
+                ), None
+            )
 
-        # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        if isinstance(resp_json, dict) and resp_json.get('message'):
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                        r.status_code,
-                        resp_json.get('message', ''))
-            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-
-        # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -172,16 +178,10 @@ class DetectionOnDemandConnector(BaseConnector):
             action_result.add_debug_data({'r_text': r.text})
             action_result.add_debug_data({'r_headers': r.headers})
 
-        # Process each 'Content-Type' of response separately
-
         # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML response, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
@@ -192,7 +192,7 @@ class DetectionOnDemandConnector(BaseConnector):
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -224,191 +224,146 @@ class DetectionOnDemandConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, 'Error Connecting to server: {}'.format(err)),
-                resp_json
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)
+                ), resp_json
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        self.save_progress("Checking connectivity by fetching API health")
+        self.save_progress("Connecting to endpoint")
         # make rest call
-        ret_val, response = self._make_rest_call(
-            DOD_HEALTH_ENDPOINT, action_result, params=None, headers={DOD_API_AUTH_HEADER: self._api_token}
-        )
-
-        if not phantom.is_fail(ret_val) and response['status'] == 'success' and response['service_status'] == 'RUNNING':
-            # Return success
-            self.save_progress("Test Connectivity Passed")
-            return action_result.set_status(phantom.APP_SUCCESS)
-        else:
-            self.save_progress("Test Connectivity Failed.")
+        ret_val, _ = self._make_rest_call('/', action_result, params=None, headers=None)
+        if phantom.is_fail(ret_val):
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
-    def _handle_detonate_file(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def major_minor_micro_patch(self, version):
+        # pad the numbers
+        if not re.search(r'(\d+)\.', version):
+            version += '.0.0.0'
+        elif not re.search(r'(\d+)\.(\d+)\.', version):
+            version += '.0.0'
+        elif not re.search(r'(\d+)\.(\d+)\.(\d+)\.', version):
+            version += '.0'
+        major, minor, micro, patch = re.search(r'(\d+)\.(\d+)\.(\d+)\.(\d+)', version).groups()
+        return int(major), int(minor), int(micro), int(patch)
+
+    def _handle_extension_metadata(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
+        extension_id = param['extension_id']
+        versions = []
+        version_list = []
+        endpoint = '/metadata/{}'.format(extension_id)
 
-        # Required values can be accessed directly
-        vault_id = param['vault_id']
-        password = param.get('password')
-        command_param = param.get('param')
+        ret_val, response = self._make_rest_call(endpoint, action_result)
 
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if response is None:
+            return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
+        endpoint = '/report/{}'.format(extension_id)
+
+        ret_val, response2 = self._make_rest_call(endpoint, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if response2 is None:
+            return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
         try:
-            file_info = Vault.get_file_info(vault_id=vault_id)[0]
-            file_path = file_info['path']
-            file_name = file_info['name']
+            for data in response2:
+                version_list.append({"version": data['version']})
+                versions.append(data['version'])
+                latest = max(versions, key=self.major_minor_micro_patch)
+            response.update({"versions": version_list})
+            action_result.add_data(response)
+            name = response['name']
+            rating = response['rating']
+            short_description = response['short_description']
+            action_result.update_summary({"extension_id": extension_id, "name": name, "rating": rating,
+                                        "short_description": short_description, "total_versions": len(versions),
+                                        "latest_version": latest})
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to find vault item")
-
-        try:
-            files = {
-                "file": (file_name, open(file_path, 'rb'))
-            }
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to open vault item. {}'.format(err))
-
-        data = {}
-        if password:
-            data['password'] = password
-        if command_param:
-            data['param'] = command_param
-        # make rest call
-        ret_val, response = self._make_rest_call(
-            DOD_FILES_ENDPOINT, action_result, method="post", files=files, data=data, headers={DOD_API_AUTH_HEADER: self._api_token}
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_detonate_url(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
-
-        # Format the url as a stringly typed array: ex. ["https://www.test.com"]
-        urls = {
-            'urls': f'["{param["url"]}"]'
-        }
-
-        # make rest call
-        ret_val, response = self._make_rest_call(
-            '/urls', action_result, method="post", files=urls, data=None, headers={DOD_API_AUTH_HEADER: self._api_token}
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_lookup_hash(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Required values can be accessed directly
-        md5_hash = param['md5_hash']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
-
-        hash_ret_val, hash_response = self._make_rest_call(
-            f'{DOD_HASHES_ENDPOINT}/{md5_hash}', action_result, params={}, headers={DOD_API_AUTH_HEADER: self._api_token}
-        )
-
-        if phantom.is_fail(hash_ret_val):
-            return action_result.get_status()
-
-        # Add the response into the data section
-        action_result.add_data(hash_response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary["is_malicious"] = hash_response["is_malicious"]
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_report(self, param):
-        attempt = 1
-
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        report_id = param['report_id']
-        # Integer Validation for 'presigned_url_expiry' parameter
-        expiry = param['presigned_url_expiry']
-        ret_val, expiry = self._validate_integer(action_result, expiry, PRESIGNED_URL_EXPIRY_KEY)
+        extension_id = param['extension_id']
+        version = param.get('version')
+        if version:
+            endpoint = '/report/{}/{}'.format(extension_id, version)
+        else:
+            # Get latest version
+            endpoint = '/report/{}'.format(extension_id)
+            ret_val, response = self._make_rest_call(endpoint, action_result)
+            if response is None:
+                return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
+            versions = []
+            try:
+                for data in response:
+                    versions.append(data['version'])
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response for version from the server. {}".format(err))
+
+            latest = max(versions, key=self.major_minor_micro_patch)
+            endpoint = '/report/{}/{}'.format(extension_id, latest)
+
+        ret_val, response = self._make_rest_call(endpoint, action_result)
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+        if response is None:
+            return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server. Please try again by providing a valid input")
 
-        # Integer Validation for 'poll_attempts' parameter
-        poll_attempts = param['poll_attempts']
-        ret_val, poll_attempts = self._validate_integer(action_result, poll_attempts, POLL_ATTEMPTS_KEY)
+        try:
+            # Scrub dots from field names
+            response = self.replace_dict(response)
+            data = response['data']
+            data.update({"extension_id": response['extension_id']})
+            data.update({"version": response['version']})
+            action_result.add_data(data)
+            total_risk = data['risk']['total']
+            action_result.update_summary({"extension_id": extension_id, "version": response['version'], "total_risk": total_risk})
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server for given extension ID")
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_submit_extension(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        extension_id = param['extension_id']
+        data = json.dumps({"extension_id": extension_id})
+
+        ret_val, response = self._make_rest_call('/submit', action_result, data=data, method='post')
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+        elif response.get('error'):
+            return action_result.set_status(phantom.APP_ERROR, response['error'])
 
-        # Integer Validation for 'poll_interval' parameter
-        poll_interval = param['poll_interval']
-        ret_val, poll_interval = self._validate_integer(action_result, poll_interval, POLL_INTERVAL_KEY)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+        action_result.add_data(response)
+        version = response.get('version')
+        code = response.get('code')
 
-        while attempt <= poll_attempts:
-            self.save_progress(f'Polling attempt {attempt} of {poll_attempts}')
-            report_ret_val, report_response = self._make_rest_call(
-                f'{DOD_REPORTS_ENDPOINT}/{report_id}', action_result, params={'extended': True}, headers={DOD_API_AUTH_HEADER: self._api_token}
-            )
-            if phantom.is_fail(report_ret_val):
-                return report_ret_val
-            self.debug_print(report_response)
-            if report_response.get('overall_status') == "DONE":
-                url_ret_val, url_response = self._make_rest_call(
-                    f'{DOD_PRESIGNED_URL_ENDPOINT}/{report_id}', action_result, params={'expiry': expiry}, headers={DOD_API_AUTH_HEADER: self._api_token}
-                )
-                if phantom.is_fail(url_ret_val):
-                    self.debug_print(url_response)
-                    url_response = {'error': 'Unable to fetch presigned URL'}
-                else:
-                    summary = action_result.update_summary({})
-                    summary["dashboard"] = url_response["presigned_report_url"]
-
-                action_result.add_data({**report_response, **url_response})
-                return action_result.set_status(phantom.APP_SUCCESS)
-
-            attempt += 1
-            time.sleep(poll_interval)
-
-        return action_result.set_status(phantom.APP_ERROR, "Maximum report polls reached")
+        action_result.update_summary({"code": code, "extension_id": extension_id, "version": version})
+        msg = response.get("message", "Successfully submitted extension")
+        return action_result.set_status(phantom.APP_SUCCESS, msg)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -420,18 +375,12 @@ class DetectionOnDemandConnector(BaseConnector):
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
-
-        elif action_id == 'detonate_file':
-            ret_val = self._handle_detonate_file(param)
-
-        elif action_id == 'detonate_url':
-            ret_val = self._handle_detonate_url(param)
-
+        elif action_id == 'extension_metadata':
+            ret_val = self._handle_extension_metadata(param)
         elif action_id == 'get_report':
             ret_val = self._handle_get_report(param)
-
-        elif action_id == 'lookup_hash':
-            ret_val = self._handle_lookup_hash(param)
+        elif action_id == 'submit_extension':
+            ret_val = self._handle_submit_extension(param)
 
         return ret_val
 
@@ -440,26 +389,15 @@ class DetectionOnDemandConnector(BaseConnector):
         # that needs to be accessed across actions
         self._state = self.load_state()
 
+        # get the asset config
+        config = self.get_config()
+
+        self._base_url = config.get('base_url').strip("/")
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
-
-        # get the asset config
-        config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
-        self._api_token = config.get('api_token')
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the phantom server's python major version.")
 
         return phantom.APP_SUCCESS
 
@@ -495,7 +433,7 @@ def main():
 
     if username and password:
         try:
-            login_url = DetectionOnDemandConnector._get_phantom_base_url() + '/login'
+            login_url = CrxcavatorConnector._get_phantom_base_url() + '/login'
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
@@ -522,7 +460,7 @@ def main():
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = DetectionOnDemandConnector()
+        connector = CrxcavatorConnector()
         connector.print_progress_message = True
 
         if session_id is not None:
