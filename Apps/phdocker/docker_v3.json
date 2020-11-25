@@ -1,7 +1,7 @@
 {
     "appid": "b004a598-2eb9-42c8-9f45-f30433da9b85",
     "name": "Docker",
-    "description": "Uses Docker remote API to perform a range of actions on existing containers within user-specified domain",
+    "description": "Uses Docker remote API to perform a range of actions on existing containers within the user-specified domain",
     "type": "endpoint",
     "product_vendor": "Docker",
     "logo": "logo_docker_v3.svg",
@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2020-05-14T13:46:36.326886Z",
     "package_name": "phantom_docker_v3",
-    "main_module": "docker_v3_connector.pyc",
+    "main_module": "docker_v3_connector.py",
     "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -37,9 +37,9 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get changes",
+            "action": "get changes of a container filesystem",
             "description": "Get added, modified, or deleted files of a container's filesystem",
-            "verbose": "The Kind of modification can be one of:\n\n0: Modified\n1: Added\n2: Deleted",
+            "verbose": "The Kind of modification can be one of:\n\n1: Modified\n2: Added\n3: Deleted",
             "type": "investigate",
             "identifier": "get_changes_of_a_container_filesystem",
             "read_only": true,
@@ -72,17 +72,17 @@
                 {
                     "data_path": "action_result.data.*.filesystem.*.Kind",
                     "data_type": "string",
-                    "column_name": "Modifications",
+                    "column_name": "Modification",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
                     ],
-                    "column_name": "Status",
                     "column_order": 2
                 },
                 {
@@ -95,11 +95,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -125,7 +131,7 @@
                     "order": 0
                 },
                 "size": {
-                    "description": "Get the size of the container as fields SizeRw and SizeRootFs",
+                    "description": "Get size of the container as fields SizeRw and SizeRootFs",
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
@@ -161,11 +167,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -177,11 +183,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -243,11 +255,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -259,11 +271,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -318,11 +336,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -334,11 +352,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -382,11 +406,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -398,11 +422,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -412,13 +442,13 @@
         },
         {
             "action": "list container",
-            "description": "Get list of containers",
+            "description": "Get a list of containers",
             "type": "investigate",
             "identifier": "list_container",
             "read_only": true,
             "parameters": {
                 "all": {
-                    "description": "Get all containers, by default, only running containers are shown",
+                    "description": "Get all containers. By default, only running containers are shown",
                     "data_type": "boolean",
                     "default": false,
                     "order": 0
@@ -435,7 +465,7 @@
                     "order": 2
                 },
                 "filters": {
-                    "description": "Filters to process on the container list, encoded as JSON (a map[string][]string), For example, {\"status\": [\"paused\"]} will only return paused containers",
+                    "description": "Filters to process on the container list, encoded as JSON (a map[string][]string). For example, {\"status\": [\"paused\"]} will only return paused containers",
                     "data_type": "string",
                     "order": 3
                 }
@@ -443,7 +473,11 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.all",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.filters",
@@ -455,7 +489,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.size",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.containers.*.Id",
@@ -482,11 +520,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -498,11 +536,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -557,11 +601,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -573,11 +617,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -603,7 +653,7 @@
                     "order": 0
                 },
                 "detachkeys": {
-                    "description": "Override the key sequence for detaching a container, format is a single character [a-Z] or ctrl-<value> where <value> is one of: a-z, @, ^, [, , or _",
+                    "description": "Override the key sequence for detaching a container. Format is a single character [a-Z] or ctrl-<value> where <value> is one of: a-z, @, ^, [, , or _",
                     "data_type": "string",
                     "order": 1
                 }
@@ -621,7 +671,7 @@
                 {
                     "data_path": "action_result.parameter.detachkeys",
                     "data_type": "string",
-                    "column_name": "Detach Keys",
+                    "column_name": "Detachkeys",
                     "column_order": 1
                 },
                 {
@@ -632,11 +682,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -648,11 +698,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -662,19 +718,19 @@
         },
         {
             "action": "list images",
-            "description": "Returns a list of images on the server, Note that it uses a different, smaller representation of an image than inspecting a single image",
+            "description": "Returns a list of images on the server. Note that it uses a different, smaller representation of an image than inspecting a single image",
             "type": "investigate",
             "identifier": "list_images",
             "read_only": true,
             "parameters": {
                 "all": {
-                    "description": "Show all images, only images from a final layer (no children) are shown by default",
+                    "description": "Show all images. Only images from a final layer (no children) are shown by default",
                     "data_type": "boolean",
                     "default": false,
                     "order": 0
                 },
                 "filters": {
-                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list, eg {\"status\":[\"exited\"]}",
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list. eg {\"status\":[\"exited\"]}",
                     "data_type": "string",
                     "order": 1
                 },
@@ -688,11 +744,19 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.all",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.digests",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.filters",
@@ -714,6 +778,10 @@
                     "data_path": "action_result.data.*.images.*.Created",
                     "data_type": "boolean",
                     "column_name": "Created",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 2
                 },
                 {
@@ -725,11 +793,11 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
                     ],
-                    "column_name": "Status",
                     "column_order": 4
                 },
                 {
@@ -742,11 +810,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -818,11 +892,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -848,7 +928,7 @@
                     "order": 0
                 },
                 "signal": {
-                    "description": "Signal to be sent to the container as an integer or string (e.g. SIGINT)",
+                    "description": "Signal to be sent to the container as an integer or string (e.g. SIGINT), default is SIGKILL",
                     "data_type": "string",
                     "default": "SIGKILL",
                     "order": 1
@@ -894,11 +974,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1006,11 +1092,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1020,13 +1112,13 @@
         },
         {
             "action": "delete stopped containers",
-            "description": "Delete containers which are in Stopped state",
+            "description": "Delete containers that are stopped",
             "type": "generic",
             "identifier": "delete_stopped",
             "read_only": false,
             "parameters": {
                 "filters": {
-                    "description": "Filters to process on the prune list, encoded as JSON eg {\"status\":[\"exited\"]}",
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}",    
                     "data_type": "string",
                     "order": 0
                 }
@@ -1062,11 +1154,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1076,7 +1174,7 @@
         },
         {
             "action": "remove image",
-            "description": "Remove an image, along with any untagged parent images that were referenced by that image, Images can't be removed if they have any descendant images or being used by a running container or build",
+            "description": "Remove an image, along with any untagged parent images that were referenced by that image. Images can't be removed if they have any descendant images or being used by a running container or build",
             "type": "generic",
             "identifier": "remove_image",
             "read_only": false,
@@ -1110,21 +1208,21 @@
                 {
                     "data_path": "action_result.parameter.force",
                     "data_type": "boolean",
+                    "column_name": "Force",
                     "example_values": [
                         true,
                         false
                     ],
-                    "column_name": "Force",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.noprune",
                     "data_type": "boolean",
+                    "column_name": "Noprune",
                     "example_values": [
                         true,
                         false
                     ],
-                    "column_name": "Noprune",
                     "column_order": 2
                 },
                 {
@@ -1151,11 +1249,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1165,13 +1269,13 @@
         },
         {
             "action": "delete unused images",
-            "description": "Delete Unused Images",
+            "description": "Delete all unused images",
             "type": "generic",
             "identifier": "delete_unused",
             "read_only": false,
             "parameters": {
                 "filters": {
-                    "description": "Filters to process on the prune list, encoded as JSON eg {\"status\":[\"exited\"]}",
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}",
                     "data_type": "string",
                     "order": 0
                 }
@@ -1207,11 +1311,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1296,11 +1406,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1328,7 +1444,7 @@
                     "order": 1
                 },
                 "filters": {
-                    "description": "A JSON encoded value of the filters to process on the image list",
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the image list",
                     "data_type": "string",
                     "order": 2
                 }
@@ -1380,11 +1496,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1393,8 +1515,8 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "take snapshot",
-            "description": "Take snapshot of a container",
+            "action": "snapshot of a container",
+            "description": "Take a snapshot of one of the containers",
             "type": "generic",
             "identifier": "snapshot_of_a_container",
             "read_only": false,
@@ -1451,11 +1573,9 @@
                 {
                     "data_path": "action_result.parameter.container",
                     "data_type": "string",
-                    "column_name": "Name",
                     "contains": [
                         "docker container id"
-                    ],
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.repo",
@@ -1475,13 +1595,17 @@
                 },
                 {
                     "data_path": "action_result.parameter.pause",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.request_body",
                     "data_type": "string",
                     "column_name": "Request Body",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.changes",
@@ -1499,7 +1623,7 @@
                         "success",
                         "failed"
                     ],
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -1511,11 +1635,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1531,7 +1661,7 @@
             "read_only": false,
             "parameters": {
                 "name": {
-                    "description": "Name of the container",
+                    "description": "Assign the specified name to the container",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -1586,11 +1716,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

@@ -1,8 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: docker_v3_connector.py
+# Copyright (c) John Wang, 2020
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -16,8 +16,8 @@ from phantom.action_result import ActionResult
 from docker_v3_consts import *
 import requests
 import json
-import sys
-from bs4 import BeautifulSoup, UnicodeDammit
+# import sys
+from bs4 import BeautifulSoup
 
 
 class RetVal(tuple):
@@ -34,25 +34,7 @@ class Docker_V3Connector(BaseConnector):
         super(Docker_V3Connector, self).__init__()
 
         self._state = None
-
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
         self._base_url = None
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
@@ -66,32 +48,40 @@ class Docker_V3Connector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            error_msg = self._unicode_string_handler(error_msg)
-        except TypeError:
-            error_msg = TYPE_ERR_MSG
-        except:
-            error_msg = ERROR_MSG_UNAVAILABLE
-
-        try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -100,7 +90,7 @@ class Docker_V3Connector(BaseConnector):
         return RetVal(
             action_result.set_status(
                 phantom.APP_ERROR,
-                "Empty response and no information in the header"
+                "Status code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -110,6 +100,9 @@ class Docker_V3Connector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -146,7 +139,7 @@ class Docker_V3Connector(BaseConnector):
         message = """Error from server.
             Status Code: {0} Data from server: {1}""".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(
@@ -167,10 +160,7 @@ class Docker_V3Connector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML response, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
+        # Process an HTML response
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
@@ -206,29 +196,36 @@ class Docker_V3Connector(BaseConnector):
                 resp_json
             )
 
-        # Create a URL to connect to
-        url = self._base_url + endpoint
-
         try:
+            # Create a URL to connect to
+            url = "{0}{1}".format(self._base_url, endpoint)
             r = request_func(
                 url,
                 # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.InvalidURL:
+            error_message = "Error connecting to server. Invalid URL %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error connecting to server. Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(err)
+                    "Error Connecting to server. {0}".format(err)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
 
-    def _make_post_call(self,
-                        endpoint, action_result, method="post", **kwargs):
+    def _make_post_call(self, endpoint, action_result, method="post", **kwargs):
         # **kwargs can be any additional
         # parameters that requests.request accepts
 
@@ -245,9 +242,10 @@ class Docker_V3Connector(BaseConnector):
                 resp_json
             )
 
-        # Create a URL to connect to
-        url = self._base_url + endpoint
         try:
+            # Create a URL to connect to
+            url = "{0}{1}".format(self._base_url, endpoint)
+
             if 'data' in kwargs:
                 try:
                     k_data = json.loads(kwargs['data'])
@@ -256,7 +254,7 @@ class Docker_V3Connector(BaseConnector):
                     return RetVal(
                         action_result.set_status(
                             phantom.APP_ERROR,
-                            "Please verify 'request_body' action parameter. Details: {0}".format(err)
+                            "{0}{1}".format(VALID_JSON_MSG.format(key='request_body'), err)
                         ), resp_json
                     )
                 r = request_func(
@@ -276,15 +274,24 @@ class Docker_V3Connector(BaseConnector):
                     verify=config.get('verify_server_cert', False),
                     **kwargs
                 )
+        except requests.exceptions.InvalidURL:
+            error_message = "Error connecting to server. Invalid URL %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error connecting to server. Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(err)
+                    "Error Connecting to server. {0}".format(err)
                 ), resp_json
             )
-        r.status_code = 200
+        # r.status_code = 200
         return self._process_response(r, action_result)
 
     def _cleanup_row_values(self, row):
@@ -294,27 +301,21 @@ class Docker_V3Connector(BaseConnector):
                 if type(v) == bytearray else v for k, v in row.items()}
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector)
-        # to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("obtaining the version of the docker host")
         # make rest call
         ret_val, response = self._make_rest_call('/version', action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out, but after implementation,
-            # return from here
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
-        res = json.dumps(response)
+        try:
+            res = json.dumps(response)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print("{}".format(err))
 
         indices = [i + 1 for i, elem in enumerate(res) if elem == ',']
         indices.insert(0, 0)
@@ -330,46 +331,22 @@ class Docker_V3Connector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR,
-        # "Action not yet implemented")
-
     def _handle_get_changes_of_a_container_filesystem(self, param):
-        # Implement the handler here
-        # use self.save_progress(...)
-        # to send progress messages back to the platform
-        self.save_progress(
-                """In action handler
-                for: {0}""".format(self.get_action_identifier()))
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector)
-        # to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         id = param['id']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # make rest call
         ret_val, response = self._make_rest_call(
             '/containers/{0}/changes'.format(id), action_result)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
-            # pass
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         response_dict = {'filesystem': response}
@@ -378,94 +355,58 @@ class Docker_V3Connector(BaseConnector):
         # Add a dictionary that is made up of the most
         # important values from data into the summary
         summary = action_result.update_summary({})
-        summary['filesystem_data'] = json.dumps(response, indent=1)
+        try:
+            summary['filesystem_data'] = json.dumps(response, indent=1)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print("Error occurred while adding data to summary.{}".format(err))
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a
-        # textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
-        # return action_result.set_status
-        # (phantom.APP_ERROR, "Action not yet implemented")
-
     def _handle_inspect_a_container(self, param):
-        # Implement the handler here
-        # use self.save_progress(...)
-        # to send progress messages back to the platform
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector)
         # to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        # required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        id = param.get['id']
+        id = param['id']
         size = param.get('size', '')
-
         # make rest call
         ret_val, response = self._make_rest_call(
             '/containers/{0}/json?size={1}'.format(id, size), action_result)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
-            # pass
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         try:
             response_dict = {'containerStats': response['HostConfig']}
             action_result.add_data(response_dict)
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, 'Error while parsing API response for fetching HostConfig')
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching 'containerStats' from API response")
 
         # Add a dictionary that is made up of the most
         # important values from data into the summary
         summary = action_result.update_summary({})
-        summary['containerStats_data'] = """Please view the results
-                                            in the results data section"""
+        summary['containerStats_data'] = "Please view the results in the results data section"
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_update_a_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         id = param['id']
         request_body = param['request_body']
-        # request_body = param['request_body']
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
+
         # response = "request body={0}".format(request_body)
         # make rest call
         ret_val, response = self._make_post_call(
@@ -474,12 +415,7 @@ class Docker_V3Connector(BaseConnector):
             data=request_body)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         response_dict = {'update_stats': response}
@@ -488,96 +424,65 @@ class Docker_V3Connector(BaseConnector):
         # Add a dictionary that is made up of the most
         # important values from data into the summary
         summary = action_result.update_summary({})
-        summary['update_data'] = json.dumps(response, indent=1)
+        try:
+            summary['update_data'] = json.dumps(response, indent=1)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print("Error occurred while adding data to summary.{}".format(err))
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message
-        # based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_restart_a_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         id = param['id']
-
-        # Optional values should use the .get() function
         t = param.get('t', '')
-
+        # Validate 't' configuration parameter
+        ret_val, t = self._validate_integer(action_result, t, "'t' action parameter")
+        if phantom.is_fail(ret_val):
+            return self.get_status()
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/restart?t={1}'.format(id, t), action_result)
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
-            return action_result.get_status()
-            # pass
-        response = "container {0} has restarted".format(id)
 
-        # Now post process the data,  uncomment code as you deem fit
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        response = "container {0} has restarted".format(id)
 
         # Add the response into the data section
         response_dict = {'restart_stats': response}
         action_result.add_data(response_dict)
+
         # Add a dictionary that is made up of the most
         # important values from data into the summary
         summary = action_result.update_summary({})
         summary['restart_data'] = response
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a
-        # textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_export_a_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        ID = param['id']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
+        id = param['id']
 
         # make rest call
         ret_val, response = self._make_rest_call(
-            '/containers/{0}/export'.format(ID), action_result)
+            '/containers/{0}/export'.format(id), action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
-            # pass
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         response_dict = {'export_stat': response}
@@ -588,36 +493,32 @@ class Docker_V3Connector(BaseConnector):
         summary = action_result.update_summary({})
         summary['expoort_data'] = len(action_result['data'])
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_list_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        # required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
         all = param.get('all', '')
         limit = param.get('limit', '')
+        # Validate 'limit' configuration parameter
+        ret_val, limit = self._validate_integer(action_result, limit, "'limit' action parameter")
+        if phantom.is_fail(ret_val):
+            return self.get_status()
         size = param.get('size', '')
         filters = param.get('filters', '')
-
+        if filters:
+            # Validate 'filters' configuration parameter
+            try:
+                json.loads(filters)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
         # make rest call
         ret_val, response = self._make_rest_call(
             '/containers/json?all={0}&limit={1}&size={2}&filters={3}'.format(
@@ -627,14 +528,7 @@ class Docker_V3Connector(BaseConnector):
                                                     filters), action_result)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            #  action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
-            # pass
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section\
         response_dict = {'containers': response}
@@ -650,49 +544,31 @@ class Docker_V3Connector(BaseConnector):
                         'id': response_dict['containers'][item]['Id'],
                         'Name': response_dict['containers'][item]['Names'][0]}}
                     for item in range(len(response_dict['containers']))]
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, 'Error while parsing API response to fetch ID and Name')
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Name'. {}".format(err))
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_stop_a_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        ID = param['id']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
+        id = param['id']
 
         # make rest call
         ret_val, response = self._make_post_call(
-            '/containers/{0}/stop'.format(ID), action_result)
+            '/containers/{0}/stop'.format(id), action_result)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out, but after implementation,
-            # return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        response = "container {0} has terminated".format(ID)
+        response = "container {0} has terminated".format(id)
         # Add the response into the data section
         response_dict = {'pause': response}
         action_result.add_data(response_dict)
@@ -702,49 +578,31 @@ class Docker_V3Connector(BaseConnector):
         summary = action_result.update_summary({})
         summary['stop_data'] = response
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_start_a_container(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector)
         # to represent the action for this param
-        if param is None:
-            param = dict()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        ID = param['id']
-
-        # Optional values should use the .get() function
+        id = param['id']
         detachkeys = param.get('detachkeys', '')
+
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/start?detachKeys={1}'.format(
-                                                        ID,
+                                                        id,
                                                         detachkeys),
             action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out, but after implementation,
-            # return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
-        response = "Container {0} has resumed".format(ID)
+        response = "Container {0} has resumed".format(id)
         response_dict = {'unpause': response}
         action_result.add_data(response_dict)
         # Add a dictionary that is made up of the
@@ -752,31 +610,26 @@ class Docker_V3Connector(BaseConnector):
         summary = action_result.update_summary({})
         summary['unpause_data'] = response
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create
-        # a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message,
-        # in case of success we don't set the message, but use the summary
 
     def _handle_list_images(self, param):
         # Implement the handler here
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self
         # (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        # required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
         all = param.get('all', '')
         filters = param.get('filters', '')
+        if filters:
+            # Validate 'filters' configuration parameter
+            try:
+                json.loads(filters)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
         digests = param.get('digests', '')
         # make rest call
         ret_val, response = self._make_rest_call(
@@ -787,10 +640,6 @@ class Docker_V3Connector(BaseConnector):
             action_result)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out, but after implementation,
-            # return from here
             return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
@@ -802,119 +651,111 @@ class Docker_V3Connector(BaseConnector):
         # the most important values from data into the summary
         summary = action_result.update_summary({})
         # res = json.dumps(response)
-        summary['image_data'] = [
+        try:
+            summary['image_data'] = [
                     {'images ' + str(item):
                         {'id': response_dict['images'][item]['Id'],
                             'Tags':
                                 response_dict['images'][item]['RepoTags'][0]}}
                     for item in range(len(response_dict['images']))]
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message
-        # based off of the summary dictionary
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Tags'")
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # For now return Error with a message,
-        # in case of success we don't set the message,
-        # but use the summary
-
     def _handle_rename_container(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ID = param['id']
+        id = param['id']
         name = param['name']
         ret_val, response = self._make_post_call(
                 '/containers/{0}/rename?name={1}'.format(
-                                                        ID,
+                                                        id,
                                                         name),
                 action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'rename': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['rename_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_kill_container(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         # Access action parameters passed in the 'param' dictionary
 
-        # Required values can be accessed directly
-        ID = param['id']
+        id = param['id']
         signal = param.get('signal', '')
         ret_val, response = self._make_post_call(
                     '/containers/{0}/kill?signal={1}'.format(
-                        ID,
+                        id,
                         signal),
                     action_result)
+
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'kill': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['kill_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_remove_container(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ID = param['id']
+        id = param['id']
         v = param.get('v', '')
         force = param.get('force', '')
         link = param.get('link', '')
         ret_val, response = self._make_post_call(
                     '/containers/{0}?v={1}&force={2}&link={3}'.format(
-                        ID,
+                        id,
                         v,
                         force,
                         link),
                     action_result, method='delete')
+
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'remove container': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['remove_container_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_stopped_containers(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
+        if filters:
+            # Validate 'filters' configuration parameter
+            try:
+                json.loads(filters)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
                     '/containers/prune?filters={0}'.format(filters),
                     action_result)
+
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'prune': response}
         action_result.add_data(response_dict)
         # Add a dictionary that is made up of
@@ -922,16 +763,11 @@ class Docker_V3Connector(BaseConnector):
         summary = action_result.update_summary({})
         summary['prune_data'] = response
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_remove_image(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
         force = param.get('force', '')
@@ -943,11 +779,8 @@ class Docker_V3Connector(BaseConnector):
                         noprune),
                     action_result, method='delete')
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'delete image': response}
         action_result.add_data(response_dict)
         # Add a dictionary that is made
@@ -955,62 +788,69 @@ class Docker_V3Connector(BaseConnector):
         summary = action_result.update_summary({})
         summary['delete_image_data'] = response
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual
-        # message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_unused_images(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
+        if filters:
+            # Validate 'filters' configuration parameter
+            try:
+                json.loads(filters)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
             '/images/prune?filters={0}'.format(filters), action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'unused_images': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['unused_images_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_image_history(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
         ret_val, response = self._make_rest_call(
             '/images/{0}/history'.format(name), action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'history': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['history_data'] = "For more detailed results please click in "
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_builder_cache(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
-        keep_storage = param.get('keep_storage', 0)
+        keep_storage = param.get('keep_storage', '')
+        # Validate 'keep_storage' configuration parameter
+        ret_val, keep_storage = self._validate_integer(action_result, keep_storage, "'keep_storage' action parameter")
+        if phantom.is_fail(ret_val):
+            return self.get_status()
         all = param.get('all', '')
         filters = param.get('filters', '')
+        if filters:
+            # Validate 'filters' configuration parameter
+            try:
+                json.loads(filters)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
                     '/build/prune?keep-storage={0}&all={1}&filters={2}'.format(
                         keep_storage,
@@ -1018,23 +858,24 @@ class Docker_V3Connector(BaseConnector):
                         filters),
                     action_result)
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'cache': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         # res = json.dumps(response)
-        summary['cache_data'] = json.dumps(response, indent=1)
+        try:
+            summary['cache_data'] = json.dumps(response, indent=1)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print("Error occurred while adding data to summary.{}".format(err))
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_snapshot_of_a_container(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         container = param['container']
         repo = param.get('repo', '')
@@ -1044,46 +885,44 @@ class Docker_V3Connector(BaseConnector):
         pause = param.get('pause', '')
         changes = param.get('changes', '')
         request_body = param['request_body']
-        rest_call_1 = '/commit?container={0}&repo={1}&tag={2}'
-        rest_call_2 = '&comment={3}&author={4}&pause={5}'
+
+        rest_call_endpoint = '/commit?container={0}&repo={1}&tag={2}&comment={3}&author={4}&pause={5}&changes={6}'
         ret_val, response = self._make_post_call(
-            rest_call_1 + rest_call_2.format(
+            rest_call_endpoint.format(
                 container, repo,
                 tag, comment, author,
                 pause, changes), action_result, data=request_body)
+
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'snapshot': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['snapshot_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_a_container(self, param):
-        self.save_progress("""In action
-        handler for: {0}""".format(self.get_action_identifier()))
-        if param is None:
-            param = dict()
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
         request_body = param['request_body']
         ret_val, response = self._make_post_call(
             '/containers/create?name={0}'.format(name),
             action_result, data=request_body)
+
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed,
-            # action result should contain all the error details
-            # for now the return is commented out,
-            # but after implementation, return from here
             return action_result.get_status()
+
         response_dict = {'create': response}
         action_result.add_data(response_dict)
+
         summary = action_result.update_summary({})
         summary['create_data'] = response
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -1135,18 +974,25 @@ class Docker_V3Connector(BaseConnector):
 
         elif action_id == 'delete_stopped':
             ret_val = self._handle_delete_stopped_containers(param)
+
         elif action_id == 'remove_image':
             ret_val = self._handle_remove_image(param)
+
         elif action_id == 'delete_unused':
             ret_val = self._handle_delete_unused_images(param)
+
         elif action_id == 'image_history':
             ret_val = self._handle_image_history(param)
+
         elif action_id == 'delete_builder_cache':
             ret_val = self._handle_delete_builder_cache(param)
+
         elif action_id == 'snapshot_of_a_container':
             ret_val = self._handle_snapshot_of_a_container(param)
+
         elif action_id == 'create_a_container':
             ret_val = self._handle_create_a_container(param)
+
         return ret_val
 
     def initialize(self):
@@ -1167,11 +1013,6 @@ class Docker_V3Connector(BaseConnector):
         """
 
         self._base_url = config['host ip']
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         return phantom.APP_SUCCESS
 
@@ -1230,8 +1071,7 @@ def main():
                 headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("""Unable to get session
-            id from the platform. Error: """ + str(e))
+            print("""Unable to get session id from the platform. Error: """ + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
