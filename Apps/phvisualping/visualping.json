@@ -1,0 +1,92 @@
+{
+    "appid": "a9f14a33-022a-4484-a25c-ce883271ab58",
+    "name": "Visualping",
+    "description": "Visualping is the newest, easiest and most convenient tool to monitor websites changes.",
+    "type": "information",
+    "product_vendor": "Visualping",
+    "logo": "visualping.png",
+    "logo_dark": "visualping_dark.png",
+    "product_name": "Visualping",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Visualping",
+    "license": "Copyright (c) Visualping, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-11-25T22:28:10.710263Z",
+    "package_name": "phantom_visualping",
+    "main_module": "visualping_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "username": {
+            "description": "User name to authenticate using HTTP Basic Authentication",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "password": {
+            "description": "Password to authenticate using HTTP Basic Authentication",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        },
+        "user_key": {
+            "description": "User key provided by Visualping for API access",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list_jobs",
+            "identifier": "list_jobs",
+            "description": "List jobs that are currently monitoring endpoints",
+            "verbose": "list all your VisualPing jobs, sorted by the job status.",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
