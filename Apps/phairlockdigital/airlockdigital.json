@@ -50,6 +50,7 @@
             "verbose": "This action will unblock hashes from one or more Blocklist policies. This is useful if you want to 'un-ban' a particular hash value.",
             "type": "correct",
             "identifier": "unblock_hash",
+            "undo": "block hash",
             "read_only": false,
             "parameters": {
                 "hash": {
@@ -1067,6 +1068,7 @@
             "verbose": "This action allows you to add hashes to a Blocklist policy. By adding a hash into a Blocklist policy that is approved, it has the result of blocking the hash on endpoints within your environment.",
             "type": "contain",
             "identifier": "block_hash",
+            "undo": "unblock hash",
             "read_only": false,
             "parameters": {
                 "hash": {
