@@ -1,5 +1,4 @@
 # File: docker_v3_consts.py
-#
 # Copyright (c) John Wang, 2020.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -17,3 +16,8 @@ NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in
 
 # Json Validation Message
 VALID_JSON_MSG = "Please verify the value of '{key}' action parameter."
+
+# Parameter Keys
+T_ACTION_PARAM = "'t' action parameter"
+LIMIT_ACTION_PARAM = "'limit' action parameter"
+KEEP_STORAGE_ACTION_PARAM = "'keep_storage' action parameter"

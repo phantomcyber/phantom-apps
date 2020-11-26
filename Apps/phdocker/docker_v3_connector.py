@@ -16,7 +16,6 @@ from phantom.action_result import ActionResult
 from docker_v3_consts import *
 import requests
 import json
-# import sys
 from bs4 import BeautifulSoup
 
 
@@ -209,7 +208,7 @@ class Docker_V3Connector(BaseConnector):
             error_message = "Error connecting to server. Invalid URL %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
-            error_message = 'Error connecting to server. Connection Refused from the Server'
+            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.InvalidSchema:
             error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
@@ -254,7 +253,7 @@ class Docker_V3Connector(BaseConnector):
                     return RetVal(
                         action_result.set_status(
                             phantom.APP_ERROR,
-                            "{0}{1}".format(VALID_JSON_MSG.format(key='request_body'), err)
+                            "{0} {1}".format(VALID_JSON_MSG.format(key='request_body'), err)
                         ), resp_json
                     )
                 r = request_func(
@@ -278,7 +277,7 @@ class Docker_V3Connector(BaseConnector):
             error_message = "Error connecting to server. Invalid URL %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
-            error_message = 'Error connecting to server. Connection Refused from the Server'
+            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.InvalidSchema:
             error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
@@ -291,6 +290,11 @@ class Docker_V3Connector(BaseConnector):
                     "Error Connecting to server. {0}".format(err)
                 ), resp_json
             )
+        """
+        Below line is commented out as it sets the status_code explicitly to 200
+        This creates a problem in the error message when the original response code is something else than 200(like 500)
+        For more details, please refer the discussion on PAPP-11420
+        """
         # r.status_code = 200
         return self._process_response(r, action_result)
 
@@ -304,18 +308,18 @@ class Docker_V3Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("obtaining the version of the docker host")
+        self.save_progress("Obtaining the version of the docker host")
         # make rest call
         ret_val, response = self._make_rest_call('/version', action_result)
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         try:
             res = json.dumps(response)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("{}".format(err))
+            self.debug_print("Error occurred while parsing response. {}".format(err))
 
         indices = [i + 1 for i, elem in enumerate(res) if elem == ',']
         indices.insert(0, 0)
@@ -359,7 +363,7 @@ class Docker_V3Connector(BaseConnector):
             summary['filesystem_data'] = json.dumps(response, indent=1)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while adding data to summary.{}".format(err))
+            self.debug_print("Error occurred while adding data to summary. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -373,7 +377,7 @@ class Docker_V3Connector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         id = param['id']
-        size = param.get('size', '')
+        size = param.get('size', False)
         # make rest call
         ret_val, response = self._make_rest_call(
             '/containers/{0}/json?size={1}'.format(id, size), action_result)
@@ -428,7 +432,7 @@ class Docker_V3Connector(BaseConnector):
             summary['update_data'] = json.dumps(response, indent=1)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while adding data to summary.{}".format(err))
+            self.debug_print("Error occurred while adding data to summary. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -443,10 +447,10 @@ class Docker_V3Connector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         id = param['id']
         t = param.get('t', '')
-        # Validate 't' configuration parameter
-        ret_val, t = self._validate_integer(action_result, t, "'t' action parameter")
+        # Validate 't' action parameter
+        ret_val, t = self._validate_integer(action_result, t, T_ACTION_PARAM)
         if phantom.is_fail(ret_val):
-            return self.get_status()
+            return action_result.get_status()
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/restart?t={1}'.format(id, t), action_result)
@@ -491,7 +495,7 @@ class Docker_V3Connector(BaseConnector):
         # Add a dictionary that is made up of the
         # most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['expoort_data'] = len(action_result['data'])
+        summary['export_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -504,21 +508,21 @@ class Docker_V3Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-        all = param.get('all', '')
+        all = param.get('all', False)
         limit = param.get('limit', '')
-        # Validate 'limit' configuration parameter
-        ret_val, limit = self._validate_integer(action_result, limit, "'limit' action parameter")
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_ACTION_PARAM)
         if phantom.is_fail(ret_val):
-            return self.get_status()
-        size = param.get('size', '')
+            return action_result.get_status()
+        size = param.get('size', False)
         filters = param.get('filters', '')
         if filters:
-            # Validate 'filters' configuration parameter
+            # Validate 'filters' action parameter
             try:
                 json.loads(filters)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
+                return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(VALID_JSON_MSG.format(key='filters'), err))
         # make rest call
         ret_val, response = self._make_rest_call(
             '/containers/json?all={0}&limit={1}&size={2}&filters={3}'.format(
@@ -621,16 +625,16 @@ class Docker_V3Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-        all = param.get('all', '')
+        all = param.get('all', False)
         filters = param.get('filters', '')
         if filters:
-            # Validate 'filters' configuration parameter
+            # Validate 'filters' action parameter
             try:
                 json.loads(filters)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
-        digests = param.get('digests', '')
+                return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(VALID_JSON_MSG.format(key='filters'), err))
+        digests = param.get('digests', False)
         # make rest call
         ret_val, response = self._make_rest_call(
             '/images/json?all={0}&filters={1}&digests={2}'.format(
@@ -658,8 +662,9 @@ class Docker_V3Connector(BaseConnector):
                             'Tags':
                                 response_dict['images'][item]['RepoTags'][0]}}
                     for item in range(len(response_dict['images']))]
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Tags'")
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Tags'. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -715,9 +720,9 @@ class Docker_V3Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         id = param['id']
-        v = param.get('v', '')
-        force = param.get('force', '')
-        link = param.get('link', '')
+        v = param.get('v', False)
+        force = param.get('force', False)
+        link = param.get('link', False)
         ret_val, response = self._make_post_call(
                     '/containers/{0}?v={1}&force={2}&link={3}'.format(
                         id,
@@ -743,12 +748,12 @@ class Docker_V3Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
         if filters:
-            # Validate 'filters' configuration parameter
+            # Validate 'filters' action parameter
             try:
                 json.loads(filters)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
+                return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
                     '/containers/prune?filters={0}'.format(filters),
                     action_result)
@@ -770,8 +775,8 @@ class Docker_V3Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         name = param['name']
-        force = param.get('force', '')
-        noprune = param.get('noprune', '')
+        force = param.get('force', False)
+        noprune = param.get('noprune', False)
         ret_val, response = self._make_post_call(
                     '/images/{0}?force={1}&noprune={2}'.format(
                         name,
@@ -796,12 +801,12 @@ class Docker_V3Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         filters = param.get('filters', '')
         if filters:
-            # Validate 'filters' configuration parameter
+            # Validate 'filters' action parameter
             try:
                 json.loads(filters)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
+                return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
             '/images/prune?filters={0}'.format(filters), action_result)
         if phantom.is_fail(ret_val):
@@ -838,19 +843,19 @@ class Docker_V3Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         keep_storage = param.get('keep_storage', '')
-        # Validate 'keep_storage' configuration parameter
-        ret_val, keep_storage = self._validate_integer(action_result, keep_storage, "'keep_storage' action parameter")
+        # Validate 'keep_storage' action parameter
+        ret_val, keep_storage = self._validate_integer(action_result, keep_storage, KEEP_STORAGE_ACTION_PARAM)
         if phantom.is_fail(ret_val):
-            return self.get_status()
-        all = param.get('all', '')
+            return action_result.get_status()
+        all = param.get('all', False)
         filters = param.get('filters', '')
         if filters:
-            # Validate 'filters' configuration parameter
+            # Validate 'filters' action parameter
             try:
                 json.loads(filters)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{0}{1}".format(VALID_JSON_MSG.format(key='filters'), err))
+                return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(VALID_JSON_MSG.format(key='filters'), err))
         ret_val, response = self._make_post_call(
                     '/build/prune?keep-storage={0}&all={1}&filters={2}'.format(
                         keep_storage,
@@ -869,7 +874,7 @@ class Docker_V3Connector(BaseConnector):
             summary['cache_data'] = json.dumps(response, indent=1)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while adding data to summary.{}".format(err))
+            self.debug_print("Error occurred while adding data to summary. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -882,7 +887,7 @@ class Docker_V3Connector(BaseConnector):
         tag = param.get('tag', '')
         comment = param.get('comment', '')
         author = param.get('author', '')
-        pause = param.get('pause', '')
+        pause = param.get('pause', False)
         changes = param.get('changes', '')
         request_body = param['request_body']
 
@@ -1002,15 +1007,6 @@ class Docker_V3Connector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = config['host ip']
 
