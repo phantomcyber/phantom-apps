@@ -1,5 +1,4 @@
 # File: airlockdigital_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -185,8 +184,8 @@ class AirlockDigitalConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
 
-        if parameter < 0:
-            return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
