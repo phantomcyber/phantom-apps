@@ -22,6 +22,7 @@ from ipwhois import IPDefinedError
 from bs4 import UnicodeDammit
 import tldextract
 import ipaddress
+import sys
 
 TLD_LIST_CACHE_FILE_NAME = "public_suffix_list.dat"
 ISO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -49,11 +50,34 @@ class WhoisConnector(BaseConnector):
         self._state_file_path = None
         self._cache_file_path = None
         self._state = {}
+        self._python_version = None
+        self._update_days = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
 
     def initialize(self):
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._state = self.load_state()
         config = self.get_config()
         self._update_days = int(config['update_days'])
+        if self._update_days <= 0:
+            return self.set_status(phantom.APP_ERROR, "Days cannot be less than or equal to 0. Update the config parameter.")
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -215,8 +239,8 @@ class WhoisConnector(BaseConnector):
 
         time_diff = current_time - last_time
 
-        app_config = self.get_config()
-        cache_exp_days = int(app_config[WHOIS_JSON_CACHE_EXP_DAYS])
+        config = self.get_config()
+        cache_exp_days = int(config[WHOIS_JSON_CACHE_EXP_DAYS])
 
         if (time_diff.days >= cache_exp_days):
             self.debug_print("Diff days {0} >= cache exp days {1}".format(time_diff.days, cache_exp_days))
@@ -285,7 +309,7 @@ class WhoisConnector(BaseConnector):
 
         server = config.get(phantom.APP_JSON_SERVER, None)
 
-        domain = param[phantom.APP_JSON_DOMAIN]
+        domain = self._handle_py_ver_compat_for_input_str(param[phantom.APP_JSON_DOMAIN])
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -384,7 +408,6 @@ class WhoisConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     # import simplejson as json
     import pudb
 
