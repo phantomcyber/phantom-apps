@@ -73,7 +73,7 @@ def check_exit_no_data_stdout(action_result, response):
 
 
 def ensure_no_errors(action_result, response):
-    if response.status_code or response.std_err:
+    if response.status_code and response.std_err:
         return action_result.set_status(
             phantom.APP_ERROR, "Error running command: {}{}".format(
                 response.std_out,
