@@ -887,7 +887,7 @@ class Docker_V3Connector(BaseConnector):
         tag = param.get('tag', '')
         comment = param.get('comment', '')
         author = param.get('author', '')
-        pause = param.get('pause', False)
+        pause = param.get('pause', True)
         changes = param.get('changes', '')
         request_body = param['request_body']
 
