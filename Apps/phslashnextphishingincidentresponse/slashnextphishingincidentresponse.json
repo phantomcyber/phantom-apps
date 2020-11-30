@@ -1,7 +1,7 @@
 {
     "appid": "28f0ee41-a058-4665-be79-fad1913312bf",
     "name": "SlashNext Phishing Incident Response",
-    "description": "SlashNext Phishing Incident Response Integration supports the investigative type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services",
+    "description": "SlashNext Phishing Incident Response Integration supports the investigative type of actions to allow Phantom users to fully automate the analysis of suspicious URLs",
     "type": "reputation",
     "product_vendor": "SlashNext",
     "logo": "logo_slashnextphishingincidentresponse.svg",
@@ -14,7 +14,7 @@
     "utctime_updated": "2019-07-29T08:46:52.622002Z",
     "package_name": "phantom_slashnextphishingincidentresponse",
     "main_module": "slashnextphishingincidentresponse_connector.pyc",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
@@ -1039,8 +1039,9 @@
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 1
                 }
             },
@@ -1356,8 +1357,9 @@
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 1
                 },
                 "timeout": {
@@ -1686,8 +1688,9 @@
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 1
                 }
             },

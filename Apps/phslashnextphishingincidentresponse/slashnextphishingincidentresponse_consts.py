@@ -7,7 +7,6 @@
 # Define your constants here
 BASE_API = 'https://oti.slashnext.cloud/api'
 HOST_REPUTE_API = '/oti/v1/host/reputation'
-URL_REPUTE_API = '/oti/v1/url/reputation'
 URL_SCAN_API = '/oti/v1/url/scan'
 URL_SCANSYNC_API = '/oti/v1/url/scansync'
 HOST_REPORT_API = '/oti/v1/host/report'
@@ -21,7 +20,7 @@ API_QUOTA = '/oti/v1/quota/status'
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
-TYPE_ERR_MSG = "Error occurred while connecting to the SlashNext Server. Please check the asset configuration and|or the action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the SlashNext Phishing Incident Response Server. Please check the asset configuration and|or the action parameters"
 
 # Constants relating to '_validate_integer'
 
