@@ -109,7 +109,7 @@
             "action": "run command",
             "identifier": "run_command",
             "description": "Execute a command on the endpoint",
-            "verbose": "Unless you implement a custom parser, this action will always succeed regardless of the input. Either a <b>command</b> or <b>command_id</b> must be specified. If a <b>command_id</b> is present, all other parameters will be ignored.",
+            "verbose": "Unless you implement a custom parser, this action will always succeed regardless of the input. Either a <b>command</b> or <b>command_id</b> must be specified. If a <b>command_id</b> is present, all other parameters will be ignored. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -272,7 +272,7 @@
             "action": "run script",
             "identifier": "run_script",
             "description": "Run a PowerShell script on the endpoint",
-            "verbose": "The script you provide can either be in the vault, or it can just be a string of the script to run. If both values are present, it will use the <b>script_file</b> over the <b>script_str</b>. Unless you implement a custom parser, this action will always succeed regardless of the input. If <b>command_id</b> and <b>shell_id</b> are present, <b>script_file</b> and <b>script_str</b> will be ignored. This action will fail if at least one of <b>script_file</b>, <b>script_str</b>, or the pair of <b>command_id</b> and <b>shell_id</b> are not specified.",
+            "verbose": "The script you provide can either be in the vault, or it can just be a string of the script to run. If both values are present, it will use the <b>script_file</b> over the <b>script_str</b>. Unless you implement a custom parser, this action will always succeed regardless of the input. If <b>command_id</b> and <b>shell_id</b> are present, <b>script_file</b> and <b>script_str</b> will be ignored. This action will fail if at least one of <b>script_file</b>, <b>script_str</b>, or the pair of <b>command_id</b> and <b>shell_id</b> are not specified. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
             "type": "generic",
             "read_only": false,
             "parameters": {
