@@ -283,7 +283,7 @@ class CuckooConnector(BaseConnector):
             return phantom.APP_SUCCESS, response['task_id']
         except KeyError:
             return action_result.set_status(
-                phantom.APP_ERROR, "Unable to retrieve 'task_id'"
+                phantom.APP_ERROR, "Unable to retrieve 'task id'"
             ), None
 
     def _poll_for_task(self, action_result, task_id, key=""):
@@ -325,7 +325,7 @@ class CuckooConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_SUCCESS)
         # Timed out
         action_result.add_data(result_data)
-        return action_result.set_status(phantom.APP_SUCCESS, "Polling timed out, continue with 'get report' action")
+        return action_result.set_status(phantom.APP_SUCCESS, "Polling timed out, continue with get report")
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
