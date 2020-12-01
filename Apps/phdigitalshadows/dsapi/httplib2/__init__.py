@@ -1,3 +1,8 @@
+# File: __init__.py
+#
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # -*- coding: utf-8 -*-
 """Small, fast HTTP client library for Python."""
 

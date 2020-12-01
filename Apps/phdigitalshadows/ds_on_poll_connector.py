@@ -1,4 +1,4 @@
-#
+# File: ds_on_poll_connector.py
 # Copyright (c) 2020 Digital Shadows Ltd.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -12,10 +12,7 @@ from unidecode import unidecode
 import phantom.app as phantom
 from phantom.action_result import ActionResult
 
-from digital_shadows_consts import DS_API_KEY_CFG, DS_API_SECRET_KEY_CFG
-# from digital_shadows_consts import DS_POLL_BREACH_COMPLETE
-from digital_shadows_consts import DS_POLL_INCIDENT_COMPLETE
-from digital_shadows_consts import DS_DL_SUBTYPE, DS_BP_SUBTYPE, DS_INFR_SUBTYPE, DS_PS_SUBTYPE, DS_SMC_SUBTYPE
+from digital_shadows_consts import *
 
 # from dsapi.service.data_breach_service import DataBreachService
 from dsapi.service.data_breach_record_service import DataBreachRecordService
@@ -23,7 +20,6 @@ from dsapi.service.incident_service import IncidentService
 from dsapi.service.intelligence_incident_service import IntelligenceIncidentService
 
 from dsapi.config import ds_api_host
-# from bs4 import UnicodeDammit
 import json
 
 
@@ -51,6 +47,38 @@ class DSOnPollConnector(object):
         self._inc_typ_social_media_compliance = config['inc_typ_social_media_compliance']
         self._inc_typ_cyber_threat = config['inc_typ_cyber_threat']
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def on_poll(self, param):
 
         # self._connector.save_progress("Ingesting param"+str(param))
@@ -59,7 +87,6 @@ class DSOnPollConnector(object):
         self._connector.add_action_result(action_result)
 
         start_time, end_time = self._phantom_daterange(param)
-
         if start_time is None or end_time is None:
             action_result.set_status(phantom.APP_ERROR, status_message='start time or end time not specified')
         else:
@@ -89,9 +116,13 @@ class DSOnPollConnector(object):
                 incident_types.append({'type': 'CYBER_THREAT'})
 
             if self._private_incident:
-                incident_service = IncidentService(self._ds_api_key, self._ds_api_secret_key)
+                try:
+                    incident_service = IncidentService(self._ds_api_key, self._ds_api_secret_key)
 
-                incident_view = IncidentService.incidents_view(date_range=date_range, date_range_field='published', statuses=['READ', 'UNREAD'], types=incident_types)
+                    incident_view = IncidentService.incidents_view(date_range=date_range, date_range_field='published', statuses=['READ', 'UNREAD'], types=incident_types)
+                except Exception as e:
+                    error_message = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
                 self._connector.save_progress("incident req view: {}".format(json.dumps(incident_view, ensure_ascii=False)))
                 try:
                     incident_pages = incident_service.find_all_pages(view=incident_view)
@@ -100,6 +131,9 @@ class DSOnPollConnector(object):
                 except StopIteration:
                     error_message = 'No Incident objects retrieved from the Digital Shadows API in page groups'
                     return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+                except Exception as e:
+                    error_message = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
                 for incident_page in incident_pages:
                     for incident in incident_page:
                         # self._connector.save_progress("incident: " + str(incident))
@@ -122,9 +156,13 @@ class DSOnPollConnector(object):
                     action_result.set_status(phantom.APP_SUCCESS)
 
             if self._global_incident:
-                intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
-                intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_range,
-                                                                              date_range_field='published', types=incident_types)
+                try:
+                    intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
+                    intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_range,
+                                                                                  date_range_field='published', types=incident_types)
+                except Exception as e:
+                    error_message = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
                 self._connector.save_progress('intelligence_incident_view: {}'.format(json.dumps(intelligence_incident_view, ensure_ascii=False)))
                 try:
                     intelligence_incident_pages = intelligence_incident_service.find_all_pages(view=intelligence_incident_view)
@@ -133,6 +171,9 @@ class DSOnPollConnector(object):
                 except StopIteration:
                     error_message = 'No IntelligenceIncident objects retrieved from the Digital Shadows API in page groups'
                     return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+                except Exception as e:
+                    error_message = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
                 # self._connector.save_progress('intelligence_incident_pages: ' + str(intelligence_incident_pages))
 
                 for intelligence_incident_page in intelligence_incident_pages:

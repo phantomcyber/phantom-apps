@@ -1,4 +1,4 @@
-#
+# File: digital_shadows_connector.py
 # Copyright (c) 2020 Digital Shadows Ltd.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -28,7 +28,8 @@ class DigitalShadowsConnector(BaseConnector):
 
     def handle_action(self, param):
         action_id = self.get_action_identifier()
-        self.save_progress("Ingesting handle action in: " + str(param))
+        if param:
+            self.save_progress("Ingesting handle action in: " + str(param))
         if action_id == 'test_connectivity':
             test_connectivity_connector = DSTestConnectivityConnector(self)
             return test_connectivity_connector.test_connectivity()
