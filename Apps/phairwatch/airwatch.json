@@ -1,0 +1,95 @@
+{
+    "appid": "7ca9ffa9-9a85-4d01-b8f3-9634ec68817a",
+    "name": "AirWatch",
+    "description": "This app interacts with airwatch",
+    "publisher": "Mhike",
+    "type": "generic",
+    "main_module": "airwatch_connector.py",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-01-28T00:00:00.000000Z",
+    "package_name": "phantom_airwatch",
+    "product_vendor": "Mhike",
+    "product_name": "AirWatch",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.5.15370",
+    "logo": "logo_airwatch.svg",
+    "logo_dark": "logo_airwatch.svg",
+    "license": "Internal Use Only",
+    "configuration": {
+        "tenant": {
+            "data_type": "password",
+            "order": 0,
+            "description": "AirWatch Tenant Code",
+            "required": true
+        },
+        "username": {
+            "data_type": "string",
+            "order": 1,
+            "description": "Basic Auth Username for AirWatch API",
+            "required": true
+        },
+        "password": {
+            "data_type": "password",
+            "order": 2,
+            "description": "Basic Auth Password for AirWatch API",
+            "required": true
+        },
+        "base_url": {
+            "data_type": "string",
+            "order": 3,
+            "description": "Base URL for AirWatch API",
+            "default": "https://cn251.awmdm.com/api",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add to group",
+            "description": "Add device UUID to AirWatch Group",
+            "verbose": "ToDo: add lengthy description here",
+            "type": "generic",
+            "identifier": "add_to_group",
+            "read_only": false,
+            "parameters": {
+                "smartgroup_uuid": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "AirWatch Smartgroup UUID",
+                    "required": true
+                },
+                "device_uuid": {
+                    "description": "Device UUID",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.smartgroup_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.device_uuid",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
+
