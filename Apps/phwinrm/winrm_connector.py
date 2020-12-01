@@ -960,8 +960,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return ret_val
         else:
-            # Nothing will need to be parsed here
-            custom_parser = None
+            if command_id and shell_id:
+                custom_parser = pc.basic
+            else:
+                # Nothing will need to be parsed here
+                custom_parser = None
 
         if arguments:
             arguments = next(csv.reader([arguments], skipinitialspace=True))
@@ -997,7 +1000,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return ret_val
         else:
-            custom_parser = None
+            if command_id and shell_id:
+                custom_parser = pc.basic
+            else:
+                # Nothing will need to be parsed here
+                custom_parser = None
 
         if script_file and command_id is None:  # don't check script if retrieving previous command
             ret_val, script_str = self._get_vault_file_text(action_result, script_file)
