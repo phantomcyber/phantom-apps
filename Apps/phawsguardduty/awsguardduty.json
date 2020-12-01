@@ -1,0 +1,1919 @@
+{
+    "appid": "a85db115-b785-4d62-b2fc-a562d367c930",
+    "name": "AWS GuardDuty",
+    "description": "This app integrates with AWS GuardDuty to investigate findings",
+    "type": "siem",
+    "product_vendor": "AWS",
+    "logo": "logo_awsguardduty.svg",
+    "logo_dark": "logo_awsguardduty_dark.svg",
+    "product_name": "GuardDuty",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2019-06-12T20:47:16.000000Z",
+    "package_name": "phantom_awsguardduty",
+    "main_module": "awsguardduty_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "futures",
+                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
+            },
+            {
+                "module": "docutils",
+                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "access_key": {
+            "description": "AWS Access Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "secret_key": {
+            "description": "AWS Secret Key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "region": {
+            "description": "AWS Region",
+            "data_type": "string",
+            "required": true,
+            "value_list": [
+                "US East (N. Virginia)",
+                "US East (Ohio)",
+                "US West (N. California)",
+                "US West (Oregon)",
+                "Asia Pacific (Mumbai)",
+                "Canada (Central)",
+                "Asia Pacific (Tokyo)",
+                "Asia Pacific (Seoul)",
+                "Asia Pacific (Singapore)",
+                "Asia Pacific (Sydney)",
+                "EU (Frankfurt)",
+                "EU (Ireland)",
+                "EU (London)",
+                "EU (Paris)",
+                "South America (Sao Paulo)"
+            ],
+            "default": "us-east-1",
+            "order": 2
+        },
+        "filter_name": {
+            "description": "Name of the saved filter on UI of AWS GuardDuty",
+            "data_type": "string",
+            "required": false,
+            "order": 3
+        },
+        "poll_now_days": {
+            "description": "Number of days prior current date to start polling (Default: 30)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 30,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "description": "Container IDs to limit the ingestion to",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "container_count": {
+                    "description": "Maximum number of container records to query for",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Maximum number of artifact records to query for",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update finding",
+            "identifier": "update_finding",
+            "description": "Updates specified Amazon GuardDuty findings as useful or not useful",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "finding_id": {
+                    "description": "The ID of the finding",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "order": 1
+                },
+                "feedback": {
+                    "description": "Feedback value of the finding",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [
+                        "USEFUL",
+                        "NOT_USEFUL"
+                    ],
+                    "default": "USEFUL",
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Additional feedback about the finding",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 3,
+                    "example_values": [
+                        "useful"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.feedback",
+                    "data_type": "string",
+                    "column_name": "Feedback",
+                    "column_order": 2,
+                    "example_values": [
+                        "USEFUL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.finding_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "column_name": "Finding ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "e0b51274addd38155e1e488bf2e6cfd1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_updated_findings",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total updated findings: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Bring the findings as per the filters are applied",
+            "type": "generic",
+            "read_only": true,
+            "verbose": "Based on the API documentation, maximum number of findings that can be fetched is 50",
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "instance_id": {
+                    "description": "The ID of the EC2 instance",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty instance id"
+                    ],
+                    "order": 1
+                },
+                "severity": {
+                    "description": "The severity of the finding",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 2,
+                    "value_list": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "default": "High",
+                    "contains": [
+                        "aws guardduty severity"
+                    ]
+                },
+                "public_ip": {
+                    "description": "Public IP address of the EC2 instance",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 3
+                },
+                "private_ip": {
+                    "description": "Private IP address of the EC2 instance",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 4
+                },
+                "limit": {
+                    "description": "The maximum number of results to be fetched",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ],
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.instance_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0242775c131db2820",
+                        "i-0d872de1de2ea7640"
+                    ],
+                    "contains": [
+                        "aws guardduty instance id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.private_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.51.104",
+                        "172.31.95.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.public_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "54.172.54.17",
+                        "3.87.26.18"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ],
+                    "contains": [
+                        "aws guardduty severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AccountId",
+                    "data_type": "string",
+                    "example_values": [
+                        "849257271967"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:guardduty:us-east-1:849257271967:detector/7eb38a3ebb7f20c83dcddbc35a46a0a4/finding/04b5151743dbff66db6a5085f55d57c4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CreatedAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-17T07:24:13.623Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "EC2 instance has an unprotected port which is being probed by a known malicious host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Id",
+                    "data_type": "string",
+                    "example_values": [
+                        "04b5151743dbff66db6a5085f55d57c4"
+                    ],
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "column_name": "Finding ID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.NextToken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Partition",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.AvailabilityZone",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.ImageDescription",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon Linux 2 AMI 2.0.20190313 x86_64 HVM gp2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.ImageId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ami-0de53d8956e8dcf80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.InstanceId",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty instance id"
+                    ],
+                    "example_values": [
+                        "i-0d872de1de2ea7640"
+                    ],
+                    "column_name": "Instance ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.InstanceState",
+                    "data_type": "string",
+                    "example_values": [
+                        "running"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.InstanceType",
+                    "data_type": "string",
+                    "example_values": [
+                        "t2.micro"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.LaunchTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-15T14:14:50Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.NetworkInterfaceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "eni-0fe0a1d2984f4aae1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PrivateDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip-172-31-95-167.ec2.internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PrivateIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.95.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Private IP",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PrivateIpAddresses.*.PrivateDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip-172-31-95-167.ec2.internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PrivateIpAddresses.*.PrivateIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.95.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PublicDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ec2-3-87-26-18.compute-1.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.PublicIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "3.87.26.18"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Public IP",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.SecurityGroups.*.GroupId",
+                    "data_type": "string",
+                    "example_values": [
+                        "sg-0c2ff5df9f6b41a58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.SecurityGroups.*.GroupName",
+                    "data_type": "string",
+                    "example_values": [
+                        "launch-wizard-12"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.SubnetId",
+                    "data_type": "string",
+                    "example_values": [
+                        "subnet-d8782cf7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.NetworkInterfaces.*.VpcId",
+                    "data_type": "string",
+                    "example_values": [
+                        "vpc-5113dc2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.Tags.*.Key",
+                    "data_type": "string",
+                    "example_values": [
+                        "Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.Tags.*.Value",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-phantom-new-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.ResourceType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Instance"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SchemaVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.ActionType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PORT_PROBE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.Blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.ConnectionDirection",
+                    "data_type": "string",
+                    "example_values": [
+                        "INBOUND"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.LocalPortDetails.Port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.LocalPortDetails.PortName",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.Protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.City.CityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ashburn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.Country.CountryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.GeoLocation.Lat",
+                    "data_type": "numeric",
+                    "example_values": [
+                        39.0481
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.GeoLocation.Lon",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -77.4728
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.IpAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "3.87.247.222"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.Organization.Asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "14618"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.Organization.AsnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.Organization.Isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemoteIpDetails.Organization.Org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemotePortDetails.Port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32768
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.RemotePortDetails.PortName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.Blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.LocalPortDetails.Port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.LocalPortDetails.PortName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.City.CityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Moscow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.Country.CountryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Russia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.GeoLocation.Lat",
+                    "data_type": "numeric",
+                    "example_values": [
+                        55.7386
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.GeoLocation.Lon",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37.6068
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.IpAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "81.22.45.226"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.Organization.Asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "49505"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.Organization.AsnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "OOO Network of data-centers Selectel"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.Organization.Isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Infolink LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.PortProbeAction.PortProbeDetails.*.RemoteIpDetails.Organization.Org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Infolink LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Archived",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        579
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.DetectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.EventFirstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-17T07:09:54Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.EventLastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-24T08:58:52Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.ResourceRole",
+                    "data_type": "string",
+                    "example_values": [
+                        "TARGET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.ServiceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "guardduty"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.UserFeedback",
+                    "data_type": "string",
+                    "example_values": [
+                        "USEFUL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 2,
+                    "contains": [
+                        "aws guardduty severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unprotected port on EC2 instance i-0d872de1de2ea7640 is being probed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Recon:EC2/PortProbeUnprotectedPort"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-04-24T09:06:21.566Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_findings",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total findings: 1",
+                        "Total findings: 7"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Findings",
+                "view": "awsguardduty_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "archive finding",
+            "identifier": "archive_finding",
+            "description": "Archives Amazon GuardDuty findings specified by the detector ID and list of finding IDs",
+            "type": "generic",
+            "read_only": true,
+            "undo": "unarchive finding",
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "finding_id": {
+                    "description": "The ID of the finding",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.finding_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "column_name": "Finding ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "e0b51274addd38155e1e488bf2e6cfd1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
+                    "data_type": "string",
+                    "example_values": [
+                        "keep-alive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tue, 23 Apr 2019 11:48:14 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.via",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1 2ac6b2644462a8466362b046856a127e.cloudfront.net (CloudFront)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ylw7rFSVoAMFkLg="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-cf-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CzBMnUw0eypQ0Iy43U2XUVsOMjV_V94IU5wHAlIKcHq1hCw-Ea0dTg=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad2750ba-65bd-11e9-8f47-bdaca0b9b9d2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root=1-5cbefb7d-79b0bee0a13019e04e183f60;Sampled=0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-cache",
+                    "data_type": "string",
+                    "example_values": [
+                        "Miss from cloudfront"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad2750ba-65bd-11e9-8f47-bdaca0b9b9d2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_findings",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully archived the findings"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unarchive finding",
+            "identifier": "unarchive_finding",
+            "description": "Unarchives Amazon GuardDuty findings specified by the detector ID and list of finding IDs",
+            "type": "generic",
+            "read_only": true,
+            "undo": "archive finding",
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "finding_id": {
+                    "description": "The ID of the finding",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.finding_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty finding id"
+                    ],
+                    "column_name": "Finding ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "e0b51274addd38155e1e488bf2e6cfd1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
+                    "data_type": "string",
+                    "example_values": [
+                        "keep-alive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tue, 23 Apr 2019 11:48:40 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.via",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1 2ac6b2644462a8466362b046856a127e.cloudfront.net (CloudFront)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ylw_rG4poAMFV8g="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-cf-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ZLfJasiNAwBJFVhtZstwdYLa8YWxyLXvKJ39qF3UxMKT6mZAeiV4QA=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "bc6cc547-65bd-11e9-a555-9398d727948b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root=1-5cbefb97-0d4bfbe8f0e2b2dc0b995358;Sampled=0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-cache",
+                    "data_type": "string",
+                    "example_values": [
+                        "Miss from cloudfront"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "bc6cc547-65bd-11e9-a555-9398d727948b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_findings",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully unarchived the findings"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list filters",
+            "identifier": "list_filters",
+            "description": "Returns a paginated list of the current filters",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "limit": {
+                    "description": "The maximum number of filters to be fetched",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Action",
+                    "data_type": "string",
+                    "example_values": [
+                        "NOOP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "only high severity incidents",
+                        "test"
+                    ],
+                    "column_name": "Filter Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.FilterName",
+                    "data_type": "string",
+                    "example_values": [
+                        "find_instanceid"
+                    ],
+                    "column_name": "Filter Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.id.Eq",
+                    "data_type": "string",
+                    "example_values": [
+                        "avv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.resource.instanceDetails.instanceId.Eq",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0029a3c756f99d4e9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.service.archived.Eq",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.severity.Eq",
+                    "data_type": "string",
+                    "example_values": [
+                        "8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my-test-high-severity-filter",
+                        "find_instanceid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Rank",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_filters",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total filters: 1",
+                        "Total filters: 3"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list threats",
+            "identifier": "list_threats",
+            "description": "Lists the ThreatIntelSets of the GuardDuty service specified by the detector ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "limit": {
+                    "description": "The maximum number of threat intel sets to be fetched (Maximum Threat Intel Sets: 7)",
+                    "data_type": "numeric",
+                    "default": 7,
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Format",
+                    "data_type": "string",
+                    "example_values": [
+                        "TXT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Location",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://s3.amazonaws.com/phantom-guardduty/IPset1_file.txt"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ThreatIPSet"
+                    ],
+                    "column_name": "Threat Intel Set Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "INACTIVE"
+                    ],
+                    "column_name": "Threat Intel Set Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.ThreatIntelSetId",
+                    "data_type": "string",
+                    "example_values": [
+                        "04b517f3e469cdc30513629c7473c33d"
+                    ],
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "Threat Intel Set ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_threats",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total threats: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list ip sets",
+            "identifier": "list_ip_sets",
+            "description": "Lists the IPSets of the GuardDuty service specified by the detector ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "detector_id": {
+                    "description": "The ID of the detector",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "order": 0
+                },
+                "limit": {
+                    "description": "The maximum number of IP sets to be fetched (Maximum IP Sets: 7)",
+                    "data_type": "numeric",
+                    "default": 7,
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detector_id",
+                    "data_type": "string",
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        51
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Format",
+                    "data_type": "string",
+                    "example_values": [
+                        "TXT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IpSetId",
+                    "data_type": "string",
+                    "example_values": [
+                        "18b517f39a5903e092182fe9a97467b9"
+                    ],
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "IP Set ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Location",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://s3.amazonaws.com/phantom-guardduty/IPset_file.txt"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "IPSet"
+                    ],
+                    "column_name": "IP Set Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACTIVE"
+                    ],
+                    "column_name": "IP Set Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.total_ip_sets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total ip sets: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list detectors",
+            "identifier": "list_detectors",
+            "description": "Lists detectorIds of all the existing Amazon GuardDuty detector resources",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CreatedAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-11-14T23:10:26.234Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DetectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "7eb38a3ebb7f20c83dcddbc35a46a0a4"
+                    ],
+                    "contains": [
+                        "aws guardduty detector id"
+                    ],
+                    "column_name": "Detector ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.FindingPublishingFrequency",
+                    "data_type": "string",
+                    "example_values": [
+                        "SIX_HOURS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ServiceRole",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::849257271967:role/aws-service-role/guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDuty"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENABLED"
+                    ],
+                    "column_name": "Detector ID Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-11-14T23:10:26.234Z"
+                    ],
+                    "column_name": "Updated At",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.total_detectors",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total detectors: 0",
+                        "Total detectors: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
