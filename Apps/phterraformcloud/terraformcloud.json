@@ -275,6 +275,12 @@
                 {
                     "data_path": "action_result.data.*.data.*.relationships.organization.data.id",
                     "data_type": "string",
+                    "contains": [	
+                        "terraform organization name"	
+                    ],	
+                    "example_values": [	
+                        "Organization"
+                    ],
                     "column_name": "Organization ID",
                     "column_order": 0
                 },
@@ -737,6 +743,9 @@
                 {
                     "data_path": "action_result.data.*.data.*.relationships.plan.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
                     "example_values": [
                         "plan-iB6dV91zqE5pNCey"
                     ]
@@ -758,6 +767,9 @@
                 {
                     "data_path": "action_result.data.*.data.*.relationships.workspace.data.id",
                     "data_type": "string",
+                    "contains":[
+                        "terraform workspace id"
+                    ],
                     "example_values": [
                         "ws-X9wL9pBZQdE6gjsp"
                     ]
@@ -772,6 +784,9 @@
                 {
                     "data_path": "action_result.data.*.data.*.relationships.apply.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
                     "example_values": [
                         "apply-eK21impkqMUvxZTw"
                     ]
@@ -1002,6 +1017,9 @@
                 {
                     "data_path": "action_result.data.*.data.*.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
                     "example_values": [
                         "run-B45D8uRipKCtvpYd"
                     ],
@@ -1853,6 +1871,9 @@
                 {
                     "data_path": "action_result.data.*.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
                     "example_values": [
                         "apply-Kasd12SWa9AhS6"
                     ],
@@ -2024,6 +2045,9 @@
                 {
                     "data_path": "action_result.data.*.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
                     "example_values": [
                         "plan-iB6dV91zqE5pNCey"
                     ]
@@ -2159,6 +2183,9 @@
                 {
                     "data_path": "action_result.data.*.relationships.plan.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
                     "example_values": [
                         "plan-iB6dV91zqE5pNCey"
                     ]
@@ -2180,6 +2207,9 @@
                 {
                     "data_path": "action_result.data.*.relationships.workspace.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
                     "example_values": [
                         "ws-X9wL9pBZQdE6gjsp"
                     ]
@@ -2194,6 +2224,9 @@
                 {
                     "data_path": "action_result.data.*.relationships.apply.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
                     "example_values": [
                         "apply-eK21impkqMUvxZTw"
                     ]
@@ -2424,6 +2457,9 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
                     "example_values": [
                         "run-B45D8uRipKCtvpYd"
                     ],
@@ -2566,6 +2602,9 @@
                 {
                     "data_path": "action_result.data.*.relationships.latest-run.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
                     "example_values": [
                         "run-B45D8uRipKCtvpYd"
                     ]
@@ -2587,6 +2626,9 @@
                 {
                     "data_path": "action_result.data.*.relationships.current-run.data.id",
                     "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
                     "example_values": [
                         "run-B45D8uRipKCtvpYd"
                     ]
