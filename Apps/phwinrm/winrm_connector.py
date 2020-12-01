@@ -265,7 +265,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if command_id:
                 if shell_id is None:
                     return action_result.set_status(phantom.APP_ERROR, "Must specify shell_id with command_id")
-                resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
+                try:
+                    resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
+                except:
+                    return action_result.set_status(phantom.APP_ERROR, "Failed to get command output from command_id and shell_id")
                 self._protocol.close_shell(shell_id)
             elif async_:
                 shell_id = self._protocol.open_shell()
@@ -298,7 +301,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if command_id:
                 if shell_id is None:
                     return action_result.set_status(phantom.APP_ERROR, "Must specify shell_id with command_id")
-                resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
+                try:
+                    resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
+                except:
+                    return action_result.set_status(phantom.APP_ERROR, "Failed to get script output from command_id and shell_id")
                 self._protocol.close_shell(shell_id)
                 if len(resp.std_err):
                     resp.std_err = self._session._clean_error_msg(resp.std_err)
