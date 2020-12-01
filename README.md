@@ -1,14 +1,14 @@
-# Splunk>Phantom
+# Splunk> Phantom
 
-Welcome to the Splunk>Phantom Community! Phantom is Splunk's premier Security Automation, Orchestration, and Response ("SOAR") platform. With it, our customers can automate entire or partial workflows for their employees across an infinite number of use-cases.
+Welcome to the Splunk> Phantom Community! Phantom is Splunk's premier Security Automation, Orchestration, and Response ("SOAR") platform. With it, our customers can automate entire or partial workflows for their employees across an infinite number of use-cases.
 
 This repository represents our efforts to open-source our Phantom Apps so our customers can look at how our code works, make improvements, and generally build a stronger community through the free exchange of ideas.
 
 ## Phantom
 For more information on Phantom, please have a look at our pages:
 
-- [Splunk > Phantom product page](https://www.splunk.com/en_us/software/splunk-security-orchestration-and-automation.html)
-- [Splunk > Phantom community page](https://my.phantom.us)
+- [Splunk> Phantom product page](https://www.splunk.com/en_us/software/splunk-security-orchestration-and-automation.html)
+- [Splunk> Phantom community page](https://my.phantom.us)
 - [SOAR Buyer's Guide](https://www.splunk.com/en_us/form/the-soar-buyers-guide.html)
 
 
