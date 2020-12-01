@@ -13,10 +13,33 @@ from phantom.vault import Vault
 import xmltodict
 import tempfile
 import base64
+import sys
 from collections import OrderedDict
+from bs4 import UnicodeDammit
 
 from builtins import str
 import six
+
+
+def _handle_py_ver_compat_for_input_str(input_str, always_encode=False):
+    """
+    This method returns the encoded|original string based on the Python version.
+    :param input_str: Input string to be processed
+    :param always_encode: Used if the string needs to be encoded for python 3
+    :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+    """
+    try:
+        _python_version = int(sys.version_info[0])
+    except:
+        return phantom.APP_ERROR
+
+    try:
+        if input_str and (_python_version == 2 or always_encode):
+            input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+    except:
+        pass
+    return input_str
+
 
 def basic(action_result, response):
     # Default one, just add the data to the action result
@@ -32,7 +55,8 @@ def basic(action_result, response):
 def check_exit(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
     data = {}
     data['status_code'] = response.status_code
@@ -50,15 +74,23 @@ def check_exit_no_data(action_result, response):
             except:
                 pass
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
+    data = {}
+    data['status_code'] = response.status_code
+    data['std_out'] = response.std_out
+    data['std_err'] = response.std_err
+    action_result.add_data(data)
+
     return phantom.APP_SUCCESS
 
 
 def check_exit_no_data2(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -67,7 +99,8 @@ def check_exit_no_data_stdout(action_result, response):
     # Same as above, but for when the error message appears in std_out instead of std_err
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_out))
         )
     return phantom.APP_SUCCESS
 
@@ -87,7 +120,7 @@ def list_processes(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
 
     output = response.std_out
@@ -121,7 +154,8 @@ def list_processes(action_result, response):
 def terminate_process(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error terminating process: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error terminating process: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -130,7 +164,7 @@ def list_connections(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
 
     lines = response.std_out.splitlines()
@@ -278,7 +312,7 @@ def create_firewall_rule(action_result, response):
 def delete_firewall_rule(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR, "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_out))
         )
 
     # action_result.add_data({'message': response.std_out})
@@ -368,7 +402,8 @@ def _parse_rule(rule):
 def list_applocker_policies(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
     try:
         # Get rid of all the linebreaks to prevent errors during reading
@@ -415,7 +450,8 @@ def decodeb64_add_to_vault(action_result, response, container_id, file_name):
         if isinstance(response.std_err, bytes):
             response.std_err = response.std_err.decode('UTF-8')
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
 
     b64string = response.std_out
