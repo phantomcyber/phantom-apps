@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2020 Splunk Inc.",
-    "app_version": "1.0.24",
+    "app_version": "1.0.25",
     "utctime_updated": "2018-09-14T17:35:56.000000Z",
     "package_name": "phantom_code42",
     "main_module": "code42_connector.pyc",
@@ -4897,6 +4897,244 @@
             "render": {
                 "type": "custom",
                 "view": "code42_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get organization info",
+            "identifier": "get_organization_info",
+            "description": "Retrieve Code42 organization info using the v3_user_token for the given username & password",
+            "verbose": "curl -X GET 'https://console.us.code42.com/c42api/v3/customer/my' --header 'Authorization: v3_user_token '$tkn' | python -m json.tool",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.deploymentModel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.maintenanceMode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement.acceptanceRequired",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement.accepted",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.registrationKey",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tenantUid",
+                    "data_type": "string",
+                    "column_name": "Tenant ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add departing employee",
+            "identifier": "add_departing_employee",
+            "description": "Add Departing Employee to Code42 Organization",
+            "verbose": "curl -X POST --header 'Content-Type: application/json' --header 'Authorization: v3_user_token '$tkn https://ecm-east.us.code42.com/svc/api/v1/departingemployee/create'' --data '' {'userName': 'username@domain.com', 'tenantId': 'x', 'alertsEnabled': true, 'notes': '' }",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "departing_employee_url": {
+                    "description": "BaseURL for DepartingEmployeeApiUrl",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 0
+                },
+                "tenant_id": {
+                    "description": "Tenant ID for Code42 organization",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "departing_user": {
+                    "description": "Code42 username of the departing employee",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 2
+                },
+                "departure_notes": {
+                    "description": "Optional notes for departing employee",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "departure_date": {
+                    "description": "Departure date of departing employee",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4,
+                    "example_values": [
+                        "YYYY-MM-DD"
+                    ]
+                },
+                "alerts_enabled": {
+                    "description": "Alerts enabled (default: true)",
+                    "data_type": "boolean",
+                    "required": true,
+                    "default": true,
+                    "primary": false,
+                    "order": 5
+                },
+                "cloud_usernames": {
+                    "description": "Comma-separated list of cloud aliases",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.departing_employee_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tenant_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.departing_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.departure_notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.departure_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.alerts_enabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.cloud_usernames",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Departing Employee Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type$",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.caseId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tenantId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cloudUsernames",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userUid",
+                    "data_type": "numeric",
+                    "column_name": "User ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.departureDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alertsEnabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
             },
             "versions": "EQ(*)"
         }

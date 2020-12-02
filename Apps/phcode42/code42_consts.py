@@ -1,7 +1,8 @@
 # File: code42_consts.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 CODE42_CONFIG_USERNAME = 'username'
 CODE42_CONFIG_PASSWORD = 'password'
@@ -23,6 +24,8 @@ CODE42_WEB_RESTORE_SESSION_ENDPOINT = '/api/WebRestoreSession'
 CODE42_DATA_KEY_TOKEN_ENDPOINT = '/api/DataKeyToken'
 CODE42_V3_TOKEN_AUTH_ENDPOINT = '/c42api/v3/auth/jwt?useBody=true'
 CODE42_ACCESS_LOCK_ENDPOINT = '/c42api/v3/AccessLock'
+CODE42_ORGANIZATION_INFO_ENDPOINT = '/c42api/v3/customer/my'
+CODE42_DEPARTING_EMPLOYEE_ENDPOINT = '/svc/api/v1/departingemployee/create'
 CODE42_FORENSIC_SEARCH_ENDPOINT = '/forensic-search/queryservice/api/v1/fileevent'
 CODE42_JSON_DEVICE_ID = 'device_id'
 CODE42_JSON_DATA = 'data'

@@ -1,7 +1,8 @@
 # File: code42_connector.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 import json
 import ipaddress
@@ -1708,6 +1709,118 @@ class Code42Connector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_get_organization_info(self, param):
+        """
+        Retrieve tenantUid for a given Cod42 Console User
+        Example cURL:
+        curl -X GET 'https://console.us.code42.com/c42api/v3/customer/my'
+        --header 'Authorization: v3_user_token '$tkn' | python -m json.tool | grep tenantUid
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        config = self.get_config()
+        self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
+        self._password = config[CODE42_CONFIG_PASSWORD]
+        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+
+        url = self._server_url + CODE42_V3_TOKEN_AUTH_ENDPOINT
+
+        try:
+            r = requests.get(url, auth=(self._username, self._password))
+            v3_user_token = r.json()['data']['v3_user_token'].encode('utf-8')
+
+            headers = {"Authorization": "v3_user_token {}".format(v3_user_token)}
+
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Exception while generating v3_user_token: {}".format(e))
+
+        try:
+            url2 = self._server_url + CODE42_ORGANIZATION_INFO_ENDPOINT
+            r = requests.get(url2, headers=headers).json()
+
+            action_result.add_data(r['data'])
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Exception while retrieving Organization Info: {}".format(e))
+
+    def _handle_add_departing_employee(self, param):
+        """
+        Add Departing Employee to Code42 Organization
+        Example cURL:
+        curl -X POST --header 'Content-Type: application/json' --header 'Authorization: v3_user_token '$tkn
+        https://ecm-east.us.code42.com/svc/api/v1/departingemployee/create''
+        --data " {'userName': 'username@domain.com', 'tenantId': 'x', 'alertsEnabled': true, 'notes': '' }
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        config = self.get_config()
+        self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
+        self._password = config[CODE42_CONFIG_PASSWORD]
+        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+
+        url = self._server_url + CODE42_V3_TOKEN_AUTH_ENDPOINT
+
+        try:
+            r = requests.get(url, auth=(self._username, self._password))
+            v3_user_token = r.json()['data']['v3_user_token'].encode('utf-8')
+
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Exception: {}".format(e))
+
+        url = param['departing_employee_url'] + CODE42_DEPARTING_EMPLOYEE_ENDPOINT
+
+        headers = {
+            'Authorization': 'v3_user_token {}'.format(v3_user_token),
+            'Content-type': 'application/json',
+            'User-Agent': 'python2.7'
+        }
+
+        if 'cloud_usernames' in param:
+
+            payload = {
+                'tenantId': param['tenant_id'],
+                'userName': param['departing_user'],
+                'notes': param['departure_notes'],
+                'departureDate': param['departure_date'],
+                'alertsEnabled': param['alerts_enabled'],
+                'cloudUsernames': param['cloud_usernames'].split(',')
+            }
+
+        else:
+
+            payload = {
+                'tenantId': param['tenant_id'],
+                'userName': param['departing_user'],
+                'notes': param['departure_notes'],
+                'departureDate': param['departure_date'],
+                'alertsEnabled': param['alerts_enabled'],
+                'cloudUsernames': []
+            }
+
+        try:
+            r = requests.post(url, data=json.dumps(payload), headers=headers).json()
+
+            if 'pop-bulletin' in r:
+                return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+
+            if 'createdAt' in r:
+                # SUCCESS
+                action_result.add_data(r)
+                summary = action_result.update_summary({})
+                summary['message'] = "Departing Employee Addition was Successful - Case ID: {} - Created Time: {}".format(r['caseId'], r['createdAt'])
+                return action_result.set_status(phantom.APP_SUCCESS)
+
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Unexpected Response: {}".format(r))
+
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Exception while making POST request: {}".format(e))
+
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
 
@@ -1738,7 +1851,9 @@ class Code42Connector(BaseConnector):
             'push_restore': self._handle_push_restore,
             'check_restore_status': self._handle_check_restore_status,
             'hunt_file': self._handle_hunt_file,
-            'run_query': self._handle_run_query
+            'run_query': self._handle_run_query,
+            'get_organization_info': self._handle_get_organization_info,
+            'add_departing_employee': self._handle_add_departing_employee
         }
 
         action = self.get_action_identifier()
