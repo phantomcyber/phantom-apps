@@ -236,7 +236,7 @@
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "Hezbollah Leader Warns of Direct Confrontation with the United States, Encourages Boycott of US Goods"
+                        "Test Title"
                     ]
                 },
                 {
@@ -1831,7 +1831,7 @@
                 {
                     "data_path": "action_result.data.*._source.account_organization",
                     "example_values": [
-                        "PayPal"
+                        "Organization"
                     ],
                     "data_type": "string"
                 },
@@ -2012,7 +2012,7 @@
                 {
                     "data_path": "action_result.data.*._source.body.enrichments.hashtags",
                     "example_values": [
-                        "#NEVERTRUMP"
+                        "#HASHTAG"
                     ],
                     "data_type": "string"
                 },
@@ -2048,7 +2048,7 @@
                     ],
                     "data_path": "action_result.data.*._source.body.raw",
                     "example_values": [
-                        "the jewish terrorists accuse Hezbollah of being a terror organization"
+                        "This is a test body"
                     ],
                     "data_type": "string"
                 },
@@ -2058,7 +2058,7 @@
                     ],
                     "data_path": "action_result.data.*._source.body.text/html+sanitized",
                     "example_values": [
-                        "the jewish terrorists accuse Hezbollah of being a terror organization"
+                        "This is a test body"
                     ],
                     "data_type": "string"
                 },
@@ -2509,7 +2509,7 @@
                 {
                     "data_path": "action_result.data.*._source.container.container.body.enrichments.hashtags",
                     "example_values": [
-                        "#conspiracy"
+                        "#hashtag"
                     ],
                     "data_type": "string"
                 },
@@ -2555,21 +2555,21 @@
                 {
                     "data_path": "action_result.data.*._source.container.container.body.raw",
                     "example_values": [
-                        "the jewish terrorists accuse Hezbollah of being a terror organization"
+                        "This is a test body"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*._source.container.container.body.text/html+sanitized",
                     "example_values": [
-                        "the jewish terrorists accuse Hezbollah of being a terror organization"
+                        "This is a test body"
                     ],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*._source.container.container.body.text/plain",
                     "example_values": [
-                        "the jewish terrorists accuse Hezbollah of being a terror organization"
+                        "This is a test body"
                     ],
                     "data_type": "string"
                 },
@@ -2947,7 +2947,7 @@
                     ],
                     "data_path": "action_result.data.*._source.container.raw_href",
                     "example_values": [
-                        "https://theuglytruth.wordpress.com/2013/01/31/russia-concerned-with-israeli-attack-in-syria"
+                        "https://theuglytruth.wordpress.com/2013/01/31/test"
                     ],
                     "data_type": "string"
                 },
@@ -3163,7 +3163,7 @@
                     ],
                     "data_path": "action_result.data.*._source.container.title",
                     "example_values": [
-                        "Strap on Bois! Whats the bottom gonna be?"
+                        "Test Title"
                     ],
                     "data_type": "string"
                 },
@@ -4030,7 +4030,7 @@
                 {
                     "data_path": "action_result.data.*._source.enrichments.hashtags",
                     "example_values": [
-                        "#NEVERTRUMP"
+                        "#HASHTAG"
                     ],
                     "data_type": "string"
                 },
