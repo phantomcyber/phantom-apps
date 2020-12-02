@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "SlashNext",
     "license": "Copyright (c) SlashNext, 2019",
-    "app_version": "1.0.0",
+    "app_version": "1.1.0",
     "utctime_updated": "2019-07-29T08:46:52.622002Z",
     "package_name": "phantom_slashnextphishingincidentresponse",
     "main_module": "slashnextphishingincidentresponse_connector.pyc",
@@ -18,7 +18,7 @@
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
-            "description": "Your API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com)",
+            "description": "SlashNext API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com)",
             "data_type": "password",
             "required": true,
             "order": 0
@@ -59,16 +59,75 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.errorMsg",
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.errorNo",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaDetails.licensedQuota",
+                    "data_type": "string",
+                    "example_values": [
+                        "1500"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaDetails.remainingQuota",
+                    "data_type": "string",
+                    "example_values": [
+                        "1471"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaDetails.expiryDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-19"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaDetails.isExpired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.quotaDetails.note",
+                    "data_type": "string",
+                    "example_values": [
+                        "Your annual API quota will be reset to zero, once either the limit is reached or upon quota expiration date indicated above."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.State",
+                    "data_type": "string",
+                    "example_values": [
+                        "Quota Fetched"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Quota",
+                    "data_type": "string",
+                    "example_values": [
+                        "1471"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "API Quota Successful"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
