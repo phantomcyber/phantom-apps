@@ -20,6 +20,26 @@
     ],
     "type": "identity management",
     "main_module": "okta_connector.py",
+    "configuration": {
+        "api_key": {
+            "required": true,
+            "description": "API token",
+            "data_type": "password",
+            "order": 1
+        },
+        "base_url": {
+            "required": true,
+            "description": "Your organization's url. Example: https://your-org.okta.com",
+            "data_type": "string",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "default": false,
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "order": 2
+        }
+    },
     "actions": [
         {
             "read_only": true,
@@ -29,8 +49,7 @@
             "action": "test connectivity",
             "output": [],
             "identifier": "test_connectivity",
-            "type": "test",
-            "verbose": ""
+            "type": "test"
         },
         {
             "identifier": "send_push_notification",
@@ -73,7 +92,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -91,8 +111,15 @@
                     "column_name": "User"
                 },
                 {
+                    "data_path": "action_result.parameter.factortype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -137,33 +164,22 @@
                 "filter": {
                     "description": "Filters users with a supported expression for a subset of properties",
                     "data_type": "string",
-                    "default": "",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "query": {
                     "description": "Find a user that matches firstName, lastName, and email properties",
                     "data_type": "string",
-                    "default": "",
-                    "required": false,
-                    "primary": true,
                     "order": 0
                 },
                 "search": {
                     "description": "Searches for users with a supported filtering expression for most properties",
                     "data_type": "string",
-                    "default": "",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 },
                 "limit": {
                     "order": 3,
-                    "required": false,
                     "description": "Specifies the number of results returned",
-                    "data_type": "numeric",
-                    "primary": false
+                    "data_type": "numeric"
                 }
             },
             "versions": "EQ(*)",
@@ -179,7 +195,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -207,7 +224,6 @@
                 },
                 {
                     "data_path": "action_result.parameter.search",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -231,6 +247,30 @@
                     "data_path": "action_result.data.*.created",
                     "example_values": [
                         "2018-05-25T21:01:54.000Z"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.status",
+                    "example_values": [
+                        "VERIFIED"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.type",
+                    "example_values": [
+                        "PRIMARY"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "email"
+                    ],
+                    "data_path": "action_result.data.*.credentials.emails.*.value",
+                    "example_values": [
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -350,12 +390,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.profile.mobilePhone",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.nickName",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -425,30 +463,6 @@
                         1
                     ],
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.status",
-                    "example_values": [
-                        "VERIFIED"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.type",
-                    "example_values": [
-                        "PRIMARY"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "email"
-                    ],
-                    "data_path": "action_result.data.*.credentials.emails.*.value",
-                    "example_values": [
-                        "test@splunk.com"
-                    ],
-                    "data_type": "string"
                 }
             ],
             "identifier": "list_users",
@@ -461,24 +475,18 @@
             "parameters": {
                 "filter": {
                     "order": 1,
-                    "required": false,
                     "description": "Filters users with a supported expression for a subset of properties",
-                    "data_type": "string",
-                    "primary": false
+                    "data_type": "string"
                 },
                 "query": {
                     "order": 0,
-                    "required": false,
                     "description": "Find a user that matches firstName, lastName, and email properties",
-                    "data_type": "string",
-                    "primary": true
+                    "data_type": "string"
                 },
                 "limit": {
                     "order": 2,
-                    "required": false,
                     "description": "Specifies the number of results returned",
-                    "data_type": "numeric",
-                    "primary": false
+                    "data_type": "numeric"
                 }
             },
             "versions": "EQ(*)",
@@ -494,7 +502,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -664,15 +673,13 @@
                     "order": 0,
                     "required": true,
                     "description": "Name of the group",
-                    "data_type": "string",
-                    "primary": true
+                    "data_type": "string"
                 },
                 "description": {
                     "order": 1,
                     "required": true,
                     "description": "Description of the group",
-                    "data_type": "string",
-                    "primary": false
+                    "data_type": "string"
                 }
             },
             "versions": "EQ(*)",
@@ -688,7 +695,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -842,8 +850,7 @@
                 }
             ],
             "identifier": "add_group",
-            "type": "generic",
-            "verbose": ""
+            "type": "generic"
         },
         {
             "read_only": false,
@@ -853,7 +860,6 @@
                     "required": true,
                     "description": "User id",
                     "data_type": "string",
-                    "default": "",
                     "contains": [
                         "okta user id"
                     ],
@@ -868,7 +874,6 @@
                         "UI"
                     ],
                     "required": true,
-                    "primary": false,
                     "default": "Email",
                     "order": 1
                 }
@@ -882,7 +887,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -917,13 +923,10 @@
                         "https://your-org.okta.com/reset_password/s-HbbqSmqoCLn0pdYTzx"
                     ],
                     "column_order": 2,
-                    "column_name": "Reset Url"
+                    "column_name": "Reset URL"
                 },
                 {
                     "data_path": "action_result.summary",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -949,8 +952,7 @@
                 }
             ],
             "identifier": "reset_password",
-            "type": "correct",
-            "verbose": ""
+            "type": "correct"
         },
         {
             "read_only": false,
@@ -960,8 +962,7 @@
                     "order": 1,
                     "required": true,
                     "description": "Password string to set",
-                    "data_type": "string",
-                    "primary": false
+                    "data_type": "string"
                 },
                 "id": {
                     "required": true,
@@ -987,7 +988,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -1138,6 +1140,23 @@
                     "data_type": "string"
                 },
                 {
+                    "contains": [
+                        "url"
+                    ],
+                    "data_path": "action_result.data.*._links.unsuspend.href",
+                    "example_values": [
+                        "https://your-org.okta.com/api/v1/users/00ugdwq3wbdAwsSQA0h7/lifecycle/unsuspend"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.unsuspend.method",
+                    "example_values": [
+                        "POST"
+                    ],
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.activated",
                     "example_values": [
                         "2018-09-27T10:27:52.000Z"
@@ -1148,6 +1167,30 @@
                     "data_path": "action_result.data.*.created",
                     "example_values": [
                         "2017-04-26T01:37:30.000Z"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.status",
+                    "example_values": [
+                        "VERIFIED"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.type",
+                    "example_values": [
+                        "PRIMARY"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "email"
+                    ],
+                    "data_path": "action_result.data.*.credentials.emails.*.value",
+                    "example_values": [
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1204,6 +1247,27 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.profile.city",
+                    "example_values": [
+                        "Palo Alto"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile.department",
+                    "example_values": [
+                        "Human Resources"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile.displayName",
+                    "example_values": [
+                        "First Last"
+                    ],
+                    "data_type": "string"
+                },
+                {
                     "contains": [
                         "email"
                     ],
@@ -1238,8 +1302,18 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.profile.middleName",
+                    "example_values": [
+                        "Middle"
+                    ],
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.profile.mobilePhone",
-                    "example_values": [],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile.nickName",
                     "data_type": "string"
                 },
                 {
@@ -1249,6 +1323,20 @@
                     "data_path": "action_result.data.*.profile.secondEmail",
                     "example_values": [
                         "test@splunk.com"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile.streetAddress",
+                    "example_values": [
+                        "123 Anystreet"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile.title",
+                    "example_values": [
+                        "Software Engineer"
                     ],
                     "data_type": "string"
                 },
@@ -1269,7 +1357,6 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -1292,99 +1379,10 @@
                         1
                     ],
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.status",
-                    "example_values": [
-                        "VERIFIED"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.type",
-                    "example_values": [
-                        "PRIMARY"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "email"
-                    ],
-                    "data_path": "action_result.data.*.credentials.emails.*.value",
-                    "example_values": [
-                        "test@splunk.com"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.city",
-                    "example_values": [
-                        "Palo Alto"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.displayName",
-                    "example_values": [
-                        "First Last"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.title",
-                    "example_values": [
-                        "Software Engineer"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.middleName",
-                    "example_values": [
-                        "Middle"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.streetAddress",
-                    "example_values": [
-                        "123 Anystreet"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.department",
-                    "example_values": [
-                        "Human Resources"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.profile.nickName",
-                    "example_values": [],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "url"
-                    ],
-                    "data_path": "action_result.data.*._links.unsuspend.href",
-                    "example_values": [
-                        "https://your-org.okta.com/api/v1/users/00ugdwq3wbdAwsSQA0h7/lifecycle/unsuspend"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*._links.unsuspend.method",
-                    "example_values": [
-                        "POST"
-                    ],
-                    "data_type": "string"
                 }
             ],
             "identifier": "set_password",
-            "type": "contain",
-            "verbose": ""
+            "type": "contain"
         },
         {
             "read_only": false,
@@ -1411,7 +1409,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -1460,8 +1459,7 @@
                 }
             ],
             "identifier": "disable_user",
-            "type": "contain",
-            "verbose": ""
+            "type": "contain"
         },
         {
             "read_only": false,
@@ -1488,7 +1486,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -1537,8 +1536,7 @@
                 }
             ],
             "identifier": "enable_user",
-            "type": "correct",
-            "verbose": ""
+            "type": "correct"
         },
         {
             "read_only": true,
@@ -1568,7 +1566,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -1584,6 +1583,23 @@
                 },
                 {
                     "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "url"
+                    ],
+                    "data_path": "action_result.data.*._links.activate.href",
+                    "example_values": [
+                        "https://your-org.okta.com/api/v1/users/00ugfn1pbgCsesAga0h7/lifecycle/activate"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.activate.method",
+                    "example_values": [
+                        "POST"
+                    ],
                     "data_type": "string"
                 },
                 {
@@ -1675,6 +1691,23 @@
                     "contains": [
                         "url"
                     ],
+                    "data_path": "action_result.data.*._links.reactivate.href",
+                    "example_values": [
+                        "https://your-org.okta.com/api/v1/users/00ugdwq3wbdAwsSQA0h7/lifecycle/reactivate"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.reactivate.method",
+                    "example_values": [
+                        "POST"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "url"
+                    ],
                     "data_path": "action_result.data.*._links.resetPassword.href",
                     "example_values": [
                         "https://your-org.okta.com/api/v1/users/00uf6qknlgEVQhDIF0h7/lifecycle/reset_password"
@@ -1726,6 +1759,30 @@
                     "data_path": "action_result.data.*.created",
                     "example_values": [
                         "2018-10-01T07:20:36.000Z"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.status",
+                    "example_values": [
+                        "VERIFIED"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.credentials.emails.*.type",
+                    "example_values": [
+                        "PRIMARY"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "email"
+                    ],
+                    "data_path": "action_result.data.*.credentials.emails.*.value",
+                    "example_values": [
+                        "test@splunk.com"
                     ],
                     "data_type": "string"
                 },
@@ -1845,12 +1902,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.profile.mobilePhone",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.profile.nickName",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -1917,69 +1972,10 @@
                         1
                     ],
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.status",
-                    "example_values": [
-                        "VERIFIED"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.credentials.emails.*.type",
-                    "example_values": [
-                        "PRIMARY"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "email"
-                    ],
-                    "data_path": "action_result.data.*.credentials.emails.*.value",
-                    "example_values": [
-                        "test@splunk.com"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "url"
-                    ],
-                    "data_path": "action_result.data.*._links.reactivate.href",
-                    "example_values": [
-                        "https://your-org.okta.com/api/v1/users/00ugdwq3wbdAwsSQA0h7/lifecycle/reactivate"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*._links.reactivate.method",
-                    "example_values": [
-                        "POST"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "url"
-                    ],
-                    "data_path": "action_result.data.*._links.activate.href",
-                    "example_values": [
-                        "https://your-org.okta.com/api/v1/users/00ugfn1pbgCsesAga0h7/lifecycle/activate"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*._links.activate.method",
-                    "example_values": [
-                        "POST"
-                    ],
-                    "data_type": "string"
                 }
             ],
             "identifier": "get_user",
-            "type": "investigate",
-            "verbose": ""
+            "type": "investigate"
         },
         {
             "read_only": true,
@@ -2009,7 +2005,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2156,8 +2153,7 @@
                 }
             ],
             "identifier": "get_group",
-            "type": "investigate",
-            "verbose": ""
+            "type": "investigate"
         },
         {
             "read_only": true,
@@ -2165,10 +2161,8 @@
             "parameters": {
                 "query": {
                     "order": 0,
-                    "required": false,
                     "description": "Find a user that matches firstName, lastName, and email properties",
-                    "data_type": "string",
-                    "primary": false
+                    "data_type": "string"
                 },
                 "type": {
                     "description": "Filter IdPs by type",
@@ -2180,16 +2174,12 @@
                         "LINKEDIN",
                         "MICROSOFT"
                     ],
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "limit": {
                     "order": 2,
-                    "required": false,
                     "description": "Specifies the number of results returned",
-                    "data_type": "numeric",
-                    "primary": false
+                    "data_type": "numeric"
                 }
             },
             "versions": "EQ(*)",
@@ -2205,7 +2195,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2219,9 +2210,6 @@
                 },
                 {
                     "data_path": "action_result.parameter.query",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -2292,6 +2280,13 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.issuerMode",
+                    "example_values": [
+                        "ORG_URL"
+                    ],
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.lastUpdated",
                     "example_values": [
                         "2017-09-07T22:01:15.000Z"
@@ -2314,7 +2309,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.policy.accountLink.filter",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -2362,12 +2356,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.policy.subject.filter",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.policy.subject.matchAttribute",
-                    "example_values": [],
                     "data_type": "string"
                 },
                 {
@@ -2493,13 +2485,6 @@
                         1
                     ],
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.issuerMode",
-                    "example_values": [
-                        "ORG_URL"
-                    ],
-                    "data_type": "string"
                 }
             ],
             "identifier": "list_providers",
@@ -2530,7 +2515,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2561,7 +2547,7 @@
                         "IFIFAX2BIRGUSTQ"
                     ],
                     "column_order": 3,
-                    "column_name": "Role Id"
+                    "column_name": "Role ID"
                 },
                 {
                     "column_order": 1,
@@ -2627,8 +2613,7 @@
                 }
             ],
             "identifier": "list_roles",
-            "type": "investigate",
-            "verbose": ""
+            "type": "investigate"
         },
         {
             "read_only": false,
@@ -2647,7 +2632,6 @@
                         "READ_ONLY_ADMIN"
                     ],
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
                 "user_id": {
@@ -2670,7 +2654,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2708,7 +2693,7 @@
                         "ra1esbjllgTr0yoz60h7"
                     ],
                     "column_order": 2,
-                    "column_name": "Role Id"
+                    "column_name": "Role ID"
                 },
                 {
                     "column_order": 0,
@@ -2744,9 +2729,6 @@
                 },
                 {
                     "data_path": "action_result.summary",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -2772,8 +2754,7 @@
                 }
             ],
             "identifier": "assign_role",
-            "type": "generic",
-            "verbose": ""
+            "type": "generic"
         },
         {
             "read_only": false,
@@ -2809,7 +2790,8 @@
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2870,29 +2852,7 @@
                 }
             ],
             "identifier": "unassign_role",
-            "type": "generic",
-            "verbose": ""
+            "type": "generic"
         }
-    ],
-    "configuration": {
-        "api_key": {
-            "required": true,
-            "description": "API token",
-            "data_type": "password",
-            "order": 1
-        },
-        "base_url": {
-            "required": true,
-            "description": "Your organization's url. Example: https://your-org.okta.com",
-            "data_type": "string",
-            "order": 0
-        },
-        "verify_server_cert": {
-            "default": false,
-            "required": true,
-            "description": "Verify server certificate",
-            "data_type": "boolean",
-            "order": 2
-        }
-    }
+    ]
 }
