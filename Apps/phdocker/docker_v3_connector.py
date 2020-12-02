@@ -1,5 +1,4 @@
 # File: docker_v3_connector.py
-# Copyright (c) John Wang, 2020
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -200,7 +199,6 @@ class Docker_V3Connector(BaseConnector):
             url = "{0}{1}".format(self._base_url, endpoint)
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
@@ -262,14 +260,8 @@ class Docker_V3Connector(BaseConnector):
                     json=k_data
                 )
             else:
-                # response = "parameters = {0}"
-                # response_dict = {'parameters': response}
-                # action_result.add_data(response_dict)
-                # summary = action_result.update_summary({})
-                # summary['parameters_data'] = response
                 r = request_func(
                     url,
-                    # auth=(username, password),  # basic authentication
                     verify=config.get('verify_server_cert', False),
                     **kwargs
                 )
@@ -290,11 +282,9 @@ class Docker_V3Connector(BaseConnector):
                     "Error Connecting to server. {0}".format(err)
                 ), resp_json
             )
-        """
-        Below line is commented out as it sets the status_code explicitly to 200
-        This creates a problem in the error message when the original response code is something else than 200(like 500)
-        For more details, please refer the discussion on PAPP-11420
-        """
+
+        # Below line is commented out as it sets the status_code explicitly to 200
+        # This creates a problem in the error message when the original response code is something else than 200(like 500)
         # r.status_code = 200
         return self._process_response(r, action_result)
 
@@ -390,7 +380,7 @@ class Docker_V3Connector(BaseConnector):
             response_dict = {'containerStats': response['HostConfig']}
             action_result.add_data(response_dict)
         except KeyError:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching 'containerStats' from API response")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the 'Host Configuration' from API response")
 
         # Add a dictionary that is made up of the most
         # important values from data into the summary
@@ -550,7 +540,7 @@ class Docker_V3Connector(BaseConnector):
                     for item in range(len(response_dict['containers']))]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Name'. {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching 'ID' and 'Name' from API response. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -664,7 +654,7 @@ class Docker_V3Connector(BaseConnector):
                     for item in range(len(response_dict['images']))]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing API response to get 'ID' and 'Tags'. {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching 'ID' and 'Tags' from API response. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1008,7 +998,7 @@ class Docker_V3Connector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config['host ip']
+        self._base_url = config['host_ip']
 
         return phantom.APP_SUCCESS
 
@@ -1067,7 +1057,7 @@ def main():
                 headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("""Unable to get session id from the platform. Error: """ + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:

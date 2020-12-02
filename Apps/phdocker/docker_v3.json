@@ -18,7 +18,7 @@
     "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "host ip": {
+        "host_ip": {
             "description": "IP address of the user-specified docker host",
             "data_type": "string",
             "required": true,
@@ -39,7 +39,7 @@
         {
             "action": "get changes of a container filesystem",
             "description": "Get added, modified, or deleted files of a container's filesystem",
-            "verbose": "The kind of modification can be one of:\n\n1: Modified\n2: Added\n3: Deleted",
+            "verbose": "The kind of modification can be one of\n\n1: Modified\n2: Added\n3: Deleted.",
             "type": "investigate",
             "identifier": "get_changes_of_a_container_filesystem",
             "read_only": true,
@@ -90,7 +90,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.filesystem_data",
                     "data_type": "string"
                 },
                 {
@@ -178,7 +178,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.containerStats_data",
                     "data_type": "string"
                 },
                 {
@@ -266,7 +266,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.update_data",
                     "data_type": "string"
                 },
                 {
@@ -291,7 +291,7 @@
         },
         {
             "action": "restart a container",
-            "description": "Restart a container based on the specified container ID or Name",
+            "description": "Restart the specified container",
             "type": "generic",
             "identifier": "restart_a_container",
             "read_only": false,
@@ -347,7 +347,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.restart_data",
                     "data_type": "string"
                 },
                 {
@@ -417,8 +417,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.export_data",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -459,7 +462,7 @@
                     "order": 1
                 },
                 "size": {
-                    "description": "Return the size of container as fields SizeRw and SizeRootFs",
+                    "description": "Return size of the container as fields SizeRw and SizeRootFs",
                     "data_type": "boolean",
                     "default": false,
                     "order": 2
@@ -556,7 +559,7 @@
         },
         {
             "action": "stop a container",
-            "description": "Stop a container based on the specified container ID or Name",
+            "description": "Stop the specified container",
             "type": "generic",
             "identifier": "stop_a_container",
             "read_only": false,
@@ -570,11 +573,6 @@
                     ],
                     "primary": true,
                     "order": 0
-                },
-                "t": {
-                    "description": "Number of seconds to wait before killing the container",
-                    "data_type": "numeric",
-                    "order": 1
                 }
             },
             "output": [
@@ -612,7 +610,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.stop_data",
                     "data_type": "string"
                 },
                 {
@@ -637,7 +635,7 @@
         },
         {
             "action": "start a container",
-            "description": "Start a container based on the specified container ID or Name",
+            "description": "Start the specified container",
             "type": "generic",
             "identifier": "start_a_container",
             "read_only": false,
@@ -653,7 +651,7 @@
                     "order": 0
                 },
                 "detachkeys": {
-                    "description": "Override the key sequence for detaching a container. Format is a single character [a-Z] or ctrl-<value> where <value> is one of: a-z, @, ^, [, , or _",
+                    "description": "Override the key sequence for detaching a container. The format is a single character [a-Z] or ctrl-<value> where <value> is one of: a-z, @, ^, [, , or _",
                     "data_type": "string",
                     "order": 1
                 }
@@ -693,7 +691,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.unpause_data",
                     "data_type": "string"
                 },
                 {
@@ -730,7 +728,7 @@
                     "order": 0
                 },
                 "filters": {
-                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list. eg {\"status\":[\"exited\"]}",
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the images list, e.g., {\"status\":[\"exited\"]}",
                     "data_type": "string",
                     "order": 1
                 },
@@ -830,7 +828,7 @@
         },
         {
             "action": "rename container",
-            "description": "Rename a container based on the new name provided",
+            "description": "Rename a container based on the provided new name",
             "type": "generic",
             "identifier": "rename_container",
             "read_only": false,
@@ -928,7 +926,7 @@
                     "order": 0
                 },
                 "signal": {
-                    "description": "Signal to be sent to the container as an integer or string (e.g. SIGINT), default is SIGKILL",
+                    "description": "Signal to be sent to the container as an integer or string, e.g., SIGINT, default is SIGKILL",
                     "data_type": "string",
                     "default": "SIGKILL",
                     "order": 1
@@ -1118,7 +1116,7 @@
             "read_only": false,
             "parameters": {
                 "filters": {
-                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}",    
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string), e.g., {\"status\":[\"exited\"]}",    
                     "data_type": "string",
                     "order": 0
                 }
@@ -1269,13 +1267,13 @@
         },
         {
             "action": "delete unused images",
-            "description": "Delete all unused images",
+            "description": "Delete all unused images based on the specified filters",
             "type": "generic",
             "identifier": "delete_unused",
             "read_only": false,
             "parameters": {
                 "filters": {
-                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string) eg {\"status\":[\"exited\"]}",
+                    "description": "Filters to process on the prune list, encoded as JSON (a map[string][]string), e.g., {\"status\":[\"exited\"]}",
                     "data_type": "string",
                     "order": 0
                 }
@@ -1401,7 +1399,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.history_data",
                     "data_type": "string"
                 },
                 {
@@ -1438,13 +1436,13 @@
                     "order": 0
                 },
                 "all": {
-                    "description": "Remove all types of build cache",
+                    "description": "Remove all types of the build cache",
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
                 },
                 "filters": {
-                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the image list",
+                    "description": "A JSON encoded value of the filters (a map[string][]string) to process on the image list, e.g., {\"status\":[\"exited\"]}",
                     "data_type": "string",
                     "order": 2
                 }
@@ -1491,7 +1489,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.cache_data",
                     "data_type": "string"
                 },
                 {
@@ -1542,12 +1540,12 @@
                     "order": 2
                 },
                 "comment": {
-                    "description": "Commit Message",
+                    "description": "Commit message",
                     "data_type": "string",
                     "order": 3
                 },
                 "author": {
-                    "description": "Author of the image (e.g., John Hannibal Smith <hannibal@a-team.com>)",
+                    "description": "Author of the image, e.g., John Hannibal Smith <hannibal@a-team.com>",
                     "data_type": "string",
                     "order": 4
                 },
@@ -1655,7 +1653,7 @@
         },
         {
             "action": "create a container",
-            "description": "Create container from an existing image",
+            "description": "Create a container from an existing image",
             "type": "generic",
             "identifier": "create_a_container",
             "read_only": false,
