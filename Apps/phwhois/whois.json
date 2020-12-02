@@ -444,7 +444,7 @@
                     "column_name": "ASN CIDR",
                     "column_order": 2,
                     "example_values": [
-                        "203.88.139.0/24"
+                        "127.127.127.127/24"
                     ]
                 },
                 {
@@ -498,7 +498,7 @@
                     "column_name": "CIDR",
                     "column_order": 8,
                     "example_values": [
-                        "203.88.128.0/20"
+                        "127.127.127.127/20"
                     ]
                 },
                 {
@@ -586,7 +586,7 @@
                     "column_name": "Range",
                     "column_order": 16,
                     "example_values": [
-                        "203.88.128.0 - 203.88.143.255"
+                        "127.127.127.127 - 127.127.143.255"
                     ]
                 },
                 {
@@ -624,7 +624,7 @@
                     "data_path": "action_result.data.*.query",
                     "data_type": "string",
                     "example_values": [
-                        "203.88.139.34"
+                        "127.127.127.127"
                     ],
                     "contains": [
                         "ip"
@@ -667,7 +667,7 @@
                     "data_path": "action_result.summary.nets.*.range",
                     "data_type": "string",
                     "example_values": [
-                        "203.88.128.0 - 203.88.143.255"
+                        "127.127.127.127 - 127.127.143.255"
                     ]
                 },
                 {
