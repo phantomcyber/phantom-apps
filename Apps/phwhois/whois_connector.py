@@ -226,7 +226,7 @@ class WhoisConnector(BaseConnector):
                 summary_net = {x: net[x] for x in wanted_keys}
                 summary[WHOIS_JSON_NETS].append(summary_net)
                 message += '\nRange: {0}'.format(summary_net['range'])
-                message += '\nAddress: {0}'.format(summary_net['address'])
+                message += '\nAddress: {0}'.format(self._handle_py_ver_compat_for_input_str(summary_net['address']))
 
         action_result.set_status(phantom.APP_SUCCESS, message)
 
@@ -306,9 +306,10 @@ class WhoisConnector(BaseConnector):
 
         domain = ""
         if result.suffix and result.domain:
-            domain = "{0}.{1}".format(self._handle_py_ver_compat_for_input_str(result.domain), result.suffix)  # pylint: disable=E1101
+            domain = "{0}.{1}".format(self._handle_py_ver_compat_for_input_str(result.domain),
+                                        self._handle_py_ver_compat_for_input_str(result.suffix))  # pylint: disable=E1101
         elif result.suffix:
-            domain = "{0}".format(result.suffix)  # pylint: disable=E1101
+            domain = "{0}".format(self._handle_py_ver_compat_for_input_str(result.suffix))  # pylint: disable=E1101
         elif result.domain:
             domain = "{0}".format(self._handle_py_ver_compat_for_input_str(result.domain))  # pylint: disable=E1101
         return domain
@@ -341,9 +342,9 @@ class WhoisConnector(BaseConnector):
 
         config = self.get_config()
         server = config.get(phantom.APP_JSON_SERVER, None)
-        
+
         domain = param[phantom.APP_JSON_DOMAIN]
-        
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         action_result.set_param({phantom.APP_JSON_DOMAIN: domain})
 
