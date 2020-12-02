@@ -194,7 +194,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
     def _init_session(self, action_result, param=None):
         config = self.get_config()
-        default_port = config.get('default_port', 5985)
+        ret_val, default_port = self._validate_integer(action_result, config.get('default_port', 5985), "Default port", True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         default_protocol = config.get('default_protocol', 'http')
         if param:
             endpoint = self._handle_py_ver_compat_for_input_str(param.get('ip_hostname', config.get('endpoint')))
@@ -333,6 +336,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         resp.std_out = self._handle_py_ver_compat_for_input_str(resp.std_out, True)
         resp.std_err = self._handle_py_ver_compat_for_input_str(resp.std_err, True)
+        resp.std_err = self._session._clean_error_msg(resp.std_err)
         return parse_callback(action_result, resp, **additional_data)
 
     def _handle_test_connectivity(self, param):
@@ -363,7 +367,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if not self._init_session(action_result, param):
             return action_result.get_status()
 
-        ret_val, pid = self._validate_integer(action_result, param.get('pid'), "pid")
+        ret_val, pid = self._validate_integer(action_result, param.get('pid'), "pid", True)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -433,7 +437,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if not self._init_session(action_result, param):
             return action_result.get_status()
 
-        ret_val, _ = self._validate_integer(action_result, param.get('filter_port'), "filter_port")
+        ret_val, _ = self._validate_integer(action_result, param.get('filter_port'), "filter_port", True)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -792,7 +796,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
                 self._sanitize_string(file_path), new_policy_str, set_policy_str
             )
 
-        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data)
+        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data2)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -915,7 +919,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             self._sanitize_string(path_to)
         )
 
-        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data)
+        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data2)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -934,7 +938,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             self._sanitize_string(file_path)
         )
 
-        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data)
+        ret_val = self._run_ps(action_result, ps_script, parse_callback=pc.check_exit_no_data2)
         if phantom.is_fail(ret_val):
             return ret_val
 
