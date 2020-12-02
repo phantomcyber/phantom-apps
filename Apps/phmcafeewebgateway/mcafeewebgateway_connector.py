@@ -1,11 +1,8 @@
 # File: mcafeewebgateway_connector.py
 # Copyright (c) 2020 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
-
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -262,7 +259,7 @@ class McafeeWebGatewayConnector(BaseConnector):
                 params['page'] = page
                 ret_val, next_page = self._make_rest_call('list', action_result, method='get', params=params)
                 if phantom.is_fail(ret_val):
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, f'Could not get lists.'), None)
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not get lists.'), None)
                 response['feed']['entry'] += next_page['feed']['entry']
 
         return RetVal(phantom.APP_SUCCESS, response)
@@ -286,7 +283,7 @@ class McafeeWebGatewayConnector(BaseConnector):
 
             if not list_id:
                 self._logout(action_result)
-                return RetVal(action_result.set_status(phantom.APP_ERROR, f'Could not find list by title.'), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not find list by title.'), None)
 
         endpoint = f'{endpoint}{list_id}'
 

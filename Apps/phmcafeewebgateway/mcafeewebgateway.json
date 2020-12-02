@@ -8,7 +8,7 @@
     "logo_dark": "mcafeewebgateway_dark.svg",
     "product_name": "McAfee Web Gateway",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "python_version": "3",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.1",
@@ -197,7 +197,7 @@
                         "mcafee web gateway list title"
                     ],
                     "column_name": "list title",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.protocol",
@@ -276,7 +276,7 @@
         {
             "action": "unblock url",
             "identifier": "unblock_url",
-            "description": "Remove URL from a list.",
+            "description": "Remove URL from a list",
             "verbose": "Either entry_position or url are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "read_only": false,
@@ -577,7 +577,7 @@
                         "mcafee web gateway list title"
                     ],
                     "column_name": "list title",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.protocol",
@@ -656,7 +656,7 @@
         {
             "action": "unblock ip",
             "identifier": "unblock_ip",
-            "description": "Remove IP from a list.",
+            "description": "Remove IP from a list",
             "verbose": "Either entry_position or ip are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "read_only": false,
@@ -957,7 +957,7 @@
                         "mcafee web gateway list title"
                     ],
                     "column_name": "list title",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.protocol",
@@ -1036,7 +1036,7 @@
         {
             "action": "unblock domain",
             "identifier": "unblock_domain",
-            "description": "Remove domain from a list.",
+            "description": "Remove domain from a list",
             "verbose": "Either entry_position or domain are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "read_only": false,
@@ -1206,7 +1206,7 @@
             "undo": "remove entry",
             "parameters": {
                 "entry": {
-                    "description": "entry to add",
+                    "description": "Entry to add",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1300,7 +1300,7 @@
                         "mcafee web gateway list title"
                     ],
                     "column_name": "list title",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.entry",
@@ -1382,14 +1382,14 @@
         {
             "action": "remove entry",
             "identifier": "remove_entry",
-            "description": "Remove entry from a list.",
+            "description": "Remove entry from a list",
             "verbose": "Either entry_position or item are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "read_only": false,
             "undo": "add entry",
             "parameters": {
                 "entry": {
-                    "description": "entry to remove (either entry or entry_position are required)",
+                    "description": "Entry to remove (either entry or entry_position are required)",
                     "data_type": "string",
                     "required": false,
                     "primary": true,
@@ -1683,7 +1683,7 @@
                     "order": 0
                 },
                 "list_id": {
-                    "description": "list id",
+                    "description": "List ID",
                     "data_type": "string",
                     "required": false,
                     "primary": true,
