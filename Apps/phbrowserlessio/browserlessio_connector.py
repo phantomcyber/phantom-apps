@@ -280,7 +280,7 @@ class BrowserlessIoConnector(BaseConnector):
                 temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
-                with open(file_path, 'wb') as (f):
+                with open(file_path, 'wb') as f:
                     f.write(response)
                 vault_ret = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name)
             if vault_ret.get('succeeded'):
@@ -322,7 +322,7 @@ class BrowserlessIoConnector(BaseConnector):
                 temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
-                with open(file_path, 'wb') as (f):
+                with open(file_path, 'wb') as f:
                     f.write(response)
                 vault_ret = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name)
             if vault_ret.get('succeeded'):
@@ -389,7 +389,7 @@ class BrowserlessIoConnector(BaseConnector):
                 temp_dir = '{}/{}'.format(temp_dir, hashlib.md5(file_name).hexdigest())
                 os.makedirs(temp_dir)
                 file_path = os.path.join(temp_dir, 'tmpfile')
-                with open(file_path, 'wb') as (f):
+                with open(file_path, 'wb') as f:
                     f.write(response)
                 vault_ret = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name)
             if vault_ret.get('succeeded'):
