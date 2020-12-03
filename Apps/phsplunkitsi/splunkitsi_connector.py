@@ -14,8 +14,10 @@ from phantom.action_result import ActionResult
 
 import requests
 import json
+import sys
 from bs4 import BeautifulSoup, UnicodeDammit
 import random
+from splunkitsi_consts import *
 
 # Need some time
 import time
@@ -51,20 +53,73 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         self.relative_time_values = { '15 min': '15m', '60 mins': '60m', '4 hours': '4h', '24 hours': '24h', '7 days': '7d', '30 days': '30d' }
 
     def _unicode_string_handler(self, input_str):
-        """helper method for handling unicode strings
-
-        Arguments:
-            input_str  -- Input string that needs to be processed
-
-        Returns:
-             -- Processed input string based on input_str
         """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
         try:
-            if input_str:
-                return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print("Error ocurred while Unicode handling of the string")
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
         return input_str
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = ERROR_CODE_MSG
+                error_msg = ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = ERROR_CODE_MSG
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._unicode_string_handler(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
@@ -102,7 +157,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 400:
@@ -175,11 +231,8 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             error_message = 'Error Details: Connection Refused from the Server'
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            if hasattr(e, 'message'):
-                error_message = self._unicode_string_handler(e.message)
-            else:
-                error_message = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message), resp_json))
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -274,7 +327,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             payload['status'] = self.itsi_episode_status_values.get(status, '1')
 
         # Create params for POST request
-        q_params = { 'is_partial_update': '1' }
+        q_params = { 'is_partial_data': '1' }
 
         # make rest call
         ret_val, response = self._make_rest_call('/servicesNS/nobody/SA-ITOA/event_management_interface/notable_event_group/{0}'.format(itsi_group_id),
@@ -322,7 +375,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Create params for POST request
         q_params = {
             'break_group_policy_id': itsi_policy_id,
-            'is_partial_update': '1'
+            'is_partial_data': '1'
         }
 
         # make rest call
@@ -356,7 +409,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         itsi_policy_id = param.get('itsi_policy_id', None)
 
         if ((break_episode) and (itsi_policy_id is None)):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Missing notable event aggregation policy id"), None)
+            return action_result.set_status(phantom.APP_ERROR, "Missing notable event aggregation policy id")
 
         if (break_episode):
             ret_val = self._handle_break_episode_helper(param, action_result)
@@ -410,13 +463,15 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             self.save_progress("Add Episode Comment Failed")
             return action_result.get_status()
 
-
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({ 'itsi_group_id': itsi_group_id})
-        summary['comment_id'] = response['comment_id']
+        try:
+            summary['comment_id'] = response['comment_id']
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error while parsing API response to get the Comment ID")
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         self.save_progress("Add Episode Comment Passed")
@@ -438,7 +493,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         earliest_time = param.get('earliest_time', '60 mins')
         max_results = param.get('max_results', '1')
 
-        # Create parms for GET request
+        # Create params for GET request
         earliest_time = '-' + self.relative_time_values.get(earliest_time, earliest_time)
         search_string = ('search index=itsi_grouped_alerts sourcetype=itsi_notable:group NOT source=itsi@internal@group_closing_event '
                          'itsi_group_id="' + itsi_group_id + '"'
@@ -589,7 +644,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Required values can be accessed directly
         itsi_service_id = param['itsi_service_id']
 
-
         # Create params for GET request
         q_params = {'filter': json.dumps({ 'services._key': itsi_service_id })}
 
@@ -604,7 +658,6 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             self.save_progress("Get Service Entities Failed")
             return action_result.get_status()
-
 
         # Return only the entity information
         # Add the response into the data section
@@ -730,30 +783,28 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Optional values should use the .get() function
         start_time = param.get('start_time', None)
-        if start_time is not None:
-            try:
-                start_time = float(start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+        # Integer validation for 'start_time' parameter
+        ret_val, start_time = self._validate_integer(action_result, start_time, "'start_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        if end_time is not None:
-            try:
-                end_time = float(end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+        # Integer validation for 'end_time' parameter
+        ret_val, end_time = self._validate_integer(action_result, end_time, "'end_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', 0)
-        try:
-            relative_start_time = float(relative_start_time)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+        # Integer validation for 'relative_start_time' parameter
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, "'relative_start_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', 300)
-        try:
-            relative_end_time = float(relative_end_time)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+        # Integer validation for 'relative_end_time' parameter
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, "'relative_end_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
@@ -763,9 +814,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # The input type is numeric. Check whether we are within the limits, that is
         # 0 <= t <= 2147483647
         if ((start_time is not None) and ((start_time < 0) or (start_time > 2147483647))):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "start_time out of range"), None)
+            return action_result.set_status(phantom.APP_ERROR, "start_time out of range")
         if ((end_time is not None) and ((end_time < 0) or (end_time > 2147483647))):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "end_time out of range"), None)
+            return action_result.set_status(phantom.APP_ERROR, "end_time out of range")
 
         start_time_val = start_time if start_time is not None else time.time() + relative_start_time
         end_time_val = end_time if end_time is not None else time.time() + relative_end_time
@@ -774,7 +825,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # object_type and object_ids are mandatory.
         # object_ids is a comma separated list of values. Split it and remove whitespace.
         if ((object_ids is None) or (object_type is None)):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Missing object information"), None)
+            return action_result.set_status(phantom.APP_ERROR, "Missing object information")
         object_id_list = [ x.strip() for x in object_ids.split(',') ]
         objects = [ { '_key': i, 'object_type': object_type } for i in object_id_list ]
 
@@ -825,32 +876,28 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # Optional values should use the .get() function
         title = param.get('title', None)
         start_time = param.get('start_time', None)
-        if start_time is not None:
-            try:
-                start_time = float(start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'start_time' parameter")
+        # Integer validation for 'start_time' parameter
+        ret_val, start_time = self._validate_integer(action_result, start_time, "'start_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         end_time = param.get('end_time', None)
-        if end_time is not None:
-            try:
-                end_time = float(end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'end_time' parameter")
+        # Integer validation for 'end_time' parameter
+        ret_val, end_time = self._validate_integer(action_result, end_time, "'end_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_start_time = param.get('relative_start_time', None)
-        if relative_start_time is not None:
-            try:
-                relative_start_time = float(relative_start_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_start_time' parameter")
+        # Integer validation for 'relative_start_time' parameter
+        ret_val, relative_start_time = self._validate_integer(action_result, relative_start_time, "'relative_start_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         relative_end_time = param.get('relative_end_time', None)
-        if relative_end_time is not None:
-            try:
-                relative_end_time = float(relative_end_time)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid numeric value in the 'relative_end_time' parameter")
+        # Integer validation for 'relative_end_time' parameter
+        ret_val, relative_end_time = self._validate_integer(action_result, relative_end_time, "'relative_end_time' action parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         object_type = param.get('object_type', None)
         object_ids = param.get('object_ids', None)
@@ -868,9 +915,9 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # The input type is numeric. Check whether we are within the limits, that is
         # 0 <= t <= 2147483647
         if ((start_time is not None) and ((start_time < 0) or (start_time > 2147483647))):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "start_time out of range"), None)
+            return action_result.set_status(phantom.APP_ERROR, "start_time out of range")
         if ((end_time is not None) and ((end_time < 0) or (end_time > 2147483647))):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "end_time out of range"), None)
+            return action_result.set_status(phantom.APP_ERROR, "end_time out of range")
 
         start_time_val = start_time if start_time is not None else (time.time() + relative_start_time if relative_start_time is not None else None)
         end_time_val = end_time if end_time is not None else (time.time() + relative_end_time if relative_end_time is not None else None)
@@ -928,7 +975,7 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
 
         # Create payload for POST request
         # end_time is now in seconds since the epoch (which mean UTC)
-        payload = { 'start_time': time.time(), 'end_time': time.time() + 1 }
+        payload = { 'end_time': time.time() + 1 }
         if comment is not None:
             payload['comment'] = comment
 
@@ -1026,6 +1073,12 @@ class SplunkItServiceIntelligenceConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._base_url = self._unicode_string_handler(config.get('base_url'))
         self._port = config.get('port')
         self._username = self._unicode_string_handler(config.get('username'))
@@ -1079,7 +1132,7 @@ if __name__ == '__main__':
         try:
             login_url = SplunkItServiceIntelligenceConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1092,11 +1145,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1112,6 +1165,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
