@@ -186,8 +186,6 @@ class TerraformCloudConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="get", headers=None, **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
-        config = self.get_config()
-
         resp_json = None
 
         _headers = {
@@ -208,7 +206,7 @@ class TerraformCloudConnector(BaseConnector):
         try:
             r = request_func(
                             url,
-                            verify=config.get('verify_server_cert', False),
+                            verify=False,
                             headers=_headers,
                             **kwargs)
         except Exception as e:
