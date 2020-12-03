@@ -115,6 +115,7 @@ class BrowserlessIoConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="post", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
+        config = self.get_config()
         params = dict()
         resp_json = None
 
@@ -138,7 +139,7 @@ class BrowserlessIoConnector(BaseConnector):
             r = request_func(
                 url,
                 params=params,
-                verify=self._verify_server_cert,
+                verify=config.get('verify_server_cert', False),
                 headers={'Content-Type': 'application/json'},
                 **kwargs
             )
@@ -442,7 +443,6 @@ class BrowserlessIoConnector(BaseConnector):
 
         self._rest_url = config['URL']
         self._rest_token = config.get('token')
-        self._verify_server_cert = config.get('verify_server_cert', False)
 
         return phantom.APP_SUCCESS
 

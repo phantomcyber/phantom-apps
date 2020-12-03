@@ -27,12 +27,6 @@
             "description": "Token for accessing service (not required if self hosting)",
             "data_type": "password",
             "order": 1
-        },
-        "verify_server_cert": {
-            "description": "Verify Server Certificate",
-            "data_type": "boolean",
-            "default": false,
-            "order": 2
         }
     },
     "actions": [
