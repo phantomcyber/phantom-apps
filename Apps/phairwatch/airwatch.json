@@ -1,19 +1,19 @@
 {
     "appid": "7ca9ffa9-9a85-4d01-b8f3-9634ec68817a",
     "name": "AirWatch",
-    "description": "This app interacts with airwatch",
+    "description": "This app interacts with Airwatch",
     "publisher": "Mhike",
     "type": "generic",
-    "main_module": "airwatch_connector.py",
+    "main_module": "airwatch_connector.pyc",
     "app_version": "1.0.0",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_airwatch",
     "product_vendor": "Mhike",
     "product_name": "AirWatch",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.5.15370",
+    "min_phantom_version": "4.8.24304",
     "logo": "logo_airwatch.svg",
-    "logo_dark": "logo_airwatch.svg",
+    "logo_dark": "logo_airwatch_dark.svg",
     "license": "Internal Use Only",
     "configuration": {
         "tenant": {
@@ -56,7 +56,6 @@
         {
             "action": "add to group",
             "description": "Add device UUID to AirWatch Group",
-            "verbose": "ToDo: add lengthy description here",
             "type": "generic",
             "identifier": "add_to_group",
             "read_only": false,
@@ -76,20 +75,58 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.smartgroup_uuid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "AirWatch Smartgroup UUID"
                 },
                 {
                     "data_path": "action_result.parameter.device_uuid",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "Device UUID"
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]
 }
-

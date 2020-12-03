@@ -2,6 +2,7 @@ import phantom.app as phantom
 import json
 import requests
 from phantom.action_result import ActionResult
+from bs4 import UnicodeDammit
 
 
 class AirWatchConnector(phantom.BaseConnector):
@@ -10,69 +11,75 @@ class AirWatchConnector(phantom.BaseConnector):
 
     def __init__(self):
         super(AirWatchConnector, self).__init__()
-        return
 
-    def _get_headers( self ):
-        self.save_progress( '_get_headers()' )
+    def _get_headers(self):
+        self.save_progress('_get_headers()')
         config = self.get_config()
-        tenant = str( config['tenant'] )
+        tenant = config['tenant']
         headers = {}
         headers['aw-tenant-code'] = tenant
         headers['Accept'] = "application/json;version=2"
         headers['Content-Type'] = "application/json"
         return headers
 
-    def _build_groupadd_body( self, param ):
-        self.save_progress( '_build_groupadd_body()' )
-        body = '[{{"value": "{0}","path": "/smartGroupsOperationV2/devices","op": "add"}}]'.format( param.get( 'device_uuid' ) )
+    def _build_groupadd_body(self, param):
+        self.save_progress('_build_groupadd_body()')
+        body = '[{{"value": "{0}","path": "/smartGroupsOperationV2/devices","op": "add"}}]'.format(UnicodeDammit(param.get('device_uuid')).unicode_markup.encode('utf-8'))
         return body
 
-    def _build_groupadd_url( self, param ):
-        self.save_progress( '_build_groupadd_url()' )
+    def _build_groupadd_url(self, param):
+        self.save_progress('_build_groupadd_url()')
         config = self.get_config()
-        url = '{0}/mdm/smartgroups/{1}'.format( str( config['base_url'] ), param.get( 'smartgroup_uuid' ) )
+        url = '{0}/mdm/smartgroups/{1}'.format(
+            UnicodeDammit(config['base_url']).unicode_markup.encode('utf-8'),
+            UnicodeDammit(param.get('smartgroup_uuid')).unicode_markup.encode('utf-8'))
         return url
 
-    def _add_to_group( self, param ):
-        self.save_progress( '_add_to_group()' )
+    def _add_to_group(self, param):
+        self.save_progress('_add_to_group()')
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             config = self.get_config()
-            u = str( config['username'] )
-            p = str( config['password'] )
+            u = UnicodeDammit(config['username']).unicode_markup.encode('utf-8')
+            p = config['password']
             headers = self._get_headers()
-            body = self._build_groupadd_body( param )
-            self.save_progress( body )
-            url = self._build_groupadd_url( param )
-            self.save_progress( url )
-            response = requests.patch( url, data=body, headers=headers, auth=( u, p ), verify=False )
-            self.save_progress( str( response.status_code ) )
-            json_response = json.loads( response.text )
-            if response.status_code >= 200 and response.status_code < 300 and str( param.get( 'device_uuid' ) ) in json_response['devices']:
-                self.save_progress( 'Device ({0}) successfully added to smartgroup ({1})'.format( param.get( 'device_uuid' ), param.get( 'smartgroup_uuid' ) ) )
-                action_result.set_status( phantom.APP_SUCCESS, 'Successfully added device to group' )
-                return phantom.APP_SUCCESS
+            body = self._build_groupadd_body(param)
+            self.save_progress("Body: {}".format(body))
+            url = self._build_groupadd_url(param)
+            self.save_progress("URL: {}".format(url))
+            try:
+                response = requests.patch(url, data=body, headers=headers, auth=(u, p), verify=False)
+            except requests.exceptions.InvalidSchema:
+                error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+                return action_result.set_status(phantom.APP_ERROR, error_message)
+            self.save_progress("Status code: {}".format(response.status_code))
+            json_response = json.loads(response.text)
+            if response.status_code >= 200 and response.status_code < 300 and UnicodeDammit(param.get('device_uuid')) in json_response['devices']:
+                self.save_progress('Device ({0}) successfully added to smartgroup ({1})'.format(
+                    UnicodeDammit(param.get('device_uuid').unicode_markup.encode('utf-8')),
+                    UnicodeDammit(param.get('smartgroup_uuid').unicode_markup.encode('utf-8'))))
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully added device to group')
             else:
-                self.save_progress( 'Failed to add device to group. Response: {0}'.format( response.status_code ) )
-                action_result.set_status( phantom.APP_ERROR, 'Failed to add device to group. Response: {0}'.format( response.status_code ) )
-                return phantom.APP_ERROR
+                self.save_progress('Failed to add device to group. Response: {0}'.format(response.status_code))
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to add device to group. Response: {0}'.format(response.status_code))
+
         except Exception as e:
-            self.save_progress( str( e ) )
-            self.save_progress( 'Exception thrown while adding to group' )
-            action_result.set_status( phantom.APP_ERROR, Exception, e )
-            return phantom.APP_ERROR
+            self.save_progress("Error occurred. {}".format(e))
+            self.save_progress('Exception thrown while adding to group')
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(e))
 
     def _test_connectivity(self, param):
-        self.save_progress( 'Nothing to test...' )
-        return self.set_status_save_progress(phantom.APP_SUCCESS, 'Hopefully it works for real' )
+        self.save_progress('Nothing to test...')
+        self.save_progress('Hopefully it works for real')
+        return self.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
         if action == self.ACTION_ID_ADD:
-            ret_val = self._add_to_group( param )
+            ret_val = self._add_to_group(param)
         elif action == self.ACTION_ID_TEST:
-            ret_val = self._test_connectivity( param )
+            ret_val = self._test_connectivity(param)
         return ret_val
 
 
