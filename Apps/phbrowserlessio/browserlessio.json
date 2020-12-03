@@ -313,27 +313,19 @@
                     "data_type": "string",
                     "contains": [
                         "url"
-                    ],
-                    "column_name": "URL",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.type",
-                    "data_type": "string",
-                    "column_name": "Type",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.quality",
-                    "data_type": "numeric",
-                    "column_name": "Quality",
-                    "column_order": 2
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.fullpage",
                     "data_type": "boolean",
-                    "column_name": "Full Page",
-                    "column_order": 3,
                     "example_values": [
                         true,
                         false
@@ -354,8 +346,6 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 4,
                     "example_values": [
                         "success",
                         "failed"

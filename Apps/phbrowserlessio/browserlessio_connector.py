@@ -115,7 +115,6 @@ class BrowserlessIoConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="post", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
-        config = self.get_config()
         params = dict()
         resp_json = None
 
@@ -131,7 +130,7 @@ class BrowserlessIoConnector(BaseConnector):
             # Create a URL to connect to
             url = "{0}{1}".format(self._handle_py_ver_compat_for_input_str(self._rest_url).strip("/"), self._handle_py_ver_compat_for_input_str(endpoint))
         except Exception:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide a valid URL"), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide a valid URL value in the 'URL for browserless.io' asset parameter"), resp_json)
         if self._rest_token:
             params['token'] = self._rest_token
 
@@ -139,7 +138,7 @@ class BrowserlessIoConnector(BaseConnector):
             r = request_func(
                 url,
                 params=params,
-                verify=config.get('verify_server_cert', False),
+                verify=False,
                 headers={'Content-Type': 'application/json'},
                 **kwargs
             )
