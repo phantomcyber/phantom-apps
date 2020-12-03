@@ -206,13 +206,13 @@ class FlashpointConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = FLASHPOINT_ERROR_CODE_MSG
+                    error_code = FLASHPOINT_ERROR_CODE_MESSAGE
                     error_msg = e.args[0]
             else:
-                error_code = FLASHPOINT_ERROR_CODE_MSG
+                error_code = FLASHPOINT_ERROR_CODE_MESSAGE
                 error_msg = FLASHPOINT_UNKNOWN_ERROR_MESSAGE
         except:
-            error_code = FLASHPOINT_ERROR_CODE_MSG
+            error_code = FLASHPOINT_ERROR_CODE_MESSAGE
             error_msg = FLASHPOINT_UNKNOWN_ERROR_MESSAGE
 
         try:
@@ -983,20 +983,20 @@ class FlashpointConnector(BaseConnector):
         """
         try:
             if not float(parameter).is_integer():
-                action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_VALID_INT_MSG.format(parameter=key))
+                action_result.set_status(phantom.APP_ERROR, FLASHPOINT_ERROR_VALID_INT_MESSAGE.format(parameter=key))
                 return None
 
             parameter = int(parameter)
             if parameter <= 0:
                 if allow_zero:
                     if parameter < 0:
-                        action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key))
+                        action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE.format(parameter=key))
                         return None
                 else:
-                    action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_MSG.format(parameter=key))
+                    action_result.set_status(phantom.APP_ERROR, FLASHPOINT_LIMIT_VALIDATION_MESSAGE.format(parameter=key))
                     return None
         except:
-            error_text = FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key) if allow_zero else FLASHPOINT_LIMIT_VALIDATION_MSG.format(parameter=key)
+            error_text = FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE.format(parameter=key) if allow_zero else FLASHPOINT_LIMIT_VALIDATION_MESSAGE.format(parameter=key)
             action_result.set_status(phantom.APP_ERROR, error_text)
             return None
         return parameter

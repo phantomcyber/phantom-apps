@@ -39,11 +39,11 @@ FLASHPOINT_CONFIG_SESSION_TIMEOUT_KEY = "'Session Timeout(in minutes)' asset con
 FLASHPOINT_ACTION_LIMIT_KEY = "'limit' action"
 
 # Error message constants
-FLASHPOINT_ERROR_VALID_INT_MSG = "Please provide a valid integer value in the {parameter} parameter"
-FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or positive integer value in the {parameter} parameter"
-FLASHPOINT_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
+FLASHPOINT_ERROR_VALID_INT_MESSAGE = "Please provide a valid integer value in the {parameter} parameter"
+FLASHPOINT_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE = "Please provide zero or positive integer value in the {parameter} parameter"
+FLASHPOINT_LIMIT_VALIDATION_MESSAGE = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
 FLASHPOINT_ALREADY_DISABLE_SESSION_SCROLL_ERROR_MESSAGE = "Status code: 404"
-FLASHPOINT_ERROR_CODE_MSG = "Error code unavailable"
+FLASHPOINT_ERROR_CODE_MESSAGE = "Error code unavailable"
 FLASHPOINT_UNKNOWN_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
 FLASHPOINT_INVALID_COMMA_SEPARATED_LIST_ERROR = "Please provide valid comma-separated list of attribute types"
 FLASHPOINT_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Flashpoint server. Please check the asset configuration and|or the action parameters."
