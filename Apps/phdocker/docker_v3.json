@@ -37,7 +37,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get changes of a container filesystem",
+            "action": "get changes of container filesystem",
             "description": "Get added, modified, or deleted files of a container's filesystem",
             "verbose": "The kind of modification can be one of\n\n1: Modified\n2: Added\n3: Deleted.",
             "type": "investigate",
@@ -114,7 +114,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "inspect a container",
+            "action": "inspect container",
             "description": "Get low-level information about a container",
             "type": "investigate",
             "identifier": "inspect_a_container",
@@ -202,7 +202,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "update a container",
+            "action": "update container",
             "description": "Change various configuration options of a container without having to recreate it",
             "type": "generic",
             "identifier": "update_a_container",
@@ -290,7 +290,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "restart a container",
+            "action": "restart container",
             "description": "Restart the specified container",
             "type": "generic",
             "identifier": "restart_a_container",
@@ -371,7 +371,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "export a container",
+            "action": "export container",
             "description": "Export the contents of a container as a tarball",
             "type": "investigate",
             "identifier": "export_a_container",
@@ -558,7 +558,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "stop a container",
+            "action": "stop container",
             "description": "Stop the specified container",
             "type": "generic",
             "identifier": "stop_a_container",
@@ -634,7 +634,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "start a container",
+            "action": "start container",
             "description": "Start the specified container",
             "type": "generic",
             "identifier": "start_a_container",
@@ -1328,7 +1328,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "image history",
+            "action": "get image history",
             "description": "Get parent layers of an image",
             "type": "investigate",
             "identifier": "image_history",
@@ -1513,7 +1513,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "snapshot of a container",
+            "action": "take container snapshot",
             "description": "Take a snapshot of one of the containers",
             "type": "generic",
             "identifier": "snapshot_of_a_container",
@@ -1652,7 +1652,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "create a container",
+            "action": "create container",
             "description": "Create a container from an existing image",
             "type": "generic",
             "identifier": "create_a_container",
