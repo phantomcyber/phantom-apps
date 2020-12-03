@@ -78,7 +78,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -89,7 +88,6 @@
             "action": "list hosts",
             "identifier": "list_hosts",
             "description": "List hosts in CounterACT",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -189,7 +187,6 @@
             "action": "list policies",
             "identifier": "list_policies",
             "description": "List policies in CounterACT",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -679,7 +676,6 @@
             "action": "get sessions",
             "identifier": "get_active_sessions",
             "description": "Get active sessions in CounterACT",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -819,7 +815,6 @@
             "action": "install firewall",
             "identifier": "install_vfw",
             "description": "Install a virtual firewall with a property",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -989,7 +984,6 @@
             "action": "delete property",
             "identifier": "delete_property",
             "description": "Delete a property of a host",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -1137,7 +1131,6 @@
             "action": "update property",
             "identifier": "update_property",
             "description": "Update a property of a host",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -1322,7 +1315,6 @@
             "action": "update list",
             "identifier": "update_list_property",
             "description": "Update a list by adding, deleting, or deleting all values from it",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
