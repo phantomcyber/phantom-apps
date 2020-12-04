@@ -53,6 +53,9 @@ class OktaConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -61,7 +64,7 @@ class OktaConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+                self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -87,7 +90,7 @@ class OktaConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -107,7 +110,7 @@ class OktaConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -140,7 +143,7 @@ class OktaConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -313,7 +316,7 @@ class OktaConnector(BaseConnector):
 
     def _is_limit_valid(self, limit):
         try:
-            if not str(limit).isdigit():
+            if not str(limit).isdigit() or int(limit) == 0:
                 raise ValueError
         except ValueError:
             return False
@@ -333,6 +336,8 @@ class OktaConnector(BaseConnector):
 
         if limit and not self._is_limit_valid(limit):
             return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
+
+        limit = int(limit)
 
         params = {
             'q': query,
@@ -372,6 +377,8 @@ class OktaConnector(BaseConnector):
 
         if limit and not self._is_limit_valid(limit):
             return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
+
+        limit = int(limit)
 
         params = {
             'q': query,
@@ -599,6 +606,8 @@ class OktaConnector(BaseConnector):
         if limit and not self._is_limit_valid(limit):
             return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
 
+        limit = int(limit)
+
         params = dict()
         params = {
             'limit': 200,
@@ -741,6 +750,7 @@ class OktaConnector(BaseConnector):
                 factor_link_verify_uri = factor_link_verify_href.split('v1')[1]
         if not factor_link_verify_uri:
             self.save_progress("[-] error retriving factor_type: " + factor_type)
+            return action_result.set_status(phantom.APP_ERROR, OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG.format(factor_type=factor_type, user_id=user_id))
 
         # call verify
         ret_val, response_verify = self._make_rest_call(factor_link_verify_uri, action_result, method='post')
