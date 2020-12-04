@@ -17,6 +17,6 @@ NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in
 VALID_JSON_MSG = "Please verify the value of '{key}' action parameter."
 
 # Parameter Keys
-T_ACTION_PARAM = "'t' action parameter"
+DELAY_ACTION_PARAM = "'delay' action parameter"
 LIMIT_ACTION_PARAM = "'limit' action parameter"
 KEEP_STORAGE_ACTION_PARAM = "'keep_storage' action parameter"

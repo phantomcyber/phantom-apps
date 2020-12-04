@@ -37,7 +37,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get changes of container filesystem",
+            "action": "get container filesystem changes",
             "description": "Get added, modified, or deleted files of a container's filesystem",
             "verbose": "The kind of modification can be one of\n\n1: Modified\n2: Added\n3: Deleted.",
             "type": "investigate",
@@ -306,9 +306,10 @@
                     "primary": true,
                     "order": 0
                 },
-                "t": {
+                "delay": {
                     "description": "Number of seconds to wait before killing the container",
                     "data_type": "numeric",
+                    "default": 1,
                     "order": 1
                 }
             },
@@ -323,9 +324,12 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.t",
+                    "data_path": "action_result.parameter.delay",
                     "data_type": "numeric",
-                    "column_name": "T",
+                    "column_name": "Delay",
+                    "example_values": [
+                        1
+                    ],
                     "column_order": 1
                 },
                 {
@@ -1001,7 +1005,7 @@
                     "primary": true,
                     "order": 0
                 },
-                "v": {
+                "volumes": {
                     "description": "Remove the volumes associated with the container",
                     "data_type": "boolean",
                     "default": false,
@@ -1031,9 +1035,9 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.v",
+                    "data_path": "action_result.parameter.volumes",
                     "data_type": "boolean",
-                    "column_name": "V",
+                    "column_name": "Volumes",
                     "example_values": [
                         true,
                         false

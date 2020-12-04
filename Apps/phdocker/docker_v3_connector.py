@@ -436,14 +436,14 @@ class Docker_V3Connector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         id = param['id']
-        t = param.get('t', '')
-        # Validate 't' action parameter
-        ret_val, t = self._validate_integer(action_result, t, T_ACTION_PARAM)
+        delay = param.get('delay', '')
+        # Validate 'delay' action parameter
+        ret_val, delay = self._validate_integer(action_result, delay, DELAY_ACTION_PARAM)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         # make rest call
         ret_val, response = self._make_post_call(
-            '/containers/{0}/restart?t={1}'.format(id, t), action_result)
+            '/containers/{0}/restart?t={1}'.format(id, delay), action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -710,13 +710,13 @@ class Docker_V3Connector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         id = param['id']
-        v = param.get('v', False)
+        volumes = param.get('volumes', False)
         force = param.get('force', False)
         link = param.get('link', False)
         ret_val, response = self._make_post_call(
                     '/containers/{0}?v={1}&force={2}&link={3}'.format(
                         id,
-                        v,
+                        volumes,
                         force,
                         link),
                     action_result, method='delete')
