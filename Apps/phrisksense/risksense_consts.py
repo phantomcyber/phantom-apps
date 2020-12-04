@@ -3,6 +3,8 @@
 #
 # Copyright (c) RiskSense, 2020
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # This unpublished material is proprietary to RiskSense.
 # All rights reserved. The methods and
 # techniques described herein are considered trade secrets

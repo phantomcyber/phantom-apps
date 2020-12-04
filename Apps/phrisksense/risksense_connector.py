@@ -3,6 +3,8 @@
 #
 # Copyright (c) RiskSense, 2020
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # This unpublished material is proprietary to RiskSense.
 # All rights reserved. The methods and
 # techniques described herein are considered trade secrets
@@ -387,7 +389,7 @@ class RisksenseConnector(BaseConnector):
 
     def build_sort(self, sort_by, sort_direction):
         """ This method creates a list of dictionary containing the sorting details.
-        :param sort_by: A list of fielnames that will be used for sorting
+        :param sort_by: A list of fieldnames that will be used for sorting
         :param sort_direction: A list of sort direction values. Valid values: ASC/DESC
         :return: list of dictionary containing the sorting details
         """
@@ -649,7 +651,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_host_findings(self, param):
-        """Fetches and returns a list of host fidings in the provided client, based on the provided input parameters.
+        """Fetches and returns a list of host findings in the provided client, based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -1120,7 +1122,7 @@ class RisksenseConnector(BaseConnector):
         return items
 
     def create_tag(self, action_result, param):
-        """Cretes a new tag based on the provided input parameters.
+        """Creates a new tag based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: details of the newly created tag
@@ -1272,7 +1274,7 @@ class RisksenseConnector(BaseConnector):
             action_result.add_data(resp)
 
         summary = action_result.update_summary({})
-        summary["asset_filter_atttibutes"] = action_result.get_data_size()
+        summary["asset_filter_attributes"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

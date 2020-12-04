@@ -19,7 +19,7 @@
     "package_name": "phantom_risksense",
     "main_module": "risksense_connector.py",
     "python_version": "3",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -27,6 +27,12 @@
             "data_type": "string",
             "required": true,
             "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 1
         },
         "client_name": {
             "description": "Client name",
@@ -46,12 +52,6 @@
             "default": 2,
             "order": 4
         },
-        "verify_server_cert": {
-            "description": "Verify server certificate",
-            "data_type": "boolean",
-            "default": true,
-            "order": 1
-        },
         "backoff_factor": {
             "description": "Backoff factor (type: float)",
             "data_type": "string",
@@ -62,9 +62,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -72,27 +72,19 @@
         },
         {
             "action": "list users",
-            "identifier": "list_users",
             "description": "List all the users",
             "type": "investigate",
+            "identifier": "list_users",
             "read_only": true,
             "parameters": {
                 "max_results": {
                     "description": "Maximum number of users to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
@@ -282,6 +274,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of error users: 0, Number of users: 60"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_users",
                     "data_type": "numeric",
                     "example_values": [
@@ -293,13 +300,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         60
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of error users: 0, Number of users: 60"
                     ]
                 },
                 {
@@ -327,27 +327,19 @@
         },
         {
             "action": "list tags",
-            "identifier": "list_tags",
             "description": "List all the tags",
             "type": "investigate",
+            "identifier": "list_tags",
             "read_only": true,
             "parameters": {
                 "max_results": {
                     "description": "Maximum number of tags to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
@@ -502,6 +494,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of tags: 174, Number of error tags: 1"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_tags",
                     "data_type": "numeric",
                     "example_values": [
@@ -513,13 +520,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         174
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of tags: 174, Number of error tags: 1"
                     ]
                 },
                 {
@@ -547,10 +547,10 @@
         },
         {
             "action": "list hosts",
-            "identifier": "list_hosts",
             "description": "List all the hosts",
-            "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li><li>Similarly, a sorting direction is required for a host attribute which is used for sorting. So, the length of <b>sort_by</b> and <b>sort_direction</b> parameters must be the same.</li></ul>",
+            "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li><li>Similarly, a sorting direction is required for a host attribute that is used for sorting. So, the length of <b>sort_by</b> and <b>sort_direction</b> parameters must be the same.</li></ul>",
             "type": "investigate",
+            "identifier": "list_hosts",
             "read_only": true,
             "parameters": {
                 "fieldname": {
@@ -588,25 +588,17 @@
                 "page": {
                     "description": "Index of the starting page to fetch the results (Default: 0)",
                     "data_type": "numeric",
-                    "defualt": 0,
+                    "default": 0,
                     "order": 6
                 },
                 "max_results": {
                     "description": "Maximum number of hosts to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 7
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.exclusivity",
                     "data_type": "string",
@@ -1435,6 +1427,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of hosts: 5, Number of error hosts: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_hosts",
                     "data_type": "numeric",
                     "example_values": [
@@ -1446,13 +1453,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         5
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of hosts: 5, Number of error hosts: 0"
                     ]
                 },
                 {
@@ -1480,10 +1480,10 @@
         },
         {
             "action": "list apps",
-            "identifier": "list_apps",
             "description": "List all the applications",
             "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li><li>Similarly, a sorting direction is required for an application attribute which is used for sorting. So, the length of <b>sort_by</b> and <b>sort_direction</b> parameters must be the same.</li></ul>",
             "type": "investigate",
+            "identifier": "list_apps",
             "read_only": true,
             "parameters": {
                 "fieldname": {
@@ -1521,25 +1521,17 @@
                 "page": {
                     "description": "Index of the starting page to fetch the results (Default: 0)",
                     "data_type": "numeric",
-                    "defualt": 0,
+                    "default": 0,
                     "order": 6
                 },
                 "max_results": {
                     "description": "Maximum number of apps to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 7
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.exclusivity",
                     "data_type": "string",
@@ -2313,6 +2305,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of error applications: 0, Number of applications: 2"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_applications",
                     "data_type": "numeric",
                     "example_values": [
@@ -2324,13 +2331,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of error applications: 0, Number of applications: 2"
                     ]
                 },
                 {
@@ -2358,10 +2358,10 @@
         },
         {
             "action": "list unique findings",
-            "identifier": "list_unique_findings",
             "description": "List all the unique findings",
             "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li><li>Similarly, a sorting direction is required for an unique host finding attribute which is used for sorting. So, the length of <b>sort_by</b> and <b>sort_direction</b> parameters must be the same.</li></ul>",
             "type": "investigate",
+            "identifier": "list_unique_findings",
             "read_only": true,
             "parameters": {
                 "fieldname": {
@@ -2399,25 +2399,17 @@
                 "page": {
                     "description": "Index of the starting page to fetch the results (Default: 0)",
                     "data_type": "numeric",
-                    "defualt": 0,
+                    "default": 0,
                     "order": 6
                 },
                 "max_results": {
                     "description": "Maximum number of unique findings to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 7
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.exclusivity",
                     "data_type": "string",
@@ -2520,6 +2512,21 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of unique host findings: 5, Number of error unique host findings: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_unique_host_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -2531,13 +2538,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         5
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of unique host findings: 5, Number of error unique host findings: 0"
                     ]
                 },
                 {
@@ -2562,10 +2562,10 @@
         },
         {
             "action": "list host findings",
-            "identifier": "list_host_findings",
             "description": "List all the host findings",
             "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li><li>Similarly, a sorting direction is required for a host finding attribute which is used for sorting. So, the length of <b>sort_by</b> and <b>sort_direction</b> parameters must be the same.</li></ul>",
             "type": "investigate",
+            "identifier": "list_host_findings",
             "read_only": true,
             "parameters": {
                 "fieldname": {
@@ -2608,25 +2608,17 @@
                 "page": {
                     "description": "Index of the starting page to fetch the results (Default: 0)",
                     "data_type": "numeric",
-                    "defualt": 0,
+                    "default": 0,
                     "order": 7
                 },
                 "max_results": {
                     "description": "Maximum number of host findings to return (Default: 1000)",
                     "data_type": "numeric",
-                    "defualt": 1000,
+                    "default": 1000,
                     "order": 8
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.exclusivity",
                     "data_type": "string",
@@ -3020,7 +3012,7 @@
                     "data_path": "action_result.data.*.host_findings.*.manualFindingReports.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "Microsoft Windows SMB Server RCE"
+                        "Test SMB Server RCE"
                     ]
                 },
                 {
@@ -3805,6 +3797,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of host findings: 5, Number of error host findings: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_host_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -3816,13 +3823,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         5
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of host findings: 5, Number of error host findings: 0"
                     ]
                 },
                 {
@@ -3850,9 +3850,9 @@
         },
         {
             "action": "list filter attributes",
-            "identifier": "list_filter_attributes",
             "description": "List all the filter attributes of a given asset type",
             "type": "investigate",
+            "identifier": "list_filter_attributes",
             "read_only": true,
             "parameters": {
                 "asset_type": {
@@ -3863,14 +3863,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.asset_type",
                     "data_type": "string",
@@ -3921,17 +3913,25 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.asset_filter_atttibutes",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        106
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Asset filter atttibutes: 106"
+                        "Asset filter attributes: 106"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.asset_filter_attributes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        106
                     ]
                 },
                 {
@@ -3959,9 +3959,9 @@
         },
         {
             "action": "get hosts",
-            "identifier": "get_hosts",
             "description": "Fetch the details for the host(s) for the given host name or host ID",
             "type": "investigate",
+            "identifier": "get_hosts",
             "read_only": true,
             "parameters": {
                 "host_id": {
@@ -3984,14 +3984,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host_id",
                     "data_type": "numeric",
@@ -4724,6 +4716,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of hosts: 1, Number of error hosts: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_hosts",
                     "data_type": "numeric",
                     "example_values": [
@@ -4735,13 +4742,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of hosts: 1, Number of error hosts: 0"
                     ]
                 },
                 {
@@ -4769,9 +4769,9 @@
         },
         {
             "action": "get host finding",
-            "identifier": "get_host_finding",
             "description": "Fetch the details for the single host finding for the given host finding ID",
             "type": "investigate",
+            "identifier": "get_host_finding",
             "read_only": true,
             "parameters": {
                 "host_finding_id": {
@@ -4786,14 +4786,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host_finding_id",
                     "data_type": "numeric",
@@ -5629,6 +5621,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of host findings: 1, Number of error host findings: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_host_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -5640,13 +5647,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of host findings: 1, Number of error host findings: 0"
                     ]
                 },
                 {
@@ -5674,9 +5674,9 @@
         },
         {
             "action": "get app",
-            "identifier": "get_app",
             "description": "Fetch the details for the single app for the given app ID",
             "type": "investigate",
+            "identifier": "get_app",
             "read_only": true,
             "parameters": {
                 "app_id": {
@@ -5691,14 +5691,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.app_id",
                     "data_type": "numeric",
@@ -6388,6 +6380,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of error applications: 0, Number of applications: 1"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_applications",
                     "data_type": "numeric",
                     "example_values": [
@@ -6399,13 +6406,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of error applications: 0, Number of applications: 1"
                     ]
                 },
                 {
@@ -6433,9 +6433,9 @@
         },
         {
             "action": "list vulnerabilities",
-            "identifier": "list_vulnerabilities",
             "description": "List all the vulnerabilities",
             "type": "investigate",
+            "identifier": "list_vulnerabilities",
             "read_only": true,
             "parameters": {
                 "host_finding_id": {
@@ -6450,14 +6450,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host_finding_id",
                     "data_type": "numeric",
@@ -6673,6 +6665,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of v2 vulnerabilities: 1, Number of v3 vulnerabilities: 1, Number of error host findings: 0"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_error_host_findings",
                     "data_type": "numeric",
                     "example_values": [
@@ -6691,13 +6698,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Number of v2 vulnerabilities: 1, Number of v3 vulnerabilities: 1, Number of error host findings: 0"
                     ]
                 },
                 {
@@ -6725,10 +6725,10 @@
         },
         {
             "action": "tag asset",
-            "identifier": "tag_asset",
             "description": "Tag the assets that are fetched using the filter",
             "verbose": "<ul><li>The <b>fieldname</b>, <b>operator</b>, <b>value</b>, and <b>exclusivity</b> parameters are used to create a filter. So, the length of these four parameters must be the same.</li></ul>",
             "type": "generic",
+            "identifier": "tag_asset",
             "read_only": false,
             "parameters": {
                 "tag_name": {
@@ -6809,14 +6809,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.entity_type",
                     "data_type": "string",
@@ -6941,10 +6933,11 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.summary.tag_id",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        249650
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -6952,6 +6945,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Tag got associated successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.tag_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        249650
                     ]
                 },
                 {

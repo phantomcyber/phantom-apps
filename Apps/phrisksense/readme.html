@@ -1,5 +1,8 @@
 <!-- File: readme.html
     Copyright (c) RiskSense, 2020
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
     This unpublished material is proprietary to RiskSense.
     All rights reserved. The methods and
     techniques described herein are considered trade secrets
@@ -132,7 +135,7 @@
             <li><b>Note:</b></li>
             <ul>
               <li>The Fieldname, Operator, Value, and Exclusivity parameters are used to create a filter. So, the length of these four parameters must be the same.</li>
-              <li>Similarly, a sorting direction is required for a host attribute which is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
+              <li>Similarly, a sorting direction is required for a host attribute that is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
             </ul>
             <li><b>Examples:</b>
               <ul>
@@ -146,7 +149,7 @@
                     <li>Sort Direction = DESC</li>
                   </ul>
                 </li>
-                <li> List the hosts that are not discovered on 2014-05-01. Results sorted first by rs3 in ascending order and then by ID in ascending order.
+                <li> List the hosts that are not discovered on 2014-05-01. Results are sorted first by rs3 in ascending order and then by ID in ascending order.
                   <ul style="list-style-type:none;">
                     <li>Fieldname = discoveredOn</li>
                     <li>Operator = EXACT</li>
@@ -154,7 +157,7 @@
                     <li>Exclusivity = true</li>
                     <li>Sort By = rs3, id</li>
                     <li>Sort Direction = ASC, ASC</li>
-                    <li><b>Note: </b>The date format is in YYYY-MM-DD. Also while using EXACT operator, note that the expected results will be fetched only if the value provided in the Value parameter will be exactly matched. So, make sure that there are no unnecessary spaces in the Value parameter.</li>
+                    <li><b>Note: </b>The date format is in YYYY-MM-DD. Also while using the EXACT operator, note that the expected results will be fetched only if the value provided in the Value parameter will be exactly matched. So, make sure that there are no unnecessary spaces in the Value parameter.</li>
                   </ul>
                 </li>
                 <li> List the hosts having ID 1 or 2 or 3.
@@ -232,7 +235,7 @@
             <li><b>Note:</b></li>
               <ul>
                 <li>The Fieldname, Operator, Value, and Exclusivity parameters are used to create a filter. So, the length of these four parameters must be the same.</li>
-                <li>Similarly, a sorting direction is required for a host attribute which is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
+                <li>Similarly, a sorting direction is required for a host attribute that is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
               </ul>
             <li><b>Examples:</b>
               <ul>
@@ -246,7 +249,7 @@
                     <li>Sort Direction = DESC</li>
                   </ul>
                 </li>
-                <li> List the applications having the group name “Default Group”. Results sorted first by name in ascending order and then by ID in descending order.
+                <li> List the applications having the group name “Default Group”. Results are sorted first by name in ascending order and then by ID in descending order.
                   <ul style="list-style-type:none;">
                     <li>Fieldname = group_names</li>
                     <li>Operator = EXACT</li>
@@ -330,7 +333,7 @@
             <li><b>Note:</b></li>
               <ul>
                 <li>The Fieldname, Operator, Value, and Exclusivity parameters are used to create a filter. So, the length of these four parameters must be the same.</li>
-                <li>Similarly, a sorting direction is required for a host attribute which is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
+                <li>Similarly, a sorting direction is required for a host attribute that is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
               </ul>
             <li><b>Examples:</b>
               <ul>
@@ -344,7 +347,7 @@
                     <li>Sort Direction = DESC</li>
                   </ul>
                 </li>
-                <li> List the unique host findings having the Assessment “First Assessment”. Results sorted first by title in ascending order and then by severity in descending order.
+                <li> List the unique host findings having the Assessment “First Assessment”. Results are sorted first by title in ascending order and then by severity in descending order.
                   <ul style="list-style-type:none;">
                     <li>Fieldname = assessment_labels</li>
                     <li>Operator = EXACT</li>
@@ -431,7 +434,7 @@
             <li><b>Note:</b></li>
               <ul>
                 <li>The Fieldname, Operator, Value, and Exclusivity parameters are used to create a filter. So, the length of these four parameters must be the same.</li>
-                <li>Similarly, a sorting direction is required for a host attribute which is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
+                <li>Similarly, a sorting direction is required for a host attribute that is used for sorting. So, the length of Sort By and Sort Direction parameters must be the same.</li>
               </ul>
             <li><b>Examples:</b>
               <ul>
@@ -445,7 +448,7 @@
                     <li>Sort Direction = DESC</li>
                   </ul>
                 </li>
-                <li> List the host findings having the state “assigned”. Results sorted first by riskRating in descending order and then by ID in ascending order.
+                <li> List the host findings having the state “assigned”. Results are sorted first by riskRating in descending order and then by ID in ascending order.
                   <ul style="list-style-type:none;">
                     <li>Fieldname = state</li>
                     <li>Operator = EXACT</li>
