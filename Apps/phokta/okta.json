@@ -99,7 +99,9 @@
                 },
                 {
                     "contains": [
-                        "okta user id"
+                        "okta user id",
+                        "okta email address",
+                        "okta username"
                     ],
                     "data_path": "action_result.parameter.email",
                     "example_values": [
