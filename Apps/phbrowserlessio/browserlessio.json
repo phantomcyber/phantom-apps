@@ -42,8 +42,7 @@
         },
         {
             "action": "get pdf",
-            "description": "Get PDF screenshot of URL",
-            "verbose": "Download a PDF of the URL.",
+            "description": "Download a PDF screenshot of the URL",
             "type": "investigate",
             "identifier": "get_pdf",
             "read_only": true,
@@ -260,8 +259,7 @@
         },
         {
             "action": "get screenshot",
-            "description": "Get Screenshot of URL",
-            "verbose": "Create a screenshot of a URL.",
+            "description": "Download a screenshot of the URL",
             "type": "investigate",
             "identifier": "get_screenshot",
             "read_only": true,
