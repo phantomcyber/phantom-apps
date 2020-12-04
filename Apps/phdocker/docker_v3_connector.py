@@ -317,11 +317,8 @@ class Docker_V3Connector(BaseConnector):
         for i in range(len(indices) - 1):
             self.save_progress(res[indices[i]:indices[i + 1]])
         self.save_progress(self._base_url)
-        # action_result.add_data(response)
-        # self.save_progress("{0}".len(response))
 
         # Return success
-        # self.save_progress("version".format(ret_val)
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -401,7 +398,6 @@ class Docker_V3Connector(BaseConnector):
         id = param['id']
         request_body = param['request_body']
 
-        # response = "request body={0}".format(request_body)
         # make rest call
         ret_val, response = self._make_post_call(
             '/containers/{0}/update'.format(id),
@@ -644,7 +640,6 @@ class Docker_V3Connector(BaseConnector):
         # Add a dictionary that is made up of
         # the most important values from data into the summary
         summary = action_result.update_summary({})
-        # res = json.dumps(response)
         try:
             summary['image_data'] = [
                     {'images ' + str(item):
@@ -859,7 +854,6 @@ class Docker_V3Connector(BaseConnector):
         action_result.add_data(response_dict)
 
         summary = action_result.update_summary({})
-        # res = json.dumps(response)
         try:
             summary['cache_data'] = json.dumps(response, indent=1)
         except Exception as e:
