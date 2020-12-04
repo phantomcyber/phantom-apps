@@ -738,7 +738,7 @@ class OktaConnector(BaseConnector):
         user_id = response_user['id']
         ret_val, response_factor = self._make_rest_call('/users/{}/factors'.format(user_id), action_result, method='get')
         if (phantom.is_fail(ret_val)):
-            self.save_progress("[-] get factors: {}".format(user_id, str(response_factor)))
+            self.save_progress("[-] get /users/{}/factors: {}".format(user_id, str(response_factor)))
             return action_result.get_status()
 
         factor_link_verify_uri = None
