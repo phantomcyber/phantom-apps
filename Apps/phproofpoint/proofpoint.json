@@ -898,37 +898,37 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.clusterName",
+                    "data_path": "action_result.data.*.urls.*.clusterName",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.decodedUrl",
+                    "data_path": "action_result.data.*.urls.*.decodedUrl",
                     "data_type": "string",
                     "contains": [
                         "url"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.encodedUrl",
+                    "data_path": "action_result.data.*.urls.*.encodedUrl",
                     "data_type": "string",
                     "contains": [
                         "url"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.error",
+                    "data_path": "action_result.data.*.urls.*.error",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.messageGuid",
+                    "data_path": "action_result.data.*.urls.*.messageGuid",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.recipientEmail",
+                    "data_path": "action_result.data.*.urls.*.recipientEmail",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.success",
+                    "data_path": "action_result.data.*.urls.*.success",
                     "data_type": "boolean"
                 },
                 {
