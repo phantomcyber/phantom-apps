@@ -13,7 +13,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from cybereason_consts import *
+from cybereason_consts import *
 import requests
 import json
 import traceback
@@ -262,21 +262,9 @@ class CybereasonConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
 
-        status = param.get('status')
-
-        if status == 'Unread':
-            status = "UNREAD"
-        elif status == 'To Review':
-            status = "TODO"
-        elif status == 'Not Relevant':
-            status = "FP"
-        elif status == 'Remediated':
-            status = "CLOSE"
-        elif status == 'Reopend':
-            status = "REOPEN"
-        elif status == 'Under Investigation':
-            status = "OPEN"
-        else:
+        phantom_status = param.get('status')
+        cybereason_status = PHANTOM_TO_CYBEREASON_STATUS.get(phantom_status)
+        if not cybereason_status:
             self.save_progress("Invalid status selected ")
             self.finalize()
 
@@ -287,7 +275,7 @@ class CybereasonConnector(BaseConnector):
             url = self._base_url + endpoint_url
             self.save_progress(url)
             api_headers = {'Content-Type': 'application/json'}
-            query = json.dumps({malop_id: status})
+            query = json.dumps({malop_id: cybereason_status})
             cr_session.post(url, data=query, headers=api_headers)
 
         except Exception as e:
