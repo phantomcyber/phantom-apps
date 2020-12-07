@@ -702,19 +702,21 @@
                 },
                 "machine_id": {
                     "data_type": "string",
+                    "description": "Machine name associated with that malop ID",
+                    "required": true,
                     "contains": [
                         "cybereason machine id"
                     ],
-                    "order": 2,
-                    "description": "Machine name associated with that malop ID"
+                    "order": 2
                 },
                 "process_id": {
                     "data_type": "string",
+                    "description": "Cybereason Process ID of the process to kill",
+                    "required": true,
                     "order": 3,
                     "contains": [
                         "cybereason process id"
-                    ],
-                    "description": "Cybereason Process ID of the process to kill"
+                    ]
                 }
             },
             "output": [
@@ -830,11 +832,12 @@
                 },
                 "remediation_id": {
                     "data_type": "string",
+                    "description": "An ID that specifies a previously executed remediation action like Kill Process",
+                    "required": true,
                     "contains": [
                         "cybereason remediation id"
                     ],
-                    "order": 2,
-                    "description": "An ID that specifies a previously executed remediation action like Kill Process"
+                    "order": 2
                 }
             },
             "output": [
