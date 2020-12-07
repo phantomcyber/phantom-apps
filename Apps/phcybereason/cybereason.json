@@ -1,7 +1,7 @@
 {
     "appid": "d8bb9ae7-4c54-4fc8-80da-b66b80d30699",
     "name": "Cybereason",
-    "description": "This app integrates with the Cybereason platform to perform investigative, contain and corrective actions on Malop and Malware events.",
+    "description": "This app integrates with the Cybereason platform to perform investigative, contain and corrective actions on Malop and Malware events",
     "type": "endpoint",
     "product_vendor": "Cybereason",
     "logo": "cybereason.png",
@@ -88,7 +88,7 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality.",
+            "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
@@ -322,7 +322,7 @@
         {
             "action": "get sensor status",
             "identifier": "get_sensor_status",
-            "description": "Get the connectivity status for all machine sensors in a Malop.",
+            "description": "Get the connectivity status for all machine sensors in a Malop",
             "verbose": "Each machine covered by Cybereason will have a sensor installed on it. This action will extract the sensor status for all machines in a Malop.",
             "type": "investigate",
             "read_only": true,
@@ -483,7 +483,7 @@
         {
             "action": "update malop status",
             "identifier": "update_malop_status",
-            "description": "Update status for the provided Malop ID such as Under Investigation, To review etc.",
+            "description": "Update status for the provided Malop ID such as Under Investigation, To review etc",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -560,7 +560,7 @@
         {
             "action": "isolate machine",
             "identifier": "isolate_machine",
-            "description": "Blocks all communication to and from the machine. Communication with the Cybereason platform is not affected.",
+            "description": "Blocks all communication to and from the machine. Communication with the Cybereason platform is not affected",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -617,7 +617,7 @@
         {
             "action": "unisolate machine",
             "identifier": "unisolate_machine",
-            "description": "Unblocks all communication to and from the machine.",
+            "description": "Unblocks all communication to and from the machine",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -675,7 +675,7 @@
         {
             "action": "kill process",
             "identifier": "kill_process",
-            "description": "Kills the active process on the machine.",
+            "description": "Kills the active process on the machine",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -911,7 +911,7 @@
         {
             "action": "set reputation",
             "identifier": "set_reputation",
-            "description": "Blacklists / Whitelists a file hash so that future malop detections can quickly identify the hash.",
+            "description": "Blacklists / Whitelists a file hash so that future malop detections can quickly identify the hash",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -1137,7 +1137,7 @@
         {
             "action": "query users",
             "identifier": "query_users",
-            "description": "Queries a given user to retrieve all user related details.",
+            "description": "Queries a given user to retrieve all user related details",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1307,7 +1307,7 @@
         {
             "action": "query domain",
             "identifier": "query_domain",
-            "description": "Queries a given domain name to retrieve all details of that domain.",
+            "description": "Queries a given domain name to retrieve all details of that domain",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1385,7 +1385,7 @@
         {
             "action": "query connections",
             "identifier": "query_connections",
-            "description": "Queries a given name to retrieve all details of that connection.",
+            "description": "Queries a given name to retrieve all details of that connection",
             "type": "investigate",
             "read_only": true,
             "parameters": {
