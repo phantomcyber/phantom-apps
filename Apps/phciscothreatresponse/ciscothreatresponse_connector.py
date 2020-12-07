@@ -318,7 +318,7 @@ class CiscoThreatResponseConnector(BaseConnector):
 
         except ConnectionError as error:
             self.debug_print(repr(error))
-            message = 'Failed to connect to Cisco Threat Response.'
+            message = 'Failed to connect to Cisco SecureX Threat Response.'
 
         except Exception as error:
             self.debug_print(repr(error))

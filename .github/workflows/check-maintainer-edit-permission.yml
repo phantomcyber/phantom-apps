@@ -1,0 +1,36 @@
+name: Alert if maintainer edit permission has not been granted
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+jobs:
+  check-edit-permission:
+
+    runs-on: ubuntu-latest
+
+    if: |
+      github.event.pull_request.head.repo.fork == true
+      && github.event.pull_request.maintainer_can_modify == false
+
+    steps:
+      - name: Update base branch and alert with information
+        uses: actions/github-script@v3.1.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            const message = `@${context.payload.pull_request.user.login} Thank you for your submission!
+
+            In order to speed up the review process we request pull request authors to grant us edit permission for the branch.
+
+            You can do this by checking the box on the right sidebar labeled as either "Allow edits from maintainers" or "Allow edits and access to secrets by maintainers".
+
+            More information can be found on this page: [Allowing changes to a pull request from a fork](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)`
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            })
+

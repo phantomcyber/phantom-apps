@@ -6,8 +6,8 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "whois_connector.py",
-    "app_version": "2.0.7",
-    "utctime_updated": "2020-06-10T20:37:28.000000Z",
+    "app_version": "2.0.8",
+    "utctime_updated": "2020-11-26T08:02:27.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
@@ -46,8 +46,7 @@
             }
         ]
     },
-    "configuration": {},
-    "app_config": {
+    "configuration": {
         "update_days": {
             "data_type": "numeric",
             "order": 0,
@@ -57,6 +56,16 @@
         }
     },
     "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the configuration for connectivity",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
         {
             "action": "whois domain",
             "description": "Execute a whois lookup on the given domain",
