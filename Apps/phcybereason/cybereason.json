@@ -143,7 +143,7 @@
                     "contains": [
                         "the count of containers"
                     ],
-                    "column_name": "container_count",
+                    "column_name": "Container Count",
                     "column_order": 0
                 },
                 {
@@ -152,7 +152,7 @@
                     "contains": [
                         "container id"
                     ],
-                    "column_name": "container_id",
+                    "column_name": "Container ID",
                     "column_order": 1
                 },
                 {
@@ -161,7 +161,7 @@
                     "contains": [
                         "start time"
                     ],
-                    "column_name": "start_time",
+                    "column_name": "Start Time",
                     "column_order": 2
                 },
                 {
@@ -170,7 +170,7 @@
                     "contains": [
                         "end time"
                     ],
-                    "column_name": "end_time",
+                    "column_name": "End Time",
                     "column_order": 3
                 },
                 {
@@ -179,7 +179,7 @@
                     "contains": [
                         "artifact count"
                     ],
-                    "column_name": "artifact_count",
+                    "column_name": "Artifact Count",
                     "column_order": 4
                 },
                 {
@@ -188,12 +188,12 @@
                     "contains": [
                         "data"
                     ],
-                    "column_name": "malop_id"
+                    "column_name": "Malop ID"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "contains": [
                         "status"
                     ],
@@ -260,7 +260,7 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
@@ -269,13 +269,13 @@
                     "contains": [
                         "cybereason machine name"
                     ],
-                    "column_name": "machine_name",
+                    "column_name": "Machine Name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -301,7 +301,7 @@
                     "contains": [
                         "cybereason remediation id"
                     ],
-                    "column_name": "remediation_id",
+                    "column_name": "Remediation ID",
                     "column_order": 2
                 },
                 {
@@ -310,7 +310,7 @@
                     "contains": [
                         "cybereason user"
                     ],
-                    "column_name": "initiating_user",
+                    "column_name": "Initiating User",
                     "column_order": 3
                 }
             ],
@@ -346,13 +346,13 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "contains": [
                         "status"
                     ],
@@ -381,7 +381,7 @@
                     "contains": [
                         "cybereason machine name"
                     ],
-                    "column_name": "machine_name",
+                    "column_name": "Machine Name",
                     "column_order": 1
                 },
                 {
@@ -390,13 +390,13 @@
                     "contains": [
                         "cybereason machine id"
                     ],
-                    "column_name": "machine_id",
+                    "column_name": "Machine ID",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 3,
                     "contains": [
                         "cybereason sensor status"
@@ -443,24 +443,24 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "column_name": "comment",
+                    "column_name": "Comment",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -517,13 +517,13 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "contains": [
                         "cybereason malop status"
                     ],
@@ -532,12 +532,12 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -583,18 +583,18 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -639,18 +639,18 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -722,7 +722,7 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
@@ -731,7 +731,7 @@
                     "contains": [
                         "cybereason user"
                     ],
-                    "column_name": "remediation_user",
+                    "column_name": "Remediation User",
                     "column_order": 1
                 },
                 {
@@ -740,7 +740,7 @@
                     "contains": [
                         "cybereason machine id"
                     ],
-                    "column_name": "machine_id",
+                    "column_name": "Machine ID",
                     "column_order": 2
                 },
                 {
@@ -749,7 +749,7 @@
                     "contains": [
                         "cybereason process id"
                     ],
-                    "column_name": "process_id",
+                    "column_name": "Process ID",
                     "column_order": 3
                 },
                 {
@@ -758,7 +758,7 @@
                     "contains": [
                         "cybereason remediation id"
                     ],
-                    "column_name": "remediation_id",
+                    "column_name": "Remediation ID",
                     "column_order": 4
                 },
                 {
@@ -767,18 +767,18 @@
                     "contains": [
                         "cybereason remediation status"
                     ],
-                    "column_name": "remediation_status",
+                    "column_name": "Remediation Status",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -843,7 +843,7 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
@@ -852,7 +852,7 @@
                     "contains": [
                         "cybereason user"
                     ],
-                    "column_name": "remediation_user",
+                    "column_name": "Remediation User",
                     "column_order": 1
                 },
                 {
@@ -861,7 +861,7 @@
                     "contains": [
                         "cybereason remediation id"
                     ],
-                    "column_name": "remediation_id",
+                    "column_name": "Remediation ID",
                     "column_order": 2
                 },
                 {
@@ -870,24 +870,24 @@
                     "contains": [
                         "cybereason remediation status"
                     ],
-                    "column_name": "remediation_status",
+                    "column_name": "Remediation Status",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.remediation_message",
                     "data_type": "string",
-                    "column_name": "remediation_message",
+                    "column_name": "Remediation Message",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -934,24 +934,24 @@
                     "data_path": "action_result.parameter.reputation_item_hash",
                     "data_type": "string",
                     "contains": ["hash"],
-                    "column_name": "reputation_item_hash",
+                    "column_name": "Reputation Item Hash",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.custom_reputation",
                     "data_type": "string",
-                    "column_name": "custom_reputation",
+                    "column_name": "Custom Reputation",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data"
+                    "column_name": "Data"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "example_values": [
                         "success",
                         "failed"
@@ -996,13 +996,13 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id",
+                    "column_name": "Malop ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
                         "success",
@@ -1023,7 +1023,7 @@
                     "contains": [
                         "cybereason process id"
                     ],
-                    "column_name": "process_id",
+                    "column_name": "Process ID",
                     "column_order": 2
                 },
                 {
@@ -1032,7 +1032,7 @@
                     "contains": [
                         "cybereason process name"
                     ],
-                    "column_name": "process_name",
+                    "column_name": "Process Name",
                     "column_order": 3
                 },
                 {
@@ -1041,7 +1041,7 @@
                     "contains": [
                         "cybereason machine id"
                     ],
-                    "column_name": "owner_machine_id",
+                    "column_name": "Owner Machine ID",
                     "column_order": 4
                 },
                 {
@@ -1050,7 +1050,7 @@
                     "contains": [
                         "cybereason machine name"
                     ],
-                    "column_name": "owner_machine_name",
+                    "column_name": "Owner Machine Name",
                     "column_order": 5
                 }
             ],
@@ -1080,29 +1080,30 @@
                     "contains": [
                         "cybereason machine id"
                     ],
-                    "column_name": "machine_id",
+                    "column_name": "Machine ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.machine_name",
                     "data_type": "string",
-                    "column_name": "machine_name",
+                    "column_name": "Machine Name",
                     "column_order": 1
                 },                {
                     "data_path": "action_result.data.*.os_version",
                     "data_type": "string",
-                    "column_name": "os_version",
+                    "column_name": "OS Version",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.platform_architecture",
                     "data_type": "string",
-                    "column_name": "platform_architecture",
+                    "column_name": "Platform Architecture",
                     "column_order": 3
-                },                {
+                },
+                {
                     "data_path": "action_result.data.*.is_connected_to_cybereason",
                     "data_type": "string",
-                    "column_name": "is_connected_to_cybereason",
+                    "column_name": "Is Connected to Cybereason",
                     "column_order": 4
                 },
                 {
@@ -1113,7 +1114,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 6,
                     "example_values": [
                         "success",
@@ -1155,7 +1156,7 @@
                 {
                     "data_path": "action_result.data.*.element_name",
                     "data_type": "string",
-                    "column_name": "element_name",
+                    "column_name": "Element Name",
                     "column_order": 0
                 },
                 {
@@ -1164,23 +1165,23 @@
                     "contains": [
                         "domain"
                     ],
-                    "column_name": "domain",
+                    "column_name": "Domain",
                     "column_order": 1
                 },                {
                     "data_path": "action_result.data.*.last_machine_logged_into",
                     "data_type": "string",
-                    "column_name": "last_machine_logged_into",
+                    "column_name": "Last Machine Logged Into",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.organization",
                     "data_type": "string",
-                    "column_name": "organization",
+                    "column_name": "Organization",
                     "column_order": 3
                 },                {
                     "data_path": "action_result.data.*.local_system",
                     "data_type": "string",
-                    "column_name": "local_system",
+                    "column_name": "Local System",
                     "column_order": 4
                 },
                 {
@@ -1194,7 +1195,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 6,
                     "example_values": [
                         "success",
@@ -1233,48 +1234,48 @@
                 {
                     "data_path": "action_result.data.*.element_name",
                     "data_type": "string",
-                    "column_name": "element_name",
+                    "column_name": "Element Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.suspicion_count",
                     "data_type": "string",
-                    "column_name": "suspicion_count",
+                    "column_name": "Suspicion Count",
                     "column_order": 1
                 },                {
                     "data_path": "action_result.data.*.signed",
                     "data_type": "string",
-                    "column_name": "signed",
+                    "column_name": "Signed",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.SHA1_signature",
                     "data_type": "string",
-                    "column_name": "SHA1_signature",
+                    "column_name": "SHA1 Signature",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.size",
                     "data_type": "string",
-                    "column_name": "size",
+                    "column_name": "Size",
                     "column_order": 4
                 },                
                 {
                     "data_path": "action_result.data.*.path",
                     "data_type": "string",
-                    "column_name": "path",
+                    "column_name": "Path",
                     "column_order": 5
                 },                
                 {
                     "data_path": "action_result.data.*.product_name",
                     "data_type": "string",
-                    "column_name": "product_name",
+                    "column_name": "Product Name",
                     "column_order": 6
                 },                
                 {
                     "data_path": "action_result.data.*.company_name",
                     "data_type": "string",
-                    "column_name": "company_name",
+                    "column_name": "Company Name",
                     "column_order": 7
                 },
                 {
@@ -1285,7 +1286,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 9,
                     "example_values": [
                         "success",
@@ -1327,30 +1328,30 @@
                 {
                     "data_path": "action_result.data.*.element_name",
                     "data_type": "string",
-                    "column_name": "element_name",
+                    "column_name": "Element Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.malicious_classification_type",
                     "data_type": "string",
-                    "column_name": "malicious_classification_type",
+                    "column_name": "Malicious Classification Type",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.is_internal_domain",
                     "data_type": "string",
-                    "column_name": "is_internal_domain",
+                    "column_name": "Is Internal Domain",
                     "column_order": 2
                 },                {
                     "data_path": "action_result.data.*.was_ever_resolved",
                     "data_type": "string",
-                    "column_name": "was_ever_resolved",
+                    "column_name": "Was Ever Resolved",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.was_ever_resolved_as_second_level_domain",
                     "data_type": "string",
-                    "column_name": "was_ever_resolved_as_second_level_domain",
+                    "column_name": "Was Ever Resolved as Second Level Domain",
                     "column_order": 4
                 },
                 {
@@ -1364,7 +1365,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 6,
                     "example_values": [
                         "success",
@@ -1403,24 +1404,24 @@
                 {
                     "data_path": "action_result.data.*.element_name",
                     "data_type": "string",
-                    "column_name": "element_name",
+                    "column_name": "Element Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.direction",
                     "data_type": "string",
-                    "column_name": "direction",
+                    "column_name": "Direction",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.server_address",
                     "data_type": "string",
-                    "column_name": "server_address",
+                    "column_name": "Server Address",
                     "column_order": 2
                 },                {
                     "data_path": "action_result.data.*.server_port",
                     "data_type": "string",
-                    "column_name": "server_port",
+                    "column_name": "Server Port",
                     "column_order": 3
                 },
                 {
@@ -1429,43 +1430,43 @@
                     "contains": [
                         "port"
                     ],
-                    "column_name": "port_type",
+                    "column_name": "Port Type",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.received_bytes",
                     "data_type": "string",
-                    "column_name": "received_bytes",
+                    "column_name": "Received Bytes",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.transmitted_bytes",
                     "data_type": "string",
-                    "column_name": "transmitted_bytes",
+                    "column_name": "Transmitted Bytes",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.remote_address",
                     "data_type": "string",
-                    "column_name": "remote_address",
+                    "column_name": "Remote Address",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.owner_machine",
                     "data_type": "string",
-                    "column_name": "owner_machine",
+                    "column_name": "Owner Machine",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.data.*.owner_process",
                     "data_type": "string",
-                    "column_name": "owner_process",
+                    "column_name": "Owner Process",
                     "column_order": 9
                 },
                 {
                     "data_path": "action_result.data.*.dns_query",
                     "data_type": "string",
-                    "column_name": "dns_query",
+                    "column_name": "DNS Query",
                     "column_order": 10
                 },
                 {
@@ -1476,7 +1477,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 12,
                     "example_values": [
                         "success",
