@@ -79,7 +79,7 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
+            "verbose": "Test the connectivity with the Cybereason server configured by the user.",
             "type": "test",
             "read_only": true,
             "parameters": {},
