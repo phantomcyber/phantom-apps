@@ -123,9 +123,13 @@ class WindowsRemoteManagementConnector(BaseConnector):
     def _get_vault_file_text(self, action_result, vault_id):
         # type: (ActionResult, str) -> (bool, str)
         # Get the contents of a file in the vault
-        file_path = Vault.get_file_path(vault_id)
-        if not file_path:
-            return action_result.set_status(phantom.APP_ERROR, "Cannot retrieve vault file"), None
+
+        try:
+            file_info = Vault.get_file_info(vault_id)[0]
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
+
+        file_path = file_info.get('path')
 
         try:
             return phantom.APP_SUCCESS, open(file_path, 'r').read()
@@ -137,9 +141,12 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if vault_id is None:
             return phantom.APP_SUCCESS, pc.basic
 
-        file_path = Vault.get_file_path(vault_id)
-        if not file_path:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrieve vault file"), None
+        try:
+            file_info = Vault.get_file_info(vault_id)[0]
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
+
+        file_path = file_info.get('path')
 
         try:
             custom_parser = imp.load_source('custom_parser', file_path)
@@ -864,12 +871,15 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if not self._init_session(action_result, param):
             return action_result.get_status()
 
-        vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+        try:
+            vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            file_info = Vault.get_file_info(vault_id)[0]
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file")
+
         destination = self._handle_py_ver_compat_for_input_str(param['destination'])
 
-        path = Vault.get_file_path(vault_id)
-        if not path:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrieve vault file")
+        path = file_info.get('path')
 
         try:
             fp = open(path, 'rb')
