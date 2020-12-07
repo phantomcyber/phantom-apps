@@ -409,7 +409,6 @@ class CybereasonConnector(BaseConnector):
             endpoint_url = "/rest/remediate/progress/" + remediation_user + "/" + malop_id + "/" + remediation_id
             url = self._base_url + endpoint_url
             res = cr_session.get(url)
-            self.debug_print(res.text)
             result = res.json()
             status_log_length = len(result["statusLog"])
             error_obj = result["statusLog"][status_log_length - 1]["error"]
