@@ -588,7 +588,7 @@ class CybereasonConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = config.get('base_url', '').rstrip('/') # Remove trailing '/' characters (if any) from URL
+        self._base_url = config.get('base_url', '').rstrip('/')  # Remove trailing '/' characters (if any) from URL
         self._username = config.get('username')
         self._password = config.get('password')
 

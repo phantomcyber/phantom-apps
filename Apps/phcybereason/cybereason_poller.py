@@ -449,22 +449,26 @@ class CybereasonPoller:
         connector.debug_print("  Building affected machines artifacts")
         artifacts = []
         for machine in malop_data["elementValues"]["affectedMachines"]["elementValues"]:
-            sensors = self._get_sensor_details(connector, machine["name"])
-            matching_sensor = [s for s in sensors if s["guid"] == machine["guid"]][0]
-            cef = { }
-            cef["osVersion"] = matching_sensor["osVersionType"].replace("_", " ")
-            cef["isolated"] = "Isolated" if matching_sensor["isolated"] else "Unisolated"
-            cef["connectionStatus"] = matching_sensor["status"]
-            cef["internalIpAddress"] = matching_sensor["internalIpAddress"]
-
             affected_machine_artifact = {
                 "source_data_identifier": machine["guid"],
                 "name": machine["name"],
                 "description": "Details of the machine affected by the Malop",
                 "type": "machine",
                 "label": "machine",
-                "cef": cef
+                "cef": {}
             }
+            sensors = self._get_sensor_details(connector, machine["name"])
+            matching_sensors = [s for s in sensors if s["guid"] == machine["guid"]]
+            if len(matching_sensors) == 1:
+                matching_sensor = matching_sensors[0]
+                cef = { }
+                cef["osVersion"] = matching_sensor["osVersionType"].replace("_", " ")
+                cef["isolated"] = "Isolated" if matching_sensor["isolated"] else "Unisolated"
+                cef["connectionStatus"] = matching_sensor["status"]
+                cef["internalIpAddress"] = matching_sensor["internalIpAddress"]
+                affected_machine_artifact["cef"] = cef
+            else:
+                connector.debug_print("  Unable to get sensor details for machine " + machine["name"])
             artifacts.append(affected_machine_artifact)
         return artifacts
 
