@@ -40,6 +40,7 @@ RISKSENSE_EXCLUSIVITY_DICTIONARY = {
     "false": False
 }
 
+# RiskSense Configuration and Action Parameter Keys
 RISKSENSE_ACTION_LIMIT_KEY = "'max results' action"
 RISKSENSE_ACTION_PAGE_KEY = "'page' action"
 RISKSENSE_ACTION_HOST_ID_KEY = "'host id' action"
@@ -48,14 +49,15 @@ RISKSENSE_ACTION_APP_ID_KEY = "'app id' action"
 RISKSENSE_CONFIG_NUM_RETRIES_KEY = "'Maximum number of retries to attempt' asset configuration"
 RISKSENSE_ACTION_TAG_OWNER_ID_KEY = "'tag owner id' action"
 
-RISKSENSE_INSUFFICIENT_PARAM_GET_HOSTS_MSG = "Please provide either 'host id' or 'host name' to fetch the host details"
-RISKSENSE_INSUFFICIENT_PARAM_CREATE_TAG_MSG = "Please provide 'tag type', 'tag description', 'tag owner id', and 'tag colour' action parameters in order to create a new tag"
-RISKSENSE_INVALID_STATUS_PARAM_MSG = "Please provide a valid value in status parameter. Valid values are: Closed, Open"
-RISKSENSE_INVALID_EXCLUSIVITY_PARAM_MSG = "Please provide valid value in exclusivity parameter. Valid values are: true, false"
-RISKSENSE_LENGTH_VALIDATION_ERROR_MSG = "Please provide same length of input in {} parameters"
-RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
-RISKSENSE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
-RISKSENSE_BACKOFF_FACTOR_VALIDATION_MSG = "Please provide a valid non-zero positive float value in the 'Backoff factor' asset configuration parameter"
+# RiskSense Error Messages
+RISKSENSE_INSUFFICIENT_PARAM_GET_HOSTS_MESSAGE = "Please provide either 'host id' or 'host name' to fetch the host details"
+RISKSENSE_INSUFFICIENT_PARAM_CREATE_TAG_MESSAGE = "Please provide 'tag type', 'tag description', 'tag owner id', and 'tag colour' action parameters in order to create a new tag"
+RISKSENSE_INVALID_STATUS_PARAM_MESSAGE = "Please provide a valid value in status parameter. Valid values are: Closed, Open"
+RISKSENSE_INVALID_EXCLUSIVITY_PARAM_MESSAGE = "Please provide valid value in exclusivity parameter. Valid values are: true, false"
+RISKSENSE_LENGTH_VALIDATION_ERROR_MESSAGE = "Please provide same length of input in {} parameters"
+RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE = "Please provide zero or a valid positive integer value in the {parameter} parameter"
+RISKSENSE_LIMIT_VALIDATION_MESSAGE = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
+RISKSENSE_BACKOFF_FACTOR_VALIDATION_MESSAGE = "Please provide a valid non-zero positive float value in the 'Backoff factor' asset configuration parameter"
 RISKSENSE_UNKNOWN_ERROR_CODE_MESSAGE = "Error code unavailable"
 RISKSENSE_UNKNOWN_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
 RISKSENSE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the RiskSense server. Please check the asset configuration and|or the action parameters."

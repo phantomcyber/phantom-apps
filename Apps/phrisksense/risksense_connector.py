@@ -338,24 +338,28 @@ class RisksenseConnector(BaseConnector):
         """
 
         try:
+            if not float(parameter).is_integer():
+                error_text = RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE.format(parameter=key) if allow_zero else RISKSENSE_LIMIT_VALIDATION_MESSAGE.format(parameter=key)
+                action_result.set_status(phantom.APP_ERROR, error_text)
+                return None
             parameter = int(parameter)
-
-            if not allow_zero and parameter <= 0:
-                action_result.set_status(phantom.APP_ERROR, RISKSENSE_LIMIT_VALIDATION_MSG.format(parameter=key))
-                return None
-            elif allow_zero and parameter < 0:
-                action_result.set_status(phantom.APP_ERROR, RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key))
-                return None
         except:
-            error_text = RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MSG.format(parameter=key) if allow_zero else RISKSENSE_LIMIT_VALIDATION_MSG.format(parameter=key)
+            error_text = RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE.format(parameter=key) if allow_zero else RISKSENSE_LIMIT_VALIDATION_MESSAGE.format(parameter=key)
             action_result.set_status(phantom.APP_ERROR, error_text)
+            return None
+
+        if not allow_zero and parameter <= 0:
+            action_result.set_status(phantom.APP_ERROR, RISKSENSE_LIMIT_VALIDATION_MESSAGE.format(parameter=key))
+            return None
+        elif allow_zero and parameter < 0:
+            action_result.set_status(phantom.APP_ERROR, RISKSENSE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE.format(parameter=key))
             return None
 
         return parameter
 
     def build_filter(self, fieldname, operator, value, exclusivity, status=None):
         """ This method creates a list of dictionary containing the filtering details.
-        :param fieldname: A list of fielnames
+        :param fieldname: A list of fieldnames
         :param operator: A list of operators
         :param value: A list of values
         :param exclusivity: A list of true/false
@@ -417,7 +421,7 @@ class RisksenseConnector(BaseConnector):
         obj_length = len(values[0])
         for val in values:
             if len(val) != obj_length:
-                action_result.set_status(phantom.APP_ERROR, RISKSENSE_LENGTH_VALIDATION_ERROR_MSG.format(", ".join(list(kwargs.keys()))))
+                action_result.set_status(phantom.APP_ERROR, RISKSENSE_LENGTH_VALIDATION_ERROR_MESSAGE.format(", ".join(list(kwargs.keys()))))
                 return None
 
         return obj_length
@@ -467,7 +471,7 @@ class RisksenseConnector(BaseConnector):
         status = param.get("status")
 
         if status and status not in ["Closed", "Open"]:
-            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INVALID_STATUS_PARAM_MSG)
+            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INVALID_STATUS_PARAM_MESSAGE)
             return None
 
         fieldname = self.form_list(self._handle_py_ver_compat_for_input_str(param.get("fieldname")))
@@ -479,7 +483,7 @@ class RisksenseConnector(BaseConnector):
         exclusivity = list(map(lambda a: RISKSENSE_EXCLUSIVITY_DICTIONARY.get(a.lower()), exclusivity))
 
         if None in exclusivity:
-            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INVALID_EXCLUSIVITY_PARAM_MSG)
+            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INVALID_EXCLUSIVITY_PARAM_MESSAGE)
             return None
 
         value = self.load_list(param.get("value"), action_result)
@@ -697,7 +701,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_unique_findings(self, param):
-        """Fetches and returns a list of unique host fidings in the provided client, based on the provided input parameters.
+        """Fetches and returns a list of unique host findings in the provided client, based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -835,7 +839,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_hosts(self, param):
-        """Fetches and returns details of host(s) presenst in the provided client, based on the provided input parameters.
+        """Fetches and returns details of host(s) presents in the provided client, based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -863,7 +867,7 @@ class RisksenseConnector(BaseConnector):
             data_host = self.build_filter(fieldname=["hostName"], operator=["EXACT"], value=[host_name], exclusivity=[False])
 
         else:
-            return action_result.set_status(phantom.APP_ERROR, RISKSENSE_INSUFFICIENT_PARAM_GET_HOSTS_MSG)
+            return action_result.set_status(phantom.APP_ERROR, RISKSENSE_INSUFFICIENT_PARAM_GET_HOSTS_MESSAGE)
 
         data["filters"] = data_host
         data["projection"] = RISKSENSE_PROJECTION_DETAIL
@@ -887,7 +891,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_host_finding(self, param):
-        """Fetches and returns details of a specific host finding presenst in the provided client, based on the provided input parameters.
+        """Fetches and returns details of a specific host finding presents in the provided client, based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -924,7 +928,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_app(self, param):
-        """Fetches and returns details of a specific application presenst in the provided client, based on the provided input parameters.
+        """Fetches and returns details of a specific application presents in the provided client, based on the provided input parameters.
         :param param: Dictionary of input parameter(s)
 
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -1040,7 +1044,7 @@ class RisksenseConnector(BaseConnector):
         tags, errors = self._paginator(RISKSENSE_LIST_TAGS_ENDPOINT.format(client_id=self._client_id), action_result, data=tag_data, data_subject="tags", method="post")
 
         if tags is None:
-            self.debug_print("Error occured while fetching the tag")
+            self.debug_print("Error occurred while fetching the tag")
             return action_result.get_status()
 
         tag_id = None
@@ -1074,7 +1078,7 @@ class RisksenseConnector(BaseConnector):
                                 data=data, method="post")
 
         if phantom.is_fail(ret_val):
-            self.debug_print("Error occured while associating the tag")
+            self.debug_print("Error occurred while associating the tag")
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -1139,7 +1143,7 @@ class RisksenseConnector(BaseConnector):
         tag_owner_id = param.get("tag_owner_id")
 
         if not (tag_owner_id and tag_type and tag_colour and tag_description):
-            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INSUFFICIENT_PARAM_CREATE_TAG_MSG)
+            action_result.set_status(phantom.APP_ERROR, RISKSENSE_INSUFFICIENT_PARAM_CREATE_TAG_MESSAGE)
             return None
 
         tag_owner_id = self._validate_integers(action_result, tag_owner_id, RISKSENSE_ACTION_TAG_OWNER_ID_KEY, allow_zero=True)
@@ -1168,7 +1172,7 @@ class RisksenseConnector(BaseConnector):
                                 data=create_data, method="post")
 
         if phantom.is_fail(ret_val):
-            self.debug_print("Error occured while creating the new tag")
+            self.debug_print("Error occurred while creating the new tag")
             return None
 
         return response
@@ -1250,7 +1254,7 @@ class RisksenseConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_filter_attributes(self, param):
-        """Fetches and returns a list of filter attribultes for the provided asset_type.
+        """Fetches and returns a list of filter attributes for the provided asset_type.
         :param param: Dictionary of input parameter(s)
 
         :return: List of filter attributes
@@ -1347,9 +1351,9 @@ class RisksenseConnector(BaseConnector):
         try:
             backoff_factor = float(self._config.get('backoff_factor', RISKSENSE_DEFAULT_BACKOFF_FACTOR))
             if backoff_factor <= 0.0:
-                return self.set_status(phantom.APP_ERROR, RISKSENSE_BACKOFF_FACTOR_VALIDATION_MSG)
+                return self.set_status(phantom.APP_ERROR, RISKSENSE_BACKOFF_FACTOR_VALIDATION_MESSAGE)
         except:
-            return self.set_status(phantom.APP_ERROR, RISKSENSE_BACKOFF_FACTOR_VALIDATION_MSG)
+            return self.set_status(phantom.APP_ERROR, RISKSENSE_BACKOFF_FACTOR_VALIDATION_MESSAGE)
 
         # get the session object
         try:
