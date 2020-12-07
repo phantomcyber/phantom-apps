@@ -998,7 +998,8 @@
                     "contains": [
                         "cybereason malop id"
                     ],
-                    "column_name": "malop_id"
+                    "column_name": "malop_id",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.status",
@@ -1025,7 +1026,7 @@
                         "cybereason process id"
                     ],
                     "column_name": "process_id",
-                    "column_order": 0
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.process_name",
@@ -1034,7 +1035,7 @@
                         "cybereason process name"
                     ],
                     "column_name": "process_name",
-                    "column_order": 1
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.owner_machine_id",
@@ -1043,7 +1044,7 @@
                         "cybereason machine id"
                     ],
                     "column_name": "owner_machine_id",
-                    "column_order": 2
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.owner_machine_name",
@@ -1052,7 +1053,7 @@
                         "cybereason machine name"
                     ],
                     "column_name": "owner_machine_name",
-                    "column_order": 3
+                    "column_order": 5
                 }
             ],
             "render": {
@@ -1108,13 +1109,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1,
+                    "column_order": 6,
                     "example_values": [
                         "success",
                         "failed"
@@ -1188,13 +1190,14 @@
                     "data_type": "string",
                     "contains": [
                         "cybereason user"
-                    ]
+                    ],
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1,
+                    "column_order": 6,
                     "example_values": [
                         "success",
                         "failed"
@@ -1278,13 +1281,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.file_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1,
+                    "column_order": 9,
                     "example_values": [
                         "success",
                         "failed"
@@ -1356,13 +1360,14 @@
                     "data_type": "string",
                     "contains": [
                         "domain"
-                    ]
+                    ],
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1,
+                    "column_order": 6,
                     "example_values": [
                         "success",
                         "failed"
@@ -1467,13 +1472,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.connection_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1,
+                    "column_order": 12,
                     "example_values": [
                         "success",
                         "failed"
