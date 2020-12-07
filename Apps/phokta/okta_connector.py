@@ -314,13 +314,22 @@ class OktaConnector(BaseConnector):
 
         return response_list
 
-    def _is_limit_valid(self, limit):
-        try:
-            if not str(limit).isdigit() or int(limit) == 0:
-                raise ValueError
-        except ValueError:
-            return False
-        return True
+    def _validate_integer(self, action_result, parameter, allow_zero=False):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def _handle_list_users(self, param):
 
@@ -332,12 +341,10 @@ class OktaConnector(BaseConnector):
         query = param.get('query', '')
         filter_param = param.get('filter', '')
         search = param.get('search', '')
-        limit = param.get('limit')
+        ret_val, limit = self._validate_integer(action_result, param.get('limit'))
 
-        if limit and not self._is_limit_valid(limit):
-            return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
-
-        limit = int(limit)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         params = {
             'q': query,
@@ -373,12 +380,10 @@ class OktaConnector(BaseConnector):
 
         query = param.get('query', '')
         filter_param = param.get('filter', '')
-        limit = param.get('limit')
+        ret_val, limit = self._validate_integer(action_result, param.get('limit'))
 
-        if limit and not self._is_limit_valid(limit):
-            return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
-
-        limit = int(limit)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         params = {
             'q': query,
@@ -601,12 +606,10 @@ class OktaConnector(BaseConnector):
 
         query = param.get('query', '')
         type_param = param.get('type', '')
-        limit = param.get('limit')
+        ret_val, limit = self._validate_integer(action_result, param.get('limit'))
 
-        if limit and not self._is_limit_valid(limit):
-            return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR)
-
-        limit = int(limit)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         params = dict()
         params = {
