@@ -30,6 +30,7 @@ import requests
 from builtins import str
 import six
 
+
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
@@ -53,14 +54,14 @@ class WindowsRemoteManagementConnector(BaseConnector):
         return True
 
     def _get_vault_file_text(self, action_result, vault_id):
-        # type: (ActionResult, str) -> str
+        # type: (ActionResult, str) -> (bool, str)
         # Get the contents of a file in the vault
         file_path = Vault.get_file_path(vault_id)
         if not file_path:
             return action_result.set_status(phantom.APP_ERROR, "Cannot retrieve vault file"), None
 
         try:
-            return (phantom.APP_SUCCESS, open(file_path, 'r').read())
+            return phantom.APP_SUCCESS, open(file_path, 'r').read()
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error reading vault file: {}".format(str(e))), None
 
@@ -124,13 +125,13 @@ class WindowsRemoteManagementConnector(BaseConnector):
         default_port = config.get('default_port', 5985)
         default_protocol = config.get('default_protocol', 'http')
         if param:
-            endpoint = param['ip_hostname']
+            endpoint = param.get('ip_hostname', config.get('endpoint'))
         else:
             endpoint = config.get('endpoint')
-            if endpoint is None:
-                return action_result.set_status(
-                    phantom.APP_ERROR, "No Endpoint Configured"
-                )
+        if endpoint is None:
+            return action_result.set_status(
+                phantom.APP_ERROR, "No Endpoint Configured"
+            )
         if re.search(r'^[a-z]+://', endpoint, re.UNICODE | re.IGNORECASE) is None:
             endpoint = '{0}://{1}'.format(default_protocol, endpoint)
         if re.search(r':\d+$', endpoint, re.UNICODE | re.IGNORECASE) is None:
