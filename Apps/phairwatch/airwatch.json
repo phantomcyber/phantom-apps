@@ -2,7 +2,7 @@
     "appid": "7ca9ffa9-9a85-4d01-b8f3-9634ec68817a",
     "name": "AirWatch",
     "description": "This app interacts with Airwatch",
-    "publisher": "Mhike",
+    "publisher": "Splunk Community",
     "type": "generic",
     "main_module": "airwatch_connector.pyc",
     "app_version": "1.0.0",
@@ -12,9 +12,9 @@
     "product_name": "AirWatch",
     "product_version_regex": ".*",
     "min_phantom_version": "4.8.24304",
-    "logo": "logo_airwatch.svg",
-    "logo_dark": "logo_airwatch_dark.svg",
-    "license": "Internal Use Only",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "license": "Copyright(c) 2020 Splunk Inc.",
     "configuration": {
         "tenant": {
             "data_type": "password",

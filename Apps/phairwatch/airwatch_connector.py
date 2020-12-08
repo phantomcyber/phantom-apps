@@ -1,3 +1,9 @@
+# File: airwatch_connector.py
+#
+# Copyright (c) 2020 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 import phantom.app as phantom
 import json
 import requests
@@ -54,10 +60,10 @@ class AirWatchConnector(phantom.BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, error_message)
             self.save_progress("Status code: {}".format(response.status_code))
             json_response = json.loads(response.text)
-            if response.status_code >= 200 and response.status_code < 300 and UnicodeDammit(param.get('device_uuid')) in json_response['devices']:
+            if response.status_code >= 200 and response.status_code < 300 and UnicodeDammit(param.get('device_uuid')).unicode_markup.encode('utf-8') in json_response['devices']:
                 self.save_progress('Device ({0}) successfully added to smartgroup ({1})'.format(
                     UnicodeDammit(param.get('device_uuid').unicode_markup.encode('utf-8')),
-                    UnicodeDammit(param.get('smartgroup_uuid').unicode_markup.encode('utf-8'))))
+                    UnicodeDammit(param.get('smartgroup_uuid')).unicode_markup.encode('utf-8')))
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully added device to group')
             else:
                 self.save_progress('Failed to add device to group. Response: {0}'.format(response.status_code))
