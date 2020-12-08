@@ -206,6 +206,14 @@ class WindowsRemoteManagementConnector(BaseConnector):
             return action_result.get_status()
 
         default_protocol = config.get('default_protocol', 'http')
+        ret_val, default_port = self._validate_integer(
+            action_result,
+            config.get('default_port', 5985 if default_protocol == 'http' else 5986),
+            "Default port",
+            True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         if param:
             endpoint = self._handle_py_ver_compat_for_input_str(param.get('ip_hostname', config.get('endpoint')))
         else:
@@ -444,10 +452,6 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if not self._init_session(action_result, param):
             return action_result.get_status()
 
-        ret_val, _ = self._validate_integer(action_result, param.get('filter_port'), "filter_port", True)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
         command = 'netsh'
         ret_val, filter_data = self._create_filter(action_result, param)
         if phantom.is_fail(ret_val):
@@ -491,14 +495,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        int_params = {
-            'remote_port', 'local_port'
-        }
         for k, v in six.iteritems(param):
-            if k in int_params:
-                ret_val, _ = self._validate_integer(action_result, v, k, True)
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k),
                     self._handle_py_ver_compat_for_input_str(v))))
@@ -566,14 +563,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             'localip', 'remoteip',
             'localport', 'remoteport'
         }
-        int_params = {
-            'remote_port', 'local_port'
-        }
         for k, v in six.iteritems(param):
-            if k in int_params:
-                ret_val, _ = self._validate_integer(action_result, v, k, True)
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
             if k in valid_params:
                 argument = '"{}"'.format(self._sanitize_string('{}={}'.format(val_map.get(k, k),
                     self._handle_py_ver_compat_for_input_str(v))))

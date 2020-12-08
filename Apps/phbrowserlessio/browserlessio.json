@@ -1,0 +1,385 @@
+{
+    "appid": "a8ca5e0d-8209-4476-a9b6-5213ed314319",
+    "name": "Browserless chrome",
+    "description": "This app integrates with Browserless.io Service and browserless/chrome App to execute various investigative actions",
+    "type": "sandbox",
+    "product_vendor": "browerless.io",
+    "logo": "logo_browserlessio.svg",
+    "logo_dark": "logo_browserlessio_dark.svg",
+    "product_name": "chrome",
+    "product_version_regex": ".*",
+    "publisher": "Stboch",
+    "license": "Copyright (c) Stboch, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-01T21:36:33.805158Z",
+    "package_name": "phantom_browserlessio",
+    "main_module": "browserlessio_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.1.0",
+    "configuration": {
+        "URL": {
+            "description": "URL for browserless.io (if using hosted service) https://chrome.browserless.io",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "token": {
+            "description": "Token for accessing service (not required if self hosting)",
+            "data_type": "password",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get pdf",
+            "description": "Download a PDF screenshot of the URL",
+            "type": "investigate",
+            "identifier": "get_pdf",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "headerfooter": {
+                    "description": "Display header and footer",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 1
+                },
+                "printbackground": {
+                    "description": "Display background images in PDF",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                },
+                "landscape": {
+                    "description": "Print as landscape",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 3
+                },
+                "followrefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.headerfooter",
+                    "data_type": "boolean",
+                    "column_name": "Header Footer",
+                    "column_order": 1,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.printbackground",
+                    "data_type": "boolean",
+                    "column_name": "Print Background",
+                    "column_order": 2,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.landscape",
+                    "data_type": "boolean",
+                    "column_name": "Landscape",
+                    "column_order": 3,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.followrefresh",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get content",
+            "description": "Get HTML contents of a webpage",
+            "verbose": "Download the HTML code for the URL provided.",
+            "type": "investigate",
+            "identifier": "get_content",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "followrefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.followrefresh",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get screenshot",
+            "description": "Download a screenshot of the URL",
+            "type": "investigate",
+            "identifier": "get_screenshot",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL of website",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "type": {
+                    "description": "Type of screenshot PNG or JPEG",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "jpeg",
+                        "png"
+                    ],
+                    "default": "png",
+                    "order": 1
+                },
+                "quality": {
+                    "description": "Quality of image",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 80,
+                    "order": 2
+                },
+                "fullpage": {
+                    "description": "Full page screenshot",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 3
+                },
+                "followrefresh": {
+                    "description": "Wait for URL redirects",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.quality",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.fullpage",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.followrefresh",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "browserlessio_view.display_screenshot",
+                "title": "Screen Shot"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
