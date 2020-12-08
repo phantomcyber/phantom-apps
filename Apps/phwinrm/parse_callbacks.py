@@ -38,6 +38,12 @@ def _handle_py_ver_compat_for_input_str(input_str, always_encode=False):
             input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
     except:
         pass
+
+    if isinstance(input_str, bytes):
+        input_str = input_str.replace(b'\r', b'').replace(b'\n', b'')
+    else:
+        input_str = input_str.replace('\r', '').replace('\n', '')
+
     return input_str
 
 

@@ -201,11 +201,15 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
     def _init_session(self, action_result, param=None):
         config = self.get_config()
-        ret_val, default_port = self._validate_integer(action_result, config.get('default_port', 5985), "Default port", True)
+        default_protocol = config.get('default_protocol', 'http')
+        ret_val, default_port = self._validate_integer(
+            action_result,
+            config.get('default_port', 5985 if default_protocol == 'http' else 5986),
+            "Default port",
+            True)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        default_protocol = config.get('default_protocol', 'http')
         if param:
             endpoint = self._handle_py_ver_compat_for_input_str(param.get('ip_hostname', config.get('endpoint')))
         else:
