@@ -7,12 +7,12 @@
     "type": "investigative",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "main_module": "phishtank_connector.py",
-    "app_version": "2.0.0",
-    "utctime_updated": "2019-11-19T01:05:00.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2020-12-08T09:55:55.000000Z",
     "product_vendor": "OpenDNS",
     "product_name": "PhishTank",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud, API: checkurl.phishtank.com/checkurl/, January 31 2020"
@@ -23,7 +23,7 @@
         "apikey": {
             "data_type": "password",
             "description": "API key",
-            "required": false
+            "order": 0
         }
     },
     "actions": [
@@ -43,7 +43,7 @@
             "description": "Queries PhishTank for URL's phishing reputation",
             "type": "investigate",
             "identifier": "check_url",
-            "verbose": "If URL information is unavailable in PhishTank, only 'url' and 'in_database' property would be populated",
+            "verbose": "If URL information is unavailable in PhishTank, only 'url' and 'in_database' property would be populated.",
             "parameters": {
                 "url": {
                     "required": true,
@@ -52,7 +52,8 @@
                     ],
                     "description": "URL to query for Phishing information",
                     "data_type": "string",
-                    "primary": true
+                    "primary": true,
+                    "order": 0
                 }
             },
             "versions": "EQ(*)",

@@ -1,7 +1,7 @@
 {
     "appid": "28f0ee41-a058-4665-be79-fad1913312bf",
     "name": "SlashNext Phishing Incident Response",
-    "description": "SlashNext Phishing Incident Response Integration supports the investigative type of actions to allow Phantom users to fully automate the analysis of suspicious URLs. For example, IR teams responsible for abuse inbox management can extract links or domains out of suspicious emails and automatically analyze them with the SlashNext SEER threat detection cloud to get definitive, binary verdicts (malicious or benign) along with IOCs, screenshots, and more. Automating URL analysis can save IR teams hundreds of hours versus manually triaging these emails or checking URLs and domains against less accurate phishing databases and domain reputation services",
+    "description": "This integration supports the investigative type of actions to fully automate the analysis of suspicious URLs by integrating with SlashNext Phishing Incident Response",
     "type": "reputation",
     "product_vendor": "SlashNext",
     "logo": "logo_slashnextphishingincidentresponse.svg",
@@ -9,16 +9,16 @@
     "product_name": "SlashNextPhishingIR",
     "product_version_regex": ".*",
     "publisher": "SlashNext",
-    "license": "Copyright (c) SlashNext, 2019",
+    "license": "Copyright (c) SlashNext, 2019-2020",
     "app_version": "1.1.0",
-    "utctime_updated": "2019-07-29T08:46:52.622002Z",
+    "utctime_updated": "2020-12-07T09:37:56.000000Z",
     "package_name": "phantom_slashnextphishingincidentresponse",
     "main_module": "slashnextphishingincidentresponse_connector.pyc",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
-            "description": "SlashNext API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don\u2019t have a valid API key, please reach us at support@slashnext.com)",
+            "description": "SlashNext API Key (The system uses this API key to authenticate with SlashNext Cloud. If you don't have a valid API key, please reach us at support@slashnext.com)",
             "data_type": "password",
             "required": true,
             "order": 0
@@ -26,7 +26,6 @@
         "api_base_url": {
             "description": "SlashNext API Base URL (Input only if specifically provided by SlashNext)",
             "data_type": "string",
-            "required": false,
             "default": "https://oti.slashnext.cloud/api",
             "order": 1
         }
@@ -34,9 +33,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity and authentication using supplied configuration",
+            "description": "Validate the asset configuration for connectivity and authentication using the supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -44,20 +43,12 @@
         },
         {
             "action": "api quota",
-            "identifier": "api_quota",
             "description": "Find information about your API quota, like current usage, quota left, etc",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "api_quota",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.data.*.errorMsg",
                     "data_type": "string",
@@ -105,7 +96,22 @@
                     "data_path": "action_result.data.*.quotaDetails.note",
                     "data_type": "string",
                     "example_values": [
-                        "Your annual API quota will be reset to zero, once either the limit is reached or upon quota expiration date indicated above."
+                        "Your annual API quota will be reset to zero, once either the limit is reached or upon the quota expiration date indicated above."
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "API Quota Successful"
                     ]
                 },
                 {
@@ -120,13 +126,6 @@
                     "data_type": "string",
                     "example_values": [
                         "1471"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "API Quota Successful"
                     ]
                 },
                 {
@@ -156,9 +155,9 @@
         },
         {
             "action": "host reputation",
-            "identifier": "host_reputation",
             "description": "Search in SlashNext Cloud database and retrieve the reputation of a host",
             "type": "investigate",
+            "identifier": "host_reputation",
             "read_only": true,
             "parameters": {
                 "host": {
@@ -174,14 +173,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host",
                     "data_type": "string",
@@ -251,6 +242,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host Reputation Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -262,13 +268,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Benign"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Host Reputation Successful"
                     ]
                 },
                 {
@@ -298,9 +297,9 @@
         },
         {
             "action": "host urls",
-            "identifier": "host_urls",
             "description": "Search in SlashNext Cloud database and retrieve a list of all URLs associated with the specified host",
             "type": "investigate",
+            "identifier": "host_urls",
             "read_only": true,
             "parameters": {
                 "host": {
@@ -317,20 +316,11 @@
                 "limit": {
                     "description": "Maximum number of URL records to fetch. This is an optional parameter with a default value of 10",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 10,
                     "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host",
                     "data_type": "string",
@@ -510,6 +500,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host URLs Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -518,16 +523,9 @@
                 },
                 {
                     "data_path": "action_result.summary.URLs Found",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Host URLs Successful"
                     ]
                 },
                 {
@@ -557,9 +555,9 @@
         },
         {
             "action": "host report",
-            "identifier": "host_report",
             "description": "Search in SlashNext Cloud database and retrieve a detailed report for a host and associated URL",
             "type": "investigate",
+            "identifier": "host_report",
             "read_only": true,
             "parameters": {
                 "host": {
@@ -575,14 +573,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host",
                     "data_type": "string",
@@ -977,6 +967,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host Report Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -988,13 +993,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Suspicious"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Host Report Successful"
                     ]
                 },
                 {
@@ -1024,10 +1022,10 @@
         },
         {
             "action": "url scan",
-            "identifier": "url_scan",
             "description": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine",
-            "verbose": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine. If the specified URL already exists in the cloud database, scan results will get returned immediately. If not, this action will submit a URL scan request and return with a \u2018check back later\u2019 message along with a unique Scan ID. Users can check the results of this scan with \u2018scan report\u2019 action after 30 seconds or later using the returned Scan ID.",
+            "verbose": "Perform a real-time URL reputation scan with SlashNext cloud-based SEER Engine. If the specified URL already exists in the cloud database, scan results will get returned immediately. If not, this action will submit a URL scan request and return with a 'check back later' message along with a unique Scan ID. Users can check the results of this scan with the 'scan report' action after 30 seconds or later using the returned Scan ID.",
             "type": "investigate",
+            "identifier": "url_scan",
             "read_only": true,
             "parameters": {
                 "url": {
@@ -1041,21 +1039,13 @@
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
-                    "required": false,
+                    "default": false,
                     "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.extended_info",
                     "data_type": "boolean",
@@ -1295,6 +1285,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "URL Scan Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -1306,13 +1311,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Redirector"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "URL Scan Successful"
                     ]
                 },
                 {
@@ -1342,10 +1340,10 @@
         },
         {
             "action": "url scansync",
-            "identifier": "url_scan_sync",
             "description": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode",
             "verbose": "Perform a real-time URL scan with SlashNext cloud-based SEER Engine in a blocking mode. If the specified URL already exists in the cloud database, the scan result will get returned immediately. If not, this action will submit a URL scan request and wait for the scan to finish. The scan may take up to 30 seconds to finish.",
             "type": "investigate",
+            "identifier": "url_scan_sync",
             "read_only": true,
             "parameters": {
                 "url": {
@@ -1359,28 +1357,19 @@
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
-                    "required": false,
+                    "default": false,
                     "order": 1
                 },
                 "timeout": {
                     "description": "A timeout value in seconds. If the system is unable to complete a scan within the specified timeout, a timeout error will be returned. Users may try again with a different timeout. If no timeout value is specified, a default value of 60 seconds will be used",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 60,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.extended_info",
                     "data_type": "boolean",
@@ -1391,7 +1380,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
                         60
                     ]
@@ -1627,6 +1616,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "URL Scan Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -1638,13 +1642,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Benign"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "URL Scan Successful"
                     ]
                 },
                 {
@@ -1674,41 +1671,30 @@
         },
         {
             "action": "scan report",
-            "identifier": "scan_report",
             "description": "Retrieve URL scan results against a previous Scan request",
-            "verbose": "Retrieve URL scan results against a previous Scan request. If the scan is finished, the result will be returned immediately; otherwise, a \u2018check back later' message will be returned.",
+            "verbose": "Retrieve URL scan results against a previous Scan request. If the scan is finished, the result will be returned immediately; otherwise, a 'check back later' message will be returned.",
             "type": "investigate",
+            "identifier": "scan_report",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to 'url scan' or 'url scansync' action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "example_values": [
-                        "99d26908-1b61-42dc-8ad1-79c8b2502616"
-                    ],
                     "contains": [
                         "snx scan id"
                     ],
                     "order": 0
                 },
                 "extended_info": {
-                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML and rendered text",
+                    "description": "If extented_info is checked, the system along with URL reputation also downloads forensics data like screenshot, HTML, and rendered text",
                     "data_type": "boolean",
-                    "required": false,
+                    "default": false,
                     "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.extended_info",
                     "data_type": "boolean",
@@ -1948,6 +1934,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Scan Report Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.State",
                     "data_type": "string",
                     "example_values": [
@@ -1959,13 +1960,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Malicious"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Scan Report Successful"
                     ]
                 },
                 {
@@ -1995,13 +1989,13 @@
         },
         {
             "action": "download screenshot",
-            "identifier": "download_screenshot",
             "description": "Download webpage screenshot against a previous URL Scan request",
             "type": "investigate",
+            "identifier": "download_screenshot",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to 'url scan' or 'url scansync' action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2012,14 +2006,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.scanid",
                     "data_type": "string",
@@ -2063,10 +2049,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.State",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Webpage-screenshot.jpeg Downloaded"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2074,6 +2061,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Download Screenshot Successful"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.State",
+                    "data_type": "string",
+                    "example_values": [
+                        "Webpage-screenshot.jpeg Downloaded"
                     ]
                 },
                 {
@@ -2103,13 +2097,13 @@
         },
         {
             "action": "download html",
-            "identifier": "download_html",
             "description": "Download webpage HTML against a previous URL Scan request",
             "type": "investigate",
+            "identifier": "download_html",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to 'url scan' or 'url scansync' action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2120,14 +2114,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.scanid",
                     "data_type": "string",
@@ -2171,10 +2157,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.State",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Webpage-html.html Downloaded"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2182,6 +2169,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Download HTML Successful"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.State",
+                    "data_type": "string",
+                    "example_values": [
+                        "Webpage-html.html Downloaded"
                     ]
                 },
                 {
@@ -2211,13 +2205,13 @@
         },
         {
             "action": "download text",
-            "identifier": "download_text",
             "description": "Download webpage text against a previous URL Scan request",
             "type": "investigate",
+            "identifier": "download_text",
             "read_only": true,
             "parameters": {
                 "scanid": {
-                    "description": "Scan ID returned by an earlier call to \u2018url scan\u2019 or \u2018url scansync\u2019 action",
+                    "description": "Scan ID returned by an earlier call to 'url scan' or 'url scansync' action",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2228,14 +2222,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.scanid",
                     "data_type": "string",
@@ -2272,10 +2258,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.State",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Webpage-text.txt Downloaded"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2283,6 +2270,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Download Text Successful"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.State",
+                    "data_type": "string",
+                    "example_values": [
+                        "Webpage-text.txt Downloaded"
                     ]
                 },
                 {
