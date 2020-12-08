@@ -80,9 +80,16 @@ DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT = 3600
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Windows Defender ATP Server. Please check the asset configuration and|or the action parameters"
 
 # Constants relating to '_validate_integer'
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
 TIMEOUT_KEY = "'timeout' action parameter"
 LIMIT_KEY = "'limit' action parameter"
+
+# Constants relating to value_list check
+INPUT_TYPE_VALUE_LIST_ALERTS = ["All", "Domain", "File Hash", "IP"]
+TYPE_VALUE_LIST = ["Full", "Selective"]
+SCAN_TYPE_VALUE_LIST = ["Quick", "Full"]
+INPUT_TYPE_VALUE_LIST_DEVICES = ["All", "Domain", "File Hash"]
