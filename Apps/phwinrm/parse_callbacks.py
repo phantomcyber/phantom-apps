@@ -41,6 +41,8 @@ def _handle_py_ver_compat_for_input_str(input_str, always_encode=False):
 
     if isinstance(input_str, bytes):
         input_str = input_str.replace(b'\r', b'').replace(b'\n', b'')
+        if _python_version == 3:
+            input_str = input_str.decode("utf-8")
     else:
         input_str = input_str.replace('\r', '').replace('\n', '')
 

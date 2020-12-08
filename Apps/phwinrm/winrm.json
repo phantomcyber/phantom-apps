@@ -830,7 +830,7 @@
             "parameters": {
                 "filter_port": {
                     "description": "Only show firewall rules acting on this port",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "primary": true,
                     "contains": [
                         "port"
