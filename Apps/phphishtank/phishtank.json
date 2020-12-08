@@ -1,0 +1,203 @@
+{
+    "appid": "c193026d-46cf-4f17-b4b9-f22525d2d87e",
+    "name": "PhishTank",
+    "description": "This app implements URL investigative capabilities utilizing PhishTank",
+    "publisher": "Splunk",
+    "package_name": "phantom_phishtank",
+    "type": "investigative",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "main_module": "phishtank_connector.py",
+    "app_version": "2.0.1",
+    "utctime_updated": "2020-12-08T09:55:55.000000Z",
+    "product_vendor": "OpenDNS",
+    "product_name": "PhishTank",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.8.24304",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, API: checkurl.phishtank.com/checkurl/, January 31 2020"
+    ],
+    "logo": "logo_phishtank.svg",
+    "logo_dark": "logo_phishtank_dark.svg",
+    "configuration": {
+        "apikey": {
+            "data_type": "password",
+            "description": "API key",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validates the connectivity by querying PhishTank",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url reputation",
+            "read_only": true,
+            "description": "Queries PhishTank for URL's phishing reputation",
+            "type": "investigate",
+            "identifier": "check_url",
+            "verbose": "If URL information is unavailable in PhishTank, only 'url' and 'in_database' property would be populated.",
+            "parameters": {
+                "url": {
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to query for Phishing information",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "URL Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://www.splunk.com"
+                    ]
+                },
+                {
+                    "column_name": "In Database",
+                    "column_order": 3,
+                    "data_path": "action_result.data.*.in_database",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "column_name": "Detail URL",
+                    "column_order": 5,
+                    "data_path": "action_result.data.*.phish_detail_page",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.phishtank.com/phish_detail.php?phish_id=62001"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "column_name": "Phish ID",
+                    "column_order": 2,
+                    "data_path": "action_result.data.*.phish_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "62771"
+                    ]
+                },
+                {
+                    "column_name": "URL",
+                    "column_order": 0,
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://www.splunk.com"
+                    ]
+                },
+                {
+                    "column_name": "Valid",
+                    "column_order": 1,
+                    "data_path": "action_result.data.*.valid",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "column_name": "Verified",
+                    "column_order": 4,
+                    "data_path": "action_result.data.*.verified",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verified_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2006-09-01T02:32:23+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.In_Database",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Valid",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Verified",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "In database: True, Verified: False, Valid: False"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        }
+    ]
+}
