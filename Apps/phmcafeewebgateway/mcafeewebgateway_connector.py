@@ -11,6 +11,7 @@ from phantom.action_result import ActionResult
 from contextlib import suppress
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
+from mcafeewebgateway_consts import *
 import xmltodict
 import requests
 import json
@@ -38,15 +39,69 @@ class McafeeWebGatewayConnector(BaseConnector):
         self._session_id = None
         self._verify = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._encode_unicode(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _encode_unicode(self, string):
         return UnicodeDammit(string).unicode_markup.encode('utf-8')
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Empty response and no information in the header'), '')
+        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Status code: {0}. Empty response and no information in the header'.format(response.status_code)), '')
 
     def _process_xml_response(self, r, action_result):
         try:
@@ -67,6 +122,9 @@ class McafeeWebGatewayConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -84,7 +142,8 @@ class McafeeWebGatewayConnector(BaseConnector):
         try:
             resp_json = r.json()
         except ValueError as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, f'Unable to parse JSON response. Error: {e}'), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f'Unable to parse JSON response. Error: {err}'), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -131,7 +190,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         """
         ret_val, response = self._make_rest_call('login', action_result, method="post")
         if phantom.is_fail(ret_val):
-            return str(response)
+            return action_result.get_message()
 
         self._session_id = response.get('entry', {}).get('content')
 
@@ -197,8 +256,18 @@ class McafeeWebGatewayConnector(BaseConnector):
                 verify=self._verify,
                 **kwargs
             )
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.RequestException as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, f'Error Connecting to server. Details: {e}'), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -405,6 +474,9 @@ class McafeeWebGatewayConnector(BaseConnector):
         list_id = param.get('list_id')
         list_title = param.get('list_title')
         entry_position = param.get('entry_position', 0)
+        ret_val, entry_position = self._validate_integer(action_result, entry_position, ENTRY_POSITION_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         complex_entry = param.get('complex', False)
         protocol = param.get('protocol')
         category = param.get('category')
@@ -523,6 +595,9 @@ class McafeeWebGatewayConnector(BaseConnector):
         list_id = param.get('list_id')
         list_title = param.get('list_title')
         entry_position = param.get('entry_position', 0)
+        ret_val, entry_position = self._validate_integer(action_result, entry_position, ENTRY_POSITION_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         list_data = None
 
