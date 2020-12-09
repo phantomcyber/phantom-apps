@@ -198,7 +198,7 @@ def list_connections(action_result, response):
             connection['foreign_address_ip'] = foreign_address[0]
             connection['foreign_address_port'] = foreign_address[1]
             connection['state'] = columns[3]
-            connection['pid'] = columns[4]
+            connection['pid'] = int(columns[4])
         except:
             continue
         action_result.add_data(connection)
