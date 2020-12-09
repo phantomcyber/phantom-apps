@@ -16,6 +16,9 @@ import os
 import json
 import sys
 from google.oauth2 import service_account
+from bs4 import UnicodeDammit
+from html import unescape
+from googleapiclient.errors import HttpError
 
 init_path = '{}/dependencies/google/__init__.py'.format(
     os.path.dirname(os.path.abspath(__file__))
@@ -121,6 +124,54 @@ class GooglePeopleConnector(BaseConnector):
 
         return RetVal(phantom.APP_SUCCESS, client)
 
+    def _paginator(self, client, fields, limit):
+
+        """
+        This method repeatedly makes API calls until the requested number of records are fetched from the server.
+
+        :param client: The object of google client API
+        :param fields: The fields to be fetched
+        :param limit: The number of records to be fetched
+        """
+
+        kwargs = dict()
+        list_items = list()
+        page_token = None
+        action_id = self.get_action_identifier()
+        kwargs.update({'pageSize': 1000})
+
+        while True:
+            if page_token:
+                kwargs.update({"pageToken": page_token})
+
+            if action_id == "list_other_contacts":
+                kwargs.update({'readMask': fields})
+                response = client.otherContacts().list(**kwargs).execute()
+                if response.get("otherContacts"):
+                    list_items.extend(response.get("otherContacts"))
+
+            elif action_id == "list_directory":
+                kwargs.update({'sources': ['DIRECTORY_SOURCE_TYPE_DOMAIN_CONTACT', 'DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE']})
+                kwargs.update({'readMask': fields})
+                response = client.people().listDirectoryPeople(**kwargs).execute()
+                if response.get("people"):
+                    list_items.extend(response.get("people"))
+
+            elif action_id == "list_people":
+                kwargs.update({'sources': ['READ_SOURCE_TYPE_CONTACT']})
+                kwargs.update({'personFields': fields})
+                response = client.people().connections().list(resourceName='people/me', **kwargs).execute()
+                if response.get("connections"):
+                    list_items.extend(response.get("connections"))
+
+            if limit and len(list_items) >= limit:
+                return list_items[:limit]
+            page_token = response.get('nextPageToken')
+            if not page_token:
+                break
+
+        return list_items
+
     def _handle_test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -138,7 +189,7 @@ class GooglePeopleConnector(BaseConnector):
             client.people().connections().list(resourceName='people/me', personFields='names,emailAddresses').execute()
         except Exception as e:
             self.save_progress("Test Connectivity Failed")
-            err_msg = self._get_error_message_from_exception(e)
+            err_msg = unescape(UnicodeDammit(self._get_error_message_from_exception(e)).unicode_markup.encode('utf-8').decode('unicode_escape'))
             return action_result.set_status(phantom.APP_ERROR, "Error while listing connections. {}".format(err_msg))
 
         # Return success
@@ -152,56 +203,36 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            self.debug_print(GOOGLE_FAILED_CREATE_CLIENT)
+            self.debug_print(GOOGLE_CREATE_CLIENT_FAILED_MSG)
             return action_result.get_status()
 
-        kwargs = {'readMask': 'names,emailAddresses'}
+        read_mask = param.get('read_mask', 'names,emailAddresses')
 
-        read_mask = param.get('read_mask')
-        if read_mask:
-            kwargs.update({'readMask': read_mask})
-
-        page_token = param.get('page_token')
-        if page_token:
-            kwargs.update({'pageToken': page_token})
-
-        page_size = param.get('page_size', 500)
-        # Validate 'page_size' action parameter
-        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        limit = param.get('limit')
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        kwargs.update({'pageSize': page_size})
-
-        request_sync_token = param.get('request_sync_token')
-        if request_sync_token:
-            kwargs.update({'requestSyncToken': request_sync_token})
-
-        sync_token = param.get('sync_token')
-        if sync_token:
-            kwargs.update({'syncToken': sync_token})
 
         try:
-            response = client.otherContacts().list(**kwargs).execute()
+            otherContacts = self._paginator(client, read_mask, limit)
+        except HttpError as e:
+            if "_get_reason" in dir(e):
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(GOOGLE_LIST_OTHER_CONTACTS_FAILED_MSG, e._get_reason()))
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Exception message: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_OTHER_CONTACTS_FAILED_MSG)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list other contacts")
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_OTHER_CONTACTS_FAILED_MSG)
 
-        otherContacts = response.get('otherContacts', [])
         num_otherContacts = len(otherContacts)
 
         for contact in otherContacts:
             action_result.add_data(contact)
 
-        summary = action_result.update_summary({'total_otherContacts_returned': num_otherContacts})
-
-        next_page = response.get('nextPageToken')
-        if next_page:
-            summary['next_page_token'] = next_page
-
-        next_sync = response.get('nextSyncToken')
-        if next_sync:
-            summary['next_sync_token'] = next_sync
+        action_result.update_summary({'total_otherContacts_returned': num_otherContacts})
 
         return action_result.set_status(
             phantom.APP_SUCCESS, 'Successfully retrieved {} otherContact{}'.format(
@@ -219,7 +250,7 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            self.debug_print(GOOGLE_FAILED_CREATE_CLIENT)
+            self.debug_print(GOOGLE_CREATE_CLIENT_FAILED_MSG)
             return action_result.get_status()
 
         resource_name = param['resource_name']
@@ -233,10 +264,16 @@ class GooglePeopleConnector(BaseConnector):
 
         try:
             response = client.otherContacts().copyOtherContactToMyContactsGroup(resourceName=resource_name, body=data).execute()
+        except HttpError as e:
+            if "_get_reason" in dir(e):
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(GOOGLE_COPY_CONTACT_FAILED_MSG, e._get_reason()))
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Exception message: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_COPY_CONTACT_FAILED_MSG)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to copy contact")
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_COPY_CONTACT_FAILED_MSG)
 
         action_result.add_data(response)
 
@@ -253,56 +290,35 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            self.debug_print(GOOGLE_FAILED_CREATE_CLIENT)
+            self.debug_print(GOOGLE_CREATE_CLIENT_FAILED_MSG)
             return action_result.get_status()
 
-        kwargs = {'readMask': 'names,emailAddresses', 'sources': ['DIRECTORY_SOURCE_TYPE_DOMAIN_CONTACT', 'DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE']}
+        read_mask = param.get('read_mask', 'names,emailAddresses')
 
-        read_mask = param.get('read_mask')
-        if read_mask:
-            kwargs.update({'readMask': read_mask})
-
-        page_size = param.get('page_size')
-        # Validate 'page_size' action parameter
-        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        limit = param.get('limit')
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        if page_size:
-            kwargs.update({'pageSize': page_size})
-
-        page_token = param.get('page_token')
-        if page_token:
-            kwargs.update({'pageToken': page_token})
-
-        request_sync_token = param.get('request_sync_token')
-        if request_sync_token:
-            kwargs.update({'requestSyncToken': request_sync_token})
-
-        sync_token = param.get('sync_token')
-        if sync_token:
-            kwargs.update({'syncToken': sync_token})
 
         try:
-            response = client.people().listDirectoryPeople(**kwargs).execute()
+            directoryPeople = self._paginator(client, read_mask, limit)
+        except HttpError as e:
+            if "_get_reason" in dir(e):
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(GOOGLE_LIST_DIRECTORY_FAILED_MSG, e._get_reason()))
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Exception message: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_DIRECTORY_FAILED_MSG)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list directory")
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_DIRECTORY_FAILED_MSG)
 
-        directoryPeople = response.get('people', [])
         num_directoryPeople = len(directoryPeople)
-        summary = action_result.update_summary({'total_people_returned': num_directoryPeople})
+        action_result.update_summary({'total_people_returned': num_directoryPeople})
 
         for person in directoryPeople:
             action_result.add_data(person)
-
-        next_page_token = response.get('nextPageToken')
-        if next_page_token:
-            summary['next_page_token'] = next_page_token
-
-        next_sync_token = response.get('nextSyncToken')
-        if next_sync_token:
-            summary['next_sync_token'] = next_sync_token
 
         return action_result.set_status(
             phantom.APP_SUCCESS, 'Successfully retrieved {} {}'.format(
@@ -323,7 +339,7 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            self.debug_print(GOOGLE_FAILED_CREATE_CLIENT)
+            self.debug_print(GOOGLE_CREATE_CLIENT_FAILED_MSG)
             return action_result.get_status()
 
         kwargs = {'sources': ['READ_SOURCE_TYPE_CONTACT']}
@@ -333,19 +349,20 @@ class GooglePeopleConnector(BaseConnector):
 
         try:
             response = client.people().get(resourceName=resource_name, **kwargs).execute()
+        except HttpError as e:
+            if "_get_reason" in dir(e):
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(GOOGLE_GET_USER_PROFILE_FAILED_MSG, e._get_reason()))
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Exception message: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_GET_USER_PROFILE_FAILED_MSG)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to get user profile")
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_GET_USER_PROFILE_FAILED_MSG)
 
         action_result.add_data(response)
 
-        try:
-            action_result.update_summary({'resource_id_returned': response['resourceName']})
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
+        action_result.update_summary({'resource_id_returned': response.get('resourceName')})
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved user profile")
 
@@ -358,66 +375,38 @@ class GooglePeopleConnector(BaseConnector):
         ret_val, client = self._create_client(action_result, scopes)
 
         if phantom.is_fail(ret_val):
-            self.debug_print(GOOGLE_FAILED_CREATE_CLIENT)
+            self.debug_print(GOOGLE_CREATE_CLIENT_FAILED_MSG)
             return action_result.get_status()
-
-        kwargs = {'sources': ['READ_SOURCE_TYPE_CONTACT']}
 
         person_fields = param.get('person_fields', 'names,emailAddresses')
-        kwargs.update({'personFields': person_fields})
 
-        page_token = param.get('page_token')
-        if page_token:
-            kwargs.update({'pageToken': page_token})
-
-        page_size = param.get('page_size')
-        # Validate 'page_size' action parameter
-        ret_val, page_size = self._validate_integer(action_result, page_size, PAGE_SIZE_KEY)
+        limit = param.get('limit')
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        if page_size:
-            kwargs.update({'pageSize': page_size})
-
-        request_sync_token = param.get('request_sync_token')
-        if request_sync_token:
-            kwargs.update({'requestSyncToken': request_sync_token})
-
-        sync_token = param.get('sync_token')
-        if sync_token:
-            kwargs.update({'syncToken': sync_token})
 
         try:
-            response = client.people().connections().list(resourceName='people/me', **kwargs).execute()
+            people = self._paginator(client, person_fields, limit)
+        except HttpError as e:
+            if "_get_reason" in dir(e):
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(GOOGLE_LIST_PEOPLE_FAILED_MSG, e._get_reason()))
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Exception message: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_PEOPLE_FAILED_MSG)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Failed to list people")
+            return action_result.set_status(phantom.APP_ERROR, GOOGLE_LIST_PEOPLE_FAILED_MSG)
 
-        try:
-            people = response['connections']
+        for person in people:
+            action_result.add_data(person)
 
-            for person in people:
-                action_result.add_data(person)
-
-            num_people = response['totalItems']
-            summary = action_result.update_summary({'total_people_returned': num_people})
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Exception message: {}".format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
-
-        next_page_token = response.get('nextPageToken')
-        if next_page_token:
-            summary['next_page_token'] = next_page_token
-
-        next_sync_token = response.get('nextSyncToken')
-        if next_sync_token:
-            summary['next_sync_token'] = next_sync_token
+        num_people = len(people)
+        action_result.update_summary({'total_people_returned': num_people})
 
         return action_result.set_status(
-            phantom.APP_SUCCESS, 'Successfully retrieved {} user{}'.format(
-                num_people, '' if num_people == 1 else 's'
-            )
+            phantom.APP_SUCCESS, 'Successfully retrieved {} user{}'.format(num_people, '' if num_people == 1 else 's')
         )
 
     def handle_action(self, param):

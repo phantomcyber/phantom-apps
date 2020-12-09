@@ -18,6 +18,11 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {}"
 INVALID_NON_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-negative integer value in the {}"
 
-PAGE_SIZE_KEY = "'page_size' action parameter"
+LIMIT_KEY = "'limit' action parameter"
 
-GOOGLE_FAILED_CREATE_CLIENT = "Failed to create the Google People client"
+GOOGLE_CREATE_CLIENT_FAILED_MSG = "Failed to create the Google People client"
+GOOGLE_LIST_OTHER_CONTACTS_FAILED_MSG = "Failed to list other contacts"
+GOOGLE_LIST_PEOPLE_FAILED_MSG = "Failed to list people"
+GOOGLE_LIST_DIRECTORY_FAILED_MSG = "Failed to list directory"
+GOOGLE_COPY_CONTACT_FAILED_MSG = "Failed to copy contact"
+GOOGLE_GET_USER_PROFILE_FAILED_MSG = "Failed to get user profile"

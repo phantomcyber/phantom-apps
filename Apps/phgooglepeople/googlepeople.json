@@ -9,7 +9,7 @@
     "product_name": "Google People",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Splunk Community",
+    "publisher": "Splunk",
     "license": "Copyright (c) 2020 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-07-21T23:24:14.466184Z",
@@ -155,31 +155,15 @@
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "Fields to be returned for each person, if empty default values will be used",
+                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
                 },
-                "page_token": {
-                    "description": "Page token",
-                    "data_type": "string",
-                    "order": 1
-                },
-                "page_size": {
-                    "description": "Number of contacts to include in response",
+                "limit": {
+                    "description": "Number of contacts to include in the response",
                     "data_type": "numeric",
-                    "default": 500,
-                    "order": 2
-                },
-                "request_sync_token": {
-                    "description": "Whether response should include nextSyncToken",
-                    "data_type": "boolean",
-                    "order": 3
-                },
-                "sync_token": {
-                    "description": "Sync Token",
-                    "data_type": "string",
-                    "order": 4
+                    "order": 1
                 }
             },
             "output": [
@@ -191,27 +175,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.page_token",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.page_size",
+                    "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
                     "example_values": [
                         500
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.request_sync_token",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sync_token",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -246,35 +214,42 @@
                     "data_path": "action_result.data.*.names.*.givenName",
                     "data_type": "string",
                     "example_values": [
-                        "Tim"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.familyName",
                     "data_type": "string",
                     "example_values": [
-                        "Drake"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.displayName",
                     "data_type": "string",
                     "example_values": [
-                        "Tim Drake"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.unstructuredName",
                     "data_type": "string",
                     "example_values": [
-                        "Tim Drake"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.displayNameLastFirst",
                     "data_type": "string",
                     "example_values": [
-                        "Drake, Tim"
+                        "Test, user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.middleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
                     ]
                 },
                 {
@@ -295,7 +270,7 @@
                     "column_name": "Email",
                     "column_order": 1,
                     "example_values": [
-                        "tim.drake@hermancorp.biz"
+                        "user@example.com"
                     ],
                     "contains": [
                         "email"
@@ -321,6 +296,55 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6babaf04880e3563"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "#pFbf7+rr0xE="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "OTHER_CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.updateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-05-24T23:40:54.632001Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PERSON"
                     ]
                 },
                 {
@@ -383,7 +407,7 @@
                     "order": 0
                 },
                 "copy_mask": {
-                    "description": "Fields to be copied into the new contact",
+                    "description": "Comma-separated fields to be copied into the new contact",
                     "data_type": "string",
                     "default": "names,emailAddresses,phoneNumbers",
                     "order": 1
@@ -487,17 +511,21 @@
                 {
                     "data_path": "action_result.data.*.memberships.*.contactGroupMembership.contactGroupResourceName",
                     "data_type": "string",
-                    "column_name": "Contact Group Resource Name",
-                    "column_order": 2,
                     "example_values": [
                         "contactGroups/myContacts"
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.memberships.*.domainMembership.inViewerDomain",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resourceName",
                     "data_type": "string",
-                    "column_name": "Resource Name",
-                    "column_order": 0,
                     "example_values": [
                         "people/c6464643871230266672"
                     ],
@@ -506,15 +534,65 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.phoneNumbers.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "36f9f3a8888aca24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.canonicalForm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.metadata.verified",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.emailAddresses.*.value",
                     "data_type": "string",
-                    "column_name": "Email",
-                    "column_order": 1,
                     "example_values": [
-                        "jerry@phantom.us"
+                        "user@example.com"
                     ],
                     "contains": [
                         "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Other"
                     ]
                 },
                 {
@@ -537,6 +615,70 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "71d4a4d58a0990ed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.givenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.familyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.unstructuredName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayNameLastFirst",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test, user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.middleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
                     ]
                 },
                 {
@@ -577,7 +719,11 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "title": "Contact Details",
+                "width": 12,
+                "height": 5,
+                "view": "googlepeople_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -589,30 +735,15 @@
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "Fields to be returned for each person",
+                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
                 },
-                "page_size": {
-                    "description": "Number of responses to include",
+                "limit": {
+                    "description": "Number of responses to include in the response",
                     "data_type": "numeric",
                     "order": 1
-                },
-                "page_token": {
-                    "description": "Page Token",
-                    "data_type": "string",
-                    "order": 2
-                },
-                "request_sync_token": {
-                    "description": "Whether response should include nextSyncToken",
-                    "data_type": "boolean",
-                    "order": 3
-                },
-                "sync_token": {
-                    "description": "Sync Token",
-                    "data_type": "string",
-                    "order": 4
                 }
             },
             "output": [
@@ -624,24 +755,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.page_size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.parameter.page_token",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.request_sync_token",
-                    "data_type": "boolean",
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
                     "example_values": [
-                        true,
-                        false
+                        100
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.sync_token",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -653,22 +771,82 @@
                 {
                     "data_path": "action_result.data.*.resourceName",
                     "data_type": "string",
-                    "column_name": "Resource Name",
-                    "column_order": 0,
-                    "contains": [
-                        "googlepeople resource name"
-                    ],
                     "example_values": [
                         "people/113211632970586460828"
+                    ],
+                    "contains": [
+                        "googlepeople resource name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7c6136a10b0a9c93"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.givenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.familyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.unstructuredName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayNameLastFirst",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test, user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.middleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.emailAddresses.*.value",
                     "data_type": "string",
-                    "column_name": "Email",
-                    "column_order": 1,
                     "example_values": [
-                        "jason.todd@hermancorp.biz"
+                        "user@example.com"
                     ],
                     "contains": [
                         "email"
@@ -756,7 +934,11 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "title": "Directory List",
+                "width": 12,
+                "height": 5,
+                "view": "googlepeople_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -778,7 +960,7 @@
                     "order": 0
                 },
                 "person_fields": {
-                    "description": "Fields to be returned for the person",
+                    "description": "Comma-separated fields to be returned for the person",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 1
@@ -788,11 +970,11 @@
                 {
                     "data_path": "action_result.parameter.resource_name",
                     "data_type": "string",
-                    "contains": [
-                        "googlepeople resource name"
-                    ],
                     "example_values": [
                         "people/116919555361086422724"
+                    ],
+                    "contains": [
+                        "googlepeople resource name"
                     ]
                 },
                 {
@@ -803,10 +985,52 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.sources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7d369160095862fe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "#JgTYM+ybUz4="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.updateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-08-04T23:06:55.492Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PERSON"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.etag",
                     "data_type": "string",
                     "example_values": [
                         "%EgcBAj0JPjcuGgQBAgUH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.middleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
                     ]
                 },
                 {
@@ -837,14 +1061,14 @@
                     "data_path": "action_result.data.*.names.*.givenName",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.familyName",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "Test user"
                     ]
                 },
                 {
@@ -853,21 +1077,21 @@
                     "column_name": "Display Name",
                     "column_order": 1,
                     "example_values": [
-                        "Herman Edwards"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.unstructuredName",
                     "data_type": "string",
                     "example_values": [
-                        "Herman Edwards"
+                        "Test user"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.names.*.displayNameLastFirst",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards, Herman"
+                        "Test, user"
                     ]
                 },
                 {
@@ -875,11 +1099,25 @@
                     "data_type": "string",
                     "column_name": "Resource Name",
                     "column_order": 0,
-                    "contains": [
-                        "googlepeople resource name"
-                    ],
                     "example_values": [
                         "people/113211632970586460828"
+                    ],
+                    "contains": [
+                        "googlepeople resource name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Other"
                     ]
                 },
                 {
@@ -888,7 +1126,7 @@
                     "column_name": "Email",
                     "column_order": 2,
                     "example_values": [
-                        "richard.grayson@hermancorp.biz"
+                        "user@example.com"
                     ],
                     "contains": [
                         "email"
@@ -976,30 +1214,15 @@
             "read_only": true,
             "parameters": {
                 "person_fields": {
-                    "description": "Fields to be returned for each person",
+                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
                 },
-                "page_token": {
-                    "description": "Page Token",
-                    "data_type": "string",
-                    "order": 1
-                },
-                "page_size": {
-                    "description": "Number of connections to include in response",
+                "limit": {
+                    "description": "Number of connections to include in the response",
                     "data_type": "numeric",
-                    "order": 2
-                },
-                "request_sync_token": {
-                    "description": "Whether response should include nextSyncToken",
-                    "data_type": "boolean",
-                    "order": 3
-                },
-                "sync_token": {
-                    "description": "Sync Token",
-                    "data_type": "string",
-                    "order": 4
+                    "order": 1
                 }
             },
             "output": [
@@ -1011,15 +1234,28 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.page_token",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.page_size",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.names.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7c6136a10b0a9c93"
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.request_sync_token",
+                    "data_path": "action_result.data.*.names.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.metadata.primary",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1027,8 +1263,46 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.sync_token",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.names.*.givenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.familyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.unstructuredName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.displayNameLastFirst",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test, user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.middleName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test user"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -1042,11 +1316,25 @@
                     "data_type": "string",
                     "column_name": "Resource Name",
                     "column_order": 0,
-                    "contains": [
-                        "googlepeople resource name"
-                    ],
                     "example_values": [
                         "people/c6275782728248360584"
+                    ],
+                    "contains": [
+                        "googlepeople resource name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddresses.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Work"
                     ]
                 },
                 {
@@ -1055,7 +1343,7 @@
                     "column_name": "Email",
                     "column_order": 1,
                     "example_values": [
-                        "jerry@phantom.us"
+                        "user@example.com"
                     ],
                     "contains": [
                         "email"
@@ -1095,7 +1383,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved 1 users"
+                        "Successfully retrieved 15 users"
                     ]
                 },
                 {
