@@ -85,12 +85,6 @@ def check_exit_no_data(action_result, response):
             phantom.APP_ERROR,
             "Error running command: {}".format(_handle_py_ver_compat_for_input_str(response.std_err))
         )
-    data = {}
-    data['status_code'] = response.status_code
-    data['std_out'] = response.std_out
-    data['std_err'] = response.std_err
-    action_result.add_data(data)
-
     return phantom.APP_SUCCESS
 
 

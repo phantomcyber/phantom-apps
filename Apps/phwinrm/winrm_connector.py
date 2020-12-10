@@ -627,7 +627,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         return phantom.APP_SUCCESS, volume
 
     def _update_system_volume(self, action_result, state):
-        tmp_action_result = copy.copy(action_result)
+        tmp_action_result = copy.deepcopy(action_result)
         ret_val, volume = self._get_system_volume(tmp_action_result)
         if phantom.is_fail(ret_val):
             action_result = tmp_action_result  # noqa
