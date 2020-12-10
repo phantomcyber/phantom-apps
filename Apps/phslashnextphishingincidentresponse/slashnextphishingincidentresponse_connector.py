@@ -1,11 +1,12 @@
 # File: slashnextphishingincidentresponse_connector.py
-# Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+# Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
 """
 Created on August 20, 2019
+Updated on June 30, 2020
 
 @author: Saadat Abid, Umair Ahmad
 """
@@ -20,6 +21,8 @@ from slashnextphishingincidentresponse_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -42,12 +45,81 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         self._base_url = None
         self._api_key = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -56,6 +128,9 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -64,9 +139,9 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+                self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -76,7 +151,8 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -84,7 +160,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -115,7 +191,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -132,17 +208,17 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
                             url,
-                            # auth=(username, password),  # basic authentication
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(
-                phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+                phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -252,21 +328,25 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_SC_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            self.save_progress('Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud')
-            actions_failed += 1
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                self.save_progress('Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud')
+                actions_failed += 1
 
-        # Return success
-        elif response['errorNo'] == 0:
-            self.save_progress('Download Screenshot Successful')
-            action_result.add_data(response)
+            # Return success
+            elif response['errorNo'] == 0:
+                self.save_progress('Download Screenshot Successful')
+                action_result.add_data(response)
 
-        # If there is an error then return the exact error message
-        else:
-            self.save_progress('Download Screenshot Failed, Error Reason: {0}'.format(response['errorMsg']))
-            msg = response['errorMsg']
-            actions_failed += 1
+            # If there is an error then return the exact error message
+            else:
+                self.save_progress('Download Screenshot Failed, Error Reason: {0}'.format(response['errorMsg']))
+                msg = response['errorMsg']
+                actions_failed += 1
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
         # --------------------------- Downloading HTML ---------------------------
         # Saving action progress
@@ -282,20 +362,24 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_HTML_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            self.save_progress('Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud')
-            actions_failed += 1
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                self.save_progress('Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud')
+                actions_failed += 1
 
-        # Return success
-        elif response['errorNo'] == 0:
-            self.save_progress('Download HTML Successful')
-            action_result.add_data(response)
+            # Return success
+            elif response['errorNo'] == 0:
+                self.save_progress('Download HTML Successful')
+                action_result.add_data(response)
 
-        # If there is an error then return the exact error message
-        else:
-            self.save_progress('Download HTML Failed, Error Reason: {0}'.format(response['errorMsg']))
-            actions_failed += 1
+            # If there is an error then return the exact error message
+            else:
+                self.save_progress('Download HTML Failed, Error Reason: {0}'.format(response['errorMsg']))
+                actions_failed += 1
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
         # --------------------------- Downloading Text ---------------------------
         # Saving action progress
@@ -311,27 +395,32 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_TEXT_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            self.save_progress('Download Text Failed, Error Reason: Error connecting to SlashNext Cloud')
-            actions_failed += 1
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                self.save_progress('Download Text Failed, Error Reason: Error connecting to SlashNext Cloud')
+                actions_failed += 1
 
-        # Return success
-        elif response['errorNo'] == 0:
-            self.save_progress('Download Text Successful')
-            action_result.add_data(response)
+            # Return success
+            elif response['errorNo'] == 0:
+                self.save_progress('Download Text Successful')
+                action_result.add_data(response)
 
-        # If there is an error then return the exact error message
-        else:
-            self.save_progress('Download Text Failed, Error Reason: {0}'.format(response['errorMsg']))
-            actions_failed += 1
+            # If there is an error then return the exact error message
+            else:
+                self.save_progress('Download Text Failed, Error Reason: {0}'.format(response['errorMsg']))
+                actions_failed += 1
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
         # All the actions failed, so display an notification
         if actions_failed == 3:
-            self.save_progress('Failed to download screenshot, HTML and text data')
+            msg = 'Failed to download screenshot, HTML and text data'
+            self.save_progress(msg)
             return action_result.set_status(phantom.APP_SUCCESS, msg)
         else:
-            self.save_progress('Successful either download screenshot, HTML or/and text data ')
+            self.save_progress('Successfully downloaded either screenshot, HTML or/and text data')
             return action_result.set_status(phantom.APP_SUCCESS, success_msg)
 
     def _handle_test_connectivity(self, param):
@@ -344,31 +433,35 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Populate the API parameter dictionary
         ep_params = {
-            'authkey': self._api_key,
-            'host': 'www.google.com'
+            'authkey': self._api_key
         }
 
-        # Making a call to OTI Host Reputation API to test connectivity with OTI Cloud
+        # Making a call to OTI Quota Status API to test the connectivity with OTI Cloud
         ret_val, response = self._make_rest_call(
-            HOST_REPUTE_API, action_result, method='post', params=ep_params, headers=None)
+            API_QUOTA, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                self.save_progress('Test Connectivity Failed')
+                msg = 'Error Reason: Error connecting to SlashNext Cloud'
+                return action_result.set_status(phantom.APP_ERROR, msg)
+
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Test Connectivity Successful'
+                self.save_progress(msg)
+                return action_result.set_status(phantom.APP_SUCCESS)
+
+            # If there is an error then return the exact error message
+            else:
+                self.save_progress('Test Connectivity Failed')
+                msg = 'Error Reason: {0}'.format(response['errorMsg'])
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             self.save_progress('Test Connectivity Failed')
-            msg = 'Error Reason: Error connecting to SlashNext Cloud'
-            return action_result.set_status(phantom.APP_ERROR, msg)
-
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Test Connectivity Successful'
-            self.save_progress(msg)
-            return action_result.set_status(phantom.APP_SUCCESS)
-
-        # If there is an error then return the exact error message
-        else:
-            self.save_progress('Test Connectivity Failed')
-            msg = 'Error Reason: {0}'.format(response['errorMsg'])
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_api_quota(self, param):
 
@@ -378,10 +471,50 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Adding input parameters to the action results
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Return success
-        msg = 'Coming Soon...'
-        self.save_progress(msg)
-        return action_result.set_status(phantom.APP_SUCCESS, msg)
+        # Accessing action parameters passed in the 'param' dictionary
+
+        # Populate the API parameter dictionary
+        ep_params = {
+            'authkey': self._api_key
+        }
+
+        # Make rest API call
+        ret_val, response = self._make_rest_call(
+            API_QUOTA, action_result, method='post', params=ep_params, headers=None)
+
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'API Quota Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'API Quota Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Quota Fetched',
+                    'Quota': response['quotaDetails']['remainingQuota']
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+            # If there is an error then return the exact error message
+            else:
+                msg = 'API Quota Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_host_reputation(self, param):
 
@@ -393,7 +526,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        host = param['host']
+        host = self._handle_py_ver_compat_for_input_str(param['host'])
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -405,35 +538,39 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             HOST_REPUTE_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Host Reputation Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Reputation Fetched',
-                'Verdict': response['threatData']['verdict']
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Host Reputation Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Reputation Fetched',
+                    'Verdict': response['threatData']['verdict']
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Host Reputation Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Host Reputation Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_host_urls(self, param):
 
@@ -445,10 +582,14 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        host = param['host']
+        host = self._handle_py_ver_compat_for_input_str(param['host'])
 
         # Optional values should use the .get() function
         limit = param.get('limit', 10)
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -462,35 +603,39 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             HOST_REPORT_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Host URLs Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'URLs Fetched',
-                'URLs Found': len(response['urlDataList'])
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Host URLs Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'URLs Fetched',
+                    'URLs Found': len(response['urlDataList'])
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Host URLs Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Host URLs Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_host_report(self, param):
 
@@ -502,7 +647,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        host = param['host']
+        host = self._handle_py_ver_compat_for_input_str(param['host'])
 
         # --------------------------- Host Reputation ---------------------------
         # Populate the API parameter dictionary
@@ -515,38 +660,42 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             HOST_REPUTE_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
-
-        # Return success
-        elif response['errorNo'] == 0:
-            self.save_progress('Host Report Successful')
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Report Fetched',
-                'Verdict': response['threatData']['verdict']
-            })
-
-            if response.get('threatData').get('verdict').startswith('Unrated'):
-                msg = 'Host Reputation Returned: {0}'.format(response.get('threatData').get('verdict'))
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Host Reputation Failed, Error Reason: Error connecting to SlashNext Cloud'
                 self.save_progress(msg)
-                return action_result.set_status(phantom.APP_SUCCESS, msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Host Reputation Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                self.save_progress('Host Report Successful')
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Report Fetched',
+                    'Verdict': response['threatData']['verdict']
+                })
+
+                if response.get('threatData').get('verdict').startswith('Unrated'):
+                    msg = 'Host Reputation Returned: {0}'.format(response.get('threatData').get('verdict'))
+                    self.save_progress(msg)
+                    return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Host Reputation Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
         # --------------------------- Host Report ---------------------------
         # Populate the API parameter dictionary
@@ -561,91 +710,95 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             HOST_REPORT_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Host URLs Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            self.save_progress('Host URLs Successful')
+            # Return success
+            elif response['errorNo'] == 0:
+                self.save_progress('Host URLs Successful')
 
-            first_url = response['urlDataList'][0]
-            latest_url = first_url['url']
-            latest_url_scanid = str(first_url['scanId'])
+                first_url = response['urlDataList'][0]
+                latest_url = first_url['url']
+                latest_url_scanid = self._handle_py_ver_compat_for_input_str(first_url['scanId'])
 
-            # Perform a URL scan if there exists no Scan ID for the URL
-            if latest_url_scanid == 'N/A':
-                # --------------------------- URL Scan Sync ---------------------------
-                # Populate the API parameter dictionary
-                ep_params = {
-                    'authkey': self._api_key,
-                    'url': latest_url
-                }
+                # Perform a URL scan if there exists no Scan ID for the URL
+                if latest_url_scanid == 'N/A':
+                    # --------------------------- URL Scan Sync ---------------------------
+                    # Populate the API parameter dictionary
+                    ep_params = {
+                        'authkey': self._api_key,
+                        'url': latest_url
+                    }
 
-                # Make rest API call
-                ret_val, response = self._make_rest_call(
-                    URL_SCANSYNC_API, action_result, method='post', params=ep_params, headers=None)
+                    # Make rest API call
+                    ret_val, response = self._make_rest_call(
+                        URL_SCANSYNC_API, action_result, method='post', params=ep_params, headers=None)
 
-                # Server did not return status code: 200, return error
-                if phantom.is_fail(ret_val):
-                    msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
-                    self.save_progress(msg)
-                    action_result.update_summary({
-                        'State': 'Connection Error'
-                    })
-                    return action_result.set_status(phantom.APP_ERROR, msg)
+                    # _make_rest_call failed
+                    if phantom.is_fail(ret_val):
+                        msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
+                        self.save_progress(msg)
+                        action_result.update_summary({
+                            'State': 'Connection Error'
+                        })
+                        return action_result.set_status(phantom.APP_ERROR, msg)
 
-                # Return success
-                elif response['errorNo'] == 0:
-                    self.save_progress('URL Synchronous Scan Successful')
-                    action_result.add_data(response)
+                    # Return success
+                    elif response['errorNo'] == 0:
+                        self.save_progress('URL Synchronous Scan Successful')
+                        action_result.add_data(response)
 
-                    # If there is landing URL available, get its forensics instead
-                    if 'landingUrl' in response['urlData']:
-                        # Set the Scan ID to landing URL if it exists
-                        latest_url_scanid = response['urlData']['landingUrl']['scanId']
+                        # If there is landing URL available, get its forensics instead
+                        if 'landingUrl' in response['urlData']:
+                            # Set the Scan ID to landing URL if it exists
+                            latest_url_scanid = response['urlData']['landingUrl']['scanId']
+                        else:
+                            # Otherwise set it to the scanned URL's scan ID
+                            latest_url_scanid = response['urlData']['scanId']
+
+                    # If there is an error then return the exact error message
                     else:
-                        # Otherwise set it to the scanned URL's scan ID
-                        latest_url_scanid = response['urlData']['scanId']
+                        msg = 'URL Synchronous Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
+                        self.save_progress(msg)
+                        action_result.add_data(response)
+                        action_result.update_summary({
+                            'State': 'API Error'
+                        })
+                        return action_result.set_status(phantom.APP_ERROR, msg)
 
-                # If there is an error then return the exact error message
                 else:
-                    msg = 'URL Synchronous Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
-                    self.save_progress(msg)
+                    # If there is landing URL available, get its forensics instead
+                    if 'landingUrl' in first_url and first_url['landingUrl']['scanId'] != 'N/A':
+                        latest_url_scanid = first_url['landingUrl']['scanId']
+
+                    # Add the result of the Host Report
                     action_result.add_data(response)
-                    action_result.update_summary({
-                        'State': 'API Error'
-                    })
-                    return action_result.set_status(phantom.APP_ERROR, msg)
 
+            # If there is an error then return the exact error message
             else:
-                # If there is landing URL available, get its forensics instead
-                if 'landingUrl' in first_url and first_url['landingUrl']['scanId'] != 'N/A':
-                    latest_url_scanid = first_url['landingUrl']['scanId']
-
-                # Add the result of the Host Report
+                msg = 'Host URLs Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
                 action_result.add_data(response)
-
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Host URLs Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
         # --------------------------- Forensics Data ---------------------------
         # Calling the function to collectively download screenshot, HTML and text data
         msg = 'Host Report Successful'
         if response.get('swlData') is None:
-            self._download_forensics(action_result, latest_url_scanid, msg)
+            return self._download_forensics(action_result, latest_url_scanid, msg)
         else:
             return action_result.set_status(phantom.APP_SUCCESS, msg)
 
@@ -659,7 +812,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        url = param['url']
+        url = self._handle_py_ver_compat_for_input_str(param['url'])
 
         # Optional values should use the .get() function
         extended_info = param.get('extended_info', False)
@@ -674,68 +827,72 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             URL_SCAN_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'URL Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'URL Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "scan report" action with Scan ID = {0} or '\
-                  'running the same "url scan" action one more time'.format(response['urlData']['scanId'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
-
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'URL Scan Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-
-            # Check to see if there is a landing URL so that correct verdict is added
-            if response['urlData'].get('landingUrl') is None:
-                verdict = response['urlData']['threatData']['verdict']
-            else:
-                verdict = response['urlData']['landingUrl']['threatData']['verdict']
-
-            action_result.update_summary({
-                'State': 'Scan Completed',
-                'Verdict': verdict
-            })
-
-            # Download the detailed forensics data if extended_info parameter is True
-            if extended_info and response.get('swlData') is None:
-                self.save_progress('Downloading Forensics Data')
-
-                # If there is landing URL available, get its forensics instead
-                if 'landingUrl' in response['urlData']:
-                    url_scanid = response['urlData']['landingUrl']['scanId']
-                else:
-                    url_scanid = response['urlData']['scanId']
-
-                self._download_forensics(action_result, url_scanid, msg)
-
-            else:
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
+                    'Please check back later using "scan report" action with Scan ID = {0} or '\
+                    'running the same "url scan" action one more time'.format(response['urlData']['scanId'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
                 return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'URL Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'URL Scan Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+
+                # Check to see if there is a landing URL so that correct verdict is added
+                if response['urlData'].get('landingUrl') is None:
+                    verdict = response['urlData']['threatData']['verdict']
+                else:
+                    verdict = response['urlData']['landingUrl']['threatData']['verdict']
+
+                action_result.update_summary({
+                    'State': 'Scan Completed',
+                    'Verdict': verdict
+                })
+
+                # Download the detailed forensics data if extended_info parameter is True
+                if extended_info and response.get('swlData') is None:
+                    self.save_progress('Downloading Forensics Data')
+
+                    # If there is landing URL available, get its forensics instead
+                    if 'landingUrl' in response['urlData']:
+                        url_scanid = response['urlData']['landingUrl']['scanId']
+                    else:
+                        url_scanid = response['urlData']['scanId']
+
+                    return self._download_forensics(action_result, url_scanid, msg)
+
+                else:
+                    return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+            # If there is an error then return the exact error message
+            else:
+                msg = 'URL Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_url_scan_sync(self, param):
 
@@ -748,11 +905,15 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        url = param['url']
+        url = self._handle_py_ver_compat_for_input_str(param['url'])
 
         # Optional values should use the .get() function
         extended_info = param.get('extended_info', False)
         timeout = param.get('timeout', 60)
+        # Validate 'timeout' action parameter
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -765,68 +926,72 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             URL_SCANSYNC_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'URL Synchronous Scan Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and is taking longer than expected to complete.\n' \
-                  'Please check back later using scan report action with Scan ID = {0} or ' \
-                  'running the same "url scan sync" action one more time'.format(response['urlData']['scanId'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
-
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'URL Scan Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-
-            # Check to see if there is a landing URL so that correct verdict is added
-            if response['urlData'].get('landingUrl') is None:
-                verdict = response['urlData']['threatData']['verdict']
-            else:
-                verdict = response['urlData']['landingUrl']['threatData']['verdict']
-
-            action_result.update_summary({
-                'State': 'Scan Completed',
-                'Verdict': verdict
-            })
-
-            # Download the detailed forensics data if extended_info parameter is True
-            if extended_info and response.get('swlData') is None:
-                self.save_progress('Downloading Forensics Data')
-
-                # If there is landing URL available, get its forensics instead
-                if 'landingUrl' in response['urlData']:
-                    url_scanid = response['urlData']['landingUrl']['scanId']
-                else:
-                    url_scanid = response['urlData']['scanId']
-
-                self._download_forensics(action_result, url_scanid, msg)
-
-            else:
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and is taking longer than expected to complete.\n' \
+                    'Please check back later using scan report action with Scan ID = {0} or ' \
+                    'running the same "url scan sync" action one more time'.format(response['urlData']['scanId'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
                 return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'URL Synchronous Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'URL Scan Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+
+                # Check to see if there is a landing URL so that correct verdict is added
+                if response['urlData'].get('landingUrl') is None:
+                    verdict = response['urlData']['threatData']['verdict']
+                else:
+                    verdict = response['urlData']['landingUrl']['threatData']['verdict']
+
+                action_result.update_summary({
+                    'State': 'Scan Completed',
+                    'Verdict': verdict
+                })
+
+                # Download the detailed forensics data if extended_info parameter is True
+                if extended_info and response.get('swlData') is None:
+                    self.save_progress('Downloading Forensics Data')
+
+                    # If there is landing URL available, get its forensics instead
+                    if 'landingUrl' in response['urlData']:
+                        url_scanid = response['urlData']['landingUrl']['scanId']
+                    else:
+                        url_scanid = response['urlData']['scanId']
+
+                    return self._download_forensics(action_result, url_scanid, msg)
+
+                else:
+                    return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+            # If there is an error then return the exact error message
+            else:
+                msg = 'URL Synchronous Scan Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_scan_report(self, param):
 
@@ -838,7 +1003,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        scanid = param['scanid']
+        scanid = self._handle_py_ver_compat_for_input_str(param['scanid'])
 
         # Optional values should use the .get() function
         extended_info = param.get('extended_info', False)
@@ -853,67 +1018,71 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             URL_SCAN_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Scan Report Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Scan Report Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
-                  'Please check back later using "scan report" action with Scan ID = {0}'.format(scanid)
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
-
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Scan Report Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-
-            # Check to see if there is a landing URL so that correct verdict is added
-            if response['urlData'].get('landingUrl') is None:
-                verdict = response['urlData']['threatData']['verdict']
-            else:
-                verdict = response['urlData']['landingUrl']['threatData']['verdict']
-
-            action_result.update_summary({
-                'State': 'Scan Completed',
-                'Verdict': verdict
-            })
-
-            # Download the detailed forensics data if extended_info parameter is True
-            if extended_info and response.get('swlData') is None:
-                self.save_progress('Downloading Forensics Data')
-
-                # If there is landing URL available, get its forensics instead
-                if 'landingUrl' in response['urlData']:
-                    url_scanid = response['urlData']['landingUrl']['scanId']
-                else:
-                    url_scanid = response['urlData']['scanId']
-
-                self._download_forensics(action_result, url_scanid, msg)
-
-            else:
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n' \
+                    'Please check back later using "scan report" action with Scan ID = {0}'.format(scanid)
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
                 return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Scan Report Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Scan Report Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+
+                # Check to see if there is a landing URL so that correct verdict is added
+                if response['urlData'].get('landingUrl') is None:
+                    verdict = response['urlData']['threatData']['verdict']
+                else:
+                    verdict = response['urlData']['landingUrl']['threatData']['verdict']
+
+                action_result.update_summary({
+                    'State': 'Scan Completed',
+                    'Verdict': verdict
+                })
+
+                # Download the detailed forensics data if extended_info parameter is True
+                if extended_info and response.get('swlData') is None:
+                    self.save_progress('Downloading Forensics Data')
+
+                    # If there is landing URL available, get its forensics instead
+                    if 'landingUrl' in response['urlData']:
+                        url_scanid = response['urlData']['landingUrl']['scanId']
+                    else:
+                        url_scanid = response['urlData']['scanId']
+
+                    return self._download_forensics(action_result, url_scanid, msg)
+
+                else:
+                    return action_result.set_status(phantom.APP_SUCCESS, msg)
+
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Scan Report Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_download_screenshot(self, param):
 
@@ -925,7 +1094,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        scanid = param['scanid']
+        scanid = self._handle_py_ver_compat_for_input_str(param['scanid'])
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -938,45 +1107,49 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_SC_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Download Screenshot Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "download screenshot" action with Scan ID = {0}'.format(scanid)
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
+                    'Please check back later using "download screenshot" action with Scan ID = {0}'.format(scanid)
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Download Screenshot Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': response['scData']['scName'] + '.jpeg Downloaded'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Download Screenshot Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': "{}.jpeg Downloaded".format(response['scData']['scName'])
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Download Screenshot Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Download Screenshot Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_download_html(self, param):
 
@@ -988,7 +1161,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        scanid = param['scanid']
+        scanid = self._handle_py_ver_compat_for_input_str(param['scanid'])
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -1000,45 +1173,49 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_HTML_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Download HTML Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "download html" action with Scan ID = {0}'.format(scanid)
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
+                    'Please check back later using "download html" action with Scan ID = {0}'.format(scanid)
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Download HTML Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': response['htmlData']['htmlName'] + '.html Downloaded'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Download HTML Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': "{}.html Downloaded".format(response['htmlData']['htmlName'])
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Download HTML Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Download HTML Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def _handle_download_text(self, param):
 
@@ -1050,7 +1227,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
 
         # Accessing action parameters passed in the 'param' dictionary
         # Required values can be accessed directly
-        scanid = param['scanid']
+        scanid = self._handle_py_ver_compat_for_input_str(param['scanid'])
 
         # Populate the API parameter dictionary
         ep_params = {
@@ -1062,45 +1239,49 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             DL_TEXT_API, action_result, method='post', params=ep_params, headers=None)
 
-        # Server did not return status code: 200, return error
-        if phantom.is_fail(ret_val):
-            msg = 'Download Text Failed, Error Reason: Error connecting to SlashNext Cloud'
-            self.save_progress(msg)
-            action_result.update_summary({
-                'State': 'Connection Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+        try:
+            # _make_rest_call failed
+            if phantom.is_fail(ret_val):
+                msg = 'Download Text Failed, Error Reason: Error connecting to SlashNext Cloud'
+                self.save_progress(msg)
+                action_result.update_summary({
+                    'State': 'Connection Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
 
-        # Return success
-        elif response['errorNo'] == 1:
-            msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
-                  'Please check back later using "download text" action with Scan ID = {0}'.format(scanid)
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'Pending, Retry'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 1:
+                msg = 'Your URL Scan request is submitted to the cloud and may take up-to 60 seconds to complete.\n'\
+                    'Please check back later using "download text" action with Scan ID = {0}'.format(scanid)
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'Pending, Retry'
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # Return success
-        elif response['errorNo'] == 0:
-            msg = 'Download Text Successful'
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': response['textData']['textName'] + '.txt Downloaded'
-            })
-            return action_result.set_status(phantom.APP_SUCCESS, msg)
+            # Return success
+            elif response['errorNo'] == 0:
+                msg = 'Download Text Successful'
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': "{}.txt Downloaded".format(response['textData']['textName'])
+                })
+                return action_result.set_status(phantom.APP_SUCCESS, msg)
 
-        # If there is an error then return the exact error message
-        else:
-            msg = 'Download Text Failed, Error Reason: {0}'.format(response['errorMsg'])
-            self.save_progress(msg)
-            action_result.add_data(response)
-            action_result.update_summary({
-                'State': 'API Error'
-            })
-            return action_result.set_status(phantom.APP_ERROR, msg)
+            # If there is an error then return the exact error message
+            else:
+                msg = 'Download Text Failed, Error Reason: {0}'.format(response['errorMsg'])
+                self.save_progress(msg)
+                action_result.add_data(response)
+                action_result.update_summary({
+                    'State': 'API Error'
+                })
+                return action_result.set_status(phantom.APP_ERROR, msg)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server. {}".format(error_msg))
 
     def handle_action(self, param):
 
@@ -1109,7 +1290,7 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -1158,9 +1339,13 @@ class SlashnextPhishingIncidentResponseConnector(BaseConnector):
         # Access values in asset config by the name
         # Required values can be accessed directly
         self._api_key = config['api_key']
-
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version.")
         # Optional values should use the .get() function
-        self._base_url = config.get('api_base_url', BASE_API)
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('api_base_url', BASE_API)).strip("/")
 
         return phantom.APP_SUCCESS
 
@@ -1200,7 +1385,7 @@ if __name__ == '__main__':
         try:
             login_url = SlashnextPhishingIncidentResponseConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1213,11 +1398,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1233,6 +1418,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

@@ -1,0 +1,786 @@
+<!-- File: readme.html
+
+    Copyright (c) 2020 Google LLC.
+    
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    
+        http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<html>
+  <body>
+    <h2>SDK and SDK Licensing details for the app</h2>
+    <p>
+      <h3>cachetools</h3>
+      This app uses the cachetools module, which is licensed under the MIT License (MIT), Copyright (c) 2014-2020 Thomas Kemmer.
+    </p>
+    <p>
+        <h3>google-api-python-client</h3>
+        This app uses the google-api-python-client module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google LLC.
+    </p>
+    <p>
+      <h3>google-auth</h3>
+      This app uses the google-auth module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h3>google-auth-httplib2</h3>
+      This app uses the google-auth-httplib2 module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h3>google-auth-oauthlib</h3>
+      This app uses the google-auth-oauthlib module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h3>httplib2-wheel</h3>
+      This app uses the httplib2-wheel module, which is licensed under the MIT License (MIT), Copyright (c) Joe Gregorio.
+    </p>
+    <p>
+      <h3>oauthclient</h3>
+      This app uses the oauthclient module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Inc.
+    </p>
+    <p>
+      <h3>pyasn</h3>
+      This app uses the pyasn module, which is licensed under the MIT License (MIT), Copyright (c) Hadi Asghari.
+    </p>
+    <p>
+      <h3>pyasn-modules</h3>
+      This app uses the pyasn-modules module, which is licensed under the BSD License (BSD-2-Clause), Copyright (c) Ilya Etingof.
+    </p>
+    <p>
+      <h3>rsa-wheel</h3>
+      This app uses the rsa-wheel module, which is licensed under the Apache Software License (ASL 2), Copyright (c) Sybren A. Stuvel.
+    </p>
+    <p>
+      <h3>uritemplate-wheel</h3>
+      This app uses the uritemplate-wheel module, which is licensed under the OSI Approved, Apache Software License, BSD License (BSD 3-Clause License or Apache License, Version 2.0), Copyright (c) Ian Stapleton Cordasco.
+    </p>
+
+    <p>
+      <h2>Explanation of the Asset Configuration Parameters</h2>
+      The asset configuration parameters affect [test connectivity] and all the other actions of the application. Below are the explanation and usage of all these parameters.
+      <ul>
+        <li>
+          <b>Base URL: </b>The URL used to connect with the Chronicle server. It represents the Chronicle platform's API base URL where /v1 represents the API version. Example: https://backstory.googleapis.com/v1
+        </li>
+        <li>
+          <b>Contents of Service Account JSON File: </b> This file contents will be used to authenticate with the Google APIs.
+        </li>
+        <li>
+          <b>Scope: </b> ["https://www.googleapis.com/auth/chronicle-backstory"]
+        </li>
+        <li>
+          <b>Number of Retries: </b> The value of this parameter defines the number of attempts for which the action will keep on retrying if the Chronicle API continuously returns the HTTP 429 (RESOURCE_EXHAUSTED) error. If the error gets eliminated before the number of retries gets exhausted, then, the action execution will continue along its workflow with the next set of API calls and if the error is still persistent and all the number of retries are exhausted, then, the action will fail with the latest error message being displayed.
+        </li>
+        <li>
+          <b>Retry Wait Period (in seconds): </b> The value of this parameter defines the waiting period in seconds for which to hold the current execution of the action on receiving the HTTP 429 (RESOURCE_EXHAUSTED) error and then, retry the same API call after the waiting period is exhausted. This ensures that the integration provides a mechanism of attempting to overcome the HTTP 429 (RESOURCE_EXHAUSTED) error.
+        </li>
+      </ul>
+    </p>
+
+    <p>
+      <h2>Service account</h2>
+        This app requires a pre-configured service account to operate. Please follow the procedure outlined at <a href="https://support.google.com/a/answer/7378726?hl=en" target="_blank"><u>this link</u></a> to create a service account. At the end of the creation process, the admin console should ask you to save the config as a JSON file. Copy the contents of the JSON file in the clipboard and paste it as the value of the "Contents of Service Account JSON file" asset configuration parameter.
+        <br>
+        <b>Or else</b>
+        <br>Your Customer Experience Engineer (CEE) will provide you with a <a href="https://developers.google.com/identity/protocols/oauth2#serviceaccount" target="_blank"><u>Google Developer Service Account Credential</u></a> to enable the Google API client to communicate with the Chronicle API. Copy the contents of the JSON file in the clipboard and paste it as the value of the "Contents of Service Account JSON file" asset configuration parameter.
+        <br><br><b>For more details visit below-listed links:</b>
+          <li><a href="https://developers.google.com/identity/protocols/oauth2/service-account#creatinganaccount" target="_blank"><u>Creating a service account</u></a></li>
+          <li><a href="https://cloud.google.com/iam/docs/understanding-service-accounts" target="_blank"><u>Understanding service accounts</u></a></li>
+    </p>
+
+    <p>
+      <h2>Explanation of the Chronicle Actions' Parameters</h2>
+      <ul>
+        <li><h3>Test Connectivity (Action Workflow Details)</h3>
+          <ul>
+            <li> This action will test the connectivity of the Phantom server to the Chronicle instance by making an initial API call to the ListIoCs endpoint using the provided asset configuration parameters.</li>
+            <li> The action validates the provided asset configuration parameters. Based on the API call response, the appropriate success and failure message will be displayed when the action gets executed.</li>
+            <li><b><u>Note:</u></b></li>
+            <ul>
+              <li>There are a total of 8 reputation related asset configuration parameters and 7 on poll action related asset configuration parameters that are not validated while running test connectivity for optimum performance and are only validated in their respective actions. You can find more details about these parameters in their respective section of the action.</li>
+            </ul>
+          </ul>
+        </li>
+        <li><h3>List Assets</h3>
+          <ul>
+            <li><b><u>Action Parameter:</u> Artifact Indicator</b></li>
+              <ul>
+                <li>The Artifact Indicator parameter enables search by selecting anyone from given artifact indicators.</li>
+                <li>Valid Values: </li>
+                <ul>
+                  <li>Domain Name</li>
+                  <li>Destination IP Address</li>
+                  <li>MD5 File Hash</li>
+                  <li>SHA1 File Hash</li>
+                  <li>SHA256 File Hash</li>
+                </ul>
+              </ul>
+            <li><b><u>Action Parameter:</u> Value</b></li> 
+              <ul>
+                <li>The user can provide artifact value into the Value action parameter.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Time Range</b></li>
+            <ul>
+              <li>This parameter will be used for specifying the time range of the search.</li>
+              <li> User can provide time using this '&lt;digit&gt;&lt;d/h/m/s&gt;' time format. Here, d = Day, h = Hour, m = Minutes, and s = Seconds.</li>
+              <li><b>Note: </b>The Start time and End time will be calculated using the specified time range. The end time will be present time and according to the specified time range, the start time will be calculated for the search.</li>
+            </ul>
+            <li><b><u>Action Parameters:</u> Start Time and End Time</b></li>
+              <ul>
+                <li>These parameters will be used for specifying the time range of the search.</li>
+                <li>Users can provide time using this 'yyyy-MM-ddTHH:mm:ssZ' time format. Here, y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds.</li>
+                <li><b>Note: </b>The number of returned assets can be reduced over a shorter period using these parameters.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Limit</b></li>
+              <ul>
+                <li>This parameter is used to limit the number of assets results to return.</li>
+                <li>The user can specify between 1 and 10,000. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 assets results.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+            <ul>
+              <li>If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days.</li>
+              <li>If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.</li>
+            </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Get a list of assets that accessed the specified domain artifact
+                  <ul style="list-style-type:none;">
+                    <li> Artifact Indicator = Domain Name</li>
+                    <li> Value = wp.com</li>
+                    <li> Start Time = 1970-01-01T00:00:00Z</li>
+                    <li> End Time = 1970-01-10T00:00:00Z</li>
+                  </ul>
+                </li>
+                <li> Fetch assets results for the IP artifact for the last three days (Here, Present time is 2020-01-03T00:00:00Z)
+                  <ul style="list-style-type:none;">
+                    <li> Artifact Indicator = Destination IP Address</li>
+                    <li> Value = 216.58.217.78</li>
+                    <li> Time Range = 3d</li>
+                  </ul>
+                </li>
+                <li> Filtering assets results based on the specifying time range for the IP artifact
+                  <ul style="list-style-type:none;">
+                    <li> Artifact Indicator = Destination IP Address</li>
+                    <li> Value = 216.58.217.78</li>
+                    <li> Start Time = 1970-01-01T00:00:00Z</li>
+                    <li> End Time = 1970-01-05T00:00:00Z</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>List Alerts</h3>
+          <ul>
+            <li><b><u>Action Parameter:</u> Time Range</b></li>
+            <ul>
+              <li>This parameter will be used for specifying the time range of the search.</li>
+              <li> User can provide time using this '&lt;digit&gt;&lt;d/h/m/s&gt;' time format. Here, d = Day, h = Hour, m = Minutes, and s = Seconds.</li>
+              <li><b>Note: </b>The Start time and End time will be calculated using the specified time range. The end time will be present time and according to the specified time range, the start time will be calculated for the search.</li>
+            </ul>
+            <li><b><u>Action Parameters:</u> Start Time and End Time</b></li>
+              <ul>
+                <li>These parameters will be used for specifying the time range of the search.</li>
+                <li>Users can provide time using this 'yyyy-MM-ddTHH:mm:ssZ' time format. Here, y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds.</li>
+                <li><b>Note: </b>The number of returned alerts can be reduced over a shorter period using these parameters.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Limit</b></li>
+              <ul>
+                <li>This parameter is used to limit the number of alerts results to return.</li>
+                <li>The user can specify between 1 and 10,000. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 alerts results.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+            <ul>
+              <li>If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days.</li>
+              <li>If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.</li>
+            </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Get a list of security alerts for the last three days (Here, Present time is 2020-01-03T00:00:00Z)
+                  <ul style="list-style-type:none;">
+                    <li> Time Range= 3d</li>
+                  </ul>
+                </li>
+                <li> Get a list of security alerts for the specified time period
+                  <ul style="list-style-type:none;">
+                    <li> Start Time= 2019-01-01T00:00:00Z</li>
+                    <li> End Time= 2020-01-01T00:00:00Z</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>List Events</h3>
+          <ul>
+            <li><b><u>Action Parameter:</u> Asset Indicator</b></li>
+              <ul>
+                <li>The Asset Indicator parameter enables search by selecting anyone from given asset indicators.</li>
+                <li>Valid Values: </li>
+                <ul>
+                  <li>Hostname</li>
+                  <li>Asset IP Address</li>
+                  <li>MAC Address</li>
+                  <li>Product ID</li>
+                </ul>
+              </ul>
+            <li><b><u>Action Parameter:</u> Value</b></li>
+              <ul>
+                <li>The user can provide asset value into the Value action parameter.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Time Range</b></li>
+            <ul>
+              <li>This parameter will be used for specifying the time range of the search.</li>
+              <li> User can provide time using this '&lt;digit&gt;&lt;d/h/m/s&gt;' time format. Here, d = Day, h = Hour, m = Minutes, and s = Seconds.</li>
+              <li><b>Note: </b>The Start time and End time will be calculated using the specified time range. The end time will be present time and according to the specified time range, the start time will be calculated for the search.</li>
+            </ul>
+            <li><b><u>Action Parameters:</u> Start Time and End Time</b></li>
+              <ul>
+                <li>These parameters will be used for specifying the time range of the search. The user specifies the time for the asset you are investigating using the reference time action parameter</li>
+                <li>Users can provide time using this 'yyyy-MM-ddTHH:mm:ssZ' time format. Here, y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds.</li>
+                <li><b>Note: </b>The number of returned events can be reduced over a shorter period using these parameters.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Limit</b></li>
+              <ul>
+                <li>This parameter is used to limit the number of events results to return.</li>
+                <li>The user can specify between 1 and 10,000. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 events results.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+            <ul>
+              <li>If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days.</li>
+              <li>If the [Reference Time] action parameter is not given, the action will consider start time as reference time. And if the value is given for it, the value will be validated and used in the search request.</li>
+              <li>If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.</li>
+            </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Get a list of events that discovered on the specified Hostname asset
+                  <ul style="list-style-type:none;">
+                    <li> Asset Indicator = Hostname</li>
+                    <li> Value = franklin-guzman-laptop</li>
+                    <li> Start Time = 2019-11-01T20:37:00Z</li>
+                    <li> End Time = 2019-11-02T20:37:00Z</li>
+                    <li> Reference Time = 2019-11-02T20:37:00Z</li>
+                  </ul>
+                </li>
+                <li> Filtering events results for the specified Asset IP Address for the last three days (Here, Present time is 2020-01-03T00:00:00Z)
+                  <ul style="list-style-type:none;">
+                    <li> Asset Indicator = Asset IP Address</li>
+                    <li> Value = 157.122.62.205</li>
+                    <li> Time Range = 3d</li>
+                  </ul>
+                </li>
+                <li> Filtering events results based on the specifying time range for the specified Asset IP Address.
+                  <ul style="list-style-type:none;">
+                    <li> Asset Indicator = Asset IP Address</li>
+                    <li> Value = 157.122.62.205</li>
+                    <li> Start Time = 2019-01-01T00:00:00Z</li>
+                    <li> End Time = 2020-01-01T00:00:00Z</li>
+                    <li> Reference Time = 2020-01-01T00:00:00Z</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>List IoCs</h3>
+          <ul>
+            <li><b><u>Action Parameter:</u> Time Range</b></li>
+            <ul>
+              <li>This parameter will be used for specifying the time range of the search.</li>
+              <li> User can provide time using this '&lt;digit&gt;&lt;d/h/m/s&gt;' time format. Here, d = Day, h = Hour, m = Minutes, and s = Seconds.</li>
+              <li><b>Note: </b>The Start time and End time will be calculated using the specified time range. The end time will be present time and according to the specified time range, the start time will be calculated for the search.</li>
+            </ul>
+            <li><b><u>Action Parameters:</u> Start Time</b></li>
+              <ul>
+                <li>This parameter will be used for specifying the start time of the search.</li>
+                <li>Users can provide time using this 'yyyy-MM-ddTHH:mm:ssZ' time format. Here, y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds.</li>
+                <li><b>Note: </b>IoCs returned by this method are the IoCs that were discovered by Chronicle within the specified time range in the enterprise environment. There might be IoCs within your data that were present prior to their discovery by the Chronicle.</li>
+              </ul>
+            <li><b><u>Action Parameter:</u> Limit</b></li>
+              <ul>
+                <li>This parameter is used to limit the number of IoCs results to return.</li>
+                <li>The user can specify between 1 and 10,000. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 IoCs results.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+            <ul>
+              <li>If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days.</li>
+              <li>If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.</li>
+            </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Get a list of all of the possible IoC discovered within the enterprise for the last three days (Here, Present time is 2020-01-03T00:00:00Z)
+                  <ul style="list-style-type:none;">
+                    <li> Time Range= 3d</li>
+                  </ul>
+                </li>
+                <li> Get a list of all of the possible IoC discovered within the enterprise starting from the specified time.
+                  <ul style="list-style-type:none;">
+                    <li> Start Time= 2019-01-01T00:00:00Z</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>List IoC Details</h3>
+          <ul>
+            <li><b><u>Action Parameter:</u> Artifact Indicator</b></li>
+              <ul>
+                <li>The Artifact Indicator parameter enables search by selecting anyone from given artifact indicators.</li>
+                <li>Valid Values: </li>
+                <ul>
+                  <li>Domain Name</li>
+                  <li>Destination IP Address</li>
+                </ul>
+              </ul>
+            <li><b><u>Action Parameter:</u> Value</b></li>
+              <ul>
+                <li>The user can provide artifact value into the Value action parameter.</li>
+              </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Fetch threat intelligence associated with the specific domain artifact
+                  <ul style="list-style-type:none;">
+                    <li> Artifact Indicator = Domain Name</li>
+                    <li> Value = wp.com</li>
+                  </ul>
+                </li>
+                <li> Fetch threat intelligence associated with the specific IP artifact
+                  <ul style="list-style-type:none;">
+                    <li> Artifact Indicator = Destination IP Address</li>
+                    <li> Value = 45.64.104.167</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>Domain Reputation</h3>
+          <ul>
+            <li><b><u>Reputation Decision Algorithm</u></b></li>
+            <ul>
+              <li>There is a total of 8 asset configuration parameters that will use in this algorithm. These parameter values will be used for deriving the anyone of reputation from 'Malicious', 'Suspicious', and 'Unknown' for the specified artifact. Chronicle provides details about the Domain/IP which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Here, 'Malicious' reputation has higher priority over 'Suspicious' reputation which means if any of the details of the sources of the retrieved domain IoC from search falls under the 'Malicious' criteria, then, reputation will be defined as 'Malicious' and won’t check for the 'Suspicious' criteria. If the retrieved IoC doesn’t fall under any one of the criteria configured for 'Malicious' and 'Suspicious', then, reputation will be derived as 'Unknown'.</li>
+            </ul>
+            <li><b><u>Action Parameter:</u> Domain Name</b></li>
+              <ul>
+                <li>This parameter will be used to specify the value of domain artifact for search. It is a required action parameter.</li>
+              </ul>
+            <li><b><u>Asset Configuration Parameters:</u> Malicious categories for reputation, Malicious severity for reputation, Malicious Str Confidence score for reputation, and Malicious Int Confidence score for reputation</b></li>
+              <ul>
+                <li>These parameters will be used for deriving the 'Malicious' reputation for the specified artifact. Chronicle provides details about the IoC which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Using the values of these parameters, if any of the details of the sources of retrieved domain IoC from search falls under these values, then, reputation will be derived as a 'Malicious'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Malicious'.</li>
+              </ul>
+            <li><b><u>Asset Configuration Parameters:</u> Suspicious categories for reputation, Suspicious severity for reputation, Suspicious Str Confidence score for reputation, and Suspicious Int Confidence score for reputation</b></li>
+              <ul>
+                <li>These parameters will be used for deriving the 'Suspicious' reputation for the specified artifact. Chronicle provides details about the IoC which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Using the values of these parameters, if any of the details of the sources of retrieved domain IoC from search falls under these values, then, reputation will be derived as a 'Suspicious'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Suspicious'.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+              <ul>
+                <li>Using the values of asset configuration parameters, if retrieved IoC from search does not fall under any of the values, then, reputation will be derived as an 'Unknown'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Unknown'.</li>
+                <li>If the user doesn’t configure any values for these asset configuration parameters, reputation will be derived as an 'Unknown'.</li>
+                <li>If the search will not retrieve any of the sources for specified domain artifact, then, reputation will be derived as an 'Unknown'.</li>
+                <li>Here, 'Malicious' reputation has higher priority over 'Suspicious' reputation which means if any of the details of the sources of the retrieved domain IoC from search falls under the 'Malicious' criteria, then, reputation will be defined as 'Malicious' and won't check for the 'Suspicious' criteria.</li>
+              </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Derive reputation of threat intelligence associated with the specific domain artifact
+                  <ul>
+                    <li> Domain Name = wp.com (Action parameter)</li>
+                    <li>Malicious severity for reputation = [“High”, “Medium”] (Asset configuration parameter)</li>
+                  </ul>
+                  <br>
+                  <ul style="list-style-type:none;">
+                    <b>Sample response for this search:</b><br>
+                    {"sources":[{"sourceUrl": "........","confidenceScore": {"strRawConfidenceScore": "30"},"rawSeverity": "Medium","category": ".......","addresses": [......],.....}]}
+                    <li><br>Reputation will be defined as ‘Malicious’ as retrieved IoC from search has ‘Medium’ rawSeverity in its sources.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><h3>IP Reputation</h3>
+          <ul>
+            <li><b><u>Reputation Decision Algorithm</u></b></li>
+            <ul>
+              <li>There is a total of 8 asset configuration parameters that will use in this algorithm. These parameter values will be used for deriving the anyone of reputation from 'Malicious', 'Suspicious', and 'Unknown' for the specified artifact. Chronicle provides details about the Domain/IP which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Here, 'Malicious' reputation has higher priority over 'Suspicious' reputation which means if any of the details of the sources of the retrieved IP IoC from search falls under the 'Malicious' criteria, then, reputation will be defined as 'Malicious' and won’t check for the 'Suspicious' criteria. If the retrieved IoC doesn’t fall under any one of the criteria configured for 'Malicious' and 'Suspicious', then, reputation will be derived as 'Unknown'.</li>
+            </ul>
+            <li><b><u>Action Parameter:</u> Destination IP Address</b></li>
+              <ul>
+                <li>This parameter will be used to specify the value of IP artifact for search. It is a required action parameter.</li>
+              </ul>
+            <li><b><u>Asset Configuration Parameters:</u> Malicious categories for reputation, Malicious severity for reputation, Malicious Str Confidence score for reputation, and Malicious Int Confidence score for reputation</b></li>
+              <ul>
+                <li>These parameters will be used for deriving the 'Malicious' reputation for the specified artifact. Chronicle provides details about the IoC which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Using the values of these parameters, if any of the details of the sources of retrieved IP IoC from search falls under these values, then, reputation will be derived as a 'Malicious'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Malicious'.</li>
+              </ul>
+            <li><b><u>Asset Configuration Parameters:</u> Suspicious categories for reputation, Suspicious severity for reputation, Suspicious Str Confidence score for reputation, and Suspicious Int Confidence score for reputation</b></li>
+              <ul>
+                <li>These parameters will be used for deriving the 'Suspicious' reputation for the specified artifact. Chronicle provides details about the IoC which includes Categories, Severity, and Confidence Score. The reputation calculation can be controlled using these 3 properties. Using the values of these parameters, if any of the details of the sources of retrieved IP IoC from search falls under these values, then, reputation will be derived as a 'Suspicious'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Suspicious'.</li>
+              </ul>
+            <li><b><u>Note:</u></b></li>
+              <ul>
+                <li>Using the values of asset configuration parameters, if retrieved IoC from search does not fall under any of the values, then, reputation will be derived as an 'Unknown'. You can identify this in the action output data path as this action will set the value of reputation datapath to 'Unknown'.</li>
+                <li>If the user doesn’t configure any values for these asset configuration parameters, reputation will be derived as an 'Unknown'.</li>
+                <li>If the search will not retrieve any of the sources for specified IP artifact, then, reputation will be derived as an 'Unknown'.</li>
+                <li>Here, 'Malicious' reputation has higher priority over 'Suspicious' reputation which means if any of the details of the sources of the retrieved IP IoC from search falls under the 'Malicious' criteria, then, reputation will be defined as 'Malicious' and won't check for the 'Suspicious' criteria.</li>
+              </ul>
+            <li><b>Example:</b>
+              <ul>
+                <li> Derive reputation of threat intelligence associated with the specific domain artifact
+                  <ul>
+                    <li> Destination IP Address = 192.225.158.2 (Action parameter)</li>
+                    <li> Suspicious Int Confidence Score Range for Reputation = 10,30 (Asset configuration parameter)</li>
+                  </ul>
+                  <br>
+                  <ul style="list-style-type:none;">
+                    <b>Sample response for this search:</b><br>
+                    {"sources":[{"sourceUrl": "........","confidenceScore": {"strRawConfidenceScore": "21"},"rawSeverity": "Low","category": "........","addresses": [......],.....}]}
+                    <li><br>Reputation will be defined as 'Suspicious' as retrieved IoC from search has 21 strRawConfidenceScore in its sources which lies between the 10 and 30.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </p>
+
+    <p>
+      <h2>On Poll</h2>
+      <ul>
+        <li><h3>What is On Poll</h3>
+          <ul>
+            <li> It will ingest data from the external system into the phantom server in the form of containers and artifacts. There are two approaches to polling which are mentioned below.</li>
+            <ul>
+              <li>POLL NOW (Manual polling)</li>
+              <ul>
+                <li>
+                  It will fetch the data every time as per the corresponding asset configuration parameters. It doesn’t store the last run context of the fetched data. The corresponding asset configuration parameters for the POLL NOW are the Time range for POLL NOW, Max results for POLL NOW.
+                </li>
+              </ul>
+              <li>Scheduled/Interval Polling</li>
+              <ul>
+                <li>Scheduled Polling: The ingestion action can be triggered at every specified timestamp interval.</li>
+                <li>Interval Polling: The ingestion action can be triggered at every time range interval.</li>
+                <li>It will fetch the data every time as per the corresponding asset configuration parameters based on the stored context from the previous ingestion run. It stores the last run context of the fetched data. It starts fetching data based on the combination of the values of stored context for the previous ingestion run and the corresponding asset configuration parameters having higher priority. The corresponding asset configuration parameters for the scheduled/interval polling are the Start time for scheduled/interval POLL, Max results for scheduled/interval POLL.</li>
+              </ul>
+            </ul>
+          </ul>
+        </li>
+        <li><h3>Containers and Artifacts creation</h3>
+          <ul>
+            <li>
+              We have configured three ingestion run modes which you can select from the [Ingestion Run Mode] asset configuration parameters. Below are the three modes
+            </li>
+            <ul>
+              <li>Both: It will ingest both the 3rd party security alerts and domain IoCs tracked/discovered within the enterprise.</li>
+              <li>IoC Domain Matches: It will ingest only the domain IoCs discovered within the enterprise.</li>
+              <li>Assets with Alerts: It will ingest only the 3rd party security alerts tracked within the enterprise.</li>
+            </ul>
+            <li>Container</li>
+            <ul>
+              <li>
+                A container is a composite object that consists of one or more artifacts that can be automated. Containers are the top-level data structure that Playbooks operate on. Every container has a common header, and beneath that, the ability to store arbitrary less structured JSON.
+              </li>
+            </ul>
+            <li>Artifacts</li>
+            <ul>
+              <li>
+                Artifacts are objects that are associated with a Container and serve as corroboration or evidence related to the Container.
+              </li>
+            </ul>
+            <li>For the security alerts and IoCs data which we are fetching will be ingested in the form of groups of entities(two groups; one for IoCs and another for security alerts based on the ingestion run mode) with the group getting created as a container and entities getting created as artifacts in the respective container. Below is the explanation based on the ingestion run mode for that.</li>
+            <ul>
+              <li><b>Both</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;For this mode, two containers will be created for each type of data. One container will be created for the security alerts data and another container will be created for the Domain IoC matches.
+              <ul>
+                <li>Container 1 :- IoC Domain Matches - creation_timestamp</li>
+                <ul>
+                  <li>This container will be used to store fetched IOC data in the form of the artifacts. The container will be saved with a creation timestamp in its name e.g. IoC Domain Matches - 2019-01-01T00:00:00Z.</li>
+                </ul>
+                <li>Container 2 :- Asset with Alerts - creation_timestamp</li>
+                <ul>
+                  <li>This container will be used to store fetched security alerts data in the form of the artifacts. The container will be saved with a creation timestamp in its name e.g. Asset with Alerts -  2019-01-01T00:00:00Z.</li>
+                </ul>
+              </ul>
+              <li><b>IoC Domain Matches</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;In this mode, one container will be created for the domain IoC matches.
+              <ul>
+                <li>Container 1 :- IoC Domain Matches - creation_timestamp</li>
+                <ul>
+                  <li>This container will be used to store fetched IOC data in the form of the artifacts. The container will be saved with a creation timestamp in its name e.g. IoC Domain Matches - 2019-01-01T00:00:00Z.</li>
+                </ul>
+              </ul>
+              <li><b>Assets with Alerts</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;In this mode, one container will be created for 3rd party security alerts.
+              <ul>
+                <li>Container 1 :- Asset with Alerts - creation_timestamp</li>
+                <ul>
+                  <li>This container will be used to store fetched IOC data in the form of the artifacts. The container will be saved with a creation timestamp in its name e.g. IoC Domain Matches - 2019-01-01T00:00:00Z.</li>
+                </ul>
+              </ul>
+            </ul>
+            <li>To make ingested data more manageable in the containers and artifacts, we have provided the configuration parameter to specify the maximum allowed artifacts in the single container. I.e. [Max allowed artifacts in a single container]</li>
+          </ul>
+        </li>
+        <li><h3>Stored Context</h3>
+          <ul>
+            <li>
+              It is the concept of storing the context of the previous ingestion run. This concept will be used in the scheduled/interval polling. It will use the state file to store the last run context. This state file will be created for the created asset for the application on the phantom platform.
+            </li>
+            <ul>
+              <li>State file location:</li>
+              <ul>
+                <li>For non-NRI Instances: /opt/phantom/local_data/app_states/8925dbb5-abe1-4e5d-b053-326e35e1e194</li>
+                <li>For NRI Instances: /home/phanru/phantomcyber/local_data/app_states/8925dbb5-abe1-4e5d-b053-326e35e1e194</li>
+              </ul>
+              <li>The default format of state file: {"app_version": "1.0.0"}</li>
+            </ul>
+          </ul>
+        </li>
+        <li><h3>Parameters</h3>
+          <ul>
+            <li><b><u>Manual Polling - Poll Now</u></b></li>
+            &nbsp;&nbsp;&nbsp;&nbsp;It will fetch the data every time as per the corresponding asset configuration parameters. It doesn’t store the last run context of the fetched data. The corresponding asset configuration parameters for the POLL NOW are the [Time range for POLL NOW], [Max results for POLL NOW].
+            <ul>
+              <li><b><u>Asset Configuration Parameter</u> - Time range for POLL NOW</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;This is an optional parameter. This parameter will be used to specify the time range for the search in the manual polling. Possible values format: 'start_time, end_time' or &lt;digit&gt;&lt;d/h/m/s&gt; or 'start_time' where d = Day, h = Hour, m = Minutes, and s = Seconds. If the value is not given, the value will be considered as 3d(means the last three days).
+              <ul>
+                <li>Format 1 - 'start_time, end_time'</li>
+                <ul>
+                  <li>
+                    Using this format you can provide start time and end time both for a specified time period. You can provide time using this 'yyyy-MM-ddTHH:mm:ssZ' time format. Here, y=Year, M=Month, d=Day, H=Hour, m=Minutes, s=Seconds.<br>E.g. 2020-03-20T00:00:00Z, 2020-06-20T00:00:00Z
+                  </li>
+                </ul>
+                <li>Format 2 - &lt;digit&gt;&lt;d/h/m/s&gt;</li>
+                <ul>
+                  <li>
+                    Using this format you can informally provide a time period. For example, 3d = 3 Days, 3m = 3 Minutes. The Start time and End time will be calculated using the specified value. The end time will be present time and according to the specified time range, the start time will be calculated for the search.<br>E.g. 10d
+                  </li>
+                </ul>
+                <li>Format 3 - 'start_time'</li>
+                <ul>
+                  <li>
+                    Using this format you can provide start time only. The end time will be considered as present time.<br>E.g. 2020-03-20T00:00:00Z
+                  </li>
+                </ul>
+              </ul>
+              <li><b><u>Asset Configuration Parameter</u> - Max results for POLL NOW</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;This is an optional parameter. This parameter is used to specify the maximum number of results to return from API calls in the manual polling. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 results.
+              <br>&nbsp;&nbsp;&nbsp;&nbsp; Example:
+              <ul>
+                <li>Run the manual poll for the Both ingestion run mode for the last ten days.</li>
+                <ul>
+                  <li>Time range for POLL NOW = 10d</li>
+                  <li>Max results for POLL NOW = 10000</li>
+                  <li>Ingestion Run Mode = Both</li>
+                </ul>
+              </ul>
+            </ul>
+            <li><b><u>Scheduled/Interval Polling</u></b></li>
+            &nbsp;&nbsp;&nbsp;&nbsp;It will fetch the data every time as per the corresponding asset configuration parameters based on the stored context from the previous ingestion run. It stores the last run context of the fetched data. It starts fetching data based on the combination of the values of stored context for the previous ingestion run and the corresponding asset configuration parameters having higher priority. The corresponding asset configuration parameters for the scheduled/interval polling are the [Start time for scheduled/interval POLL], [Max results for scheduled/interval POLL].
+            <ul>
+              <li><b><u>Asset Configuration Parameter</u> - Start time for scheduled/interval POLL</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;This parameter will be used to specify the start time for the search. Possible values format: 'start_time' or &lt;digit&gt;&lt;d/h/m/s&gt; where d = Day, h = Hour, m = Minutes, and s = Seconds.
+              <ul>
+                <li>Format 1 - &lt;digit&gt;&lt;d/h/m/s&gt;</li>
+                <ul>
+                  <li>
+                    Using this format you can informally provide a time period. For example, 3d = 3 Days, 3m = 3 Minutes. The Start time and End time will be calculated using the specified value. The end time will be present time and according to the specified value, the start time will be calculated for the search.<br>E.g. 10d
+                  </li>
+                </ul>
+                <li>Format 2 - 'start_time'</li>
+                <ul>
+                  <li>
+                    Using this format you can provide start time only. The end time will be considered as present time.<br>E.g. 2020-03-20T00:00:00Z
+                  </li>
+                </ul>
+              </ul>
+              <li><b><u>Asset Configuration Parameter</u> - Max results for scheduled/interval POLL</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;This is an optional parameter. This parameter is used to specify the maximum number of results to return from API calls. The default value is 10,000. If the limit is not provided, it will fetch by default 10,000 results.
+              <br>&nbsp;&nbsp;&nbsp;&nbsp; Example:
+              <ul>
+                <li>Run the Scheduled poll for the Both ingestion run mode for the last three days.</li>
+                <ul>
+                  <li>Start time for scheduled/interval POLL = 3d</li>
+                  <li>Max results for scheduled/interval POLL = 10000</li>
+                  <li>Ingestion Run Mode = Both</li>
+                </ul>
+              </ul>
+              <li><b><u>Stored Context</u> - State file intervention</b></li>
+              &nbsp;&nbsp;&nbsp;&nbsp;The state file will be used to save the last run context. For the first run, the state is mentioned below. Hence, the action will run as the provided asset configuration parameters. After performing the first run, the action will save the individual last run context for the IoC and Alerts for the scheduled/interval polling.
+              <ul>
+                <li>State file without the stored context of the previous run: {"app_version": "1.0.0"}</li>
+                <li>State file with the stored context of the previous run: {"app_version": "1.0.0","last_run_ioc_time": "2020-01-03T00:00:00Z", "last_run_alert_time": "2020-01-03T00:00:00Z"}</li>
+              </ul>
+            </ul>
+            <li><b><u>Common Asset parameters</u></b></li>
+            <ul>
+              <li><b><u>Asset Configuration Parameter</u> - Alert Severity (JSON formatted list)</b></li>
+              This parameter will be used to filter fetched security alerts data based on the alert severity. It is an optional parameter. This action will ingest only those alerts which have specified severity. If the value is not provided, it will ingest all fetched data into the container.This parameter will be validated and used only when ingestion run mode is either ‘Both’ or ‘Assets with Alerts’.
+              <li><b><u>Asset Configuration Parameter</u> - Max allowed artifacts in a single container</b></li>
+              This is an optional parameter. This parameter is used to specify the maximum allowed artifacts in a single container to ingest. The default value is 10,000. If the value is not provided, it will set it to 10,000 by default. If the container limit is exhausted, this action will create a new container with a creation timestamp and start ingestion in it.
+              <br>
+              <b>Manual Polling (POLL NOW)</b>
+              <ul>
+                <li>In this case, every time the action will create a new container. If the fetched data has more data than the specified value of ‘Max allowed artifacts in a single container’, it will create multiple containers to ingest data as it satisfies the maximum allowed artifacts limit in a single container.</li>
+              </ul>
+              <b>Scheduled/Interval Polling</b>
+              <br>The action will determine the run whether it is the first run or not based on the stored context for scheduled/interval polling.
+              <ul>
+                <li>For the first ingestion run for Scheduled/Interval polling</li>
+                <ul>
+                  <li>In this case, every time the action will create a new container. If the fetched data has more data than the specified value of [Max allowed artifacts in a single container], it will create multiple containers to ingest data as it satisfies the maximum allowed artifacts limit in a single container.</li>
+                </ul>
+                <li>For the subsequent ingestion run for Scheduled/Interval polling</li>
+                <ul>
+                  <li>In this case, there three possible ways to ingest artifacts into the container.</li>
+                  <ul>
+                    <li><b>Container does not exist: </b>In this way, the action will create a new container and start ingesting artifacts in it.</li>
+                    <li><b>Container already exists  and having sufficient margin for artifacts creation: </b>In this way, the action will ingest artifacts into the already existing container.</li>
+                    <li><b>Container already exists and not having sufficient margin: </b>In this way, the action will ingest artifacts into the already existing container until the limit is reached, then, the action will create a new container and start ingesting artifacts in it.</li>
+                  </ul>
+                </ul>
+              </ul>
+            </ul>
+          </ul>
+        </li>
+        <li><h3>Sample of Ingested Artifacts</h3>
+          There are a total of two types of artifacts getting ingested into the phantom server which are mentioned below.<br>
+          <br><ul>
+              <li><b>Alert Artifact</b></li>
+              This artifact will be created when ingestion run mode is either ‘Both’ or ‘Assets with Alerts’. This artifact will be ingested into the separate container named ‘Assets with Alerts &lt;creation_timestamp&gt;’.
+              <li style="list-style-type:none;">
+                  <ul>
+                      <li>Sample response of the ListAlerts endpoint which is used to fetch the alerts data:</li>
+                          &nbsp;&nbsp;{<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;"asset": {<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"hostname": "mary-gonzalez-laptop"<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;"alertInfos": [<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "if match then match [1]",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sourceProduct": "Rule Generated Alert [456def]",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"severity": "High",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"timestamp": "2020-01-27T22:07:12Z",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rawLog": "...",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"uri": [“...”]<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;]<br>
+                          &nbsp;&nbsp;}<br>
+                      <li>Sample ‘Alert artifact’ which gets created from the received response:</li>
+                          &nbsp;&nbsp;{<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;...<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;"cef": {<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"assetIndicator": "hostname",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"assetValue": "mary-gonzalez-laptop",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"alertName": "if match then match [1]",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sourceProduct": "Rule Generated Alert [456def]"<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"severity": "High",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"timestamp": "2020-01-27T22:07:12Z",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rawLog": "..."<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"uri": "...",<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;...<br>
+                          &nbsp;&nbsp;}<br>                    
+                  </ul>
+              </li>
+          <br><li><b>IoC Domain Artifact</b></li>
+              This artifact will be created when ingestion run mode is either ‘Both’ or ‘IoC Domain Matches’. This artifact will be ingested into the separate container named ‘IoC Domain Matches &lt;creation_timestamp&gt;’.
+              <li style="list-style-type:none;">
+                  <ul>
+                      <li>Sample response of the ListIoCs endpoint which is used to fetch the IoCs data:</li>
+                      &nbsp;&nbsp;{<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"artifact": {<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"domainName": "speedtest.net"<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"firstSeenTime": "2018-11-05T12:00:57Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"iocIngestTime": "2018-07-21T20:00:00Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"uri": [“...”],<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"lastSeenTime": "2020-03-23T23:51:00.241330Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"sources": [<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "IP Check Services",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"source": "ET Intelligence Rep List",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rawSeverity": "Info",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"confidenceScore": {<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"normalizedConfidenceScore": "Medium",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"intRawConfidenceScore": 0<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;]<br>
+                      &nbsp;&nbsp;}<br>                      
+                      <li>Sample ‘IoC Domain artifact’ which gets created from the received response:</li>
+                      &nbsp;&nbsp;{<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;...<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;"cef": {<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"artifactIndicator": "domainName",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"artifactValue": "speedtest.net",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "IP Check Services",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rawSeverity": "Info",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"normalizedConfidenceScore": "Medium",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"iocIngestTime": "2018-07-21T20:00:00Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"uri": “...”,<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lastSeenTime": "2020-03-23T23:51:00.241330Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sources": "ET Intelligence Rep List",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"firstSeenTime": "2018-11-05T12:00:57Z",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"intRawConfidenceScore": "0",<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rawJSON": '{"artifact": {"domainName": "speedtest.net"}, "sources": [{"source": "ET Intelligence Rep List", "confidenceScore": {"normalizedConfidenceScore": "Medium", "intRawConfidenceScore": 0}, "rawSeverity": "Info", "category": "IP Check Services"}], "iocIngestTime": "2018-07-21T20:00:00Z", "firstSeenTime": "2018-11-05T12:00:57Z", "lastSeenTime": "2020-03-23T23:51:00.241330Z", "uri": ["..."]}'<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;...<br>
+                      &nbsp;&nbsp;}<br>
+                      <br><b>NOTE - </b>
+                Here, the category, sources, rawSeverity, normalizedConfidenceScore, intRawConfidenceScore keys of the IoC Domain Artifact are the details of IoC sources and it has comma-separated string datatype. There are chances to retrieved multiple sources for single IoC so that to club all the details in the single key make all these key as a comma-separated string.                                      
+                  </ul>
+              </li>
+          </ul>
+      </li>
+      </ul>
+    </p>
+
+    <p>
+      <h2>Error code caveats</h2>
+      <ul>
+        <li> <h4>Handling for HTTP 429 (RESOURCE_EXHAUSTED) Error </h4>
+          The Chronicle API enforces limits on the volume of requests that can be made by anyone against the Chronicle platform. If the user reaches or exceeds the query limit, the Chronicle API server returns HTTP 429 (RESOURCE_EXHAUSTED) to the caller. Hence, while executing the actions of the Chronicle Phantom integration, there were situations where the actions failed due to the above-mentioned API error. To handle this scenario, we have implemented the below-mentioned logic.
+          <ul>
+            <li>The action will execute as per the normal action flow.</li>
+            <li>If the Chronicle APIs return HTTP 429 (RESOURCE_EXHAUSTED) error, then, the retry API calls workflow will be executed. The retry workflow is governed by the 2 asset configuration parameters named “Retry Wait Period(in seconds)” and “Number Of Retries”. The explanation of both the parameters is provided below.
+              <ul>
+                <li>
+                  <b>Number of Retries: </b> The value of this parameter defines the number of attempts for which the action will keep on retrying if the Chronicle API continuously returns the HTTP 429 (RESOURCE_EXHAUSTED) error. If the error gets eliminated before the number of retries gets exhausted, then, the action execution will continue along its workflow with the next set of API calls and if the error is still persistent and all the number of retries are exhausted, then, the action will fail with the latest error message being displayed.
+                </li>
+                <li>
+                  <b>Retry Wait Period (in seconds): </b> The value of this parameter defines the waiting period in seconds for which to hold the current execution of the action on receiving the HTTP 429 (RESOURCE_EXHAUSTED) error and then, retry the same API call after the waiting period is exhausted. This ensures that the integration provides a mechanism of attempting to overcome the HTTP 429 (RESOURCE_EXHAUSTED) error.
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <li> <h4>The HTTP 500 Internal Server Error </h4>
+          The 500 Internal Server Error is a general HTTP status code which means that something on the server has gone wrong, but the server couldn't be more precise about the exact issue. There are certain cases where this error may occur with this Chronicle Phantom Integration which are listed below. There are possibilities to get this error in any other invalid scenarios.
+          <ul>
+            <li><b><u>Action</u> - List Assets</b>
+              <ul>
+                <li>When the destination IP address is not valid but it has a valid IP format.</li>
+              </ul>
+            </li>
+            <li><b><u>Action</u> - List Events</b>
+              <ul>
+                <li>When the asset IP address is not valid but it has a valid IP format.</li>
+                <li>When an incorrect product ID is given for the asset.</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,291 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: risksense_list_apps.html
+
+    Copyright (c) RiskSense, 2020
+
+    This unpublished material is proprietary to RiskSense.
+    All rights reserved. The methods and
+    techniques described herein are considered trade secrets
+    and/or confidential. Reproduction or distribution, in whole
+    or in part, is forbidden except by express written permission
+    of RiskSense.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+
+    .risksense a:hover {
+        text-decoration:underline;
+    }
+
+
+    .risksense .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .risksense .wf-table-vertical td{
+    padding: 8px 10px;
+    border: 1px solid;
+    }
+
+    .risksense .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+    }
+
+    .risksense .wf-table-horizontal {
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .risksense .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .risksense .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .risksense .wf-h3-style {
+        font-size : 20px
+    }
+
+    .risksense .wf-h4-style {
+        font-size : 16px
+    }
+
+    .risksense .collapse.in {
+        display: block !important;
+    }
+
+    .risksense .panel-collapse {
+        overflow-x: auto;
+    }
+
+    .risksense .glyphicon.glyphicon-dot:before {
+        content: "\25cf"; font-size: 10px;
+    }
+
+    .risksense .no-word-wrap {
+        white-space: nowrap;
+    }
+
+    .risksense a.nowrap {
+        white-space:nowrap;
+    }
+
+</style>
+<div class="risksense" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    {% for result in results %} <!-- loop for each result -->
+    <br>
+
+    <!------------------- For each Result ---------------------->
+    {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+
+    {% else %}
+        <h4 class="wf-h3-style">Action Parameters</h4>
+        {% if result.check_param %}
+            <table class="wf-table-vertical">
+            {% if result.param.app_id %}
+                <tr>
+                    <td>App ID</td>
+                    <td>
+                        <a class="no-word-wrap"href="javascript:;" onclick="context_menu(this, [{'contains': ['risksense app id'], 'value':'{{ result.param.app_id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.app_id }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span><br>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.fieldname %}
+                <tr>
+                    <td>Fieldname</td>
+                    <td>{{ result.param.fieldname }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.operator %}
+                <tr>
+                    <td>Operator</td>
+                    <td>{{ result.param.operator }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.value %}
+                <tr>
+                    <td>Value</td>
+                    <td>{{ result.param.value }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.exclusivity %}
+                <tr>
+                    <td>Exclusivity</td>
+                    <td>{{ result.param.exclusivity }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.sort_by %}
+                <tr>
+                    <td>Sort By</td>
+                    <td>{{ result.param.sort_by }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.sort_direction %}
+                <tr>
+                    <td>Sort Direction</td>
+                    <td>{{ result.param.sort_direction }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.page %}
+                <tr>
+                    <td>Page</td>
+                    <td>{{ result.param.page }}</td>
+                </tr>
+            {% endif %}
+            {% if result.param.max_results %}
+                <tr>
+                    <td>Max Results</td>
+                    <td>{{ result.param.max_results }}</td>
+                </tr>
+            {% endif %}
+            </table>
+        {% else %}
+            <h4 class="wf-h4-style">No action parameters provided</h4>
+        {% endif %}
+
+        <div class="results">
+        {% for response in result.data %}
+            <h4 class="wf-h4-style">Application Details</h4>
+
+            <!--Default View-->
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>App ID</th>
+                        <th>App Name</th>
+                        <th>App URI</th>
+                        <th>App description</th>
+                        <th>Total Finding</th>
+                        <th>Total VRR Finding</th>
+                        <th>Tags</th>
+                        <th>Groups</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if response.applications %}
+                        {% for app in response.applications %}
+                            <tr>
+                                <td>
+                                    <a class="no-word-wrap"href="javascript:;" onclick="context_menu(this, [{'contains': ['risksense app id'], 'value':'{{ app.id }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ app.id }}
+                                        &nbsp;
+                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span><br>
+                                    </a>
+                                </td>
+                                <td>{{ app.name }}</td>
+                                <td>{{ app.uri }}</td>
+                                <td>{{ app.description }}</td>
+                                <td>{{ app.findingsDistribution.total.value }}</td>
+                                <td>{{ app.findingsByVrrDistribution.total.value }}</td>
+                                <td>
+                                    {% for tag in app.tags %}
+                                        <a class="no-word-wrap"href="javascript:;" onclick="context_menu(this, [{'contains': ['risksense tag name'], 'value':'{{ tag.name }}' }], 0, {{ container.id }}, null, false);">
+                                            {{ tag.name }}
+                                            &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span><br>
+                                        </a>
+                                    {% endfor %}    
+                                </td>
+                                <td>
+                                    {% for group in app.groups %}
+                                        <li class="no-word-wrap">{{ group.name }}</li>
+                                    {% endfor %}    
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="8" align="center">No Apps available</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+            <h4 class="wf-h4-style">Error App Details</h4>
+
+            <!--Default View-->
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>Error App ID</th>
+                        <th>Error Reference ID</th>
+                        <th>Code</th>
+                        <th>Cause</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if response.error_applications %}
+                        {% for error in response.error_applications %}
+                            <tr>
+                                <td>
+                                    <a class="no-word-wrap"href="javascript:;" onclick="context_menu(this, [{'contains': ['risksense app id'], 'value':'{{ error.id }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ error.id }}
+                                        &nbsp;
+                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span><br>
+                                    </a>
+                                </td>
+                                <td>{{ error.errorRefId }}</td>
+                                <td>{{ error.code }}</td>
+                                <td>{{ error.cause }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="4" align="center">No Error Apps available</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <script>
+        $('.datatable').DataTable();
+    </script>
+    {% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": false,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top">rt<"bottom"p><"clear">',
+        drawCallback: function(settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable();
+</script>
+{% endblock %} <!-- Main Start Block -->

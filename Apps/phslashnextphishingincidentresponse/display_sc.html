@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_sc.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -37,6 +37,7 @@ em{font-style: normal}
 .fs-17{font-size:17px!important}
 .fs-13{font-size:13px!important}
 .fs-11{font-size:11px!important}
+.wf-h4-style{font-size:16px}
 .br-top-3{border-top:3px solid #535454;}
 .br-gray{border:1px solid #D8D8D8;}
 .br-gray-bottom{border-bottom:1px solid #D8D8D8;}
@@ -99,55 +100,59 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 		{% for result in results %} <!-- Loop for each result -->
 
-		<section class="mb-20 mt-20">
-			<!-- Download Screenshot section -->
-			<h2 class="mb-10">SlashNext Phishing Incident Response - Download Screenshot</h2>
+			{% if not result.data %}
+				<h4 class="wf-h4-style">No data found</h4>
+			{% else %}
+				<section class="mb-20 mt-20">
+					<!-- Download Screenshot section -->
+					<h2 class="mb-10">SlashNext Phishing Incident Response - Download Screenshot</h2>
 
-			<h3 class="mb-5">action = download screenshot</h3>
-			<h3 class="mb-5">scan id = {{result.param.scanid}}</h3>
+					<h3 class="mb-5">action = download screenshot</h3>
+					<h3 class="mb-5">scan id = {{result.param.scanid}}</h3>
 
-			{% if result.data.errorNo == 0 %} <!-- Download screenshot success condition -->
+					{% if result.data.errorNo == 0 %} <!-- Download screenshot success condition -->
 
-			<div class="full"><a href="javascript:;" class="bttn download-jpeg" id="imgDwlBnt{{ forloop.counter }}">Download Screenshot</a></div>
-			<script type="text/javascript">
-				function downloadImg(imgData,imgName) {
-					return function() {
-						var element = document.createElement('a');
-						element.setAttribute('href', imgData);
-						element.setAttribute('download', imgName);
-						element.style.display = 'none';
-						document.body.appendChild(element);
-						element.click();
-						document.body.removeChild(element);
-					};
-				};
-				var image = document.createElement('img');
-				image.src = "data:image/jpeg;base64," + "{{result.data.scData.scBase64}}";
-				var imgData = image.src;
-				var src = document.getElementById("imageSrc" + "{{ forloop.counter }}");
-				src.appendChild(image);
-				var imgName = 'snx_' + '{{result.param.scanid}}' +'.jpeg';
-				$("#imgDwlBnt" + "{{ forloop.counter }}").click(downloadImg(imgData,imgName));
-			</script>
+						<div class="full"><a href="javascript:;" class="bttn download-jpeg" id="imgDwlBnt{{ forloop.counter }}">Download Screenshot</a></div>
+						<script type="text/javascript">
+							function downloadImg(imgData,imgName) {
+								return function() {
+									var element = document.createElement('a');
+									element.setAttribute('href', imgData);
+									element.setAttribute('download', imgName);
+									element.style.display = 'none';
+									document.body.appendChild(element);
+									element.click();
+									document.body.removeChild(element);
+								};
+							};
+							var image = document.createElement('img');
+							image.src = "data:image/jpeg;base64," + "{{result.data.scData.scBase64}}";
+							var imgData = image.src;
+							var src = document.getElementById("imageSrc" + "{{ forloop.counter }}");
+							src.appendChild(image);
+							var imgName = 'snx_' + '{{result.param.scanid}}' +'.jpeg';
+							$("#imgDwlBnt" + "{{ forloop.counter }}").click(downloadImg(imgData,imgName));
+						</script>
 
-			<section class="mt-20">
-				<!-- Screenshot preview section -->
-				<div class="full imgSection">
-					<div class="img-enlarge full" id="imageSrc{{ forloop.counter }}"></div>
-				</div>
+						<section class="mt-20">
+							<!-- Screenshot preview section -->
+							<div class="full imgSection">
+								<div class="img-enlarge full" id="imageSrc{{ forloop.counter }}"></div>
+							</div>
 
-			</section>
+						</section>
 
-			{% elif result.data.errorNo == 1 %} <!-- Download screenshot pending condition -->
-			<h3 class="mb-5">{{result.message}}</h3>
-			{% else %} <!-- Download screenshot error condition -->
-			<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
-			<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
-			{% endif %} <!-- Download screenshot success condition -->
+					{% elif result.data.errorNo == 1 %} <!-- Download screenshot pending condition -->
+						<h3 class="mb-5">{{result.message}}</h3>
+					{% else %} <!-- Download screenshot error condition -->
+						<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+						<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+					{% endif %} <!-- Download screenshot success condition -->
 
-		</section>
+				</section>
+			{% endif %}
 
-	{% endfor %} <!-- Loop for each result end -->
+		{% endfor %} <!-- Loop for each result end -->
 
 	</div>
 </div> <!-- Main Div -->
