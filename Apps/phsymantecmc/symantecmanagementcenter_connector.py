@@ -215,6 +215,12 @@ class SymantecManagementCenterConnector(BaseConnector):
                 headers=headers,
                 verify=config.get('verify_server_cert', False),
                 **kwargs)
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print("In rest call. {0}".format(err))
