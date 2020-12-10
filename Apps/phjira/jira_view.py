@@ -1,5 +1,5 @@
 # File: jira_view.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -57,5 +57,7 @@ def display_view(provides, all_app_runs, context):
         return_page = "jira_update_ticket.html"
     if provides == "list tickets":
         return_page = "jira_list_tickets.html"
+    if provides == 'lookup users':
+        return_page = "jira_search_users.html"
 
     return return_page

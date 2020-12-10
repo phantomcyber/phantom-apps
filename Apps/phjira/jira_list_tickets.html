@@ -9,7 +9,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: jira_list_tickets.html
-  Copyright (c) 2016-2019 Splunk Inc.
+  Copyright (c) 2016-2020 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -130,10 +130,26 @@
                                     {{ ticket.status }}
                             </td>
                             <td class="widget-td">
-                                    {{ ticket.priority }}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket priority'], 'value':'{{ ticket.priority }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.priority }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
                             </td>
-                            <td class="widget-td">{{ ticket.resolution }}</td>
-                            <td class="widget-td">{{ ticket.reporter }}</td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira ticket resolution'], 'value':'{{ ticket.resolution }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.resolution }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td class="widget-td">
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['jira user display name'], 'value':'{{ ticket.reporter }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ ticket.reporter }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
                             <td class="widget-td">{{ ticket.summary }}</td>
                             <td class="widget-td">{{ ticket.description }}</td>
                         </tr>
@@ -167,4 +183,3 @@ $.extend(true, $.fn.dataTable.defaults, {
 </script>
 
 {% endblock %}
-    

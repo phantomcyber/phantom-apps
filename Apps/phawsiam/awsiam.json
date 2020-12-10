@@ -9,12 +9,16 @@
     "product_name": "AWS Identity Access Management",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
-    "app_version": "1.0.8",
+    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-06-07T17:52:30.000000Z",
     "package_name": "phantom_awsiam",
-    "main_module": "awsiam_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "python_version": "3",
+    "main_module": "awsiam_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "latest_tested_versions": [
+        "Cloud, February 25 2020"
+    ],
     "app_wizard_version": "1.0.0",
     "configuration": {
         "access_key": {

@@ -4,19 +4,22 @@
     "package_name": "phantom_reversinglabs",
     "description": "This app implements an investigative action on the ReversingLabs reputation service",
     "type": "reputation",
-    "main_module": "reversinglabs_connector.pyc",
-    "app_version": "1.2.29",
-    "utctime_updated": "2019-10-14T23:05:49.000000Z",
+    "main_module": "reversinglabs_connector.py",
+    "app_version": "2.0.1",
+    "utctime_updated": "2020-01-30T18:01:01.000000Z",
     "product_vendor": "ReversingLabs",
     "product_name": "TitaniumCloud",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.5.15922",
+    "latest_tested_versions": [
+        "Cloud, TitaniumCloud API api.reversinglabs.com/api, January 24, 2020"
+    ],
     "python_version": "3",
     "publisher": "Splunk",
     "consolidate_widgets": false,
     "logo": "logo_reversinglabs.svg",
     "logo_dark": "logo_reversinglabs_dark.svg",
-    "license": "Copyright (c) 2014-2019 Splunk Inc.",
+    "license": "Copyright (c) 2014-2020 Splunk Inc.",
     "configuration": {
         "username": {
             "description": "Username",

@@ -1,0 +1,102 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}
+    {% if title_logo %}
+        style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+    {% endif %}
+{% endblock %}
+{% block title1 %}
+    {{ title1 }}
+{% endblock %}
+{% block title2 %}
+    {{ title2 }}
+{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+
+    <!-- File: taniumthreatresponse_display_events.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+    <style>
+        .dataTables_scrollBody {
+            position: relative;
+            overflow: scroll;
+            width: 100%;
+            height: 270px;
+        }
+        .phantom-table {
+            min-width: 100%;
+            margin: 0px;
+            width: 100%;
+        }
+        .widget-th {
+            border-color: currentcolor;
+            border-style: none;
+            border-width: 0px medium;
+            border-image: none 100% / 1 / 0 stretch;
+            font-weight: normal;
+            max-width: 600px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            height: 0px;
+            width: 143px;
+        }
+        .wf-h4-style {
+            font-size : 16px;
+        }
+    </style>
+    {% for result in results %}
+    {% if not result.events %}
+        <h4 class="wf-h4-style">No data found</h4>
+
+    {% else %}
+
+        <div id="DataTables_Table_1_wrapper" class="dataTables_wrapper no-footer">
+            <div class="dataTables_scroll">
+                <div class="dataTables_scrollBody">
+                    <table class="phantom-table dataTable no-footer"
+                           id="DataTables_Table_1"
+                           role="grid">
+                        <thead>
+                        <tr role="row">
+                            {% for header in result.headers %}
+                                <th class="widget-th"
+                                    aria-controls="DataTables_Table_1" rowspan="1" colspan="1"
+                                    aria-label="{{ header }}: activate to sort column ascending">
+                                    {{ header }}
+                                    {# <div class="dataTables_sizing" style="height:0;overflow:hidden;">{{ header }}</div> #}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for event in result.events %}
+                            <tr role="row" class="hover">
+                                {% for detail in event %}
+                                    <td class="widget-td">
+                                        {% if detail.contains %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': {{ detail.contains }}, 'value': '{{ detail.data }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ detail.data }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span></a>
+                                        {% else %}
+                                            {{ detail.data }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% endfor %}
+
+{% endblock %}

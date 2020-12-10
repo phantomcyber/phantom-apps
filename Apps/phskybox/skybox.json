@@ -1,0 +1,420 @@
+{
+    "appid": "0152eaca-38bd-4be6-8ff2-f64edcfa8b9e",
+    "name": "Skybox",
+    "description": "This app integrates with Skybox to provide an investigative action",
+    "type": "information",
+    "product_vendor": "Skybox Security",
+    "logo": "logo_skybox.svg",
+    "logo_dark": "logo_skybox_dark.svg",
+    "product_name": "Skybox",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.3",
+    "utctime_updated": "2019-08-08T20:41:59.051390Z",
+    "package_name": "phantom_skybox",
+    "main_module": "skybox_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "suds",
+                "input_file": "wheels/suds-0.4-cp27-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "base_url": {
+            "description": "Server URL (e.g. https://myskybox.com)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "ph": {
+          "data_type": "ph",
+          "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Checks Skybox for the existence of the IP among the model's assets",
+            "verbose": "If a CIDR block is specified, the action will return all assets in that range.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP (or CIDR) to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.41.1.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Up"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.netInterface.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tunnel"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.netInterface.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.40.0.2"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.netInterface.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10568
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.netInterface.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tunnel222"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Router"
+                    ],
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Skytest_Router"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.osVendor",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cisco"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.40.0.2"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.routingRules",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.accessRules",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.createdBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "skyboxview"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.lastScanTime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1449763906560
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.hostName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Skytest_Router"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "IOS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        25941
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.risk",
+                    "data_type": "string",
+                    "example_values": [
+                        "NO_RISK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "[cisco-sa-20120926-nat] Cisco IOS NAT Implementation Allows Remote DoS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.lastModifiedBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "skyboxview"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.servicePorts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.networkNames",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.11.0.2_10.40.0.2,,0.0.0.0_0.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.hostId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10376
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "The NAT implementation in Cisco IOS 12.2, 12.4, and 15.0 through 15.2 allows remote attackers to cause a denial of service (device reload) via transit IP packets, aka Bug ID CSCtr46123."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.discoveryMethod",
+                    "data_type": "string",
+                    "example_values": [
+                        "VULNERABILITY_DETECTOR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.lastModificationTime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1427987506176
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.vulnerabilityTypeId.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        36257
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.vulnerabilityTypeId.dictionary",
+                    "data_type": "string",
+                    "example_values": [
+                        "SBV"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.hostIp",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.40.0.2"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.exposure",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mitigated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.creationTime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1428837875712
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.networkGroupNames",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.cve",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-2012-4619"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.services",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "12.4"
+                    ],
+                    "column_name": "OS Version",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.os",
+                    "data_type": "string",
+                    "example_values": [
+                        "IOS"
+                    ],
+                    "column_name": "OS",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10376
+                    ],
+                    "column_name": "Asset ID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilities.*.scannerId",
+                    "data_type": "string",
+                    "example_values": [
+                        "SBV/54866"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

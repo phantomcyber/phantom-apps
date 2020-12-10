@@ -1,0 +1,586 @@
+{
+    "appid": "f3605b22-3771-41d5-a393-47f9ca79e25b",
+    "name": "Expanse",
+    "description": "Expanse allows you to perform enrichment using Expanse's Internet Asset data, including ip, domain, certificates, and more",
+    "type": "information",
+    "product_vendor": "Expanse",
+    "logo": "logo_expanse.svg",
+    "logo_dark": "logo_expanse_dark.svg",
+    "product_name": "Expanse",
+    "product_version_regex": ".*",
+    "publisher": "Expanse",
+    "license": "Copyright (c) Expanse, 2020",
+    "app_version": "1.0.0",
+    "python_version" : "3",
+    "utctime_updated": "2020-04-08T16:11:16.683577Z",
+    "package_name": "phantom_expanse",
+    "main_module": "expanse_connector.py",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "Token": {
+            "description": "Token to authenticate API calls",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Check for the presence of an IP within a known IP range in Expanse",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                      "success",
+                      "failed"
+                  ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Searched IP",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.startAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Range Start IP",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.endAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Range End IP",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.businessUnits.0.name",
+                    "data_type": "string",
+                    "column_name": "Business Unit",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.created",
+                    "data_type": "string",
+                    "column_name": "Created",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.modified",
+                    "data_type": "string",
+                    "column_name": "Modified",
+                    "column_order": 5 
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.responsiveIpCount",
+                    "data_type": "numeric",
+                    "column_name": "Responsive IP Count",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.customChildRanges",
+                    "data_type": "string",
+                    "column_name": "Child Ranges",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.locationInformation.0.geolocation.countryCode",
+                    "data_type": "string",
+                    "column_name": "Country",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.annotations.pointsOfContact.0.email",
+                    "data_type": "string",
+                    "column_name": "Point Of Contact",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.annotations.additionalNotes",
+                    "data_type": "string",
+                    "column_name": "Additional Notes",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.severity_counts.CRITICAL",
+                    "data_type": "numeric",
+                    "column_name": "Critical Exposures",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.severity_counts.WARNING",
+                    "data_type": "numeric",
+                    "column_name": "Warning Exposures",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.severity_counts.ROUTINE",
+                    "data_type": "numeric",
+                    "column_name": "Routine Exposures",
+                    "column_order": 13
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup domain",
+            "identifier": "lookup_domain",
+            "description": "Check for the presence of a known domain in Expanse",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                      "success",
+                      "failed"
+                  ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Searched Domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.businessUnits.0.name",
+                    "data_type": "string",
+                    "column_name": "Business Unit",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.firstObserved",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.lastObserved",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.lastSampledIp",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Most Recent IP",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.providers.0.name",
+                    "data_type": "string",
+                    "column_name": "Provider",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.whois.0.registryExpiryDate",
+                    "data_type": "string",
+                    "column_name": "Expiration Date",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.whois.0.nameServers",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Name Servers",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.whois.0.registrar.name",
+                    "data_type": "string",
+                    "column_name": "Registrar",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.whois.0.registrant.emailAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Registrant",
+                    "column_order": 10
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup certificate",
+            "identifier": "lookup_certificate",
+            "description": "Returns certificates from Expanse for a full or partial common name",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "common_name": {
+                    "description": "Search for given certificate value via a domain substring match",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                      "success",
+                      "failed"
+                  ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.common_name",
+                    "data_type": "string",
+                    "column_name": "Searched Term",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.commonName",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Common Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.businessUnits.0.name",
+                    "data_type": "string",
+                    "column_name": "Business Unit",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.firstObserved",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.lastObserved",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.providers.0.name",
+                    "data_type": "string",
+                    "column_name": "Provider",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.validNotAfter",
+                    "data_type": "string",
+                    "column_name": "Expiration",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.issuerName",
+                    "data_type": "string",
+                    "column_name": "Issuer",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.subjectName",
+                    "data_type": "string",
+                    "column_name": "Subject",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.md5Hash",
+                    "data_type": "string",
+                    "column_name": "md5 Hash",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.pemSha1",
+                    "data_type": "string",
+                    "column_name": "pemSha1",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.pemSha256",
+                    "data_type": "string",
+                    "column_name": "pemSha256",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.publicKeyAlgorithm",
+                    "data_type": "string",
+                    "column_name": "Public Key Algo",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificate.publicKeyBits",
+                    "data_type": "string",
+                    "column_name": "Public Key Length",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.certificateAdvertisementStatus.0",
+                    "data_type": "string",
+                    "column_name": "Certificate Advertisement Status",
+                    "column_order": 14
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup behavior",
+            "identifier": "lookup_behavior",
+            "description": "Returns Expanse behavior data for an IP. Limited to 30 flows within the last 30 days",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "Internal IP address to search for",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                      "success",
+                      "failed"
+                  ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                      1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "Searched Term",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Internal IP Address",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalPort",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "Internal Port Number",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.internalCountryCode",
+                    "data_type": "string",
+                    "column_name": "Internal Country Code",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "External IP Address",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalPort",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "External Port Number",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.externalCountryCode",
+                    "data_type": "string",
+                    "column_name": "External Country Code",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.protocol",
+                    "data_type": "string",
+                    "column_name": "Transport Protocol",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.observationTimestamp",
+                    "data_type": "string",
+                    "column_name": "Observation Timestamp",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.flowDirection",
+                    "data_type": "string",
+                    "column_name": "Flow Direction",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.0.data.*.riskRule.name",
+                    "data_type": "string",
+                    "column_name": "Violated Risk Rule",
+                    "column_order": 10
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

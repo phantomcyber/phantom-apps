@@ -1,0 +1,83 @@
+{
+    "appid": "feca6617-c895-4465-926a-fc5d9c4e3bdc",
+    "name": "Arbor Sightline",
+    "description": "This app implements ingest action to integrate with Arbor Sightline for retrieving alerts details",
+    "type": "network security",
+    "product_vendor": "Arbor Networks",
+    "logo": "logo_arborsightline.svg",
+    "logo_dark": "logo_arborsightline_dark.svg",
+    "product_name": "Arbor Sightline",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-01-22T10:58:46.046809Z",
+    "package_name": "phantom_arborsightline",
+    "main_module": "arborsightline_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Server URL (e.g. https://10.10.10.10)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "default": false,
+            "order": 1
+        },
+        "auth_token": {
+            "description": "Sightline API Token",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "max_containers": {
+            "description": "Disable Maximum Containers for Polling Now",
+            "data_type": "boolean",
+            "default": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Action handler for the ingest functionality",
+            "verbose": "Ingest DOS alerts from Arbor Sightline.",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {
+               "start_time": {
+                    "data_type": "numeric",
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is past 5 days."
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is now."
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of alerts to ingest"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}

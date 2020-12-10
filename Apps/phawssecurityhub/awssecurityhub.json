@@ -9,14 +9,17 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.1.7",
-    "utctime_updated": "2019-06-24T20:02:22.000000Z",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "app_version": "2.0.1",
+    "utctime_updated": "2020-01-29T23:47:07.000000Z",
     "package_name": "phantom_awssecurityhub",
-    "main_module": "awssecurityhub_connector.pyc",
+    "main_module": "awssecurityhub_connector.py",
     "min_phantom_version": "4.5.15922",
-    "app_wizard_version": "1.0.0",
     "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API, January 27, 2020"
+    ],
+    "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
@@ -47,7 +50,7 @@
             "data_type": "password",
             "required": true,
             "order": 0
-       },
+        },
         "secret_key": {
             "description": "AWS Secret Key",
             "data_type": "password",

@@ -1,5 +1,5 @@
 # File: whois_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -19,6 +19,7 @@ import datetime
 import time
 from ipwhois import IPWhois
 from ipwhois import IPDefinedError
+from bs4 import UnicodeDammit
 import tldextract
 import ipaddress
 
@@ -95,13 +96,16 @@ class WhoisConnector(BaseConnector):
 
         try:
             obj_whois = IPWhois(ip)
-            whois_response = obj_whois.lookup_whois()
+            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
         except IPDefinedError as e_defined:
             self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
             return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
         except Exception as e:
             self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(e)))
             return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+
+        if not whois_response:
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
 
         self.save_progress("Parsing response")
 
@@ -207,12 +211,39 @@ class WhoisConnector(BaseConnector):
         if (should_update):
             # Set the updated time
             self._state[WHOIS_JSON_CACHE_UPDATE_TIME] = datetime.datetime.utcnow().strftime(ISO_TIME_FORMAT)
-        if result.suffix:
+
+        domain = ""
+        if result.suffix and result.domain:
             domain = "{0}.{1}".format(result.domain, result.suffix)  # pylint: disable=E1101
-        else:
+        elif result.suffix:
+            domain = "{0}".format(result.suffix)  # pylint: disable=E1101
+        elif result.domain:
             domain = "{0}".format(result.domain)  # pylint: disable=E1101
 
         return domain
+
+    def _fetch_whois_info(self, action_result, domain, server):
+        '''
+        This method fetches the whois information for the given domain based on the
+        value of the server if provided or by using the default server of the pythonwhois library.
+        '''
+
+        try:
+            self.debug_print("Fetching the WHOIS information. Server is: {}".format(server))
+            if server:
+                raw_whois_resp = pythonwhois.net.get_whois_raw(domain, server)
+                whois_response = pythonwhois.parse.parse_raw_whois(raw_whois_resp)
+            else:
+                whois_response = pythonwhois.get_whois(domain)
+        except Exception as e:
+            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+            return None
+
+        if not whois_response:
+            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
+            return None
+
+        return whois_response
 
     def _whois_domain(self, param):
 
@@ -245,15 +276,25 @@ class WhoisConnector(BaseConnector):
 
         self.save_progress("Querying...")
 
-        try:
-            if (server):
-                self.debug_print("Using server", server)
-                raw_whois_resp = pythonwhois.net.get_whois_raw(domain, server)
-                whois_response = pythonwhois.parse.parse_raw_whois(raw_whois_resp)
+        # 1. Attempting to fetch the whois information with the server
+        # if provided or without it if not provided
+        whois_response = self._fetch_whois_info(action_result, domain, server)
+
+        if whois_response is None:
+            return action_result.get_status()
+
+        # 2. Attempting to fetch the whois information with the server obtained
+        # in the output response of the first step above
+        if whois_response.get('contacts') and not whois_response.get('contacts').get('registrant'):
+            if whois_response.get('whois_server'):
+                resp_server = UnicodeDammit(whois_response.get('whois_server')[0]).unicode_markup.encode('utf-8')
+
+                whois_response = self._fetch_whois_info(action_result, domain, resp_server)
+
+                if whois_response is None:
+                    return action_result.get_status()
             else:
-                whois_response = pythonwhois.get_whois(domain)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+                self.debug_print("No second API call required as the server information could not be fetched from the first WHOIS API call")
 
         self.save_progress("Parsing response")
 
@@ -269,17 +310,17 @@ class WhoisConnector(BaseConnector):
 
         # Even if the query was successfull the data might not be available
         if (self._response_no_data(whois_response, domain)):
-            return action_result.set_status(phantom.APP_SUCCESS, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
+            return action_result.set_status(phantom.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_ERR_QUERY_RETURNED_NO_CONTACTS_DATA))
         else:
             # get the registrant
-            if ('contacts' in whois_response and 'registrant' in whois_response['contacts']):
+            if whois_response.get('contacts') and whois_response.get('contacts').get('registrant'):
                 registrant = whois_response['contacts']['registrant']
                 wanted_keys = ['organization', 'name', 'city', 'country']
                 summary = {x: registrant[x] for x in wanted_keys if x in registrant}
                 action_result.update_summary(summary)
                 action_result.set_status(phantom.APP_SUCCESS)
             else:
-                action_result.set_status(phantom.APP_SUCCESS, WHOIS_SUCC_QUERY)
+                action_result.set_status(phantom.APP_SUCCESS, '{}, but, {}.'.format(WHOIS_SUCC_QUERY, WHOIS_SUCC_QUERY_RETURNED_NO_REGISTRANT_DATA))
 
         return phantom.APP_SUCCESS
 

@@ -1,0 +1,1721 @@
+{
+    "appid": "83d3ffa1-88f2-4870-9d89-07c4f594a98d",
+    "name": "Cofense Triage",
+    "description": "This app supports investigative actions that enable the security teams to analyze and respond to phishing faster",
+    "type": "information",
+    "product_vendor": "Cofense",
+    "logo": "logo_cofensetriage.svg",
+    "logo_dark": "logo_cofensetriage_dark.svg",
+    "product_name": "Triage",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2019-07-09T14:37:47.638392",
+    "package_name": "phantom_cofensetriage",
+    "main_module": "cofensetriage_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL of the Triage appliance",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify SSL certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 1
+        },
+        "api_email": {
+            "description": "API email address for authentication",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "api_token": {
+            "description": "API token for authentication",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "ingestion_method": {
+            "description": "You can ingest either Threat Indicators or Reports (More details in Section 1: Remaining Settings of the readme/documentation)",
+            "data_type": "string",
+            "order": 4,
+            "value_list": [
+                "Threat Indicators",
+                "Reports"
+            ]
+        },
+        "max_results": {
+            "description": "Maximum number of results to ingest into containers",
+            "data_type": "numeric",
+            "default": 10,
+            "order": 5
+        },
+        "start_date": {
+            "description": "The initial start date and time of the ingestion. The default is six days ago",
+            "data_type": "string",
+            "order": 6
+        },
+        "date_sort": {
+            "description": "Retrieve results either the oldest first or the latest first",
+            "data_type": "string",
+            "default": "oldest_first",
+            "order": 7,
+            "value_list": [
+                "oldest_first",
+                "latest_first"
+            ]
+        },
+        "cef_mapping": {
+            "description": "JSON dictionary represented as a serialized JSON string (More details in Section 1: Remaining Settings of the readme/documentation)",
+            "data_type": "string",
+            "order": 8
+        },
+        "threat_type": {
+            "description": "Filter results by threat indicator type, default retrieve All. Types are: Subject, Sender, Domain, URL, MD5, SHA256",
+            "data_type": "string",
+            "default": "All",
+            "order": 9,
+            "value_list": [
+                "All",
+                "Subject",
+                "Sender",
+                "Domain",
+                "URL",
+                "MD5",
+                "SHA256"
+            ]
+        },
+        "threat_level": {
+            "description": "Filter results by threat indicator level, default retrieve All. Levels are: Malicious, Suspicious, Benign",
+            "data_type": "string",
+            "default": "All",
+            "order": 10,
+            "value_list": [
+                "All",
+                "Malicious",
+                "Suspicious",
+                "Benign"
+            ]
+        },
+        "report_ingest_subfields": {
+            "description": "Only applicable if ingesting reports. This option will ingest dictionary and list fields of the subject as additional artifacts",
+            "data_type": "boolean",
+            "default": false,
+            "order": 11
+        },
+        "report_type": {
+            "description": "Type of reports to retrieve (More details in Section 3: Ingestion Settings for Ingesting Reports of the readme/documentation)",
+            "data_type": "string",
+            "default": "All",
+            "order": 12,
+            "value_list": [
+                "All",
+                "Inbox",
+                "Processed"
+            ]
+        },
+        "report_match_priority": {
+            "description": "The highest match priority based on rule hits for the report",
+            "data_type": "numeric",
+            "order": 13
+        },
+        "report_category_id": {
+            "description": "Report category ID (Select any value from the value_list) (More details in Section 3: Ingestion Settings for Ingesting Reports of the readme/documentation)",
+            "data_type": "string",
+            "default": "All",
+            "order": 14,
+            "value_list": [
+                "All",
+                "ID:5 Phishing Simulation",
+                "ID:1 Non-Malicious",
+                "ID:2 Spam",
+                "ID:3 Crimeware",
+                "ID:4 Advanced Threats"
+            ]
+        },
+        "report_tags": {
+            "description": "One or more tags of processed reports to filter on. Use commas to separate multiple tags",
+            "data_type": "string",
+            "order": 15
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get threat indicators",
+            "identifier": "get_threat_indicators",
+            "description": "Retrieve the subjects, senders, domains, URLs, or MD5 or SHA256 hashes that operators identified in Cofense Triage as threat indicators within a specified timeframe",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "max_results": {
+                    "description": "If the number of total results exceed max_results, return only the first max_results number of items retrieved",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 10,
+                    "order": 0
+                },
+                "date_sort": {
+                    "description": "Retrieve either the oldest results first or the latest results first",
+                    "data_type": "string",
+                    "default": "oldest_first",
+                    "order": 1,
+                    "value_list": [
+                        "oldest_first",
+                        "latest_first"
+                    ]
+                },
+                "type": {
+                    "description": "Filter results by threat indicator type, default retrieve All. Types are: Subject, Sender, Domain, URL, MD5, SHA256",
+                    "data_type": "string",
+                    "default": "All",
+                    "order": 2,
+                    "value_list": [
+                        "All",
+                        "Subject",
+                        "Sender",
+                        "Domain",
+                        "URL",
+                        "MD5",
+                        "SHA256"
+                    ]
+                },
+                "level": {
+                    "description": "Filter results by threat indicator level, default retrieve All. Levels are: Malicious, Suspicious, Benign",
+                    "data_type": "string",
+                    "default": "All",
+                    "order": 3,
+                    "value_list": [
+                        "All",
+                        "Malicious",
+                        "Suspicious",
+                        "Benign"
+                    ]
+                },
+                "start_date": {
+                    "description": "The start date and time of the query. The default is six days ago",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 4,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "end_date": {
+                    "description": "The end date and time of the query. The default is current time",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 5,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "all_pages": {
+                    "description": "Retrieve all pages or only a specific page and number of results",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 6
+                },
+                "page": {
+                    "description": "Ignored if all_pages is set to true. The page number of results to retrieve. The default is zero, which is the same as all pages. The header of the response contains the number of the next page and the total number of results",
+                    "data_type": "numeric",
+                    "default": 0,
+                    "order": 7
+                },
+                "per_page": {
+                    "description": "Ignored if all_pages is set to true. The number of results rendered per page. The maximum value is 50 results per page",
+                    "data_type": "numeric",
+                    "default": 50,
+                    "order": 8
+                },
+                "ingest_to_label": {
+                    "description": "If set, ingest report(s) into container(s) with provided label. Label must be valid or action will fail",
+                    "data_type": "string",
+                    "order": 9
+                },
+                "tenant": {
+                    "description": "Required if ingest_to_label is set. Must provide a valid tenant name or id or action will fail",
+                    "data_type": "string",
+                    "order": 10
+                },
+                "cef_mapping": {
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a json dictionary represented as a serialized json string, such as the result of json.dumps(). Each key in the dictionary is a potential keyname in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "data_type": "string",
+                    "order": 11
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.all_pages",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.cef_mapping",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.date_sort",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ingest_to_label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.level",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.per_page",
+                    "data_type": "numeric"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tenant",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "string",
+                    "column_name": "Container ID",
+                    "column_order": 1,
+                    "contains": [
+                        "container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Threat Indicator ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense threat indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.operator_id",
+                    "data_type": "string",
+                    "column_name": "Operator ID",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "column_name": "Report ID",
+                    "column_order": 2,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_key",
+                    "data_type": "string",
+                    "column_name": "Threat Key",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.threat_level",
+                    "data_type": "string",
+                    "column_name": "Threat Level",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.threat_value",
+                    "data_type": "string",
+                    "column_name": "Threat Value",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get reports",
+            "identifier": "get_reports",
+            "description": "Retrieve all reports in the Inbox, Recon, and Processed folders that match specified parameters",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "max_results": {
+                    "description": "If the number of total results exceed max_results, return only the first max_results number of items retrieved",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 10,
+                    "order": 0
+                },
+                "date_sort": {
+                    "description": "Retrieve either the oldest results first or the latest results first",
+                    "data_type": "string",
+                    "default": "oldest_first",
+                    "order": 1,
+                    "value_list": [
+                        "oldest_first",
+                        "latest_first"
+                    ]
+                },
+                "type": {
+                    "description": "Type of reports to retrieve, default All. Possible values are: All - All reports in Inbox, Recon, and Processed folders; Inbox - Uncategorized reports in the Inbox and Recon folders; Processed - Categorized reports in the Processed folder",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "All",
+                    "order": 2,
+                    "value_list": [
+                        "All",
+                        "Inbox",
+                        "Processed"
+                    ]
+                },
+                "match_priority": {
+                    "description": "The highest match priority based on rule hits for the report",
+                    "data_type": "numeric",
+                    "primary": true,
+                    "order": 3,
+                    "contains": [
+                        "cofense match priority"
+                    ]
+                },
+                "category_id": {
+                    "description": "Filter by category ID, default retrieve All. The category ID (1-5) for processed reports. Takes either string or number. Only valid when retrieving \"All\" or \"Processed\" reports. Category IDs correspond to category names as follows: 5 (lowest): Phishing Simulation; 1: Non-Malicious; 2: Spam; 3: Crimeware; 4 (highest): Advanced Threats",
+                    "data_type": "string",
+                    "primary": true,
+                    "default": "All",
+                    "order": 4,
+                    "contains": [
+                        "cofense category id"
+                    ],
+                    "value_list": [
+                        "All",
+                        "ID:5 Phishing Simulation",
+                        "ID:1 Non-Malicious",
+                        "ID:2 Spam",
+                        "ID:3 Crimeware",
+                        "ID:4 Advanced Threats"
+                    ]
+                },
+                "tags": {
+                    "description": "One or more tags of processed reports to filter on. Use commas to separate multiple tags",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 5,
+                    "contains": [
+                        "tags"
+                    ]
+                },
+                "start_date": {
+                    "description": "The start date and time of the query. The default is six days ago",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 6,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "end_date": {
+                    "description": "The end date and time of the query. The default is current time",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 7,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "all_pages": {
+                    "description": "Retrieve all pages or only a specific page and number of results",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 8
+                },
+                "page": {
+                    "description": "Ignored if all_pages is set to true. The page number of results to retrieve. The default is zero, which is the same as all pages. The header of the response contains the number of the next page and the total number of results",
+                    "data_type": "numeric",
+                    "default": 0,
+                    "order": 9
+                },
+                "per_page": {
+                    "description": "Ignored if all_pages is set to true. The number of results rendered per page. The maximum value is 50 results per page",
+                    "data_type": "numeric",
+                    "default": 50,
+                    "order": 10
+                },
+                "ingest_to_label": {
+                    "description": "If set, ingest report(s) into container(s) with provided label. Label must be valid or action will fail",
+                    "data_type": "string",
+                    "order": 11
+                },
+                "tenant": {
+                    "description": "Required if ingest_to_label is set. Must provide a valid tenant name or id or action will fail",
+                    "data_type": "string",
+                    "order": 12
+                },
+                "ingest_subfields": {
+                    "description": "Only applicable if ingesting new containers/artifacts. This option will ingest dictionary and list fields of the subject as additional artifacts",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 13
+                },
+                "cef_mapping": {
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a json dictionary represented as a serialized json string, such as the result of json.dumps(). Each key in the dictionary is a potential keyname in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "data_type": "string",
+                    "order": 14
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.all_pages",
+                    "data_type": "boolean"
+                },
+                {
+                    "contains": [
+                        "cofense category id"
+                    ],
+                    "data_path": "action_result.parameter.category_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.cef_mapping",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.date_sort",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ingest_subfields",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.ingest_to_label",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "cofense match priority"
+                    ],
+                    "data_path": "action_result.parameter.match_priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.per_page",
+                    "data_type": "numeric"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "tags"
+                    ],
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tenant",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.category_id",
+                    "data_type": "string",
+                    "column_name": "Category ID",
+                    "column_order": 8,
+                    "contains": [
+                        "cofense category id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "string",
+                    "column_name": "Container ID",
+                    "column_order": 1,
+                    "contains": [
+                        "container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Report ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "column_name": "Folder",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.match_priority",
+                    "data_type": "string",
+                    "column_name": "Match Priority",
+                    "column_order": 7,
+                    "contains": [
+                        "cofense match priority"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 11,
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processed_at",
+                    "data_type": "string",
+                    "column_name": "Processed At",
+                    "column_order": 4,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_subject",
+                    "data_type": "string",
+                    "column_name": "Report Subject",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.reported_at",
+                    "data_type": "string",
+                    "column_name": "Reported At",
+                    "column_order": 3,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "data_type": "string",
+                    "column_name": "Reporter ID",
+                    "column_order": 2,
+                    "contains": [
+                        "cofense reporter id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 10,
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "column_name": "Tags",
+                    "column_order": 9,
+                    "contains": [
+                        "tags"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "description": "Retrieve a single report that matches the specified report ID. Optionally ingest to a provided label",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "report_id": {
+                    "description": "The ID of the report to retrieve",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "default": 0,
+                    "order": 0,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                "ingest_to_label": {
+                    "description": "If set, ingest report(s) into container(s) with provided label. Label must be valid or action will fail",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "tenant": {
+                    "description": "Required if ingest_to_label is set. Must provide a valid tenant name or id or action will fail",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "ingest_subfields": {
+                    "description": "Only applicable if ingesting new containers/artifacts. This option will ingest dictionary and list fields of the subject as additional artifacts",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 3
+                },
+                "cef_mapping": {
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a json dictionary represented as a serialized json string, such as the result of json.dumps(). Each key in the dictionary is a potential keyname in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_mapping",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ingest_subfields",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.ingest_to_label",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "cofense report id"
+                    ],
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.tenant",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.category_id",
+                    "data_type": "string",
+                    "column_name": "Category ID",
+                    "column_order": 8,
+                    "contains": [
+                        "cofense category id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "string",
+                    "column_name": "Container ID",
+                    "column_order": 1,
+                    "contains": [
+                        "container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Report ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "column_name": "Folder",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.match_priority",
+                    "data_type": "string",
+                    "column_name": "Match Priority",
+                    "column_order": 7,
+                    "contains": [
+                        "cofense match priority"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 11,
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processed_at",
+                    "data_type": "string",
+                    "column_name": "Processed At",
+                    "column_order": 4,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_subject",
+                    "data_type": "string",
+                    "column_name": "Report Subject",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.reported_at",
+                    "data_type": "string",
+                    "column_name": "Reported At",
+                    "column_order": 3,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "data_type": "string",
+                    "column_name": "Reporter ID",
+                    "column_order": 2,
+                    "contains": [
+                        "cofense reporter id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 10,
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "column_name": "Tags",
+                    "column_order": 9,
+                    "contains": [
+                        "tags"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get email",
+            "identifier": "get_email",
+            "description": "Downloads the raw email attachment for the report that matches the specified report ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "report_id": {
+                    "description": "The ID of the report to retrieve",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "default": 0,
+                    "order": 0,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                "download_method": {
+                    "description": "Download as artifact or as vaulted file",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "artifact",
+                    "order": 1,
+                    "value_list": [
+                        "artifact",
+                        "vaulted file"
+                    ]
+                },
+                "create_vaulted_file_artifact": {
+                    "description": "If downloading vaulted file, create an artifact referencing the file",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.create_vaulted_file_artifact",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.download_method",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "cofense report id"
+                    ],
+                    "data_path": "action_result.parameter.report_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifact_id",
+                    "data_type": "string",
+                    "column_name": "Artifact ID",
+                    "column_order": 2,
+                    "contains": [
+                        "artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filename",
+                    "data_type": "string",
+                    "column_name": "Filename",
+                    "column_order": 1,
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 6,
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_id",
+                    "data_type": "string",
+                    "column_name": "Report ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense report id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 5,
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": 3,
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vaulted",
+                    "data_type": "string",
+                    "column_name": "Vaulted Path",
+                    "column_order": 7,
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file",
+            "identifier": "get_file",
+            "description": "Downloads and vault the attachment that matches the specified attachment ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "attachment_id": {
+                    "description": "The ID of the attachment to retrieve",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "default": 0,
+                    "order": 0,
+                    "contains": [
+                        "cofense attachment id"
+                    ]
+                },
+                "create_vaulted_file_artifact": {
+                    "description": "If downloading vaulted file, create an artifact referencing the file",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "contains": [
+                        "cofense attachment id"
+                    ],
+                    "data_path": "action_result.parameter.attachment_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.create_vaulted_file_artifact",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifact_id",
+                    "data_type": "string",
+                    "column_name": "Artifact ID",
+                    "column_order": 2,
+                    "contains": [
+                        "artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_id",
+                    "data_type": "string",
+                    "column_name": "Attachment ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense attachment id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filename",
+                    "data_type": "string",
+                    "column_name": "Filename",
+                    "column_order": 1,
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 6,
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 5,
+                    "contains": [
+                        "sha256",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault ID",
+                    "column_order": 3,
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vaulted",
+                    "data_type": "string",
+                    "column_name": "Vaulted Path",
+                    "column_order": 7,
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get reporters",
+            "identifier": "get_reporters",
+            "description": "Retrieves information about reporters, such as their email address and credit score, whether they are VIP reporters, how many reports they reported, and the date and time of their last report",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "max_results": {
+                    "description": "If the number of total results exceed max_results, return only the first max_results number of items retrieved",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 50,
+                    "order": 0
+                },
+                "date_sort": {
+                    "description": "Retrieve either the oldest results first or the latest results first",
+                    "data_type": "string",
+                    "default": "oldest_first",
+                    "order": 1,
+                    "value_list": [
+                        "oldest_first",
+                        "latest_first"
+                    ]
+                },
+                "vip": {
+                    "description": "Whether to fetch VIP reporters (true) or not (false)",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                },
+                "email": {
+                    "description": "The email address of the reporter to fetch. If you do not pass a value for this parameter, Cofense Triage returns all reporters",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "start_date": {
+                    "description": "The start date and time of the query. The default is six days ago",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 4,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "end_date": {
+                    "description": "The end date and time of the query. The default is current time",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 5,
+                    "contains": [
+                        "date"
+                    ]
+                },
+                "all_pages": {
+                    "description": "Retrieve all pages or only a specific page and number of results",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 6
+                },
+                "page": {
+                    "description": "Ignored if all_pages is set to true. The page number of results to retrieve. The default is zero, which is the same as all pages. The header of the response contains the number of the next page and the total number of results",
+                    "data_type": "numeric",
+                    "default": 0,
+                    "order": 7
+                },
+                "per_page": {
+                    "description": "Ignored if all_pages is set to true. The number of results rendered per page. The maximum value is 50 results per page",
+                    "data_type": "numeric",
+                    "default": 50,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.all_pages",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.date_sort",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.per_page",
+                    "data_type": "numeric"
+                },
+                {
+                    "contains": [
+                        "date"
+                    ],
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.vip",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.credibility_score",
+                    "data_type": "string",
+                    "column_name": "Credibility Score",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 2,
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Reporter ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense reporter id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_reported_at",
+                    "data_type": "string",
+                    "column_name": "Last Reported At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.reports_count",
+                    "data_type": "string",
+                    "column_name": "Reports Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.updated_at",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.vip",
+                    "data_type": "string",
+                    "column_name": "VIP",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get reporter",
+            "identifier": "get_reporter",
+            "description": "Retrieve reporter that matches the specified reporter ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "reporter_id": {
+                    "description": "Required. The ID of the reporter to retrieve",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "default": 0,
+                    "order": 0,
+                    "contains": [
+                        "cofense reporter id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "contains": [
+                        "cofense reporter id"
+                    ],
+                    "data_path": "action_result.parameter.reporter_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.credibility_score",
+                    "data_type": "string",
+                    "column_name": "Credibility Score",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "column_name": "Email",
+                    "column_order": 2,
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Reporter ID",
+                    "column_order": 0,
+                    "contains": [
+                        "cofense reporter id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_reported_at",
+                    "data_type": "string",
+                    "column_name": "Last Reported At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.reports_count",
+                    "data_type": "string",
+                    "column_name": "Reports Count",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.updated_at",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.vip",
+                    "data_type": "string",
+                    "column_name": "VIP",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Retrieve integration results based on the specified hash (MD5 or SHA256) or URL. Specify only one parameter (sha256, md5, or URL) with this method",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "query_type": {
+                    "description": "Type of parameter",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "value_list": [
+                        "sha256",
+                        "md5",
+                        "url"
+                    ]
+                },
+                "search_term": {
+                    "description": "Search parameter for query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "sha256",
+                        "md5",
+                        "url",
+                        "hash"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query_type",
+                    "data_type": "string"
+                },
+                {
+                    "contains": [
+                        "sha256",
+                        "md5",
+                        "url",
+                        "hash"
+                    ],
+                    "data_path": "action_result.parameter.search_term",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "cofense triage"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

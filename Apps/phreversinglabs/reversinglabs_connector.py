@@ -1,5 +1,5 @@
 # File: reversinglabs_connector.py
-# Copyright (c) 2014-2019 Splunk Inc.
+# Copyright (c) 2014-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -17,6 +17,8 @@ import hashlib
 import requests
 from requests.auth import HTTPBasicAuth
 from collections import defaultdict
+
+from builtins import str
 
 
 class ReversinglabsConnector(BaseConnector):
@@ -49,7 +51,10 @@ class ReversinglabsConnector(BaseConnector):
         # Create a hash of a random string
         random_string = phantom.get_random_chars(size=10)
 
-        md5_hash = hashlib.md5(random_string).hexdigest()
+        try:
+            md5_hash = hashlib.md5(random_string).hexdigest()
+        except TypeError:  # py3
+            md5_hash = hashlib.md5(random_string.encode('UTF-8')).hexdigest()
 
         self.save_progress(REVERSINGLABS_GENERATED_RANDOM_HASH)
 
@@ -278,7 +283,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -291,15 +296,15 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     if (len(sys.argv) < 2):
-        print ("No test json specified as input")
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -314,6 +319,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

@@ -1,14 +1,21 @@
 # File: netskope_consts.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 NETSKOPE_CONFIG_SERVER_URL = 'server_url'
+NETSKOPE_CONFIG_SCIM_URL = 'scim_url'
 NETSKOPE_CONFIG_API_KEY = 'api_key'
+NETSKOPE_CONFIG_SCIM_KEY = 'scim_key'
 NETSKOPE_CONNECTIVITY_ENDPOINT = '/api/v1/clients'
 NETSKOPE_QUARANTINE_ENDPOINT = '/api/v1/quarantine'
 NETSKOPE_ON_POLL_ENDPOINT = '/api/v1/alerts'
 NETSKOPE_EVENTS_ENDPOINT = '/api/v1/events'
+NETSKOPE_URL_LIST_ENDPOINT = '/api/v1/updateUrlList'
+NETSKOPE_FILE_LIST_ENDPOINT = '/api/v1/updateFileHashList'
+NETSKOPE_SCIM_USERS_ENDPOINT = '/Users'
+NETSKOPE_SCIM_GROUPS_ENDPOINT = '/Groups'
+NETSKOPE_SCIM_GROUP_ENDPOINT = '/Group'
 NETSKOPE_PARAM_LIST_FILES = 'get-files'
 NETSKOPE_PARAM_IP = 'ip'
 NETSKOPE_PARAM_START_TIME = 'start_time'
@@ -30,3 +37,6 @@ NETSKOPE_24_HOUR_GAP = 86400
 NETSKOPE_INITIAL_SKIP_VALUE = 0
 NETSKOPE_UPDATE_SKIP_VALUE = 5000
 NETSKOPE_DEFAULT_LIMIT = 50
+NETSKOPE_URL_LIST = 'netskope_url_list'
+NETSKOPE_FILE_LIST = 'netskope_file_list'
+NETSKOPE_LIST_NAME = 'list_name'

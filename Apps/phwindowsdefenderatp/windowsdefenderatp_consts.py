@@ -1,5 +1,5 @@
 # File: windowsdefenderatp_consts.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -14,7 +14,6 @@ DEFENDERATP_AUTHORIZE_URL = '/{tenant_id}/oauth2/authorize?client_id={client_id}
 DEFENDERATP_RESOURCE_URL = 'https://api.securitycenter.windows.com'
 DEFENDERATP_MSGRAPH_API_BASE_URL = 'https://api.securitycenter.windows.com/api'
 DEFENDERATP_MACHINES_ENDPOINT = '/machines'
-DEFENDERATP_IP_MACHINES_ENDPOINT = '/ips/{input}/machines'
 DEFENDERATP_DOMAIN_MACHINES_ENDPOINT = '/domains/{input}/machines'
 DEFENDERATP_FILE_MACHINES_ENDPOINT = '/files/{input}/machines'
 DEFENDERATP_ALERTS_ENDPOINT = '/alerts'
@@ -24,13 +23,12 @@ DEFENDERATP_FILE_ALERTS_ENDPOINT = '/files/{input}/alerts'
 DEFENDERATP_ISOLATE_ENDPOINT = '/machines/{device_id}/isolate'
 DEFENDERATP_UNISOLATE_ENDPOINT = '/machines/{device_id}/unisolate'
 DEFENDERATP_SESSIONS_ENDPOINT = '/machines/{device_id}/logonusers'
-DEFENDERATP_FILE_QUARANTINE_ENDPOINT = '/machines/{device_id}/stopAndQuarantineFile'
+DEFENDERATP_FILE_QUARANTINE_ENDPOINT = '/machines/{device_id}/StopAndQuarantineFile'
 DEFENDERATP_MACHINEACTIONS_ENDPOINT = '/machineactions/{action_id}'
-DEFENDERATP_FILEMACHINEACTIONS_ENDPOINT = '/filemachineactions/{action_id}'
 DEFENDERATP_SCAN_DEVICE_ENDPOINT = '/machines/{device_id}/runAntiVirusScan'
 DEFENDERATP_UNBLOCK_HASH_ENDPOINT = '/files/{file_hash}/unblock'
 DEFENDERATP_FILE_BLOCK_ENDPOINT = '/files/{file_hash}/block'
-DEFENDERATP_TOKEN_EXPIRED = 'Access token has expired'
+DEFENDERATP_TOKEN_EXPIRED = 'Status Code: 401. Error: Empty response and no information in the header'
 DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG = 'Token not available. Please run test connectivity first.'
 DEFENDERATP_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                      'Please specify this value in System Settings.'
@@ -52,10 +50,11 @@ DEFENDERATP_NO_EVENT_FOUND_MSG = 'No events found'
 DEFENDERATP_FILE_BLOCKED_MSG = 'File hash blocked successfully'
 DEFENDERATP_PARAM_VALIDATION_FAILED_MSG = 'Parameter validation failed. Invalid {}'
 DEFENDERATP_INPUT_REQUIRED_MSG = 'Input is required for the given type'
-DEFENDERATP_LIMIT_VALIDATION_MSG = 'Limit should be a positive integer'
-DEFENDERATP_TIMEOUT_VALIDATION_MSG = 'Timeout should be a positive integer'
+DEFENDERATP_LIMIT_VALIDATION_MSG = 'Limit should be a non-zero positive integer'
+DEFENDERATP_TIMEOUT_VALIDATION_MSG = 'Timeout should be a non-zero positive integer'
 DEFENDERATP_CONFIG_TENANT_ID = 'tenant_id'
 DEFENDERATP_CONFIG_CLIENT_ID = 'client_id'
+DEFENDERATP_CONFIG_CLIENT_SECRET = 'client_secret'
 DEFENDERATP_ALL_CONST = 'All'
 DEFENDERATP_IP_CONST = 'IP'
 DEFENDERATP_DOMAIN_CONST = 'Domain'

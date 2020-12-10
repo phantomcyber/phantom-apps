@@ -1,0 +1,710 @@
+{
+    "appid": "0eca8bfa-cc09-4eea-ab52-fbe52f4d1de2",
+    "name": "AWS WAF",
+    "description": "This app integrates with AWS WAF to add and delete IP addresses",
+    "type": "devops",
+    "product_vendor": "AWS",
+    "logo": "logo_aws.svg",
+    "logo_dark": "logo_aws_dark.svg",
+    "product_name": "WAF",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2019-04-25T23:07:28.000000Z",
+    "package_name": "phantom_awswaf",
+    "main_module": "awswaf_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+            },
+            {
+                "module": "futures",
+                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
+            },
+            {
+                "module": "docutils",
+                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "access_key_id": {
+            "description": "Access Key ID",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "access_key_secret": {
+            "description": "Access Key Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "region": {
+            "description": "region",
+            "data_type": "string",
+            "required": true,
+            "value_list": [
+                "US East (Ohio)",
+                "US East (N. Virginia)",
+                "US West (N. California)",
+                "US West (Oregon)",
+                "Asia Pacific (Mumbai)",
+                "Asia Pacific (Seoul)",
+                "Asia Pacific (Singapore)",
+                "Asia Pacific (Sydney)",
+                "Asia Pacific (Tokyo)",
+                "Canada (Central)",
+                "China (Beijing)",
+                "China (Ningxia)",
+                "EU (Frankfurt)",
+                "EU (Ireland)",
+                "EU (London)",
+                "EU (Paris)",
+                "EU (Stockholm)",
+                "South America (Sao Paulo)",
+                "AWS GovCloud (US-East)",
+                "AWS GovCloud (US)"
+            ],
+            "default": "US East (N. Virginia)",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add ip",
+            "identifier": "add_ip",
+            "description": "Add a new IP to an existing IP set OR a new IP set",
+            "verbose": "ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
+            "type": "correct",
+            "undo": "delete ip",
+            "read_only": false,
+            "parameters": {
+                "ip_set_id": {
+                    "description": "ID of the IP set",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set id"
+                    ],
+                    "order": 0
+                },
+                "ip_set_name": {
+                    "description": "Name of the IP set",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set name"
+                    ],
+                    "order": 1
+                },
+                "ip_address": {
+                    "description": "IP Address being added",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip mask"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string",
+                    "column_name": "IP Address",
+                    "column_order": 2,
+                    "example_values": [
+                        "126.0.0.0/24"
+                    ],
+                    "contains": [
+                        "awswaf ip mask"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_id",
+                    "data_type": "string",
+                    "column_name": "IP Set ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "0778db34-cc96-4795-8c14-d1a146888391"
+                    ],
+                    "contains": [
+                        "awswaf ip set id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_name",
+                    "data_type": "string",
+                    "column_name": "IP Set Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "test_ip_set",
+                        "test_ip_set_6"
+                    ],
+                    "contains": [
+                        "awswaf ip set name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ChangeToken",
+                    "data_type": "string",
+                    "example_values": [
+                        "70a58581-faf9-4ffc-8fa0-04c5a303dc37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.IpSetId",
+                    "data_type": "string",
+                    "contains": [
+                        "awswaf ip set id"
+                    ],
+                    "column_name": "New IP Set ID",
+                    "column_order": 3,
+                    "example_values": [
+                        "b53eef26-f2be-44ef-9bcf-c16c3d07d791"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "54"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-amz-json-1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thu, 04 Apr 2019 09:02:54 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "6e762be6-56b8-11e9-ab52-739c81485c05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "6e762be6-56b8-11e9-ab52-739c81485c05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP added successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip status: IP added successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete ip",
+            "identifier": "delete_ip",
+            "description": "Removes IP from an existing IP set",
+            "verbose": "ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
+            "type": "contain",
+            "undo": "add ip",
+            "read_only": false,
+            "parameters": {
+                "ip_set_id": {
+                    "description": "IP Set ID",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set id"
+                    ],
+                    "order": 0
+                },
+                "ip_set_name": {
+                    "description": "IP Set Name",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set name"
+                    ],
+                    "order": 1
+                },
+                "ip_address": {
+                    "description": "IP Address",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip mask"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string",
+                    "column_name": "IP Address",
+                    "column_order": 2,
+                    "example_values": [
+                        "126.0.0.0/24"
+                    ],
+                    "contains": [
+                        "awswaf ip mask"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_id",
+                    "data_type": "string",
+                    "column_name": "IP Set ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "0778db34-cc96-4795-8c14-d1a146888391"
+                    ],
+                    "contains": [
+                        "awswaf ip set id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_name",
+                    "data_type": "string",
+                    "column_name": "IP Set Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "test_ip",
+                        "test_ip_set_5"
+                    ],
+                    "contains": [
+                        "awswaf ip set name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ChangeToken",
+                    "data_type": "string",
+                    "example_values": [
+                        "b81aae80-ac5d-4f13-bd35-6e37b5386338"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "54"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-amz-json-1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thu, 04 Apr 2019 09:08:32 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "389889ac-56b9-11e9-ab52-739c81485c05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "389889ac-56b9-11e9-ab52-739c81485c05"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP deleted successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip status: IP deleted successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list acls",
+            "identifier": "list_acls",
+            "description": "List ACLs",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "description": "Maximum number of results (default: 100)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 100,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ],
+                    "column_name": "Limit",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_acl_2"
+                    ],
+                    "column_name": "ACL Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.WebACLId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1d5f92b0-c376-4095-a939-efd04f62fda1"
+                    ],
+                    "column_name": "ACL ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.number_of_acls",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number_of_acls: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list rules",
+            "identifier": "list_rules",
+            "description": "List Rules",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ch2"
+                    ],
+                    "column_name": "Rule Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.RuleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "4b47eab3-d421-43f6-86ab-9f87b7ef2d36"
+                    ],
+                    "column_name": "Rule ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.number_of_rules",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number_of_rules: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list ip sets",
+            "identifier": "list_ip_sets",
+            "description": "List IP sets",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "description": "Maximum number of results (default: 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "required": false,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ],
+                    "column_name": "Limit",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.IPSetId",
+                    "data_type": "string",
+                    "column_name": "IP Set ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "0778db34-cc96-4795-8c14-d1a146888391"
+                    ],
+                    "contains": [
+                        "awswaf ip set id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string",
+                    "column_name": "IP Set Name",
+                    "column_order": 2,
+                    "example_values": [
+                        "test_ip"
+                    ],
+                    "contains": [
+                        "awswaf ip set name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.number_of_ip_sets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        56
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number_of_ip_sets: 56"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

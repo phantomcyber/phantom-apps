@@ -1,5 +1,5 @@
 # File: carbonblack_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -956,7 +956,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         # Get the file_id from the Upload File to Server response
-        file_id = response.get('id')
+        file_id = response.get('file_id')
 
         # Post the file to the host
         data = {'object': destination, 'file_id': file_id}
@@ -1030,7 +1030,7 @@ class CarbonblackConnector(BaseConnector):
             if (phantom.is_fail(ret_val)):
                 return action_result.get_status()
 
-            file_id = response.get('id')
+            file_id = response.get('file_id')
 
             # Download file from server
             url = '/v1/cblr/session/{session_id}/file/{file_id}/content'.format(session_id=session_id, file_id=file_id)
