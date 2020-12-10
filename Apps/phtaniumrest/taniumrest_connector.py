@@ -1082,9 +1082,8 @@ class TaniumRestConnector(BaseConnector):
                                          return_when_n_results_available, wait_for_n_results_available)
 
         if response is None:
-            action_result.set_status(phantom.APP_ERROR, "Failed to get results")
-        else:
-            action_result.set_status(phantom.APP_SUCCESS)
+            return None
+        action_result.set_status(phantom.APP_SUCCESS)
         return response
 
     def handle_action(self, param):
@@ -1135,7 +1134,7 @@ class TaniumRestConnector(BaseConnector):
         config = self.get_config()
         self._username = self._handle_py_ver_compat_for_input_str(config['username'])
         self._password = config['password']
-        self._verify = config['verify_server_cert']
+        self._verify = config.get('verify_server_cert', False)
         self._percentage = config.get('results_percentage', 99)
 
         # Integer validation for 'results_percentage' configuration parameter
