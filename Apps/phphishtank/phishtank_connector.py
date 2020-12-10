@@ -140,15 +140,15 @@ class PhishtankConnector(BaseConnector):
                     status_summary['In_Database'] = status["in_database"]
                     status_summary['Valid'] = status["valid"]
                 else:
-                    if 'phish_detail_page' not in status.keys():
+                    if 'phish_detail_page' not in list(status.keys()):
                         status["phish_detail_page"] = None
-                    if 'verified_at' not in status.keys():
+                    if 'verified_at' not in list(status.keys()):
                         status["verified_at"] = None
-                    if 'phish_id' not in status.keys():
+                    if 'phish_id' not in list(status.keys()):
                         status["phish_id"] = None
-                    if 'valid' not in status.keys():
+                    if 'valid' not in list(status.keys()):
                         status["valid"] = None
-                    if 'verified' not in status.keys():
+                    if 'verified' not in list(status.keys()):
                         status["verified"] = None
 
                     status_summary['Verified'] = status["verified"]
