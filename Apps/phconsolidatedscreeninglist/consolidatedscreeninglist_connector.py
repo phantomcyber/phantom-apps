@@ -1,9 +1,11 @@
 # File: consolidatedscreeninglist_connector.py
 # Copyright (c) 2020 Splunk Inc.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# without a valid written license from Splunk Inc. is PROHIBITED.
+
 
 from __future__ import print_function, unicode_literals
 
@@ -30,9 +32,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         super(ConsolidatedScreeningListConnector, self).__init__()
 
         self._state = None
-
-
-        self._base_url = None
+        self._auth_token = None
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -40,15 +40,20 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
     def _process_html_response(self, response, action_result):
         status_code = response.status_code
+        if 200 <= status_code < 399:
+            return RetVal(phantom.APP_SUCCESS, None)
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -58,25 +63,30 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
         try:
             resp_json = r.json()
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(err_msg)
                 ), None
             )
 
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
+        msg = None
+        if resp_json.get("fault") and isinstance(resp_json.get("fault"), dict):
+            msg = resp_json.get("fault").get("description")
+
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            msg if msg else r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -126,27 +136,100 @@ class ConsolidatedScreeningListConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(err_msg)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        self.save_progress("Testing the reachability of {}. This action doesn't perform any validation for the asset configuration parameter".format(BASE_URL))
         self.save_progress("Connecting to endpoint")
-        ret_val, response = self._make_rest_call(
-            '', action_result, params=None, headers=None
-        )
+        ret_val, _ = self._make_rest_call('', action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _paginator(self, action_result, name, country="", fuzzy_name=False):
+        # This method is used to create an iterator that will paginate through responses from called methods
+
+        params = {"name": name, "countries": country, "fuzzy_name": fuzzy_name, "size": 100}
+        headers = {"Authorization": "Bearer " + self._auth_token, "Accept": "application/json"}
+        offset = 0
+        sources_used = []
+        results = []
+        search_performed_at = None
+        while True:
+            if offset:
+                params.update({"offset": offset})
+
+            ret_val, response = self._make_rest_call(LOOKUP_ENDPOINT, action_result, params=params, headers=headers)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None, None, None
+
+            if response.get("sources_used"):
+                sources_used = response["sources_used"]
+
+            if response.get("results"):
+                results.extend(response["results"])
+
+            if response.get("search_performed_at"):
+                search_performed_at = response["search_performed_at"]
+
+            if response.get("offset"):
+                offset = response["offset"]
+
+            if response.get("total") is not None:
+                if response["total"] == 0:
+                    return phantom.APP_SUCCESS, sources_used, results, search_performed_at
+                total = response["total"]
+                offset += 100
+                if offset >= total:
+                    return phantom.APP_SUCCESS, sources_used, results, search_performed_at
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server"), None, None, None
 
     def _handle_lookup_user(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -156,29 +239,27 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         name = param['name']
 
         country = param.get('country', '')
-        fuzzy_name = param.get('fuzzy_name', '')
+        fuzzy_name = param.get('fuzzy_name', False)
 
-        params = {"q": name, "countries": country, "fuzzy_name": fuzzy_name}
+        try:
+            ret_val, sources_used, results, search_performed_at = self._paginator(action_result, name, country, fuzzy_name)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        config = self.get_config()
-        headers = {"Authorization": "Bearer " + config["auth_token"]}
-
-        ret_val, response = self._make_rest_call(
-            LOOKUP_ENDPOINT, action_result, params=params, headers=headers
-        )
-
-        if phantom.is_fail(ret_val):
-
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-
-        if response['total'] == 0:
-            summary['match'] = False
-        else:
-            summary['match'] = True
+            response = {
+                "sources_used": sources_used,
+                "results": results,
+                "total": len(results),
+                "search_performed_at": search_performed_at
+            }
+            action_result.add_data(response)
+            summary = action_result.update_summary({})
+            if response['total'] == 0:
+                summary['match'] = False
+            else:
+                summary['match'] = True
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -187,7 +268,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -199,10 +280,8 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
-
         config = self.get_config()
-
-        self._base_url = config.get('base_url')
+        self._auth_token = config["auth_token"]
 
         return phantom.APP_SUCCESS
 
@@ -253,6 +332,7 @@ def main():
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -267,6 +347,7 @@ def main():
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
 
