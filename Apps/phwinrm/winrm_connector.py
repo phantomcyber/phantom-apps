@@ -306,7 +306,16 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         resp.std_out = self._handle_py_ver_compat_for_input_str(resp.std_out, True)
         resp.std_err = self._handle_py_ver_compat_for_input_str(resp.std_err, True)
-        return parse_callback(action_result, resp, **additional_data)
+
+        if self._python_version == 3:
+            resp.std_out = resp.std_out.decode('UTF-8')
+            resp.std_err = resp.std_err.decode('UTF-8')
+
+        try:
+            return parse_callback(action_result, resp, **additional_data)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                "Error parsing output: {}".format(self._get_error_message_from_exception(e)))
 
     def _run_ps(self, action_result, script, parse_callback=pc.basic, additional_data=None, async_=False, command_id=None, shell_id=None):
         if additional_data is None:
@@ -349,7 +358,16 @@ class WindowsRemoteManagementConnector(BaseConnector):
         resp.std_out = self._handle_py_ver_compat_for_input_str(resp.std_out, True)
         resp.std_err = self._handle_py_ver_compat_for_input_str(resp.std_err, True)
         resp.std_err = self._session._clean_error_msg(resp.std_err)
-        return parse_callback(action_result, resp, **additional_data)
+
+        if self._python_version == 3:
+            resp.std_out = resp.std_out.decode('UTF-8')
+            resp.std_err = resp.std_err.decode('UTF-8')
+
+        try:
+            return parse_callback(action_result, resp, **additional_data)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                "Error parsing output: {}".format(self._get_error_message_from_exception(e)))
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
