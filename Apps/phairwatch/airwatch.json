@@ -2,44 +2,45 @@
     "appid": "7ca9ffa9-9a85-4d01-b8f3-9634ec68817a",
     "name": "AirWatch",
     "description": "This app interacts with Airwatch",
-    "publisher": "Splunk Community",
     "type": "generic",
-    "main_module": "airwatch_connector.pyc",
+    "product_vendor": "Mhike",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "product_name": "AirWatch",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright(c) 2020 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_airwatch",
-    "product_vendor": "Mhike",
-    "product_name": "AirWatch",
-    "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
-    "logo": "logo_splunk.svg",
-    "logo_dark": "logo_splunk_dark.svg",
-    "license": "Copyright(c) 2020 Splunk Inc.",
+    "main_module": "airwatch_connector.pyc",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
     "configuration": {
         "tenant": {
-            "data_type": "password",
-            "order": 0,
             "description": "AirWatch Tenant Code",
-            "required": true
+            "data_type": "password",
+            "required": true,
+            "order": 0
         },
         "username": {
-            "data_type": "string",
-            "order": 1,
             "description": "Basic Auth Username for AirWatch API",
-            "required": true
+            "data_type": "string",
+            "required": true,
+            "order": 1
         },
         "password": {
-            "data_type": "password",
-            "order": 2,
             "description": "Basic Auth Password for AirWatch API",
-            "required": true
+            "data_type": "password",
+            "required": true,
+            "order": 2
         },
         "base_url": {
-            "data_type": "string",
-            "order": 3,
             "description": "Base URL for AirWatch API",
+            "data_type": "string",
+            "required": true,
             "default": "https://cn251.awmdm.com/api",
-            "required": true
+            "order": 3
         }
     },
     "actions": [
@@ -61,30 +62,30 @@
             "read_only": false,
             "parameters": {
                 "smartgroup_uuid": {
-                    "data_type": "string",
-                    "order": 0,
                     "description": "AirWatch Smartgroup UUID",
-                    "required": true
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
                 },
                 "device_uuid": {
                     "description": "Device UUID",
                     "data_type": "string",
-                    "order": 1,
-                    "required": true
+                    "required": true,
+                    "order": 1
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.smartgroup_uuid",
                     "data_type": "string",
-                    "column_order": 0,
-                    "column_name": "AirWatch Smartgroup UUID"
+                    "column_name": "AirWatch Smartgroup UUID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.device_uuid",
                     "data_type": "string",
-                    "column_order": 1,
-                    "column_name": "Device UUID"
+                    "column_name": "Device UUID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
@@ -97,8 +98,8 @@
                         "success",
                         "failed"
                     ],
-                    "column_order": 2,
-                    "column_name": "Status"
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
