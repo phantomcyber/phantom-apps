@@ -6,9 +6,9 @@
 
 # Phantom App imports
 import phantom.app as phantom
+import phantom.rules as phantom_rules
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
 
 # Local imports
 import parse_callbacks as pc
@@ -125,11 +125,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
         # Get the contents of a file in the vault
 
         try:
-            file_info = Vault.get_file_info(vault_id)[0]
+            success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            file_path = list(file_info)[0].get('path')
         except:
             return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
-
-        file_path = file_info.get('path')
 
         try:
             return phantom.APP_SUCCESS, open(file_path, 'r').read()
@@ -142,11 +141,10 @@ class WindowsRemoteManagementConnector(BaseConnector):
             return phantom.APP_SUCCESS, pc.basic
 
         try:
-            file_info = Vault.get_file_info(vault_id)[0]
+            success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            file_path = list(file_info)[0].get('path')
         except:
             return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
-
-        file_path = file_info.get('path')
 
         try:
             custom_parser = imp.load_source('custom_parser', file_path)
@@ -375,11 +373,12 @@ class WindowsRemoteManagementConnector(BaseConnector):
             self.save_progress("Test connectivity failed")
             return action_result.get_status()
 
-        ret_val = self._run_cmd(action_result, 'ifconfig')
+        ret_val = self._run_cmd(action_result, 'ipconfig')
         if phantom.is_fail(ret_val):
             self.save_progress("Test connectivity failed")
-            return self.set_status(phantom.APP_ERROR)
-        return self.set_status_save_progress(phantom.APP_SUCCESS, "Test connectivity passed")
+            return action_result.set_status(phantom.APP_ERROR)
+        self.save_progress("Test connectivity passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_processes(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -878,13 +877,12 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         try:
             vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
-            file_info = Vault.get_file_info(vault_id)[0]
+            success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            path = list(file_info)[0].get('path')
         except:
             return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file")
 
         destination = self._handle_py_ver_compat_for_input_str(param['destination'])
-
-        path = file_info.get('path')
 
         try:
             fp = open(path, 'rb')

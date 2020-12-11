@@ -14,10 +14,10 @@
     "utctime_updated": "2018-12-20T22:27:33.000000Z",
     "package_name": "phantom_winrm",
     "main_module": "winrm_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On-premise, Windows 7 Ultimate SP1"
+        "On-premise, Windows Server 2012 R2 Standard"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -108,7 +108,7 @@
             "action": "run command",
             "identifier": "run_command",
             "description": "Execute a command on the endpoint",
-            "verbose": "Unless you implement a custom parser, this action will always succeed regardless of the input. Either a <b>command</b> or <b>command_id</b> must be specified. If a <b>command_id</b> is present, all other parameters will be ignored. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
+            "verbose": "Unless you implement a custom parser, this action will always succeed regardless of the input. Either a <b>command</b> or pair of <b>command_id</b> and <b>shell_id</b> must be specified. If a <b>command_id</b> is present, all other parameters will be ignored. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -567,6 +567,9 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
+                    "contains": [
+                        "process name"
+                    ],
                     "example_values": [
                         "cmd"
                     ],
@@ -666,7 +669,7 @@
             "action": "terminate process",
             "identifier": "terminate_process",
             "description": "Terminate a process",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "pid": {
@@ -681,6 +684,10 @@
                 "name": {
                     "description": "Name of program to terminate, accepts wildcards",
                     "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "process name"
+                    ],
                     "order": 2
                 },
                 "ip_hostname": {
@@ -717,6 +724,9 @@
                 {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string",
+                    "contains": [
+                        "process name"
+                    ],
                     "example_values": [
                         "iexplore"
                     ]
@@ -1193,8 +1203,8 @@
             "action": "delete firewall rule",
             "identifier": "delete_firewall_rule",
             "description": "Remove a firewall rule using netsh",
-            "verbose": "This action will invoke the command <code>netsh advfirewall firewall delete rule</code>, and the rest is determined by the input. At a minimum, the rule name must be provided, but if you need to you can also specify any other arguments which the command accepts, in the same manner that input from <b>add firewall rule</b> gets added.",
-            "type": "correct",
+            "verbose": "This action will invoke the command <code>netsh advfirewall firewall delete rule</code>, and the rest is determined by the input. At a minimum, the rule name must be provided, but if you need to you can also specify any other arguments which the command accepts, in the same manner, that input from the <b>add firewall rule</b> gets added.",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "name": {
@@ -1332,7 +1342,7 @@
                         "windows firewall rule name"
                     ],
                     "example_values": [
-                        "phantom created rule"
+                        "test rule"
                     ]
                 },
                 {
@@ -1417,7 +1427,7 @@
             "action": "block ip",
             "identifier": "block_ip",
             "description": "Create a firewall rule to block a specified IP",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -1478,7 +1488,7 @@
                         "windows firewall rule name"
                     ],
                     "example_values": [
-                        "phantom created rule"
+                        "test rule"
                     ]
                 },
                 {
@@ -1532,8 +1542,8 @@
             "action": "add firewall rule",
             "identifier": "create_firewall_rule",
             "description": "Add a firewall rule using netsh",
-            "verbose": "This action will invoke the command <code>netsh advfirewall firewall add rule</code>, where the rest is determined by the input. Each <b>key</b> <b>value</b> pair from the <b>other</b> parameter will be added in the form of <b>key</b>=<b>value</b>. The user input will  be sanitized.",
-            "type": "contain",
+            "verbose": "This action will invoke the command <code>netsh advfirewall firewall add rule</code>, where the rest is determined by the input. Each <b>key-value</b> pair from the <b>other</b> parameter will be added in the form of <b>key</b>=<b>value</b>. The user input will  be sanitized.",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "name": {
@@ -1690,7 +1700,7 @@
                         "windows firewall rule name"
                     ],
                     "example_values": [
-                        "phantom created rule"
+                        "test rule"
                     ]
                 },
                 {
@@ -1772,7 +1782,7 @@
             "action": "logoff user",
             "identifier": "logoff_user",
             "description": "Logoff a user",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2059,7 +2069,7 @@
             "identifier": "activate_partition",
             "description": "Activate a partition",
             "undo": "deactivate partition",
-            "type": "generic",
+            "type": "correct",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2134,7 +2144,7 @@
             "action": "shutdown system",
             "identifier": "shutdown_system",
             "description": "Shutdown a system",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2221,7 +2231,7 @@
             "action": "restart system",
             "identifier": "restart_system",
             "description": "Restart a system",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2479,10 +2489,13 @@
                 {
                     "data_path": "action_result.data.*.user_or_group_sid",
                     "data_type": "string",
+                    "contains": [
+                        "user or group sid"
+                    ],
                     "example_values": [
                         "S-1-1-0"
                     ],
-                    "column_name": "User or Group SID",
+                    "column_name": "User Or Group SID",
                     "column_order": 5
                 },
                 {
@@ -2520,8 +2533,8 @@
             "action": "block file path",
             "identifier": "create_applocker_policy",
             "description": "Create a new AppLocker policy to block a file path",
-            "verbose": "By default this policy will apply to the \"Everyone\" group. You can specify the user with either a variety of formats, which are documented <a href=\"https://technet.microsoft.com/en-us/library/ee460963.aspx\">here</a>. By specifying LDAP, it will apply that policy to that GPO, as opposed to just the local machine. By default, Windows <b>does not</b> have the service required service running for AppLocker policies to be enforced. The <b>Application Identity</b> service must be running for AppLocker to enforce its policies.",
-            "type": "contain",
+            "verbose": "By default, this policy will apply to the \"Everyone\" group. You can specify the user with either a variety of formats, which are documented <a href=\"https://technet.microsoft.com/en-us/library/ee460963.aspx\" target=\"_blank\">here</a>. By specifying LDAP, it will apply that policy to that GPO, as opposed to just the local machine. By default, Windows <b>does not</b> have the service required service running for AppLocker policies to be enforced. The <b>Application Identity</b> service must be running for AppLocker to enforce its policies.",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2557,7 +2570,11 @@
                 "user": {
                     "description": "User or group to apply rule to",
                     "data_type": "string",
-                    "order": 3
+                    "order": 3,
+                    "contains": [
+                        "user or group sid"
+                    ],
+                    "primary": true
                 },
                 "rule_name_prefix": {
                     "description": "Prefix for new rule name",
@@ -2619,12 +2636,15 @@
                     "data_path": "action_result.parameter.rule_name_prefix",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "test"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
+                    "contains": [
+                        "user or group sid"
+                    ],
                     "example_values": [
                         "Administrator"
                     ]
@@ -2670,7 +2690,7 @@
             "action": "delete policy",
             "identifier": "delete_applocker_policy",
             "description": "Delete an AppLocker policy",
-            "type": "correct",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2777,8 +2797,8 @@
             "action": "get file",
             "identifier": "get_file",
             "description": "Copy a file from the Windows Endpoint to the Vault",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "ip_hostname": {
                     "description": "IP/Hostname",
@@ -2834,10 +2854,6 @@
                 },
                 {
                     "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
