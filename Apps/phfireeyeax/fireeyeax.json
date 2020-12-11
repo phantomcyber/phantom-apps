@@ -901,9 +901,7 @@
                     "data_type": "string",
                     "contains": [
                         "fireeyeax submission id"
-                    ],
-                    "column_name": "ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.extended",
@@ -915,24 +913,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.alert.*.malicious",
-                    "data_type": "string",
-                    "column_name": "Malicious",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.alert.*.severity",
-                    "data_type": "string",
-                    "column_name": "Severity",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.alert.*.uuid",
                     "data_type": "string",
                     "contains": [
                         "fireeyeax submission uuid"
-                    ],
-                    "column_name": "UUID",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.status",

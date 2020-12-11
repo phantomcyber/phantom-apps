@@ -124,3 +124,5 @@ NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in
 
 # Parameter Keys
 TIMEOUT_ACTION_PARAM = "'timeout' action parameter"
+PROFILE_ACTION_PARAM = "'profile' action parameter"
+URL_ACTION_PARAM = "'url' action parameter"

@@ -15,12 +15,15 @@ from phantom.vault import Vault
 # Usage of the consts file is recommended
 from fireeyeax_consts import *
 import requests
-from requests.auth import HTTPBasicAuth
 import json
 from bs4 import BeautifulSoup, UnicodeDammit
 import uuid
 import os
 import sys
+try:
+    from urllib import unquote
+except:
+    from urllib.parse import unquote
 # import pudb
 
 
@@ -45,7 +48,7 @@ class FireeyeAxConnector(BaseConnector):
         self._base_url = None
 
     def _validate_integer(self, action_result, parameter, key):
-        if parameter:
+        if parameter is not None:
             try:
                 if not float(parameter).is_integer():
                     return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
@@ -170,7 +173,7 @@ class FireeyeAxConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_octet_response(self, r, action_result):
-        # Create a unqiue ID for this file
+        # Create a unique ID for this file
         guid = uuid.uuid4()
 
         if hasattr(Vault, 'get_vault_tmp_dir'):
@@ -184,11 +187,11 @@ class FireeyeAxConnector(BaseConnector):
             os.makedirs(local_dir)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to create temporary vault folder.', err)
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to create temporary vault folder. {}'.format(err))
 
         action_params = self.get_current_param()
 
-        # Get the parameter passed into the function that caused an octect-stream response
+        # Get the parameter passed into the function that caused an octet-stream response
         # Many cases this will be a file download function
         acq_id = action_params.get('uuid', 'no_id')
 
@@ -201,7 +204,7 @@ class FireeyeAxConnector(BaseConnector):
 
             try:
                 # Write the file to disk
-                with open(zip_file_path, 'wb') as (f):
+                with open(zip_file_path, 'wb') as f:
                     f.write(r.content)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
@@ -228,7 +231,7 @@ class FireeyeAxConnector(BaseConnector):
         # Process each 'Content-Type' of response separately
 
         # Process an octet response.
-        # This is mainly for processing data downloaded during acquistions.
+        # This is mainly for processing data downloaded during acquisition.
         if 'octet' in r.headers.get('Content-Type', ''):
             return self._process_octet_response(r, action_result)
 
@@ -272,9 +275,9 @@ class FireeyeAxConnector(BaseConnector):
 
             self.save_progress('AX Auth: Execute REST Call')
 
-            req = requests.post(
+            req = request_func(
                 login_url,
-                auth=HTTPBasicAuth(self._username, self._password),  # basic authentication
+                auth=(self._username, self._password),  # basic authentication
                 verify=self._verify,
                 headers=self._header
             )
@@ -314,14 +317,21 @@ class FireeyeAxConnector(BaseConnector):
                 )
 
             # Create a URL to connect to
-            url = self._base_url + endpoint
+            try:
+                url = "{0}{1}".format(self._base_url, endpoint)
+            except:
+                error_msg = "Failed to parse the url"
+                return RetVal(
+                    action_result.set_status(phantom.APP_ERROR, error_msg),
+                    resp_json
+                )
 
             # If we are submitting a file for detonation we need to update the content-type
             if "files" in kwargs.keys() or FIREEYEAX_DETONATE_FILE_ENDPOINT == endpoint:
                 # Remove the Content-Type variable. Requests adds this automatically when uploading Files
                 del self._header['Content-Type']
             # If we are downloading the artifact data from a submissions we need to update the content-type
-            elif get_file is True:
+            elif get_file:
                 self._header['Content-Type'] = 'application/zip'
 
             try:
@@ -350,7 +360,7 @@ class FireeyeAxConnector(BaseConnector):
                 try:
                     self.save_progress('AX Logout: Execute REST Call')
 
-                    logout_url = self._base_url + FIREEYEAX_LOGOUT_ENDPOINT
+                    logout_url = "{0}{1}".format(self._base_url, FIREEYEAX_LOGOUT_ENDPOINT)
 
                     self.save_progress('AX Auth: Execute REST Call')
 
@@ -378,11 +388,11 @@ class FireeyeAxConnector(BaseConnector):
 
         # make rest call
         ret_val, response = self._make_rest_call(
-            endpoint, action_result, method="get", params=params
+            endpoint, action_result, params=params
         )
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
@@ -405,6 +415,7 @@ class FireeyeAxConnector(BaseConnector):
             vault_info = Vault.get_file_info(vault_id=vault_id)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
+            error_msg = unquote(error_msg)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. {}".format(error_msg))
 
         if not vault_info:
@@ -422,7 +433,7 @@ class FireeyeAxConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided Vault ID")
             try:
                 # Open the file
-                vault_file = open(item.get('path'), 'rb')
+                vault_file = open(vault_path, 'rb')
                 # Create the files data to send to the console
                 files = {
                     'file': (item['name'], vault_file)
@@ -436,12 +447,14 @@ class FireeyeAxConnector(BaseConnector):
         try:
             profile = [x.strip() for x in profile.split(',')]
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'profile' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the {}".format(PROFILE_ACTION_PARAM))
         profile = list(filter(None, profile))
+        if not profile:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value for the {}".format(PROFILE_ACTION_PARAM))
 
         # Get the other parameters and information
-        priority = 0 if param['priority'] == 'Normal' else 1
-        analysis_type = 1 if param['analysis_type'] == 'Live' else 2
+        priority = 0 if param['priority'].lower() == 'normal' else 1
+        analysis_type = 1 if param['analysis_type'].lower() == 'live' else 2
 
         timeout = param.get('timeout')
         # Validate 'timeout' action parameter
@@ -449,25 +462,15 @@ class FireeyeAxConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # force = "true" if param['force'].lower() == "true" else "false"
-        force = "false"
-        if param.get('force', True):
-            force = "true"
+        force = "true" if param.get('force', True) else "false"
 
         # When analysis type = 2 (Sandbox), prefetch must equal 1
         if analysis_type == 2:
             prefetch = 1
         else:
-            # prefetch = 1 if param['prefetch'].lower() is "true" else 0
-            prefetch = 0
-            if param.get('prefetch', False):
-                prefetch = 1
+            prefetch = 1 if param.get('prefetch', False) else 0
 
-        # if param['enable_vnc']:
-        #     enable_vnc = "true" if param['enable_vnc'].lower() == "true" else "false"
-        enable_vnc = "false"
-        if param.get('enable_vnc', False):
-            enable_vnc = "true"
+        enable_vnc = "true" if param.get('enable_vnc', False) else "false"
 
         data = {}
 
@@ -534,29 +537,27 @@ class FireeyeAxConnector(BaseConnector):
         try:
             urls = [x.strip() for x in urls.split(',')]
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'url' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the {}".format(URL_ACTION_PARAM))
         urls = list(filter(None, urls))
+        if not urls:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value for the {}".format(URL_ACTION_PARAM))
 
         profile = param.get("profile")
         try:
             profile = [x.strip() for x in profile.split(',')]
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'profile' action parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the {}".format(PROFILE_ACTION_PARAM))
         profile = list(filter(None, profile))
+        if not profile:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value for the {}".format(PROFILE_ACTION_PARAM))
 
         # Get the other parameters and information
         priority = 0 if param['priority'].lower() == 'normal' else 1
         analysis_type = 1 if param['analysis_type'].lower() == 'live' else 2
 
-        # force = "true" if param['force'].lower() == "true" else "false"
-        force = "false"
-        if param.get('force', True):
-            force = "true"
+        force = "true" if param.get('force', True) else "false"
 
-        # prefetch = 1 if param['prefetch'].lower() == "true" else 0
-        prefetch = 0
-        if param.get('prefetch', False):
-            prefetch = 1
+        prefetch = 1 if param.get('prefetch', False) else 0
 
         timeout = param.get('timeout')
         # Validate 'timeout' action parameter
@@ -567,9 +568,7 @@ class FireeyeAxConnector(BaseConnector):
         # Get the application code to use for the detonation
         application = self.get_application_code(param.get('application'))
 
-        enable_vnc = "false"
-        if param.get('enable_vnc', False):
-            enable_vnc = "true"
+        enable_vnc = "true" if param.get('enable_vnc', False) else "false"
 
         data = {
             "priority": priority,
@@ -628,10 +627,7 @@ class FireeyeAxConnector(BaseConnector):
 
         params = {}
         # Add parameter to get more information on the report
-        # params['info_level'] = "extended" if param['extended'].lower() == "true" else "normal"
-        params['info_level'] = "normal"
-        if param.get('extended', False):
-            params['info_level'] = "extended"
+        params['info_level'] = "extended" if param.get('extended', False) else "normal"
 
         endpoint = FIREEYEAX_GET_RESULTS_ENDPOINT.format(submission_id=id)
 
@@ -760,11 +756,8 @@ class FireeyeAxConnector(BaseConnector):
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
-        # Base URL initalize
-        base_url = ""
-
-        # Check to see which instance the user selected. Use the appropate URL.
-        base_url = config.get('base_url')
+        # Check to see which instance the user selected. Use the appropriate URL.
+        base_url = config.get('base_url').strip("/")
 
         self._base_url = "{}/{}".format(base_url, FIREEYEAX_API_PATH)
 
