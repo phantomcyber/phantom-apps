@@ -1,11 +1,11 @@
 {
     "appid": "5e808b3f-f930-43f9-8931-a6152f3f23c3",
     "name": "Fireeye AX",
-    "description": "Connectivity to the Fireeye Advanced Mawalre Analysis tool.",
+    "description": "This app provides connectivity to the Fireeye Advanced Malware Analysis tool",
     "type": "sandbox",
     "product_vendor": "Fireeye",
-    "logo": "fireeyeax.svg",
-    "logo_dark": "fireeyeax_dark.svg",
+    "logo": "logo_fireeyeax.svg",
+    "logo_dark": "logo_fireeyeax_dark.svg",
     "product_name": "Advanced Malware Analysis",
     "python_version": "2.7",
     "product_version_regex": ".*",
@@ -15,11 +15,11 @@
     "utctime_updated": "2020-09-25T17:44:07.565949Z",
     "package_name": "phantom_fireeyeax",
     "main_module": "fireeyeax_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
-            "description": "Base URL for the console. IE. https://<console IP or FQDN>",
+            "description": "Base URL for the console, i.e., https://<console IP or FQDN>",
             "data_type": "string",
             "required": true,
             "order": 0
@@ -40,10 +40,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -51,14 +50,14 @@
         },
         {
             "action": "detonate file",
+            "description": "Run a file in the sandbox and retrieve the analysis results",
+            "verbose": "Detonate a file in the AX console.",
+            "type": "generic",
             "identifier": "detonate_file",
-            "description": "Run the file in the sandbox and retrieve the analysis results",
-            "verbose": "Detonate a file in the AX console",
-            "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "vault_id": {
-                    "description": "Vault ID of file to detonate",
+                    "description": "Vault ID of the file to detonate",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -72,14 +71,12 @@
                         "xls",
                         "ppt"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "priority": {
-                    "description": "Sets the analysis priority: (default: Normal)",
+                    "description": "Sets the analysis priority, default is Normal",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Normal",
                         "Urgent"
@@ -91,7 +88,6 @@
                     "description": "Specifies the analysis mode",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Live",
                         "Sandbox"
@@ -100,46 +96,27 @@
                     "order": 2
                 },
                 "force": {
-                    "description": "Specifies whether to perform an analysis on the file even if the file exactly matches ananalysis that has already been performed on this file",
+                    "description": "Perform an analysis on the file even if the file exactly matches an analysis that has already been performed on this file",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "True",
+                    "default": true,
                     "order": 3
                 },
                 "prefetch": {
-                    "description": "Specifies whether to determine the file target based on an internal determination rather than browsing to the target location",
+                    "description": "Determine the file target based on an internal determination rather than browsing to the target location",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "False",
+                    "default": false,
                     "order": 4
                 },
                 "enable_vnc": {
-                    "description": "Specifies whether to enable VNC while making a submission on an Malware Analysis appliance (Default: False)",
+                    "description": "Enable VNC while submitting on a Malware Analysis appliance, default is False",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "False",
+                    "default": false,
                     "order": 5
                 },
                 "profile": {
                     "description": "Select the Malware Analysis profile to use for analysis",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "win7-sp1",
                         "winxp-sp3",
@@ -153,7 +130,6 @@
                     "description": "Specifies the ID of the application to be used for the analysis",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Auto",
                         "Adobe Acrobat Reader DC 15.008",
@@ -250,10 +226,9 @@
                     "order": 7
                 },
                 "timeout": {
-                    "description": "Specifies the timout period for the analysis in seconds",
+                    "description": "Specifies the timeout period for the analysis in seconds",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
                     "default": 500,
                     "order": 8
                 }
@@ -272,7 +247,7 @@
                         "xls",
                         "ppt"
                     ],
-                    "column_name": "vault_id",
+                    "column_name": "Vault ID",
                     "column_order": 1
                 },
                 {
@@ -285,15 +260,27 @@
                 },
                 {
                     "data_path": "action_result.parameter.force",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.prefetch",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.enable_vnc",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.profile",
@@ -403,7 +390,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.submission_details.*.id",
@@ -432,6 +422,9 @@
                 {
                     "data_path": "action_result.data.*.submission_details.*.vnc_port",
                     "data_type": "numeric",
+                    "example_values": [
+                        8080
+                    ],
                     "column_name": "VNC Port",
                     "column_order": 5
                 },
@@ -443,23 +436,33 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -469,14 +472,14 @@
         },
         {
             "action": "detonate url",
+            "description": "Run a URL in the sandbox",
+            "verbose": "Detonate a URL in the AX console.",
+            "type": "generic",
             "identifier": "detonate_url",
-            "description": "Run the URL in the sandbox",
-            "verbose": "Detonate a URL in the AX console",
-            "type": "investigate",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "urls": {
-                    "description": "URL(s) to detonate. Comma seperated list allowed",
+                    "description": "URL(s) to detonate. Comma separated list allowed",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -484,14 +487,12 @@
                         "url"
                     ],
                     "allow_list": true,
-                    "default": "",
                     "order": 0
                 },
                 "priority": {
-                    "description": "Sets the analysis priority: (default: Normal)",
+                    "description": "Sets the analysis priority, default is Normal",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Normal",
                         "Urgent"
@@ -503,7 +504,6 @@
                     "description": "Specifies the analysis mode",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Live",
                         "Sandbox"
@@ -512,46 +512,27 @@
                     "order": 2
                 },
                 "force": {
-                    "description": "Specifies whether to perform an analysis on the file even if the file exactly matches ananalysis that has already been performed on this file",
+                    "description": "Perform an analysis on the file even if the file exactly matches an analysis that has already been performed on this file",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "True",
+                    "default": true,
                     "order": 3
                 },
                 "prefetch": {
-                    "description": "Specifies whether to determine the file target based on an internal determination rather than browsing to the target location",
+                    "description": "Determine the file target based on an internal determination rather than browsing to the target location",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "False",
+                    "default": false,
                     "order": 4
                 },
                 "enable_vnc": {
-                    "description": "Specifies whether to enable VNC while making a submission on an Malware Analysis appliance (Default: False)",
+                    "description": "Enable VNC while submitting on a Malware Analysis appliance, default is False",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "False",
+                    "default": false,
                     "order": 5
                 },
                 "profile": {
                     "description": "Select the Malware Analysis profile to use for analysis",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "win7-sp1",
                         "winxp-sp3",
@@ -565,7 +546,6 @@
                     "description": "Specifies the ID of the application to be used for the analysis",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "Auto",
                         "Adobe Acrobat Reader DC 15.008",
@@ -662,10 +642,9 @@
                     "order": 7
                 },
                 "timeout": {
-                    "description": "Specifies the timout period for the analysis in seconds",
+                    "description": "Specifies the timeout period for the analysis in seconds",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": false,
                     "default": 500,
                     "order": 8
                 }
@@ -688,15 +667,27 @@
                 },
                 {
                     "data_path": "action_result.parameter.force",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.prefetch",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.enable_vnc",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.profile",
@@ -806,7 +797,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.*.submission_details.*.id",
@@ -835,6 +829,9 @@
                 {
                     "data_path": "action_result.data.*.*.submission_details.*.vnc_port",
                     "data_type": "numeric",
+                    "example_values": [
+                        8080
+                    ],
                     "column_name": "VNC Port",
                     "column_order": 4
                 },
@@ -846,14 +843,18 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -872,10 +873,9 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
-            "description": "Query for results of an already completed detonation",
-            "verbose": "",
+            "description": "Get results of an already completed detonation",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -886,19 +886,12 @@
                     "contains": [
                         "fireeyeax submission id"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "extended": {
                     "description": "Get additional information from the console about this report",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": true,
-                    "value_list": [
-                        "True",
-                        "False"
-                    ],
-                    "default": "False",
+                    "default": false,
                     "order": 1
                 }
             },
@@ -909,12 +902,16 @@
                     "contains": [
                         "fireeyeax submission id"
                     ],
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.extended",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.alert.*.malicious",
@@ -939,6 +936,14 @@
                 },
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -946,16 +951,18 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -969,10 +976,10 @@
         },
         {
             "action": "save artifacts",
-            "identifier": "save_artifacts",
             "description": "Save a ZIP file of the detonation report to the Vault",
-            "verbose": "This function downloads all the malware artifacts from a detonation as a ZIP file and adds that file to the vault",
+            "verbose": "This function downloads all the malware artifacts from a detonation as a ZIP file and adds that file to the vault.",
             "type": "investigate",
+            "identifier": "save_artifacts",
             "read_only": true,
             "parameters": {
                 "uuid": {
@@ -983,7 +990,6 @@
                     "contains": [
                         "fireeyeax submission uuid"
                     ],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -994,7 +1000,7 @@
                     "contains": [
                         "fireeyeax submission uuid"
                     ],
-                    "column_name": "id",
+                    "column_name": "UUID",
                     "column_order": 0
                 },
                 {
@@ -1005,7 +1011,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1017,11 +1027,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1031,24 +1047,19 @@
         },
         {
             "action": "get status",
-            "identifier": "get_status",
             "description": "Gets the status of a detonation report",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "get_status",
             "read_only": true,
             "parameters": {
                 "id": {
-                    "description": "Submission ID of to get the status of",
-                    "data_type": "numeric",
+                    "description": "Submission ID of the detonation report to get the status of",
+                    "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "example_values": [
-                        "12345"
-                    ],
                     "contains": [
                         "fireeyeax submission id"
                     ],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -1081,7 +1092,7 @@
                         "running",
                         "done"
                     ],
-                    "column_name": "Status",
+                    "column_name": "Submission Status",
                     "column_order": 1
                 },
                 {
@@ -1098,7 +1109,7 @@
                     "data_path": "action_result.data.*.submission_details.*.vnc_port",
                     "data_type": "numeric",
                     "example_values": [
-                        "8080"
+                        8080
                     ],
                     "column_name": "VNC Port",
                     "column_order": 4
@@ -1106,18 +1117,12 @@
                 {
                     "data_path": "action_result.data.*.submission_details.*.job_ids",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "column_name": "Job IDs",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.submission_details.*.uuid",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "fireeyeax submission uuid"
                     ],
@@ -1126,7 +1131,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.submission_details.*.id",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "example_values": [
                         "12345"
                     ],
@@ -1137,24 +1142,34 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

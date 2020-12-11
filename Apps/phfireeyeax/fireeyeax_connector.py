@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: fireeyeax_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -18,10 +17,10 @@ from fireeyeax_consts import *
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
+from bs4 import BeautifulSoup, UnicodeDammit
 import uuid
 import os
+import sys
 # import pudb
 
 
@@ -45,13 +44,82 @@ class FireeyeAxConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -61,6 +129,9 @@ class FireeyeAxConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -68,9 +139,10 @@ class FireeyeAxConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
+                self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -78,9 +150,10 @@ class FireeyeAxConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(err)
                 ), None
             )
 
@@ -89,10 +162,10 @@ class FireeyeAxConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
+        error_message = r.text.replace('{', '{{').replace('}', '}}')
+        error_message = self._handle_py_ver_compat_for_input_str(error_message)
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
-        )
+            r.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -105,12 +178,13 @@ class FireeyeAxConnector(BaseConnector):
         else:
             local_dir = ('/opt/phantom/vault/tmp/{}').format(guid)
 
-        self.save_progress(('Using temp directory: {0}').format(guid))
+        self.save_progress("Using temp directory: {0}".format(guid))
 
         try:
             os.makedirs(local_dir)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to create temporary vault folder.', e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to create temporary vault folder.', err)
 
         action_params = self.get_current_param()
 
@@ -121,7 +195,7 @@ class FireeyeAxConnector(BaseConnector):
         # Set the file name for the vault
         filename = "{}_artifacts.zip".format(acq_id)
 
-        zip_file_path = ('{0}/{1}').format(local_dir, filename)
+        zip_file_path = "{0}/{1}".format(local_dir, filename)
 
         if r.status_code == 200:
 
@@ -130,15 +204,17 @@ class FireeyeAxConnector(BaseConnector):
                 with open(zip_file_path, 'wb') as (f):
                     f.write(r.content)
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to write zip file to disk. Error: {0}').format(str(e))), None)
+                err = self._get_error_message_from_exception(e)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to write zip file to disk. {0}".format(err)), None)
             else:
                 try:
                     vault_results = Vault.add_attachment(zip_file_path, self.get_container_id(), file_name=filename)
                     return RetVal(phantom.APP_SUCCESS, vault_results)
                 except Exception as e:
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, ('Unable to store file in Phantom Vault. Error: {0}').format(str(e))), None)
+                    err = self._get_error_message_from_exception(e)
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to store file in Phantom Vault. {0}".format(err)), None)
 
-        message = ('Error from server. Status Code: {0} Data from server: {1}').format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -174,7 +250,7 @@ class FireeyeAxConnector(BaseConnector):
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -184,7 +260,15 @@ class FireeyeAxConnector(BaseConnector):
         resp_json = None
 
         try:
-            login_url = self._base_url + FIREEYEAX_LOGIN_ENDPOINT
+            request_func = getattr(requests, "post")
+        except AttributeError:
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)),
+                resp_json
+            )
+
+        try:
+            login_url = "{0}{1}".format(self._base_url, FIREEYEAX_LOGIN_ENDPOINT)
 
             self.save_progress('AX Auth: Execute REST Call')
 
@@ -203,12 +287,22 @@ class FireeyeAxConnector(BaseConnector):
             else:
                 self.save_progress('AX Auth: Process Response - Token Failed')
 
-                message = 'AX Auth Failed, please confirm username and password'
+                message = "AX Auth Failed, please confirm 'username' and 'password'"
 
                 return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
+        except requests.exceptions.InvalidURL:
+            error_message = "Error connecting to server. Invalid URL %s" % (login_url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (login_url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (login_url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.RequestException as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(str(e))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
         else:
             # After we Login now proceed to call the endpoint we want
             try:
@@ -237,11 +331,11 @@ class FireeyeAxConnector(BaseConnector):
                     headers=self._header,
                     **kwargs
                 )
-
             except Exception as e:
+                err = self._get_error_message_from_exception(e)
                 return RetVal(
                     action_result.set_status(
-                        phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                        phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)
                     ), resp_json
                 )
 
@@ -267,18 +361,14 @@ class FireeyeAxConnector(BaseConnector):
                     )
 
                 except requests.exceptions.RequestException as e:
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error Connecting to server. Details: {0}').format(str(e))), resp_json)
+                    err = self._get_error_message_from_exception(e)
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
 
         self.save_progress("Connecting to endpoint")
 
@@ -292,8 +382,6 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
@@ -310,72 +398,76 @@ class FireeyeAxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-
-        vault_id = UnicodeDammit(param.get('vault_id')).unicode_markup.encode('utf-8')
+        vault_id = self._handle_py_ver_compat_for_input_str(param.get('vault_id'))
 
         # Get vault info from the vauld_id parameter
         try:
             vault_info = Vault.get_file_info(vault_id=vault_id)
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Unknown error occurred."
-            else:
-                error_msg = "Unknown error occurred."
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(error_msg))
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. {}".format(error_msg))
 
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
+            try:
+                error_msg = "Error occurred while fetching the vault information of the Vault ID: {}".format(vault_id)
+            except:
+                error_msg = "Error occurred while fetching the vault information of the specified Vault ID"
+
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Loop through the Vault infomation
         for item in vault_info:
-
             vault_path = item.get('path')
-
             if vault_path is None:
-                return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
-
+                return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided Vault ID")
             try:
                 # Open the file
                 vault_file = open(item.get('path'), 'rb')
-
                 # Create the files data to send to the console
                 files = {
                     'file': (item['name'], vault_file)
                 }
-
             except Exception as e:
-                if e.message:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred."
-                else:
-                    error_msg = "Unknown error occurred."
-
+                error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
 
         # Process parameters
         profile = param.get("profile")
-        profile = [x.strip() for x in profile.split(',')]
+        try:
+            profile = [x.strip() for x in profile.split(',')]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'profile' action parameter")
         profile = list(filter(None, profile))
 
         # Get the other parameters and information
         priority = 0 if param['priority'] == 'Normal' else 1
         analysis_type = 1 if param['analysis_type'] == 'Live' else 2
+
         timeout = param.get('timeout')
-        force = "true" if param['force'].lower() == "true" else "false"
+        # Validate 'timeout' action parameter
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # force = "true" if param['force'].lower() == "true" else "false"
+        force = "false"
+        if param.get('force', True):
+            force = "true"
 
         # When analysis type = 2 (Sandbox), prefetch must equal 1
         if analysis_type == 2:
             prefetch = 1
         else:
-            prefetch = 1 if param['prefetch'].lower() is "true" else 0
+            # prefetch = 1 if param['prefetch'].lower() is "true" else 0
+            prefetch = 0
+            if param.get('prefetch', False):
+                prefetch = 1
 
-        if param['enable_vnc']:
-            enable_vnc = "true" if param['enable_vnc'].lower() == "true" else "false"
+        # if param['enable_vnc']:
+        #     enable_vnc = "true" if param['enable_vnc'].lower() == "true" else "false"
+        enable_vnc = "false"
+        if param.get('enable_vnc', False):
+            enable_vnc = "true"
 
         data = {}
 
@@ -407,19 +499,24 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
-        resp_data = response[0]
-        resp_data['submission_details'] = json.loads(resp_data['submission_details'])
+        try:
+            resp_data = response[0]
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching data from API response. {}".format(err))
+
+        try:
+            resp_data['submission_details'] = json.loads(resp_data['submission_details'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response. {}".format(err))
 
         # Add the response into the data section
         action_result.add_data(resp_data)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_url(self, param):
@@ -434,23 +531,45 @@ class FireeyeAxConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         urls = param.get("urls")
-        urls = [x.strip() for x in urls.split(',')]
+        try:
+            urls = [x.strip() for x in urls.split(',')]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'url' action parameter")
         urls = list(filter(None, urls))
 
         profile = param.get("profile")
-        profile = [x.strip() for x in profile.split(',')]
+        try:
+            profile = [x.strip() for x in profile.split(',')]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the 'profile' action parameter")
         profile = list(filter(None, profile))
 
         # Get the other parameters and information
         priority = 0 if param['priority'].lower() == 'normal' else 1
-        analysis_type = 1 if param['analysis_type'].lower == 'live' else 2
-        force = "true" if param['force'].lower() == "true" else "false"
-        prefetch = 1 if param['prefetch'].lower() == "true" else 0
+        analysis_type = 1 if param['analysis_type'].lower() == 'live' else 2
+
+        # force = "true" if param['force'].lower() == "true" else "false"
+        force = "false"
+        if param.get('force', True):
+            force = "true"
+
+        # prefetch = 1 if param['prefetch'].lower() == "true" else 0
+        prefetch = 0
+        if param.get('prefetch', False):
+            prefetch = 1
 
         timeout = param.get('timeout')
+        # Validate 'timeout' action parameter
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Get the application code to use for the detonation
         application = self.get_application_code(param.get('application'))
+
+        enable_vnc = "false"
+        if param.get('enable_vnc', False):
+            enable_vnc = "true"
 
         data = {
             "priority": priority,
@@ -460,11 +579,9 @@ class FireeyeAxConnector(BaseConnector):
             "urls": urls,
             "profiles": profile,
             "application": application,
+            "enable_vnc": enable_vnc,
             "timeout": timeout
         }
-
-        if param['enable_vnc']:
-            data['enable_vnc'] = "true" if param['enable_vnc'].lower() == "true" else "false"
 
         endpoint = FIREEYEAX_DETONATE_URL_ENDPOINT
 
@@ -474,21 +591,26 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         # Updating the response data so we can properly get the data. The data is returned by a string so we need to convert it into JSON to be useable
-        resp_data = response['entity']['response']
-        resp_data[0]['submission_details'] = json.loads(resp_data[0]['submission_details'])
+        try:
+            resp_data = response['entity']['response']
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching data from API response. {}".format(err))
+
+        try:
+            resp_data[0]['submission_details'] = json.loads(resp_data[0]['submission_details'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response. {}".format(err))
 
         action_result.add_data(resp_data)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_report(self, param):
@@ -506,7 +628,10 @@ class FireeyeAxConnector(BaseConnector):
 
         params = {}
         # Add parameter to get more information on the report
-        params['info_level'] = "extended" if param['extended'].lower() == "true" else "normal"
+        # params['info_level'] = "extended" if param['extended'].lower() == "true" else "normal"
+        params['info_level'] = "normal"
+        if param.get('extended', False):
+            params['info_level'] = "extended"
 
         endpoint = FIREEYEAX_GET_RESULTS_ENDPOINT.format(submission_id=id)
 
@@ -516,17 +641,11 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_save_artifacts(self, param):
@@ -549,17 +668,11 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_status(self, param):
@@ -583,19 +696,18 @@ class FireeyeAxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         resp_data = response
-        resp_data['submission_details'] = json.loads(resp_data['submission_details'])
+        try:
+            resp_data['submission_details'] = json.loads(resp_data['submission_details'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response. {}".format(err))
 
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     # Returns the application code for submitting URL's and Files to AX
@@ -605,7 +717,7 @@ class FireeyeAxConnector(BaseConnector):
         try:
             code = FIREEYEAX_APPLICATION_CODES[application]
         except KeyError:
-            self.save_progress("Application {} is not found in the list of avaliable applications. Reverting to Default application code 0.".format(application))
+            self.save_progress("Could not find the specified application in the available application list. Reverting to Default application code 0")
             pass
 
         return code
@@ -641,6 +753,12 @@ class FireeyeAxConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         # Base URL initalize
         base_url = ""

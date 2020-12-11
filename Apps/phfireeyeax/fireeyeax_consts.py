@@ -1,3 +1,7 @@
+# File: fireeyeax_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Define your constants here
 FIREEYEAX_API_PATH = "wsapis/v2.0.0/"
 FIREEYEAX_LOGIN_ENDPOINT = "auth/login"
@@ -10,7 +14,7 @@ FIREEYEAX_DETONATE_URL_ENDPOINT = "submissions/url"
 FIREEYEAX_GET_STATUS_ENDPOINT = "submissions/status/{submission_id}"
 FIREEYEAX_GET_RESULTS_ENDPOINT = "submissions/results/{submission_id}"
 FIREEYEAX_SAVE_ARTIFACTS_ENDPOINT = "artifacts/{uuid}"
-FIREEYEAX_GET_CONFIG_ENDPOINT = "config"
+# FIREEYEAX_GET_CONFIG_ENDPOINT = "config"
 
 # Application codes
 # Application codes allow for the specific application to be used for the analysis
@@ -107,3 +111,16 @@ FIREEYEAX_APPLICATION_CODES = {
     "XML Handler": "241",
     "XPS Viewer 1.0": "166"
 }
+
+# Exception message handling constants
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Fireeye AX Server. Please check the asset configuration and|or the action parameters"
+
+# Integer validation constants
+VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
+NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
+
+# Parameter Keys
+TIMEOUT_ACTION_PARAM = "'timeout' action parameter"
