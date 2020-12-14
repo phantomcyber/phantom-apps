@@ -39,3 +39,7 @@ PASSIVETOTAL_MSG_GET_DOMAIN_TEST = "Querying a single domain to check credential
 PASSIVETOTAL_USING_BASE_URL = "Using url: {base_url}"
 
 PASSIVETOTAL_REST_API_URL = "https://api.passivetotal.org/v2"
+
+PASSIVETOTAL_ERR_CODE_UNAVAILABLE = "Error code unavailable"
+PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters."
+PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters."

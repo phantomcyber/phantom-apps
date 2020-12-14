@@ -15,9 +15,11 @@ from passivetotal_consts import *
 
 from datetime import datetime
 from datetime import timedelta
+from bs4 import UnicodeDammit
 import requests
 import json
 import ipaddress
+import sys
 
 
 class PassivetotalConnector(BaseConnector):
@@ -40,6 +42,12 @@ class PassivetotalConnector(BaseConnector):
         if (self._base_url.endswith('/')):
             self._base_url = self._base_url[:-1]
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
+
         self._host = ph_utils.get_host_from_url(self._base_url)
 
         self._params = {}
@@ -47,6 +55,54 @@ class PassivetotalConnector(BaseConnector):
         self._headers = {'Content-Type': 'application/json'}
 
         return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+        error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+            else:
+                error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+                error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+        except:
+            error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+            error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MESSAGE
+        except:
+            error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
@@ -84,7 +140,7 @@ class PassivetotalConnector(BaseConnector):
                     params=params,
                     headers=self._headers)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_SERVER_CONNECTION, e), resp_json, status_code)
+            return (action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_SERVER_CONNECTION, self._get_error_message_from_exception(e)), resp_json, status_code)
 
         # It's ok if r.text is None, dump that
         action_result.add_debug_data({'r_text': r.text if r else 'r is None'})
