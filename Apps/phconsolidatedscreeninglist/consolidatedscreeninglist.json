@@ -15,7 +15,7 @@
     "utctime_updated": "2020-06-29T20:55:15.416688Z",
     "package_name": "phantom_consolidatedscreeninglist",
     "main_module": "consolidatedscreeninglist_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "auth_token": {
@@ -45,7 +45,7 @@
             "read_only": true,
             "parameters": {
                 "name": {
-                    "description": "Searches against the name and alt_names fields",
+                    "description": "Searches against the 'name' and 'alt_names' fields",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -55,11 +55,16 @@
                     "data_type": "string",
                     "order": 1
                 },
+                "limit": {
+                    "description": "Number of records to include in the response",
+                    "data_type": "numeric",
+                    "order": 2
+                },
                 "fuzzy_name": {
                     "description": "Enables users to query a name and get usable results without knowing the exact spelling of an entry",
                     "data_type": "boolean",
                     "default": false,
-                    "order": 2
+                    "order": 3
                 }
             },
             "output": [
@@ -73,6 +78,13 @@
                 {
                     "data_path": "action_result.parameter.country",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.fuzzy_name",

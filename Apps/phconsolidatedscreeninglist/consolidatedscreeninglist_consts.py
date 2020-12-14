@@ -14,3 +14,9 @@ LOOKUP_ENDPOINT = "/gateway/v1/consolidated_screening_list/search?"
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+# Constants relating to '_validate_integer'
+INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {}"
+INVALID_NON_ZERO_NON_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-zero positive integer value in the {}"
+
+LIMIT_KEY = "'limit' action parameter"

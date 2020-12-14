@@ -33,6 +33,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
         self._state = None
         self._auth_token = None
+        self._headers = None
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -127,7 +128,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
                 resp_json
             )
 
-        url = BASE_URL + endpoint
+        url = "{}{}".format(BASE_URL, endpoint)
 
         try:
             r = request_func(
@@ -191,11 +192,25 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _paginator(self, action_result, name, country="", fuzzy_name=False):
-        # This method is used to create an iterator that will paginate through responses from called methods
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+            if parameter <= 0:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_ZERO_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _paginator(self, action_result, name, country="", fuzzy_name=False, limit=None):
+        # This method is used to paginate through the responses using the lookup user endpoint based on the provided request parameters
 
         params = {"name": name, "countries": country, "fuzzy_name": fuzzy_name, "size": 100}
-        headers = {"Authorization": "Bearer " + self._auth_token, "Accept": "application/json"}
         offset = 0
         sources_used = []
         results = []
@@ -204,7 +219,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
             if offset:
                 params.update({"offset": offset})
 
-            ret_val, response = self._make_rest_call(LOOKUP_ENDPOINT, action_result, params=params, headers=headers)
+            ret_val, response = self._make_rest_call(LOOKUP_ENDPOINT, action_result, params=params, headers=self._headers)
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None, None, None
@@ -224,6 +239,8 @@ class ConsolidatedScreeningListConnector(BaseConnector):
             if response.get("total") is not None:
                 if response["total"] == 0:
                     return phantom.APP_SUCCESS, sources_used, results, search_performed_at
+                if limit and len(results) >= limit:
+                    return phantom.APP_SUCCESS, sources_used, results[:limit], search_performed_at
                 total = response["total"]
                 offset += 100
                 if offset >= total:
@@ -237,12 +254,17 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         name = param['name']
+        limit = param.get('limit')
+        # Validate 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         country = param.get('country', '')
         fuzzy_name = param.get('fuzzy_name', False)
 
         try:
-            ret_val, sources_used, results, search_performed_at = self._paginator(action_result, name, country, fuzzy_name)
+            ret_val, sources_used, results, search_performed_at = self._paginator(action_result, name, country, fuzzy_name, limit)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
@@ -282,6 +304,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         self._state = self.load_state()
         config = self.get_config()
         self._auth_token = config["auth_token"]
+        self._headers = {"Authorization": "Bearer {}".format(self._auth_token), "Accept": "application/json"}
 
         return phantom.APP_SUCCESS
 
