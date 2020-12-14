@@ -164,3 +164,6 @@ AWSIAM_POLICY_DOC_TRIMMING_ERROR_MSG = 'Error occurred while trimming role polic
 AWSIAM_ROLE_DOES_NOT_EXIST_MSG = 'Role {role_name} does not exist. Hence, policy can not be {policy_status}.'
 AWSIAM_ACTION_FAILED_MESSAGE = 'Action {action_name} failed'
 AWSIAM_TIME_OUT = 30
+AWSIAM_UNKNOWN_ERROR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters"
+AWSIAM_UNKNOWN_ERROR_CODE = "Error code unavailable"
+AWSIAM_TYPE_ERROR_MSG = "Error occurred while connecting to the AWS IAM server. Please check the asset configuration and|or the action parameters"
