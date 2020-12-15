@@ -7,6 +7,7 @@ on:
 
 env:
   SCRIPTS_DIRECTORY: .github/workflows/scripts
+  PYTHON_REQUIREMENTS_FILE: .github/workflows/scripts/requirements.txt
 
 jobs:
   test-pull-request-commit:
@@ -14,8 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set env
-        run: echo ::set-env name=PYTHON_REQUIREMENTS_FILE::${{ env.SCRIPTS_DIRECTORY }}/requirements.txt
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
