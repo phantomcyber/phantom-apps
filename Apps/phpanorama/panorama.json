@@ -1,19 +1,20 @@
 {
     "appid": "3d88e427-0e61-4311-a613-bbddeac532e0",
     "name": "Panorama",
-    "description": "This app integrates with the Palo Alto Networks Panorama product to support several containment and investigative actions.",
+    "description": "This app integrates with the Palo Alto Networks Panorama product to support several containment and investigative actions",
     "publisher": "Splunk",
     "type": "firewall",
-    "main_module": "panorama_connector.pyc",
+    "main_module": "panorama_connector.py",
     "app_version": "1.1.7",
     "utctime_updated": "2018-12-07T01:35:49.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
     "product_name": "Panorama",
     "product_version_regex": "7\\..*\\..*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
     "logo": "pan.png",
-    "license": "Copyright (c) 2014-2020 Splunk Inc.",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "configuration": {
         "device": {
             "data_type": "string",
@@ -45,7 +46,7 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity",
-            "verbose": "This action logs into the device using a REST Api call to check the connection and credentials configured",
+            "verbose": "This action logs into the device using a REST Api call to check the connection and credentials configured.",
             "type": "test",
             "identifier": "test_asset_connectivity",
             "read_only": true,
@@ -397,7 +398,6 @@
                 "is_source_address": {
                     "description": "Source address",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 1
                 },
                 "device_group": {
@@ -499,7 +499,6 @@
                 "is_source_address": {
                     "description": "Source address",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 1
                 },
                 "device_group": {

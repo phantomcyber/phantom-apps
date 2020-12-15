@@ -1,7 +1,8 @@
 # File: panorama_connector.py
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom imports
 import phantom.app as phantom
@@ -11,10 +12,12 @@ from phantom.action_result import ActionResult
 # THIS Connector imports
 from panorama_consts import *
 
+import sys
 import requests
 import xmltodict
 import re
 import time
+from bs4 import UnicodeDammit
 
 
 class PanoramaConnector(BaseConnector):
@@ -44,12 +47,75 @@ class PanoramaConnector(BaseConnector):
 
         config = self.get_config()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
+
         # Base URL
         self._base_url = 'https://' + config[phantom.APP_JSON_DEVICE] + '/api/'
 
         self._dev_sys_key = "device-group"
 
         return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        error_msg = PAN_ERR_MESSAGE
+        error_code = PAN_ERR_CODE_MESSAGE
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = PAN_ERR_CODE_MESSAGE
+                    error_msg = e.args[0]
+            else:
+                error_code = PAN_ERROR_CODE_MESSAGE
+                error_msg = PAN_ERROR_MESSAGE
+        except:
+            error_code = PAN_ERR_CODE_MESSAGE
+            error_msg = PAN_ERR_MESSAGE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MESSAGE
+        except:
+            error_msg = PAN_ERR_MESSAGE
+
+        try:
+            if error_code in PAN_ERR_CODE_MESSAGE:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = PARSE_ERR_MESSAGE
+
+        return error_text
 
     def _parse_response_msg(self, response, action_result):
 
@@ -72,9 +138,12 @@ class PanoramaConnector(BaseConnector):
             return
 
         # parse it as a string
-        if (type(msg) == str) or (type(msg) == unicode):
-            action_result.append_to_message("message: '{}'".format(msg))
-
+        try:
+            if (type(msg) == str) or (type(msg) == unicode):
+                action_result.append_to_message("message: '{}'".format(msg))
+        except:
+            if (type(msg) == str):
+                action_result.append_to_message("message: '{}'".format(msg))
         return
 
     def _parse_response(self, response_dict, action_result):
@@ -129,7 +198,7 @@ class PanoramaConnector(BaseConnector):
             response = requests.post(self._base_url, data=data, verify=config[phantom.APP_JSON_VERIFY])
         except Exception as e:
             self.debug_print(PAN_ERR_DEVICE_CONNECTIVITY, e)
-            return self.set_status(phantom.APP_ERROR, PAN_ERR_DEVICE_CONNECTIVITY, e)
+            return self.set_status(phantom.APP_ERROR, PAN_ERR_DEVICE_CONNECTIVITY, self._get_error_message_from_exception(e))
 
         xml = response.text
 
@@ -137,7 +206,7 @@ class PanoramaConnector(BaseConnector):
         try:
             response_dict = xmltodict.parse(xml)
         except Exception as e:
-            return self.set_status(phantom.APP_ERROR, PAN_ERR_UNABLE_TO_PARSE_REPLY, e)
+            return self.set_status(phantom.APP_ERROR, PAN_ERR_UNABLE_TO_PARSE_REPLY, self._get_error_message_from_exception(e))
 
         response = response_dict.get('response')
 
@@ -182,7 +251,9 @@ class PanoramaConnector(BaseConnector):
             self.append_to_message(PAN_ERR_TEST_CONNECTIVITY_FAILED)
             return self.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, PAN_SUCC_TEST_CONNECTIVITY_PASSED)
+        self.save_progress(PAN_SUCC_TEST_CONNECTIVITY_PASSED)
+
+        return self.set_status(phantom.APP_SUCCESS, PAN_SUCC_TEST_CONNECTIVITY_PASSED)
 
     def _make_rest_call(self, data, action_result):
 
@@ -196,7 +267,7 @@ class PanoramaConnector(BaseConnector):
             response = requests.post(self._base_url, data=data, verify=config[phantom.APP_JSON_VERIFY])
         except Exception as e:
             self.debug_print(PAN_ERR_DEVICE_CONNECTIVITY, e)
-            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_DEVICE_CONNECTIVITY, e)
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_DEVICE_CONNECTIVITY, self._get_error_message_from_exception(e))
 
         xml = response.text
 
@@ -208,7 +279,7 @@ class PanoramaConnector(BaseConnector):
             response_dict = xmltodict.parse(xml)
         except Exception as e:
             self.save_progress(PAN_ERR_UNABLE_TO_PARSE_REPLY)
-            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_UNABLE_TO_PARSE_REPLY, e)
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_UNABLE_TO_PARSE_REPLY, self._get_error_message_from_exception(e))
 
         status = self._parse_response(response_dict, action_result)
 
@@ -231,12 +302,12 @@ class PanoramaConnector(BaseConnector):
             try:
                 status_string += '\n'.join(job['details']['line'])
             except Exception as e:
-                self.debug_print("Parsing commit status dict, handled exception", e)
+                self.debug_print("Parsing commit status dict, handled exception", self._get_error_message_from_exception(e))
                 pass
 
             try:
                 status_string = '\n'.join(job['warnings']['line'])
-            except Exception as e:
+            except:
                 pass
 
         action_result.append_to_message("\n{0}".format(status_string))
@@ -324,7 +395,7 @@ class PanoramaConnector(BaseConnector):
         try:
             device_groups = result_data[0]['device-group']['entry']
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse response for the device group listing"), e)
+            return (action_result.set_status(phantom.APP_ERROR, "Unable to parse response for the device group listing"), self._get_error_message_from_exception(e))
 
         try:
             device_groups = [x['@name'] for x in device_groups]
@@ -339,15 +410,19 @@ class PanoramaConnector(BaseConnector):
 
     def _get_device_commit_details_string(self, commit_all_device_details):
 
-        if (type(commit_all_device_details) == str) or (type(commit_all_device_details) == unicode):
-            return commit_all_device_details
+        try:
+            if (type(commit_all_device_details) == str) or (type(commit_all_device_details) == unicode):
+                return commit_all_device_details
+        except:
+            if (type(commit_all_device_details) == str):
+                return commit_all_device_details
 
         if (type(commit_all_device_details) == dict):
             try:
                 return "{0}, warnings: {1}".format('\n'.join(commit_all_device_details['msg']['errors']['line']),
                         '\n'.join(commit_all_device_details['msg']['warnings']['line']))
             except Exception as e:
-                self.debug_print("Parsing commit all device details dict, handled exception", e)
+                self.debug_print("Parsing commit all device details dict, handled exception", self._get_error_message_from_exception(e))
                 return "UNKNOWN"
 
     def _parse_device_group_job_response(self, job, action_result):
@@ -363,7 +438,7 @@ class PanoramaConnector(BaseConnector):
         try:
             devices = job['devices']['entry']
         except Exception as e:
-            self.debug_print("Parsing commit all message, handled exception", e)
+            self.debug_print("Parsing commit all message, handled exception", self._get_error_message_from_exception(e))
             devices = []
 
         if (isinstance(devices, dict)):
@@ -382,7 +457,7 @@ class PanoramaConnector(BaseConnector):
                         self._get_device_commit_details_string(device['details']))
                 status_string += "<li>{0}</li>".format(device_status)
             except Exception as e:
-                self.debug_print("Parsing commit all message for a single device, handled exception", e)
+                self.debug_print("Parsing commit all message for a single device, handled exception", self._get_error_message_from_exception(e))
 
         status_string += '</ul>'
 
@@ -417,8 +492,12 @@ class PanoramaConnector(BaseConnector):
 
             detail_lines = []
             details = device.get('details')
-            if ((isinstance(details, str)) or (isinstance(details, unicode))):
-                detail_lines.append(details)
+            try:
+                if ((isinstance(details, str)) or (isinstance(details, unicode))):
+                    detail_lines.append(details)
+            except:
+                if ((isinstance(details, str)) or (isinstance(details, unicode))):
+                    detail_lines.append(details)
             else:
                 try:
                     errors = device['details']['msg']['errors']['line']
@@ -446,7 +525,7 @@ class PanoramaConnector(BaseConnector):
 
     def _commit_device(self, device_group, device, dev_info, device_ar, param):
 
-        device_group = param[PAN_JSON_DEVICE_GRP]
+        device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
 
         self.save_progress("Commiting the config to device '{0}({1})' belonging to device group '{2}'".format(dev_info['hostname'], device, device_group))
 
@@ -584,7 +663,7 @@ class PanoramaConnector(BaseConnector):
         ip_type = None
         name = None
         tag = self.get_container_id()
-        block_ip = param[PAN_JSON_IP]
+        block_ip = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_IP])
 
         # Add the tag to the system
         data = {'type': 'config',
@@ -630,17 +709,18 @@ class PanoramaConnector(BaseConnector):
     def _get_security_policy_xpath(self, param, action_result):
 
         try:
-            rules_xpath = '{config_xpath}/{policy_type}/security/rules'.format(config_xpath=self._get_config_xpath(param), policy_type=param[PAN_JSON_POLICY_TYPE])
-            policy_name = param[PAN_JSON_POLICY_NAME]
+            rules_xpath = '{config_xpath}/{policy_type}/security/rules'.format(config_xpath=self._get_config_xpath(param),
+                    policy_type=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_POLICY_TYPE]))
+            policy_name = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_POLICY_NAME])
             rules_xpath += "/entry[@name='{policy_name}']".format(policy_name=policy_name)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Unable to create xpath to the security policies", e), None)
+            return (action_result.set_status(phantom.APP_ERROR, "Unable to create xpath to the security policies", self._get_error_message_from_exception(e)), None)
 
         return (phantom.APP_SUCCESS, rules_xpath)
 
     def _update_security_policy(self, param, sec_policy_type, action_result, name=None, use_source=False):
 
-        sec_policy_name = param[PAN_JSON_POLICY_NAME]
+        sec_policy_name = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_POLICY_NAME])
 
         self.debug_print("Updating Security Policy", sec_policy_name)
 
@@ -684,9 +764,9 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        block_app = param[PAN_JSON_APPLICATION]
+        block_app = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_APPLICATION])
 
-        app_group_name = BLOCK_APP_GROUP_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+        app_group_name = BLOCK_APP_GROUP_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         app_group_name = app_group_name[:MAX_NODE_NAME_LEN].strip()
 
         xpath = "{0}{1}".format(APP_GRP_XPATH.format(config_xpath=self._get_config_xpath(param), app_group_name=app_group_name),
@@ -705,7 +785,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _block_application(self, param):
 
@@ -727,9 +807,9 @@ class PanoramaConnector(BaseConnector):
 
         self.debug_print("Creating the Application Group")
 
-        block_app = param[PAN_JSON_APPLICATION]
+        block_app = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_APPLICATION])
 
-        app_group_name = BLOCK_APP_GROUP_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+        app_group_name = BLOCK_APP_GROUP_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         app_group_name = app_group_name[:MAX_NODE_NAME_LEN].strip()
 
         data = {'type': 'config',
@@ -751,7 +831,7 @@ class PanoramaConnector(BaseConnector):
 
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _unblock_url(self, param):
 
@@ -765,8 +845,8 @@ class PanoramaConnector(BaseConnector):
         self.debug_print("Removing the Blocked URL")
 
         # Add the block url, will create the url profile if not present
-        block_url = param[PAN_JSON_URL]
-        url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+        url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
         xpath = "{0}{1}".format(URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
@@ -785,7 +865,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _block_url(self, param):
 
@@ -807,8 +887,8 @@ class PanoramaConnector(BaseConnector):
 
         self.debug_print("Adding the Block URL")
         # Add the block url, will create the url profile if not present
-        block_url = param[PAN_JSON_URL]
-        url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+        url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
         data = {'type': 'config',
@@ -831,7 +911,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _get_dgs(self, action_result):
 
@@ -896,7 +976,11 @@ class PanoramaConnector(BaseConnector):
         status = phantom.APP_ERROR
         status_message = ''
 
-        for dg, dg_status in dg_status.iteritems():
+        try:
+            dg_status_value = dg_status.iteritems()
+        except:
+            dg_status_value = dg_status.items()
+        for dg, dg_status in dg_status_value:
 
             status_message += "Device Group: '{0}'\n".format(dg)
             devices = dg_status.get('devices')
@@ -905,7 +989,11 @@ class PanoramaConnector(BaseConnector):
                 status_message += 'No Devices'
                 continue
 
-            for device, dev_ar in devices.iteritems():
+            try:
+                devices_value = devices.iteritems()
+            except:
+                devices_value = devices.items()
+            for device, dev_ar in devices_value:
                 status |= dev_ar.get_status()
                 status_message += '{0}\n'.format(dev_ar.get_message())
 
@@ -919,7 +1007,7 @@ class PanoramaConnector(BaseConnector):
         if (phantom.is_fail(status)):
             return action_result.get_status()
 
-        device_group = param[PAN_JSON_DEVICE_GRP]
+        device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
         device_groups = [device_group]
 
         if (device_group.lower() == PAN_DEV_GRP_SHARED):
@@ -967,7 +1055,7 @@ class PanoramaConnector(BaseConnector):
             return action_result.get_status()
 
         # Now Commit for each device in the device group
-        device_group = param[PAN_JSON_DEVICE_GRP]
+        device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
         device_groups = [device_group]
 
         if (device_group.lower() == PAN_DEV_GRP_SHARED):
@@ -1006,7 +1094,11 @@ class PanoramaConnector(BaseConnector):
 
             curr_dg_status['devices'] = curr_dg_devices = {}
 
-            for device, dev_info in devices.iteritems():
+            try:
+                devices_values = devices.iteritems()
+            except:
+                devices_values = devices.items()
+            for device, dev_info in devices_values:
 
                 # create a status dictionary
                 curr_dg_devices[device] = device_ar = ActionResult()
@@ -1033,7 +1125,7 @@ class PanoramaConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Create the ip addr name
-        unblock_ip = param[PAN_JSON_IP]
+        unblock_ip = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_IP])
 
         addr_name = self._get_addr_name(unblock_ip)
 
@@ -1041,9 +1133,9 @@ class PanoramaConnector(BaseConnector):
         use_source = param.get(PAN_JSON_SOURCE_ADDRESS, PAN_DEFAULT_SOURCE_ADDRESS)
 
         if use_source:
-            block_ip_grp = BLOCK_IP_GROUP_NAME_SRC.format(device_group=param[PAN_JSON_DEVICE_GRP])
+            block_ip_grp = BLOCK_IP_GROUP_NAME_SRC.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         else:
-            block_ip_grp = BLOCK_IP_GROUP_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+            block_ip_grp = BLOCK_IP_GROUP_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
 
         ip_group_name = block_ip_grp
         ip_group_name = ip_group_name[:MAX_NODE_NAME_LEN].strip()
@@ -1066,7 +1158,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _block_ip(self, param):
 
@@ -1098,9 +1190,9 @@ class PanoramaConnector(BaseConnector):
             return action_result.get_status()
 
         if use_source:
-            block_ip_grp = BLOCK_IP_GROUP_NAME_SRC.format(device_group=param[PAN_JSON_DEVICE_GRP])
+            block_ip_grp = BLOCK_IP_GROUP_NAME_SRC.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         else:
-            block_ip_grp = BLOCK_IP_GROUP_NAME.format(device_group=param[PAN_JSON_DEVICE_GRP])
+            block_ip_grp = BLOCK_IP_GROUP_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
 
         ip_group_name = block_ip_grp
         ip_group_name = ip_group_name[:MAX_NODE_NAME_LEN].strip()
@@ -1125,7 +1217,7 @@ class PanoramaConnector(BaseConnector):
 
         self._commit_and_commit_all(param, action_result)
 
-        return phantom.APP_SUCCESS
+        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
 
     def _run_query(self, param):
 
@@ -1136,7 +1228,7 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        query = param[PAN_JSON_QUERY]
+        query = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_QUERY])
         log_type = param.get(PAN_JSON_LOG_TYPE, 'traffic')
 
         offset_range = param.get('range', '1-{0}'.format(MAX_QUERY_COUNT))
@@ -1147,7 +1239,7 @@ class PanoramaConnector(BaseConnector):
             min_offset = int(spl_range[0].strip())
             max_offset = int(spl_range[1].strip())
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Given range has a bad format: {0}".format(e))
+            return action_result.set_status(phantom.APP_ERROR, "Given range has a bad format: {0}".format(self._get_error_message_from_exception(e)))
         offset_diff = max_offset - min_offset + 1
 
         if max_offset < min_offset:
@@ -1227,7 +1319,7 @@ class PanoramaConnector(BaseConnector):
 
     def _get_config_xpath(self, param):
 
-        device_group = param[PAN_JSON_DEVICE_GRP]
+        device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
 
         if (device_group.lower() == PAN_DEV_GRP_SHARED):
             return '/config/shared'
@@ -1337,7 +1429,6 @@ class PanoramaConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import pudb
     import json
 
@@ -1352,6 +1443,6 @@ if __name__ == '__main__':
         connector.print_progress_message = True
         result = connector._handle_action(json.dumps(in_json), None)
 
-        print result
+        print(result)
 
     exit(0)

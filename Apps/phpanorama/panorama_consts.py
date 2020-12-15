@@ -1,7 +1,8 @@
 # File: panorama_consts.py
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 PAN_ERR_REPLY_FORMAT_KEY_MISSING = "None '{key}' missing in reply from device"
 PAN_ERR_REPLY_NOT_SUCCESS = "REST call returned '{status}'"
@@ -18,6 +19,10 @@ PAN_ERR_NO_ALLOW_POLICY_ENTRIES_FOUND = "Did not find any policies with an 'allo
 PAN_ERR_NO_ALLOW_POLICY_ENTRIES_FOUND += "\nNeed atleast one such policy."
 PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE = "Policy not found. Please make sure the policy name specified in the parameter exists."
 PAN_ERR_NO_JOB_ID = "Could not find Job ID in response body"
+PAN_ERR_CODE_MESSAGE = "Error code unavailable"
+PAN_ERR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MESSAGE = "Error occurred while connecting to the Panorama server. Please check the asset configuration and|or the action parameters"
+PARSE_ERR_MESSAGE = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 PAN_PROG_USING_BASE_URL = "Using base URL '{base_url}'"
 PAN_PROG_GOT_REPLY = "Got reply, parsing..."
