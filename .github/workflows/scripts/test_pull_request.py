@@ -2,11 +2,13 @@
 
 import argparse
 import datetime
-import logging
+import json
 import os
 
 import requests
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_SERVER_URL = os.environ['APPS_TEST_SERVER_URI']
 API_SERVER_KEY = os.environ['APPS_TEST_SERVER_API_KEY']
@@ -30,6 +32,7 @@ def request_test(pr_number, requester=None, publish_results=False):
     }
 
     return requests.post(TEST_REQUEST_URL,
+                         verify=False,
                          data=data,
                          headers=HEADERS,
                          timeout=round(DEFAULT_REQUEST_TIMEOUT.total_seconds()))
@@ -47,6 +50,7 @@ def query_test_results(results_id, query_timeout=None):
         request_timeout = default_request_timeout
 
     return requests.get(TEST_RESULTS_URL,
+                        verify=False,
                         params=params,
                         headers=HEADERS,
                         timeout=request_timeout)
@@ -61,7 +65,7 @@ if __name__ == '__main__':
                         help='whether to post results in a comment with a Google Drive link')
     args = parser.parse_args()
 
-    logging.info('Requesting testing of pull request number %s for "%s"', args.pull_request_id, args.requester)
+    print('Requesting testing of pull request number {args.pull_request_id} for "{args.requester}"')
     test_request_response = request_test(args.pull_request_id,
                                          requester=args.requester,
                                          publish_results=args.publish_results)
@@ -69,17 +73,17 @@ if __name__ == '__main__':
     test_request_response_json = test_request_response.json()
     results_id = test_request_response_json['results_id']
 
-    logging.info('Querying for results with results ID "%s"', results_id)
+    print('Querying for results with results ID "{results_id}"')
     query_timeout = round(DEFAULT_QUERY_TIMEOUT.total_seconds())
     query_results_response = query_test_results(results_id, query_timeout=query_timeout)
     query_results_response.raise_for_status()
     query_results_response_json = query_results_response.json()
 
-    results = query_results_response_json['results']
+    results = json.loads(query_results_response_json['results'])
 
     report = results.get('report')
     if report:
-        logging.info('TEST RESULTS REPORT:\n%s', report)
+        print(f'TEST RESULTS REPORT:\n{report}')
 
     success = results['success']
     if not success:
@@ -90,4 +94,4 @@ if __name__ == '__main__':
             test_failure_message = 'Tests have failed. Please review the report and make corrections as needed.'
         raise Exception(test_failure_message)
 
-    logging.info('Tests have succeeded.')
+    print('Tests have succeeded.')
