@@ -3,7 +3,6 @@
 import argparse
 import datetime
 import json
-import logging
 import os
 
 import requests
@@ -66,7 +65,7 @@ if __name__ == '__main__':
                         help='whether to post results in a comment with a Google Drive link')
     args = parser.parse_args()
 
-    logging.info('Requesting testing of pull request number %s for "%s"', args.pull_request_id, args.requester)
+    print('Requesting testing of pull request number {args.pull_request_id} for "{args.requester}"')
     test_request_response = request_test(args.pull_request_id,
                                          requester=args.requester,
                                          publish_results=args.publish_results)
@@ -74,7 +73,7 @@ if __name__ == '__main__':
     test_request_response_json = test_request_response.json()
     results_id = test_request_response_json['results_id']
 
-    logging.info('Querying for results with results ID "%s"', results_id)
+    print('Querying for results with results ID "{results_id}"')
     query_timeout = round(DEFAULT_QUERY_TIMEOUT.total_seconds())
     query_results_response = query_test_results(results_id, query_timeout=query_timeout)
     query_results_response.raise_for_status()
@@ -84,7 +83,7 @@ if __name__ == '__main__':
 
     report = results.get('report')
     if report:
-        logging.info('TEST RESULTS REPORT:\n%s', report)
+        print(f'TEST RESULTS REPORT:\n{report}')
 
     success = results['success']
     if not success:
@@ -95,4 +94,4 @@ if __name__ == '__main__':
             test_failure_message = 'Tests have failed. Please review the report and make corrections as needed.'
         raise Exception(test_failure_message)
 
-    logging.info('Tests have succeeded.')
+    print('Tests have succeeded.')
