@@ -5,18 +5,35 @@ on:
     paths:
       - 'Apps/**'
 
+env:
+  SCRIPTS_DIRECTORY: .github/workflows/scripts
+
 jobs:
   test-pull-request-commit:
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Queue pull request
-        run: |
-          curl -k -X POST 'https://${{ secrets.APPS_TEST_SERVER_URI }}/pull_request/' \
-               -H 'Authorization: Bearer ${{ secrets.APPS_TEST_SERVER_API_KEY }}' \
-               -d 'id=${{ github.event.number }}' \
-               -d 'requester=${{ github.event.sender.login }}' \
-               --retry 5 \
-               --retry-delay 10 \
-               --max-time 30
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles(${{ SCRIPTS_DIRECTORY }}/requirements.txt) }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: pip install -r ${{ SCRIPTS_DIRECTORY }}/requirements.txt
+      - name: Test pull request
+        env:
+          APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
+          APPS_TEST_SERVER_API_KEY: ${{ secrets.APPS_TEST_SERVER_API_KEY }}
+        run: python ${{ SCRIPTS_DIRECTORY }}/test_pull_request.py \
+                ${{ github.event.number }} \
+                --requester '${{ github.event.sender.login }}'
