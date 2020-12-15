@@ -2,9 +2,6 @@
 # Copyright (c) 2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-#
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
 
 
 from __future__ import print_function, unicode_literals
@@ -116,8 +113,6 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
 
-        config = self.get_config()
-
         resp_json = None
 
         try:
@@ -133,7 +128,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                verify=config.get('verify_server_cert', False),
+                verify=False,
                 **kwargs
             )
         except Exception as e:
@@ -212,9 +207,12 @@ class ConsolidatedScreeningListConnector(BaseConnector):
 
         params = {"name": name, "countries": country, "fuzzy_name": fuzzy_name, "size": 100}
         offset = 0
-        sources_used = []
-        results = []
-        search_performed_at = None
+        response_dict = {
+            "results": [],
+            "search_performed_at": None,
+            "sources_used": None,
+            "total": 0
+        }
         while True:
             if offset:
                 params.update({"offset": offset})
@@ -222,31 +220,36 @@ class ConsolidatedScreeningListConnector(BaseConnector):
             ret_val, response = self._make_rest_call(LOOKUP_ENDPOINT, action_result, params=params, headers=self._headers)
 
             if phantom.is_fail(ret_val):
-                return action_result.get_status(), None, None, None
+                return action_result.get_status(), response_dict
 
             if response.get("sources_used"):
-                sources_used = response["sources_used"]
+                response_dict["sources_used"] = response["sources_used"]
 
             if response.get("results"):
-                results.extend(response["results"])
+                response_dict["results"].extend(response["results"])
 
             if response.get("search_performed_at"):
-                search_performed_at = response["search_performed_at"]
+                response_dict["search_performed_at"] = response["search_performed_at"]
 
             if response.get("offset"):
                 offset = response["offset"]
 
             if response.get("total") is not None:
                 if response["total"] == 0:
-                    return phantom.APP_SUCCESS, sources_used, results, search_performed_at
-                if limit and len(results) >= limit:
-                    return phantom.APP_SUCCESS, sources_used, results[:limit], search_performed_at
+                    return phantom.APP_SUCCESS, response_dict
+
+                response_dict["total"] = response["total"]
+
+                if limit and len(response_dict["results"]) >= limit:
+                    response_dict["results"] = response_dict["results"][:limit]
+                    return phantom.APP_SUCCESS, response_dict
+
                 total = response["total"]
                 offset += 100
                 if offset >= total:
-                    return phantom.APP_SUCCESS, sources_used, results, search_performed_at
+                    return phantom.APP_SUCCESS, response_dict
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server"), None, None, None
+                return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server"), response_dict
 
     def _handle_lookup_user(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -264,22 +267,19 @@ class ConsolidatedScreeningListConnector(BaseConnector):
         fuzzy_name = param.get('fuzzy_name', False)
 
         try:
-            ret_val, sources_used, results, search_performed_at = self._paginator(action_result, name, country, fuzzy_name, limit)
+            ret_val, response = self._paginator(action_result, name, country, fuzzy_name, limit)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            response = {
-                "sources_used": sources_used,
-                "results": results,
-                "total": len(results),
-                "search_performed_at": search_performed_at
-            }
             action_result.add_data(response)
             summary = action_result.update_summary({})
+
             if response['total'] == 0:
                 summary['match'] = False
             else:
                 summary['match'] = True
+
+            summary['total_results_fetched'] = len(response["results"])
         except:
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 

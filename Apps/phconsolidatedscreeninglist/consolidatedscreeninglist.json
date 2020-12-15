@@ -1,7 +1,7 @@
 {
     "appid": "68618e58-2fd8-4019-9bca-79271c942600",
     "name": "Consolidated Screening List",
-    "description": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software",
+    "description": "This app integrates with ConsolidatedScreeningList API that consolidates export screening lists of the Departments of Commerce, State and, the Treasury into a single data feed as an aid to industry in conducting electronic screens of potential parties to regulated transactions, to perform investigative actions",
     "type": "information",
     "product_vendor": "Splunk",
     "logo": "logo_consolidatedscreeninglist.svg",
@@ -39,7 +39,6 @@
         {
             "action": "lookup user",
             "description": "Validate if a specified individual is found in the Consolidated Screening List watchlist",
-            "verbose": "US Companies that develop products including encryption are required to validate users against various screens before distributing the product. This helps prevent, for example, sending a weapons shipment to North Korea. Or, perhaps some kick-ass security automation software.",
             "type": "investigate",
             "identifier": "lookup_user",
             "read_only": true,
@@ -265,13 +264,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.offset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -292,6 +284,13 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_results_fetched",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
