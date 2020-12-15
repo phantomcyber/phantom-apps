@@ -761,8 +761,21 @@ class OktaConnector(BaseConnector):
             self.save_progress("[-] send push notification (call verify) {} - {}".format(str(response_verify), factor_link_verify_uri))
             return action_result.get_status()
 
-        transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
-        transaction_url = transaction_url.split('v1')[1]
+        try:
+            transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
+
+            if not transaction_url:
+                if factor_type == "sms":
+                    return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent push notification for the 'sms' factortype workflow")
+                elif factor_type == "token:software:totp":
+                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'token:software:totp' factortype workflow")
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the polling link for the 'push' factortype workflow")
+
+            transaction_url = transaction_url.split('v1')[1]
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                "Error occurred while fetching the transaction_url for the 'send push notification' workflow. Error Details: {}".format(self._get_error_message_from_exception(e)))
 
         # response of verify
         ack_flag = False
