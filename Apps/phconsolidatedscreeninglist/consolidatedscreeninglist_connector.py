@@ -244,9 +244,8 @@ class ConsolidatedScreeningListConnector(BaseConnector):
                     response_dict["results"] = response_dict["results"][:limit]
                     return phantom.APP_SUCCESS, response_dict
 
-                total = response["total"]
                 offset += 100
-                if offset >= total:
+                if offset >= response_dict["total"]:
                     return phantom.APP_SUCCESS, response_dict
             else:
                 return action_result.set_status(phantom.APP_ERROR, "Received unexpected response from the server"), response_dict
@@ -279,7 +278,7 @@ class ConsolidatedScreeningListConnector(BaseConnector):
             else:
                 summary['match'] = True
 
-            summary['total_results_fetched'] = len(response["results"])
+            summary['total_fetched_results'] = len(response["results"])
         except:
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from the server")
 
