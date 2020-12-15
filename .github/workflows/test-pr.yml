@@ -53,7 +53,7 @@ jobs:
         env:
           APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
           APPS_TEST_SERVER_API_KEY: ${{ secrets.APPS_TEST_SERVER_API_KEY }}
-        run: python ${{ SCRIPTS_DIRECTORY }}/test_pull_request.py \
+        run: python ${{ env.SCRIPTS_DIRECTORY }}/test_pull_request.py \
                 ${{ github.event.issue.number }} \
                 --requester '${{ github.event.issue.sender.login }}' \
                 --publish_results
