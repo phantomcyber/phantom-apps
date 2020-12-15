@@ -40,6 +40,8 @@ OKTA_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed."
 
 OKTA_INVALID_USER_MSG = "Kindly provide valid user_id."
 
+OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG = "Please configure factor_type '{factor_type}' for the user '{user_id}'"
+
 # DO NOT MODIFY!
 # A fixed field used by Okta to the integration
 OKTA_APP_USER_AGENT_BASE = "SplunkPhantom/"
