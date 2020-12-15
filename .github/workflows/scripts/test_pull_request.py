@@ -30,6 +30,7 @@ def request_test(pr_number, requester=None, publish_results=False):
     }
 
     return requests.post(TEST_REQUEST_URL,
+                         verify=False,
                          data=data,
                          headers=HEADERS,
                          timeout=round(DEFAULT_REQUEST_TIMEOUT.total_seconds()))
@@ -47,6 +48,7 @@ def query_test_results(results_id, query_timeout=None):
         request_timeout = default_request_timeout
 
     return requests.get(TEST_RESULTS_URL,
+                        verify=False,
                         params=params,
                         headers=HEADERS,
                         timeout=request_timeout)
