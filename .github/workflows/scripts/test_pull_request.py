@@ -2,11 +2,14 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 
 import requests
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_SERVER_URL = os.environ['APPS_TEST_SERVER_URI']
 API_SERVER_KEY = os.environ['APPS_TEST_SERVER_API_KEY']
@@ -77,7 +80,7 @@ if __name__ == '__main__':
     query_results_response.raise_for_status()
     query_results_response_json = query_results_response.json()
 
-    results = query_results_response_json['results']
+    results = json.loads(query_results_response_json['results'])
 
     report = results.get('report')
     if report:
