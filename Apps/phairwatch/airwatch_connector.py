@@ -181,7 +181,7 @@ class AirWatchConnector(BaseConnector):
 
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self.save_progress('Nothing to test...')
+        self.save_progress("The test connectivity action doesn't perform any validation for the asset configuration parameters")
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
