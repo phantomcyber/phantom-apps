@@ -35,6 +35,4 @@ jobs:
         env:
           APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
           APPS_TEST_SERVER_API_KEY: ${{ secrets.APPS_TEST_SERVER_API_KEY }}
-        run: python ${{ env.SCRIPTS_DIRECTORY }}/test_pull_request.py \
-                ${{ github.event.number }} \
-                --requester '${{ github.event.sender.login }}'
+        run: python ${{ env.SCRIPTS_DIRECTORY }}/test_pull_request.py ${{ github.event.number }} --requester '${{ github.event.sender.login }}'
