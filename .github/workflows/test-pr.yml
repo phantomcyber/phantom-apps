@@ -31,6 +31,8 @@ jobs:
               comment_id: context.payload.comment.id,
               content: 'eyes'
             })
+      - name: Set env
+        run: echo ::set-env name=PYTHON_REQUIREMENTS_FILE::${{ env.SCRIPTS_DIRECTORY }}/requirements.txt
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -41,12 +43,16 @@ jobs:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
           # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-pip-${{ hashFiles('.github/workflows/scripts/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles(env.PYTHON_REQUIREMENTS_FILE) }}
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
       - name: Install dependencies
-        run: pip install -r ${{ SCRIPTS_DIRECTORY }}/requirements.txt
+        run: pip install -r ${{ env.PYTHON_REQUIREMENTS_FILE }}
+      - name: Test pull request
+        env:
+          APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
+          APPS_TEST_SERVER_API_KEY: ${{ secrets.APPS_TEST_SERVER_API_KEY }}
       - name: Test pull request
         env:
           APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
