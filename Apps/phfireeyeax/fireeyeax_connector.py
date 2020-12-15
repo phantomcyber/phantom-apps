@@ -11,6 +11,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as phantom_rules
 
 # Usage of the consts file is recommended
 from fireeyeax_consts import *
@@ -20,11 +21,6 @@ from bs4 import BeautifulSoup, UnicodeDammit
 import uuid
 import os
 import sys
-try:
-    from urllib import unquote
-except:
-    from urllib.parse import unquote
-# import pudb
 
 
 class RetVal(tuple):
@@ -387,7 +383,7 @@ class FireeyeAxConnector(BaseConnector):
         endpoint = FIREEYEAX_ALERTS_ENDPOINT
 
         # make rest call
-        ret_val, response = self._make_rest_call(
+        ret_val, _ = self._make_rest_call(
             endpoint, action_result, params=params
         )
 
@@ -412,11 +408,9 @@ class FireeyeAxConnector(BaseConnector):
 
         # Get vault info from the vauld_id parameter
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_id)
-        except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            error_msg = unquote(error_msg)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. {}".format(error_msg))
+            success, msg, vault_info = phantom_rules.vault_info(vault_id=vault_id)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the vault information of the specified Vault ID")
 
         if not vault_info:
             try:

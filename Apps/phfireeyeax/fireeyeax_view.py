@@ -3,10 +3,6 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-# import phantom.app as phantom
-# import phantom.utils as util
-
-
 def get_ctx_result(result):
 
     ctx_result = {}
@@ -36,5 +32,4 @@ def display_report(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    # print context
     return 'fireeyeax_get_report.html'
