@@ -15,11 +15,11 @@
     "utctime_updated": "2020-05-14T19:45:12.601161Z",
     "package_name": "phantom_mcafeewebgateway",
     "main_module": "mcafeewebgateway_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
-            "description": "Base URL; use port 4712 for https, 4711 for http",
+            "description": "Base URL [Use port 4712 for https and 4711 for http]",
             "data_type": "string",
             "required": true,
             "default": "https://<Hostname_OR_IP>:4712/Konfigurator/REST/",
@@ -58,7 +58,7 @@
         {
             "action": "block url",
             "description": "Add URL to a list",
-            "verbose": "Either list_title or list_id are required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds URL to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' are required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds URL to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_url",
             "read_only": false,
@@ -80,7 +80,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -89,7 +89,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -275,13 +275,13 @@
         {
             "action": "unblock url",
             "description": "Remove URL from a list",
-            "verbose": "Either entry_position or url is required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'url' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_url",
             "read_only": false,
             "parameters": {
                 "url": {
-                    "description": "URL to unblock (either url or entry_position are required)",
+                    "description": "URL to unblock (either 'url' or 'entry_position' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -299,7 +299,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -308,7 +308,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -434,7 +434,7 @@
         {
             "action": "block ip",
             "description": "Add IP to a list",
-            "verbose": "Either list_title or list_id is required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds IP to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds IP to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_ip",
             "read_only": false,
@@ -456,7 +456,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -465,7 +465,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -651,13 +651,13 @@
         {
             "action": "unblock ip",
             "description": "Remove IP from a list",
-            "verbose": "Either entry_position or ip is required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'ip' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_ip",
             "read_only": false,
             "parameters": {
                 "ip": {
-                    "description": "IP to unblock (either ip or entry_position are required)",
+                    "description": "IP to unblock (either 'ip' or 'entry_position' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -675,7 +675,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -684,7 +684,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -810,7 +810,7 @@
         {
             "action": "block domain",
             "description": "Add domain to a list",
-            "verbose": "Either list_title or list_id is required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds domain to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds domain to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_domain",
             "read_only": false,
@@ -832,7 +832,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -841,7 +841,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1026,13 +1026,13 @@
         {
             "action": "unblock domain",
             "description": "Remove a domain from a list",
-            "verbose": "Either entry_position or domain is required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'domain' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_domain",
             "read_only": false,
             "parameters": {
                 "domain": {
-                    "description": "Domain to unblock (either domain or entry_position are required)",
+                    "description": "Domain to unblock (either 'domain' or 'entry_position' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1050,7 +1050,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1059,7 +1059,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1185,7 +1185,7 @@
         {
             "action": "add entry",
             "description": "Add an entry to a list",
-            "verbose": "Either list_title or list_id is required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds an entry to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds an entry to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "add_entry",
             "read_only": false,
@@ -1210,7 +1210,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1219,7 +1219,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1374,13 +1374,13 @@
         {
             "action": "remove entry",
             "description": "Remove an entry from a list",
-            "verbose": "Either entry_position or item are required, but the entry_position is faster and recommended (if available). <p> <i>Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or item are required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "remove_entry",
             "read_only": false,
             "parameters": {
                 "entry": {
-                    "description": "Entry to remove (either entry or entry_position are required)",
+                    "description": "Entry to remove (either 'entry' or 'entry_position' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1401,7 +1401,7 @@
                     "order": 1
                 },
                 "list_title": {
-                    "description": "List Title (either list_title or list_id are required)",
+                    "description": "List Title (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1410,7 +1410,7 @@
                     "order": 2
                 },
                 "list_id": {
-                    "description": "List ID (either list_title or list_id are required)",
+                    "description": "List ID (either 'list_title' or 'list_id' are required)",
                     "data_type": "string",
                     "primary": true,
                     "contains": [

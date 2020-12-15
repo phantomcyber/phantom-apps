@@ -12,4 +12,4 @@ TYPE_ERR_MSG = "Error occurred while connecting to the McAfee Web Gateway Server
 # Integer validation constants
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
-ENTRY_POSITION_KEY = "'entry position' configuration parameter"
+ENTRY_POSITION_KEY = "'entry position' action parameter"

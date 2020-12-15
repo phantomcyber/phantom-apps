@@ -61,25 +61,24 @@ class McafeeWebGatewayConnector(BaseConnector):
             error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            error_msg = self._encode_unicode(error_msg)
-        except TypeError:
-            error_msg = TYPE_ERR_MSG
-        except:
-            error_msg = ERR_MSG_UNAVAILABLE
-
-        try:
             if error_code in ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
+                error_text = f"Error Message: {error_msg}"
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                error_text = f"Error Code: {error_code}. Error Message: {error_msg}"
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
 
     def _encode_unicode(self, string):
-        return UnicodeDammit(string).unicode_markup.encode('utf-8')
+        try:
+            if string:
+                string = UnicodeDammit(string).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while unicode handling for the input string")
+
+        return string
 
     def _validate_integer(self, action_result, parameter, key):
         if parameter is not None:
@@ -101,7 +100,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Status code: {0}. Empty response and no information in the header'.format(response.status_code)), '')
+        return RetVal(action_result.set_status(phantom.APP_ERROR, f'Status code: {response.status_code}. Empty response and no information in the header'), '')
 
     def _process_xml_response(self, r, action_result):
         try:
@@ -113,7 +112,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         except Exception as err:
             message = f'Error parsing results data. Status Code: {r.status_code} Message - {err}; Data from server: {r.text}'
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), str(message))
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), message)
 
     def _process_html_response(self, response, action_result) -> RetVal:
 
@@ -134,14 +133,14 @@ class McafeeWebGatewayConnector(BaseConnector):
 
         message = f'Status Code: {status_code}. Data from server:\n{error_text}\n'.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), str(message))
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), message)
 
     def _process_json_response(self, r, action_result):
 
         # Try a json parse
         try:
             resp_json = r.json()
-        except ValueError as e:
+        except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f'Unable to parse JSON response. Error: {err}'), None)
 
@@ -152,7 +151,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         # You should process the error returned in the json
         message = f'Error from server. Status Code: {r.status_code} Data from server: {r.text}'.replace('{', '{{').replace('}', '}}')
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), str(message))
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), message)
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
@@ -193,6 +192,8 @@ class McafeeWebGatewayConnector(BaseConnector):
             return action_result.get_message()
 
         self._session_id = response.get('entry', {}).get('content')
+        if not self._session_id:
+            return "Failed to create session"
 
         return ''
 
@@ -264,7 +265,7 @@ class McafeeWebGatewayConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.RequestException as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, err), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f'Error connecting to server. {err}'), None)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
@@ -318,18 +319,22 @@ class McafeeWebGatewayConnector(BaseConnector):
 
         pages = []
 
-        if len(response['feed']['link']) > 1:
-            for link in response['feed']['link']:
-                page_num = page_finder.findall(link['@href'])
-                page_num = list(set(page_num))
-                if len(page_num) > 0 and int(page_num[0]) > 1:
-                    pages.append(page_num[0])
-            for page in pages:
-                params['page'] = page
-                ret_val, next_page = self._make_rest_call('list', action_result, method='get', params=params)
-                if phantom.is_fail(ret_val):
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not get lists.'), None)
-                response['feed']['entry'] += next_page['feed']['entry']
+        try:
+            if len(response['feed']['link']) > 1:
+                for link in response['feed']['link']:
+                    page_num = page_finder.findall(link['@href'])
+                    page_num = list(set(page_num))
+                    if len(page_num) > 0 and int(page_num[0]) > 1:
+                        pages.append(page_num[0])
+                for page in pages:
+                    params['page'] = page
+                    ret_val, next_page = self._make_rest_call('list', action_result, method='get', params=params)
+                    if phantom.is_fail(ret_val):
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not get lists'), None)
+                    response['feed']['entry'] += next_page['feed']['entry']
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), None)
 
         return RetVal(phantom.APP_SUCCESS, response)
 
@@ -345,21 +350,25 @@ class McafeeWebGatewayConnector(BaseConnector):
             ret_val, found_list_info = self._make_rest_call(endpoint, action_result, method='get', params=params)
 
             if phantom.is_fail(ret_val):
-                self._logout(action_result)
+                logout_error = self._logout(action_result)
+                if logout_error:
+                    self.debug_print(logout_error)
                 return RetVal(action_result.get_status(), None)
 
             list_id = found_list_info.get('feed', {}).get('entry', {}).get('id')
 
             if not list_id:
                 self._logout(action_result)
-                return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not find list by title.'), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not find list by title'), None)
 
         endpoint = f'{endpoint}{list_id}'
 
         ret_val, found_list_data = self._make_rest_call(endpoint, action_result, method='get', params=params)
 
         if phantom.is_fail(ret_val):
-            self._logout(action_result)
+            logout_error = self._logout(action_result)
+            if logout_error:
+                self.debug_print(logout_error)
             return RetVal(action_result.get_status(), None)
 
         return RetVal(phantom.APP_SUCCESS, found_list_data)
@@ -374,9 +383,11 @@ class McafeeWebGatewayConnector(BaseConnector):
         endpoint = 'version/mwg-ui'
         ret_val, response = self._make_rest_call(endpoint, action_result)
         if phantom.is_fail(ret_val):
-            self.save_progress('Test Connectivity Failed.')
-            self.save_progress(self._logout(action_result))
-            return action_result.set_status(phantom.APP_ERROR, 'Unable to get McAfee Web Gateway version number.')
+            self.save_progress('Test Connectivity Failed')
+            logout_error = self._logout(action_result)
+            if logout_error:
+                self.save_progress(logout_error)
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to get McAfee Web Gateway version number')
 
         self.save_progress('McAfee Web Gateway version: {0}'.format(response.get('entry', {}).get('content')))
         self.debug_print(f'JSESSIONID - {self._session_id}')
@@ -384,6 +395,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         # Logout of MWG
         logout_error = self._logout(action_result)
         if logout_error:
+            self.save_progress(logout_error)
             return action_result.set_status(phantom.APP_ERROR, logout_error)
 
         self.save_progress('Test Connectivity Passed')
@@ -424,7 +436,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not (param.get('list_id') or param.get('list_title')):
-            return action_result.set_status(phantom.APP_ERROR, 'A list_title or list_id must be supplied.')
+            return action_result.set_status(phantom.APP_ERROR, 'A "list_title" or "list_id" must be supplied')
 
         ret_val, found_list_data = self._get_list(param.get('list_title'), param.get('list_id'), action_result)
 
@@ -468,7 +480,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         item_type = action_id.split('_')[-1]
         item = param.get(item_type)
         if not item:
-            return action_result.set_status(phantom.APP_ERROR, f'Must provide {item_type} to run action.')
+            return action_result.set_status(phantom.APP_ERROR, f'Must provide {item_type} to run action')
 
         description = param.get('description')
         list_id = param.get('list_id')
@@ -482,7 +494,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         category = param.get('category')
 
         if not (list_id or list_title):
-            return action_result.set_status(phantom.APP_ERROR, 'A list_id or list_title must be provided.')
+            return action_result.set_status(phantom.APP_ERROR, 'A "list_id" or "list_title" must be provided')
 
         # If list_id not provided, get it by using the list_title
         if list_title and not list_id:
@@ -494,7 +506,7 @@ class McafeeWebGatewayConnector(BaseConnector):
         # Create entry XML
         if complex_entry:
             if not (category and protocol):
-                message = 'When adding a "complex entry", category and protocol must be provided.'
+                message = 'When adding a "complex entry", "category" and "protocol" must be provided'
                 return action_result.set_status(phantom.APP_ERROR, message)
 
             config_type = 'com.scur.type.string'
@@ -550,7 +562,9 @@ class McafeeWebGatewayConnector(BaseConnector):
         endpoint = f'list/{list_id}/entry/{entry_position}/insert'
         ret_val, response = self._make_rest_call(endpoint, action_result, method='post', data=entry)
         if phantom.is_fail(ret_val):
-            self._logout(action_result)
+            logout_error = self._logout(action_result)
+            if logout_error:
+                self.debug_print(logout_error)
             existing_message = action_result.get_message()
             # Don't send error if the item already exists in the list
             if 'duplicate' in existing_message:
@@ -602,39 +616,48 @@ class McafeeWebGatewayConnector(BaseConnector):
         list_data = None
 
         if not (list_id or list_title):
-            return action_result.set_status(phantom.APP_ERROR, 'A list_id or list_title must be provided.')
+            return action_result.set_status(phantom.APP_ERROR, 'A "list_id" or "list_title" must be provided')
 
         # If list_id not provided, get it by using the list_title
         if list_title and not list_id:
             ret_val, list_data = self._get_list(list_title, None, action_result)
             if phantom.is_fail(ret_val):
-                self._logout(action_result)
+                logout_error = self._logout(action_result)
+                if logout_error:
+                    self.debug_print(logout_error)
                 return action_result.get_status()
             list_id = list_data.get('entry', {}).get('id')
 
         if not (item or entry_position):
             return action_result.set_status(
                 phantom.APP_ERROR,
-                f'{item_type} or entry position most be provided. Use {item_type} if you are unsure of entry position to be removed.'
+                f'{item_type} or entry position most be provided. Use {item_type} if you are unsure of entry position to be removed'
             )
         elif not entry_position and item:
             if not list_data:
                 ret_val, list_data = self._get_list(list_title, list_id, action_result)
                 if phantom.is_fail(ret_val):
-                    self._logout(action_result)
+                    logout_error = self._logout(action_result)
+                    if logout_error:
+                        self.debug_print(logout_error)
                     return action_result.get_status()
                 list_id = list_data.get('entry', {}).get('id')
-
-            entry_position = self._determine_entry_position(list_data, item)
+            try:
+                entry_position = self._determine_entry_position(list_data, item)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, f'Error while processing response. {err}')
             if entry_position is None:
-                message = 'Entry not found in list.'
+                message = 'Entry not found in list'
                 return action_result.set_status(phantom.APP_ERROR, message)
 
         # make rest call
         endpoint = f'list/{list_id}/entry/{entry_position}'
         ret_val, response = self._make_rest_call(endpoint, action_result, method='delete')
         if phantom.is_fail(ret_val):
-            self._logout(action_result)
+            logout_error = self._logout(action_result)
+            if logout_error:
+                self.debug_print(logout_error)
             existing_message = action_result.get_message()
             message = f'Could not remove entry from the list. Details - {existing_message}'
             return action_result.set_status(phantom.APP_ERROR, message)
@@ -649,7 +672,7 @@ class McafeeWebGatewayConnector(BaseConnector):
             del response['entry']['link']
         action_result.add_data(response)
 
-        message = f'Successfully removed {item_type} from list.'
+        message = f'Successfully removed {item_type} from list'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def handle_action(self, param):
@@ -706,11 +729,10 @@ class McafeeWebGatewayConnector(BaseConnector):
 
         if self._session_id:
             # Make sure to logout if not already done.
-            requests.post(
-                f'{self._base_url}logout',
-                headers={'Cookie': f'JSESSIONID={self._session_id}', 'Content-Type': 'application/xml'},
-                verify=self._verify
-            )
+            # Logout of MWG
+            logout_error = self._logout(self)
+            if logout_error:
+                return self.set_status(phantom.APP_ERROR, logout_error)
 
         return phantom.APP_SUCCESS
 
