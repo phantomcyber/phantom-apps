@@ -375,6 +375,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         ret_val = self._run_cmd(action_result, 'ipconfig')
         if phantom.is_fail(ret_val):
+            self.save_progress(action_result.get_message())
             self.save_progress("Test connectivity failed")
             return action_result.set_status(phantom.APP_ERROR)
         self.save_progress("Test connectivity passed")
@@ -986,7 +987,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if command_id and shell_id:
                 custom_parser = pc.basic
             else:
-                # Nothing will need to be parsed here
+                # Nothing needs to be parsed here
                 custom_parser = None
 
         if arguments:
@@ -1026,7 +1027,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
             if command_id and shell_id:
                 custom_parser = pc.basic
             else:
-                # Nothing will need to be parsed here
+                # Nothing needs to be parsed here
                 custom_parser = None
 
         if script_file and command_id is None:  # don't check script if retrieving previous command
