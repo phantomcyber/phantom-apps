@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: fireeye_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -17,13 +16,13 @@ from phantom.vault import Vault
 from fireeyeetp_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 from datetime import datetime, timedelta
 import uuid
 import os
 import hashlib
 import pytz
-# import pudb
+import sys
 
 
 class RetVal(tuple):
@@ -46,13 +45,93 @@ class FireeyeEtpConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = error_msg
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: action parameter key
+        :param allow_zero: action parameter allowed zero value or not
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code: {}. Error: Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -62,6 +141,9 @@ class FireeyeEtpConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -71,7 +153,7 @@ class FireeyeEtpConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -79,9 +161,10 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)
                 ), None
             )
 
@@ -92,7 +175,7 @@ class FireeyeEtpConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -102,9 +185,10 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             resp_json = r.content
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse response. Error: {0}".format(err)
                 ), None
             )
 
@@ -115,7 +199,7 @@ class FireeyeEtpConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -128,7 +212,7 @@ class FireeyeEtpConnector(BaseConnector):
             action_result.add_debug_data({'r_headers': r.headers})
 
         # Check to see if we are downloading a file.
-        # Files are still showing a Content-Type of JSON althoug there is no JSON data.
+        # Files are still showing a Content-Type of JSON although there is no JSON data.
         if r.headers.get('Content-Disposition'):
             return self._process_file_response(r, action_result)
 
@@ -152,7 +236,7 @@ class FireeyeEtpConnector(BaseConnector):
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace('{', '{{').replace('}', '}}')
+            self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -172,9 +256,12 @@ class FireeyeEtpConnector(BaseConnector):
                 resp_json
             )
 
-        # Create a URL to connect to
-        url = self._base_url + endpoint
-
+        try:
+            # Create a URL to connect to
+            url = "{}{}".format(self._base_url, endpoint)
+        except Exception:
+            err = "Please provide valid asset configuration and|or the action parameters"
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
         try:
             r = request_func(
                 url,
@@ -182,13 +269,17 @@ class FireeyeEtpConnector(BaseConnector):
                 headers=self._header,
                 **kwargs
             )
-            # print(r.text)
-            # print(r.headers)
-            # print(r.json)
+        except requests.exceptions.InvalidSchema:
+            err = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
+        except requests.exceptions.InvalidURL:
+            err = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)
                 ), resp_json
             )
 
@@ -202,7 +293,7 @@ class FireeyeEtpConnector(BaseConnector):
             else:
                 temp_dir = "/opt/phantom/vault/tmp/"
 
-            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            temp_dir = "{}{}".format(temp_dir, '/{}'.format(uuid.uuid4()))
 
             os.makedirs(temp_dir)
 
@@ -211,7 +302,8 @@ class FireeyeEtpConnector(BaseConnector):
             with open(file_path, 'wb') as file_obj:
                 file_obj.write(data)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error while writing to temporary file", e), None
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error while writing to temporary file", err), None
 
         # Adding pcap to vault
         vault_ret_dict = Vault.add_attachment(file_path, container_id, filename)
@@ -219,8 +311,8 @@ class FireeyeEtpConnector(BaseConnector):
         # Removing temporary directory created to download file
         try:
             os.rmdir(temp_dir)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to remove temporary directory", e), None
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Unable to remove temporary directory"), None
 
         # Updating data with vault details
         if vault_ret_dict['succeeded']:
@@ -251,10 +343,8 @@ class FireeyeEtpConnector(BaseConnector):
         while True:
             ret_val, items = self._make_rest_call(endpoint, action_result, json=data, method=method, **kwargs)
 
-            if (phantom.is_fail(ret_val)):
-                # the call to the 3rd party device or service failed, action result should contain all the error details
-                # for now the return is commented out, but after implementation, return from here
-                return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
             else:
                 limit = items.get('meta').get('total') - len(items_list)
 
@@ -273,7 +363,7 @@ class FireeyeEtpConnector(BaseConnector):
             if limit <= 0:
                 break
 
-        return items_list
+        return phantom.APP_SUCCESS, items_list
 
     def _paginator2(self, endpoint, action_result, data, limit=None, method="get", **kwargs):
         """ This function is used to handle the gathering of alerts for the on_poll action.
@@ -291,10 +381,8 @@ class FireeyeEtpConnector(BaseConnector):
         while limit > 0:
             ret_val, items = self._make_rest_call(endpoint, action_result, json=data, method=method, **kwargs)
 
-            if (phantom.is_fail(ret_val)):
-                # the call to the 3rd party device or service failed, action result should contain all the error details
-                # for now the return is commented out, but after implementation, return from here
-                return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
 
             if items.get('data'):
                 for item in items.get("data"):
@@ -309,10 +397,9 @@ class FireeyeEtpConnector(BaseConnector):
             if items.get('meta').get('total') < limit:
                 break
 
-        return items_list
+        return phantom.APP_SUCCESS, items_list
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # NOTE: test connectivity does _NOT_ take any parameters
@@ -329,12 +416,10 @@ class FireeyeEtpConnector(BaseConnector):
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
         # make rest call
-        ret_val = self._make_rest_call(endpoint, action_result, method="post", data=data)
+        ret_val, response = self._make_rest_call(endpoint, action_result, method="post", data=data)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
@@ -343,44 +428,60 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_alerts(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
         data['attributes'] = {}
 
-        # Check the limit paramter
-        if param.get('size') > 200:
+        # Check the 'size' parameter
+        ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if size > 200:
             size = 200
-        elif param.get('size') > 0:
-            size = param.get('size')
-
         data['size'] = size
 
-        # Check the legacy id parameter
-        if param.get('legacy_id'):
-            data['attributes']['legacy_id'] = param.get('legacy_id')
+        # Check the 'legacy_id' parameter
+        ret_val, legacy_id = self._validate_integer(action_result, param.get('legacy_id'), LEGACY_ID_KEY, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if legacy_id:
+            data['attributes']['legacy_id'] = legacy_id
 
         # Check the message id parameter
-        if param.get('message_id'):
-            data['attributes']['etp_message_id'] = param.get('message_id')
+        message_id_param = self._handle_py_ver_compat_for_input_str(param.get('message_id'))
+        if message_id_param:
+            data['attributes']['etp_message_id'] = message_id_param
 
         # Check the email status parmater
-        if param.get('email_status'):
-            data['attributes']['email_status'] = param.get('email_status')
+        email_status_param = self._handle_py_ver_compat_for_input_str(param.get('email_status'))
+        if email_status_param:
+            try:
+                email_status = [x.strip() for x in email_status_param.split(',')]
+                email_status = list(filter(None, email_status))
+                if not email_status:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'email_status' action parameter"), None
+                data['attributes']['email_status'] = email_status_param
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'email_status' action parameter"), None
 
+        # Check the 'num_days' parameter
+        ret_val, num_days = self._validate_integer(action_result, param.get('num_days'), NUM_DAYS_KEY, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         # Check and calculate the timestamp to filter by
-        if param.get('num_days'):
-            timestamp = datetime.utcnow() - timedelta(days=param.get('num_days'))
+        if num_days:
+            timestamp = datetime.utcnow() - timedelta(days=num_days)
             date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
             data['fromLastModifiedOn'] = date
 
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
         # make rest call
-        response = self._paginator(endpoint, action_result, data, method="post")
+        ret_val, response = self._paginator(endpoint, action_result, data, method="post")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -389,20 +490,19 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_alert(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = FIREETEETP_GET_ALERT_ENDPOINT.format(alertId=param.get('alert_id'))
+        try:
+            endpoint = FIREETEETP_GET_ALERT_ENDPOINT.format(alertId=self._handle_py_ver_compat_for_input_str(param.get('alert_id')))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -416,25 +516,21 @@ class FireeyeEtpConnector(BaseConnector):
 
         data = {}
 
-        # Check the limit paramter
-        if param.get('size') > 200:
+        # Check the 'size' parameter
+        ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if size > 200:
             size = 200
-        elif param.get('size') > 0:
-            size = param.get('size')
-
         data['size'] = size
-
         endpoint = FIREETEETP_LIST_MESSAGE_ATTRIBUTES_ENDPOINT
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, json=data, method="post")
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -443,20 +539,20 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_email_attributes(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = FIREETEETP_GET_MESSAGE_ATTRIBUTES_ENDPOINT.format(etp_message_id=param.get('etp_message_id'))
+        etp_message_id_param = self._handle_py_ver_compat_for_input_str(param.get('etp_message_id'))
+        try:
+            endpoint = FIREETEETP_GET_MESSAGE_ATTRIBUTES_ENDPOINT.format(etp_message_id=etp_message_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -469,26 +565,28 @@ class FireeyeEtpConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {}
+        original_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("original_message_id"))
+        if original_message_id_param:
+            params['original_message_id'] = original_message_id_param
 
-        if param.get("original_message_id"):
-            params['original_message_id'] = param.get("original_message_id")
+        downstream_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("downstream_message_id"))
+        if downstream_message_id_param:
+            params['downstream_message_id'] = downstream_message_id_param
 
-        if param.get("downstream_message_id"):
-            params['downstream_message_id'] = param.get("downstream_message_id")
-
-        params['size'] = params.get("size")
+        # Check the 'size' parameter
+        ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        params['size'] = size
 
         endpoint = FIREETEETP_GET_MESSAGE_TRACE_ENDPOINT
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -497,74 +595,96 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_trace_email(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {"attributes": {}}
+        modified_date_param = self._handle_py_ver_compat_for_input_str(param.get("modified_date"))
 
-        if param.get("modified_date"):
-            lastModifiedDateTime = param.get("modified_date").strip()
+        if modified_date_param:
             # Make sure the datetime supplied is a valid
             try:
+                lastModifiedDateTime = modified_date_param.strip()
                 lastModifiedDateTime = datetime.strptime(lastModifiedDateTime, "%Y-%m-%dT%H:%M:%S")
                 params['attributes']['lastModifiedDateTime'] = {"value": lastModifiedDateTime.strftime("%Y-%m-%dT%H:%M:%S"), "filter": ">="}
             except:
-                return self.set_status(phantom.APP_ERROR, "Date supplied in the modified_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Date supplied in the modified_date field is not ISO8601 compliant. Please make sure it is a valid ISO8601 datetime stamp")
 
-        if param.get("recipients"):
-            recipients = param.get("recipients")
-            recipients = [x.strip() for x in recipients.split(',')]
-            recipients = list(filter(None, recipients))
+        recipients_param = self._handle_py_ver_compat_for_input_str(param.get("recipients"))
+        if recipients_param:
+            try:
+                recipients = [x.strip() for x in recipients_param.split(',')]
+                recipients = list(filter(None, recipients))
+                if not recipients:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                params['attributes']['recipients'] = {"value": recipients, "filter": "in", "includes": ["SMTP", "HEADER"]}
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
 
-            params['attributes']['recipients'] = {"value": recipients, "filter": "in", "includes": ["SMTP", "HEADER"]}
+        sender_param = self._handle_py_ver_compat_for_input_str(param.get("sender"))
+        if sender_param:
+            try:
+                sender = [x.strip() for x in sender_param.split(',')]
+                sender = list(filter(None, sender))
+                if not sender:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter"), None
+                params['attributes']['fromEmail'] = {"value": sender, "filter": "in", "includes": ["SMTP", "HEADER"]}
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter"), None
 
-        if param.get("sender"):
-            sender = param.get("sender")
-            sender = [x.strip() for x in sender.split(',')]
-            sender = list(filter(None, sender))
+        status_param = self._handle_py_ver_compat_for_input_str(param.get("status"))
+        if status_param:
+            try:
+                status = [x.strip() for x in status_param.split(',')]
+                status = list(filter(None, status))
+                if not status:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter"), None
+                params['attributes']['status'] = {"value": status, "filter": "in"}
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter"), None
 
-            params['attributes']['fromEmail'] = {"value": sender, "filter": "in", "includes": ["SMTP", "HEADER"]}
+        tags_param = self._handle_py_ver_compat_for_input_str(param.get("tags"))
+        if tags_param:
+            try:
+                tags = [x.strip() for x in tags_param.split(',')]
+                tags = list(filter(None, tags))
+                if not tags:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                params['attributes']['tags'] = {"value": tags, "filter": "in"}
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
 
-        if param.get("status"):
-            status = param.get("status")
-            status = [x.strip() for x in status.split(',')]
-            status = list(filter(None, status))
-
-            params['attributes']['status'] = {"value": status, "filter": "in"}
-
-        if param.get("tags"):
-            tags = param.get("tags")
-            tags = [x.strip() for x in tags.split(',')]
-            tags = list(filter(None, tags))
-
-            params['attributes']['tags'] = {"value": tags, "filter": "in"}
-
-        if param.get("subject"):
-            subject = param.get("subject").strip()
-
+        subject_param = self._handle_py_ver_compat_for_input_str(param.get("subject"))
+        if subject_param:
+            subject = subject_param.strip()
             params['attributes']['subject'] = {"value": [subject], "filter": "in"}
 
-        # Check the domain
-        if param.get('domains'):
-            domains = param.get("domains")
-            domains = [x.strip() for x in domains.split(',')]
-            domains = list(filter(None, domains))
+        # Check the 'domain' parameter
+        domains_param = self._handle_py_ver_compat_for_input_str(param.get("domains"))
+        if domains_param:
+            try:
+                domains = [x.strip() for x in domains_param.split(',')]
+                domains = list(filter(None, domains))
+                if not domains:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                params['attributes']['domains'] = domains
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
 
-            data['attributes']['domains'] = domains
-
-        params['size'] = int(param.get("size"))
+        # Check the 'size' parameter
+        ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        params['size'] = size
 
         endpoint = FIREETEETP_LIST_MESSAGE_ATTRIBUTES_ENDPOINT
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=params)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -573,30 +693,29 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_download_email(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Set the file name for the vault
-        filename = "raw_email_{}.txt".format(param.get("etp_message_id"))
+        etp_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("etp_message_id"))
 
-        endpoint = FIREETEETP_GET_EMAIL_ENDPOINT.format(etp_message_id=param.get("etp_message_id"))
+        # Set the file name for the vault
+        try:
+            filename = "raw_email_{}.txt".format(etp_message_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+
+        endpoint = FIREETEETP_GET_EMAIL_ENDPOINT.format(etp_message_id=etp_message_id_param)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val, vault_details = self._save_file_to_vault(response, filename, self.get_container_id(), action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -608,29 +727,29 @@ class FireeyeEtpConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        alert_id_param = self._handle_py_ver_compat_for_input_str(param.get("alert_id"))
+
         data = {}
 
         # Set the file name for the vault
-        filename = "{}_pcap.zip".format(param.get("alert_id"))
+        try:
+            filename = "{}_pcap.zip".format(alert_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
 
-        endpoint = FIREETEETP_GET_ALERT_PCAP_FILES_ENDPOINT.format(alertId=param.get("alert_id"))
+        endpoint = FIREETEETP_GET_ALERT_PCAP_FILES_ENDPOINT.format(alertId=alert_id_param)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data, stream=True)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val, vault_details = self._save_file_to_vault(response, filename, self.get_container_id(), action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -639,32 +758,31 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_download_malware_files(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        alert_id_param = self._handle_py_ver_compat_for_input_str(param.get("alert_id"))
 
         data = {}
 
         # Set the file name for the vault
-        filename = "{}_malware.zip".format(param.get("alert_id"))
+        try:
+            filename = "{}_malware.zip".format(alert_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
 
-        endpoint = FIREETEETP_GET_ALERT_MALWARE_FILES_ENDPOINT.format(alertId=param.get("alert_id"))
+        endpoint = FIREETEETP_GET_ALERT_MALWARE_FILES_ENDPOINT.format(alertId=alert_id_param)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data, stream=True)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val, vault_details = self._save_file_to_vault(response, filename, self.get_container_id(), action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -673,32 +791,31 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_download_case_files(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        alert_id_param = self._handle_py_ver_compat_for_input_str(param.get("alert_id"))
 
         data = {}
 
         # Set the file name for the vault
-        filename = "{}_case.zip".format(param.get("alert_id"))
+        try:
+            filename = "{}_case.zip".format(alert_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
 
-        endpoint = FIREETEETP_GET_ALERT_CASE_FILES_ENDPOINT.format(alertId=param.get("alert_id"))
+        endpoint = FIREETEETP_GET_ALERT_CASE_FILES_ENDPOINT.format(alertId=alert_id_param)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data, stream=True)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val, vault_details = self._save_file_to_vault(response, filename, self.get_container_id(), action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -707,33 +824,34 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_remediate_emails(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
+        action_override_param = self._handle_py_ver_compat_for_input_str(param.get('action_override'))
+        move_to_param = self._handle_py_ver_compat_for_input_str(param.get('move_to'))
 
-        if param.get('action_override'):
-            data['action_override'] = param.get('action_override')
+        if action_override_param:
+            data['action_override'] = action_override_param
 
-            if not param.get('move_to'):
-                action_result.set_status(phantom.APP_ERROR, "If the parameter action_override is enabled the move_to parameter also needs to be filled out.")
+            if not move_to_param:
+                action_result.set_status(phantom.APP_ERROR, "If the parameter action_override is enabled the move_to parameter also needs to be filled out")
                 return action_result.get_status()
             else:
-                data['move_to'] = param.get('move_to')
+                data['move_to'] = move_to_param
 
-        data['message_ids'] = ",".join(param.get('etp_message_ids'))
+        try:
+            data['message_ids'] = ",".join(self._handle_py_ver_compat_for_input_str(param.get('etp_message_ids')))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_ids' action parameter"), None
 
         endpoint = FIREETEETP_REMEDIATE_EMAILS_ENDPOINT
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -742,30 +860,28 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_quarantined_email(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        etp_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("etp_message_id"))
         # Set the file name for the vault
-        filename = "quarantined_email_{}.txt".format(param.get("etp_message_id"))
+        try:
+            filename = "quarantined_email_{}.txt".format(etp_message_id_param)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
 
-        endpoint = FIREEYEETP_GET_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=param.get("etp_message_id"))
+        endpoint = FIREEYEETP_GET_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=etp_message_id_param)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val, vault_details = self._save_file_to_vault(response, filename, self.get_container_id(), action_result)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -774,36 +890,38 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unquarantine_email(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
 
-        ids = param.get("etp_message_ids")
-        ids = [x.strip() for x in ids.split(',')]
-        ids = list(filter(None, ids))
+        etp_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("etp_message_id"))
+        try:
+            ids = [x.strip() for x in etp_message_id_param.split(',')]
+            ids = list(filter(None, ids))
+            if not ids:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            if len(ids) > 1:
+                data['message_ids'] = ",".join(ids)
+                endpoint = FIREEYEETP_BULK_RELEASE_QUARANTINE_EMAILS_ENDPOINT
+            else:
+                endpoint = FIREEYEETP_RELEASE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
 
-        if len(ids) > 1:
-            data['message_ids'] = ",".join(ids)
-            endpoint = FIREEYEETP_BULK_RELEASE_QUARANTINE_EMAILS_ENDPOINT
-        else:
-            endpoint = FIREEYEETP_RELEASE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
+        is_not_spam_param = param.get("is_not_spam")
+        if is_not_spam_param:
+            data['is_not_spam'] = is_not_spam_param
 
-        if param.get("is_not_spam"):
-            data['is_not_spam'] = param.get("is_not_spam")
-
-        if param.get("headers_only"):
-            data['headers_only'] = param.get("headers_only")
+        headers_only_param = param.get("headers_only")
+        if headers_only_param:
+            data['headers_only'] = headers_only_param
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -812,30 +930,30 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_quarantined_email(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
 
-        ids = param.get("etp_message_ids")
-        ids = [x.strip() for x in ids.split(',')]
-        ids = list(filter(None, ids))
-
-        if len(ids) > 1:
-            data['message_ids'] = ",".join(ids)
-            endpoint = FIREEYEETP_BULK_DELETE_QUARANTINE_EMAILS_ENDPOINT
-        else:
-            endpoint = FIREEYEETP_DELETE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
+        etp_message_id_param = self._handle_py_ver_compat_for_input_str(param.get("etp_message_id"))
+        try:
+            ids = [x.strip() for x in etp_message_id_param.split(',')]
+            ids = list(filter(None, ids))
+            if not ids:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            if len(ids) > 1:
+                data['message_ids'] = ",".join(ids)
+                endpoint = FIREEYEETP_BULK_DELETE_QUARANTINE_EMAILS_ENDPOINT
+            else:
+                endpoint = FIREEYEETP_DELETE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         resp_data = response
 
@@ -860,109 +978,136 @@ class FireeyeEtpConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_quarantined_emails(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
+    def _handle_list_quarantined_emails(self, param): # noqa
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
         data['attributes'] = {}
 
-        # Check the limit paramter
-        if param.get('size') > 200:
+        # Check the 'size' parameter
+        ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if size > 200:
             size = 200
-        elif param.get('size') > 0:
-            size = param.get('size')
-
         data['size'] = size
 
-        # Check the from date
-        if param.get('from_date'):
-            from_date = param.get("from_date").strip()
-
+        # Check the 'from_date' parameter
+        from_date_param = self._handle_py_ver_compat_for_input_str(param.get("from_date"))
+        if from_date_param:
             # Make sure the datetime supplied is a valid. Should be ISO8601 compliant
             try:
+                from_date = from_date_param.strip()
                 from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S")
                 from_date = from_date.strftime("%Y-%m-%dT%H:%M:%S")
 
                 data['attributes']['date'] = {}
                 data['attributes']['date']['from_date'] = from_date
             except:
-                return self.set_status(phantom.APP_ERROR, "Date supplied in the from_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Date supplied in the from_date field is not ISO8601 compliant. Please make sure it is a valid ISO8601 datetime stamp")
 
-            # Since the from_date and to_date need to be supplied together check it here
-            # Check the to date
-            if param.get('to_date'):
-                to_date = param.get('to_date').strip()
+            # Check the 'to_date' parameter
+            to_date_param = self._handle_py_ver_compat_for_input_str(param.get('to_date'))
+            # Since the 'from_date' and 'to_date' need to be supplied together check it here
+            if to_date_param:
                 # Make sure the datetime supplied is a valid. Should be ISO8601 compliant
                 try:
+                    to_date = to_date_param.strip()
                     to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S")
                     to_date = to_date.strftime("%Y-%m-%dT%H:%M:%S")
 
                     data['attributes']['date'] = {}
                     data['attributes']['date']['to_date'] = to_date
                 except:
-                    return self.set_status(phantom.APP_ERROR, "Date supplied in the to_date field is not ISO8601 compliant. Make sure it is a valid ISO8601 datetime stamp.")
+                    return action_result.set_status(
+                        phantom.APP_ERROR, "Date supplied in the to_date field is not ISO8601 compliant. Please make sure it is a valid ISO8601 datetime stamp")
 
-        # Check the domain
-        if param.get('domains'):
-            domains = param.get("domains")
-            domains = [x.strip() for x in domains.split(',')]
-            domains = list(filter(None, domains))
+        # Check the 'domain' parameter
+        domains_param = self._handle_py_ver_compat_for_input_str(param.get("domains"))
+        if domains_param:
+            try:
+                domains = [x.strip() for x in domains_param.split(',')]
+                domains = list(filter(None, domains))
+                if not domains:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                data['attributes']['domains'] = domains
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
 
-            data['attributes']['domains'] = domains
+        # Check the 'email_server' parameter
+        email_server_param = self._handle_py_ver_compat_for_input_str(param.get('email_server'))
+        if email_server_param:
+            data['attributes']['email_server'] = email_server_param
 
-        # Check the email server
-        if param.get('email_server'):
-            data['attributes']['email_server'] = param.get('email_server')
+        # Check the from 'email_address' parameter
+        from_param = self._handle_py_ver_compat_for_input_str(param.get('from'))
+        if from_param:
+            try:
+                data['attributes']['from'] = from_param.strip()
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'from' action parameter"), None
 
-        # Check the from email address
-        if param.get('from'):
-            data['attributes']['from'] = param.get('from').strip()
+        # Check the 'reason' parameter
+        reason_param = self._handle_py_ver_compat_for_input_str(param.get("reason"))
+        if reason_param:
+            try:
+                reason = [x.strip() for x in reason_param.split(',')]
+                reason = list(filter(None, reason))
+                if not reason:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter"), None
+                data['attributes']['reason'] = reason
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter"), None
 
-        # Check the reason
-        if param.get('reason'):
-            reason = param.get("reason")
-            reason = [x.strip() for x in reason.split(',')]
-            reason = list(filter(None, reason))
+        # Check the 'recipients' parameter
+        recipients_param = self._handle_py_ver_compat_for_input_str(param.get("recipients"))
+        if recipients_param:
+            try:
+                recipients = [x.strip() for x in recipients_param.split(',')]
+                recipients = list(filter(None, recipients))
+                if not recipients:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                data['attributes']['recipients'] = recipients
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
 
-            data['attributes']['reason'] = reason
+        # Check the 'sender_domain' parameter
+        sender_domain_param = self._handle_py_ver_compat_for_input_str(param.get('sender_domain'))
+        if sender_domain_param:
+            try:
+                data['attributes']['sender_domain'] = sender_domain_param.strip()
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender_domain' action parameter"), None
 
-        # Check the recipients
-        if param.get('recipients'):
-            recipients = param.get("recipients")
-            recipients = [x.strip() for x in recipients.split(',')]
-            recipients = list(filter(None, recipients))
+        # Check the 'subject' parameter
+        subject_param = self._handle_py_ver_compat_for_input_str(param.get('subject'))
+        if subject_param:
+            try:
+                data['attributes']['subject'] = subject_param.strip()
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'subject' action parameter"), None
 
-            data['attributes']['recipients'] = recipients
-
-        # Check the sender domain
-        if param.get('sender_domain'):
-            data['attributes']['sender_domain'] = param.get('sender_domain').strip()
-
-        # Check the subject
-        if param.get('subject'):
-            data['attributes']['subject'] = param.get('subject').strip()
-
-        # Check the tags
-        if param.get('tags'):
-            tags = param.get("tags")
-            tags = [x.strip() for x in tags.split(',')]
-            tags = list(filter(None, tags))
-
-            data['attributes']['tags'] = {}
-            data['attributes']['tags']['value'] = tags
+        # Check the 'tags' parameter
+        tags_param = self._handle_py_ver_compat_for_input_str(param.get("tags"))
+        if tags_param:
+            try:
+                tags = [x.strip() for x in tags_param.split(',')]
+                tags = list(filter(None, tags))
+                if not tags:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                data['attributes']['tags'] = {}
+                data['attributes']['tags']['value'] = tags
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
 
         endpoint = FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT
 
         # make rest call
         ret_val, response = self._paginator(endpoint, action_result, data, method="post")
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -971,7 +1116,6 @@ class FireeyeEtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_on_poll(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # pudb.set_trace()
@@ -989,7 +1133,7 @@ class FireeyeEtpConnector(BaseConnector):
             # Get the endtime from Phantom which is when the action was ran
             timestamp = datetime.utcfromtimestamp(param.get(phantom.APP_JSON_END_TIME) / 1000.0)
         except:
-            self.debug_print("end_time in Phantom could not be converted correctly. Use alternative time equal to datetime.utcnow().")
+            self.debug_print("'end_time' in Phantom could not be converted correctly. Use alternative time equal to datetime.utcnow()")
         else:
             timestamp = datetime.utcnow()
 
@@ -997,24 +1141,25 @@ class FireeyeEtpConnector(BaseConnector):
         if self.is_poll_now() or self._state.get('first_run', True):
 
             try:
-                # Check the limit paramter
+                # Check the 'container_count' parameter
                 # If container count is not present just get 1
-                limit = param.get(phantom.APP_JSON_CONTAINER_COUNT, 1)
+                ret_val, limit = self._validate_integer(action_result, param.get(phantom.APP_JSON_CONTAINER_COUNT, 1), CONTAINER_COUNT_KEY)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
             except:
-                return action_result.set_status(phantom.APP_ERROR, "The maximum containers is invalid.")
+                return action_result.set_status(phantom.APP_ERROR, "The maximum containers is invalid")
 
             date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000") - timedelta(minutes=15)
             data['fromLastModifiedOn'] = date
 
         # If it is a scheduled poll, ingest from last_ingestion_time
         else:
-
             try:
                 # Get the ingestion interval
                 # If interval is not present just get the last 15 minutes
                 interval_mins = int(config.get('ingest').get('interval_mins', 15))
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Ingestion interval is invalid.")
+                return action_result.set_status(phantom.APP_ERROR, "Ingestion interval is invalid")
 
             # Try to get the last_ingestion_time from the state file
             # If not get the last x minutes which is determined by the interval
@@ -1024,7 +1169,9 @@ class FireeyeEtpConnector(BaseConnector):
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
         # make rest call
-        response = self._paginator2(endpoint, action_result, data, limit=limit, method="post")
+        ret_val, response = self._paginator2(endpoint, action_result, data, limit=limit, method="post")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Start creating events and artifacts
         if response:
@@ -1037,7 +1184,7 @@ class FireeyeEtpConnector(BaseConnector):
 
             for alert in response:
                 # Create a container for each alert
-                container_creation_status, container_id = self._create_container(alert)
+                container_creation_status, container_id = self._create_container(action_result, alert)
 
                 if phantom.is_fail(container_creation_status) or not container_id:
                     self.debug_print('Error while creating container with ID {container_id}. {error_msg}'.
@@ -1061,7 +1208,6 @@ class FireeyeEtpConnector(BaseConnector):
 
         self._state['last_ingestion_time'] = data['fromLastModifiedOn']
 
-        # Now post process the data, uncomment code as you deem fit
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -1072,7 +1218,7 @@ class FireeyeEtpConnector(BaseConnector):
     def _convert_timestamp_to_string(self, timestamp, tz):
         """ This function is used to handle of timestamp converstion for on_poll action.
         :param timestamp: Epoch time stamp
-        :param tz: Timezone configued in the Asset
+        :param tz: Timezone configured in the Asset
         :return: datetime string
         """
 
@@ -1080,7 +1226,7 @@ class FireeyeEtpConnector(BaseConnector):
 
         return date_time.strftime('%Y-%m-%dT%H:%M:%S:%fZ')
 
-    def _create_container(self, alert):
+    def _create_container(self, action_result, alert):
         """ This function is used to create the container in Phantom using alert data.
         :param alert: Data of single alert
         :return: status(success/failure), container_id
@@ -1107,9 +1253,9 @@ class FireeyeEtpConnector(BaseConnector):
             self.debug_print(container_creation_msg)
             self.save_progress('Error while creating container for alert {alert_name}. '
                                '{error_message}'.format(alert_name=name, error_message=container_creation_msg))
-            return self.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_ERROR), None
 
-        return self.set_status(phantom.APP_SUCCESS), container_id
+        return action_result.set_status(phantom.APP_SUCCESS), container_id
 
     def _create_artifacts(self, alert, container_id):
         """ This function is used to create artifacts in given container using alert data.
@@ -1157,7 +1303,8 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             input_dict_str = json.dumps(input_dict, sort_keys=True)
         except Exception as e:
-            self.debug_print('Handled exception in _create_dict_hash', e)
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Handled exception in _create_dict_hash', err)
             return None
 
         return hashlib.md5(input_dict_str).hexdigest()
@@ -1224,10 +1371,16 @@ class FireeyeEtpConnector(BaseConnector):
         # that needs to be accessed across actions
 
         # Check for load_state API, use it if it is present
-        if (hasattr(self, 'load_state')):
+        if hasattr(self, 'load_state'):
             self._state = self.load_state()
         else:
             self._state = self._load_state()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         # get the asset config
         config = self.get_config()
@@ -1246,11 +1399,12 @@ class FireeyeEtpConnector(BaseConnector):
             'x-fireeye-api-key': config.get('api_key', '')
         }
 
-        self._zip_password = config.get('zip_password', 'infected')
+        # unused action parameter
+        # self._zip_password = config.get('zip_password', 'infected')
 
         base_url = ""
 
-        # Check to see which instance the user selected. Use the appropate URL.
+        # Check to see which instance the user selected. Use the appropriate URL.
         base_url = config.get('base_url')
 
         self._base_url = "{}/{}".format(base_url, FIREETEETP_API_PATH)
