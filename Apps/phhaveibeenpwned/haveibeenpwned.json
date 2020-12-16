@@ -48,6 +48,7 @@
                 "email": {
                     "description": "Email address",
                     "data_type": "string",
+                    "order": 0,
                     "contains": [
                         "email"
                     ],
@@ -57,6 +58,7 @@
                 "truncate": {
                     "description": "Truncate results to just domains (Default: False)",
                     "data_type": "string",
+                    "order": 1,
                     "value_list": [
                         "True",
                         "False"
@@ -225,6 +227,7 @@
                 "domain": {
                     "description": "URL or domain to query",
                     "data_type": "string",
+                    "order": 0,
                     "contains": [
                         "url",
                         "domain"
