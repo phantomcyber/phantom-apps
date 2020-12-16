@@ -4,8 +4,8 @@
     "description": "This app integrates with McAfee Web Gateway to perform contain and correct actions for maintaining lists",
     "type": "network security",
     "product_vendor": "McAfee",
-    "logo": "mcafeewebgateway.svg",
-    "logo_dark": "mcafeewebgateway_dark.svg",
+    "logo": "logo_mcafeewebgateway.svg",
+    "logo_dark": "logo_mcafeewebgateway_dark.svg",
     "product_name": "McAfee Web Gateway",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
@@ -58,7 +58,7 @@
         {
             "action": "block url",
             "description": "Add URL to a list",
-            "verbose": "Either 'list_title' or 'list_id' are required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds URL to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' are required, but the 'list_id' is faster and recommended (if available). <br> Note: Only adds URL to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_url",
             "read_only": false,
@@ -146,7 +146,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -210,7 +210,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -244,7 +244,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added url to list."
+                        "Successfully added url to list"
                     ]
                 },
                 {
@@ -275,7 +275,7 @@
         {
             "action": "unblock url",
             "description": "Remove URL from a list",
-            "verbose": "Either 'entry_position' or 'url' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'url' is required, but the 'entry_position' is faster and recommended (if available). <br> Note: Only removes URL from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_url",
             "read_only": false,
@@ -368,7 +368,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -402,7 +402,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully removed url from list."
+                        "Successfully removed url from list"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -434,7 +434,7 @@
         {
             "action": "block ip",
             "description": "Add IP to a list",
-            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds IP to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <br> Note: Only adds IP to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_ip",
             "read_only": false,
@@ -522,7 +522,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -586,7 +586,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -620,7 +620,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added ip to list."
+                        "Successfully added ip to list"
                     ]
                 },
                 {
@@ -651,7 +651,7 @@
         {
             "action": "unblock ip",
             "description": "Remove IP from a list",
-            "verbose": "Either 'entry_position' or 'ip' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'ip' is required, but the 'entry_position' is faster and recommended (if available). <br> Note: Only removes IP from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_ip",
             "read_only": false,
@@ -744,7 +744,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -778,7 +778,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully removed ip from list."
+                        "Successfully removed ip from list"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -810,7 +810,7 @@
         {
             "action": "block domain",
             "description": "Add domain to a list",
-            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <p> <i>Note: Only adds domain to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the 'list_id' is faster and recommended (if available). <br> Note: Only adds domain to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "block_domain",
             "read_only": false,
@@ -898,7 +898,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -962,7 +962,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -996,7 +996,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added domain to list."
+                        "Successfully added domain to list"
                     ]
                 },
                 {
@@ -1026,7 +1026,7 @@
         {
             "action": "unblock domain",
             "description": "Remove a domain from a list",
-            "verbose": "Either 'entry_position' or 'domain' is required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or 'domain' is required, but the 'entry_position' is faster and recommended (if available). <br> Note: Only removes domain from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "unblock_domain",
             "read_only": false,
@@ -1119,7 +1119,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -1185,7 +1185,7 @@
         {
             "action": "add entry",
             "description": "Add an entry to a list",
-            "verbose": "Either 'list_title' or 'list_id' is required, but the list_id is faster and recommended (if available). <p> <i>Note: Only adds an entry to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'list_title' or 'list_id' is required, but the list_id is faster and recommended (if available). <br> Note: Only adds an entry to a list and blocking only occurs if the list is added to a rule on McAfee Web Gateway.",
             "type": "contain",
             "identifier": "add_entry",
             "read_only": false,
@@ -1242,7 +1242,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -1309,7 +1309,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {
@@ -1343,7 +1343,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added item to list."
+                        "Successfully added item to list"
                     ]
                 },
                 {
@@ -1374,7 +1374,7 @@
         {
             "action": "remove entry",
             "description": "Remove an entry from a list",
-            "verbose": "Either 'entry_position' or item are required, but the 'entry_position' is faster and recommended (if available). <p> <i>Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
+            "verbose": "Either 'entry_position' or item are required, but the 'entry_position' is faster and recommended (if available). <br> Note: Only removes an entry from a list and unblocking only occurs if the list is assigned to a rule on McAfee Web Gateway.",
             "type": "correct",
             "identifier": "remove_entry",
             "read_only": false,
@@ -1478,7 +1478,7 @@
                     "data_path": "action_result.data.*.entry.content.listEntry.description",
                     "data_type": "string",
                     "example_values": [
-                        "This is test description"
+                        "Added by Splunk> Phantom"
                     ]
                 },
                 {

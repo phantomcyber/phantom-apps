@@ -27,7 +27,7 @@ class McafeeWebGatewayConnector(BaseConnector):
 
     def __init__(self):
 
-        # Call the BaseConnectors init first
+        # Call the BaseConnector init first
         super(McafeeWebGatewayConnector, self).__init__()
 
         self._state = None
@@ -110,11 +110,11 @@ class McafeeWebGatewayConnector(BaseConnector):
             else:
                 message = f'Error from server. Status Code: {r.status_code} Data from server: {r.text}'.replace('{', '{{').replace('}', '}}')
         except Exception as err:
-            message = f'Error parsing results data. Status Code: {r.status_code} Message - {err}; Data from server: {r.text}'
+            message = f'Error occurred while parsing results data. Status Code: {r.status_code} Message - {err}; Data from server: {r.text}'
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), message)
 
-    def _process_html_response(self, response, action_result) -> RetVal:
+    def _process_html_response(self, response, action_result):
 
         # An html response, treat it like an error
         status_code = response.status_code
@@ -584,7 +584,7 @@ class McafeeWebGatewayConnector(BaseConnector):
             del response['entry']['link']
         action_result.add_data(response)
 
-        message = f'Successfully added {item_type} to list.'
+        message = f'Successfully added {item_type} to list'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_remove_entry(self, param):
