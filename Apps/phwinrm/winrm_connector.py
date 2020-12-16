@@ -126,9 +126,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         try:
             success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            if not file_info:
+                return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID), None
             file_path = list(file_info)[0].get('path')
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
+            return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID), None
 
         try:
             return phantom.APP_SUCCESS, open(file_path, 'r').read()
@@ -142,9 +144,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
 
         try:
             success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            if not file_info:
+                return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID), None
             file_path = list(file_info)[0].get('path')
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file"), None
+            return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID), None
 
         try:
             custom_parser = imp.load_source('custom_parser', file_path)
@@ -879,9 +883,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
         try:
             vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
             success, message, file_info = phantom_rules.vault_info(vault_id=vault_id)
+            if not file_info:
+                return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID)
             path = list(file_info)[0].get('path')
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not retrive vault file")
+            return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID)
 
         destination = self._handle_py_ver_compat_for_input_str(param['destination'])
 

@@ -85,3 +85,4 @@ WINRM_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset c
 WINRM_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
 WINRM_ERR_INVALID_INT = 'Please provide a valid {msg} integer value in the "{param}"'
 WINRM_ERR_PARTITION = "Failed to fetch system volume, Please check the asset configuration and|or \"ip hostname\" parameter."
+WINRM_ERR_INVALID_VAULT_ID = "Could not retrive vault file"
