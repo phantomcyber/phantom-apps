@@ -1,16 +1,20 @@
+# File: akamaiwaf_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-from akamainetworklists_consts import *
+from akamaiwaf_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
+import sys
+from bs4 import BeautifulSoup, UnicodeDammit
 # Import Akamai Edgegrid authentication module
 from akamai.edgegrid import EdgeGridAuth
-# import pudb
 
 
 class RetVal(tuple):
@@ -26,21 +30,89 @@ class AkamaiNetworkListsConnector(BaseConnector):
         super(AkamaiNetworkListsConnector, self).__init__()
 
         self._state = None
-
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
         self._base_url = None
         self._client_token = None
         self._client_secret = None
         self._access_token = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+
+                input_str = UnicodeDammit(
+                    input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(
+                "Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -49,6 +121,8 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -57,10 +131,9 @@ class AkamaiNetworkListsConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+                self._handle_py_ver_compat_for_input_str(error_text))
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
-
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -69,15 +142,19 @@ class AkamaiNetworkListsConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+        if resp_json.get('detail'):
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, resp_json.get('detail'))
+        else:
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -108,7 +185,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -123,7 +200,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + AKAMAI_API_PATH + endpoint
+        url = "{}{}{}".format(self._base_url, AKAMAI_API_PATH, endpoint)
 
         try:
             r = requests.Session()
@@ -134,9 +211,15 @@ class AkamaiNetworkListsConnector(BaseConnector):
             )
             print(vars(r))
             r = request_func(url, auth=r.auth, **kwargs)
-
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -148,20 +231,13 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to endpoint")
 
         # make rest call
         ret_val, response = self._make_rest_call(AKAMAI_NETWORK_LIST_ENDPOINT, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
@@ -174,11 +250,8 @@ class AkamaiNetworkListsConnector(BaseConnector):
         :return: status success/failure
         """
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {}
@@ -188,7 +261,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         if param.get("extended"):
             params['extended'] = param.get("extended")
         if param.get("search"):
-            params['search'] = param.get("search")
+            params['search'] = self._handle_py_ver_compat_for_input_str(param.get("search"))
 
         endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT, params)
 
@@ -196,75 +269,57 @@ class AkamaiNetworkListsConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_network(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
         params = {}
 
         if param.get("includeelements"):
             params['includeElements'] = param.get("includeelements")
         if param.get("extended"):
             params['extended'] = param.get("extended")
-        if param.get('networklistid'):
-            param_networklistid = param.get('networklistid').split(",")
+        if param.get("networklistid"):
+            param_networklistid = self._handle_py_ver_compat_for_input_str(param.get("networklistid")).split(',')
 
         # Loop through each Network ID to retrive the data.
         for networklist in param_networklistid:
             # Format the URI
-            endpoint = self._process_parameters(AKAMAI_NETWORK_LIST_ENDPOINT + "/{}".format(networklist), params)
+            endpoint = self._process_parameters("{}/{}".format(AKAMAI_NETWORK_LIST_ENDPOINT, networklist), params)
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
             if (phantom.is_fail(ret_val)):
-                # the call to the 3rd party device or service failed, action result should contain all the error details
-                # for now the return is commented out, but after implementation, return from here
                 return action_result.get_status()
 
-            # Now post process the data,  uncomment code as you deem fit
-            # Add the response into the data section
             action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_add_element(self, param):
         # Use  POST /network-list/v2/network-lists/{networkListId}/append since you can add more than one element to a list.
         # Should be easier than using the 'Add an element' function which you can only add one at a time.
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        param_elements = param.get('elements').split(",")
+        param_elements = self._handle_py_ver_compat_for_input_str(param.get('elements')).split(",")
 
         if len(param_elements) <= 1:
             # Create the param data to build the URI correctly. Only doing this to reuse code.
             # Can assign manually but it wont be as flexiable if the API changes.
-            params = {'element': param.get('elements')}
+            params = {'element': self._handle_py_ver_compat_for_input_str(param.get('elements'))}
 
-            endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid')), params)
+            endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid'))), params)
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="put")
@@ -275,40 +330,32 @@ class AkamaiNetworkListsConnector(BaseConnector):
                 # Add element to the list
                 data['list'].append(element)
 
-            endpoint = "{}/{}/append".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'))
+            endpoint = "{}/{}/append".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')))
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_remove_element(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        param_elements = param.get('elements').split(",")
+        param_elements = self._handle_py_ver_compat_for_input_str(param.get('elements')).split(",")
 
         if len(param_elements) < 2:
             # Create the param data to build the URI correctly. Only doing this to reuse code.
             # Can assign manually but it wont be as flexiable if the API changes.
-            params = {'element': param.get('elements')}
+            params = {'element': self._handle_py_ver_compat_for_input_str(param.get('elements'))}
 
-            endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid')), params)
+            endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid'))), params)
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="delete")
@@ -317,13 +364,15 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
             # Need to get the list of items before we can remove them. We also need other data to be able to update the network list.
             # Format the URI
-            endpoint = "{}/{}".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'))
+            endpoint = "{}/{}".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')))
 
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
-
-            networkList = response['list']
-
+            try:
+                networkList = response['list']
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the response. {}".format(err))
             # Loop through the parameters passed.
             for item in param_elements:
                 # Index is used to pop the item from the list
@@ -348,38 +397,34 @@ class AkamaiNetworkListsConnector(BaseConnector):
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="put", json=data)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_create_network(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
         ip_data = []
 
-        ip_list = param.get('list').split(",")
+        ip_list = self._handle_py_ver_compat_for_input_str(param.get('list')).split(",")
 
         for ip in ip_list:
             ip_data.append(ip)
 
+        type = self._handle_py_ver_compat_for_input_str(param.get('type'))
+        if type not in TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'type' action parameter".format(TYPE_VALUE_LIST))
+
         data = {
-            "name": param.get('name'),
-            "type": param.get('type'),
-            "description": param.get('description'),
+            "name": self._handle_py_ver_compat_for_input_str(param.get('name')),
+            "type": type,
+            "description": self._handle_py_ver_compat_for_input_str(param.get('description')),
             "list": ip_data
         }
 
@@ -389,198 +434,159 @@ class AkamaiNetworkListsConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_network(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-        endpoint = "{}/{}/details".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'))
+        endpoint = "{}/{}/details".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')))
 
         data = {
-            "name": param.get('name'),
-            "description": param.get('description')
+            "name": self._handle_py_ver_compat_for_input_str(param.get('name')),
+            "description": self._handle_py_ver_compat_for_input_str(param.get('description'))
         }
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="put", json=data)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_network(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
 
-        endpoint = "{}/{}".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'))
+        endpoint = "{}/{}".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')))
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="delete")
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_activate_network(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
 
         data = {
-            "comments": param.get('comments', '')
+            "comments": self._handle_py_ver_compat_for_input_str(param.get('comments', ''))
         }
 
         # Notification parameter is used
         if param.get("notification"):
             notificationEmails = []
 
-            for notificationEmail in param.get("notification").split(','):
+            for notificationEmail in self._handle_py_ver_compat_for_input_str(param.get("notification")).split(','):
                 notificationEmails.append(notificationEmail)
 
             data['notification'] = notificationEmails
 
-        endpoint = "{}/{}/environments/{}/activate".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'), param.get('environment'))
+        environment = self._handle_py_ver_compat_for_input_str(param.get('environment'))
+        if environment not in ENVIRONMENT_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'environment' action parameter".format(ENVIRONMENT_VALUE_LIST))
+
+        endpoint = "{}/{}/environments/{}/activate".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')), environment)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_activation_status(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = "{}/{}/environments/{}/status".format(AKAMAI_NETWORK_LIST_ENDPOINT, param.get('networklistid'), param.get('environment'))
+        environment = self._handle_py_ver_compat_for_input_str(param.get('environment'))
+        if environment not in ENVIRONMENT_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'environment' action parameter".format(ENVIRONMENT_VALUE_LIST))
+
+        endpoint = "{}/{}/environments/{}/status".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid')), environment)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_activation_snapshot(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {'extended': param.get('extended')}
 
+        ret_val, syncpoint = self._validate_integer(action_result, param.get('syncpoint'), SYNCPOINT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         endpoint = self._process_parameters("{}/{}/sync-points/{}/history".format(AKAMAI_NETWORK_LIST_ENDPOINT,
-                                                                            param.get('networklistid'), param.get('syncpoint')), params)
+                                                                            self._handle_py_ver_compat_for_input_str(param.get('networklistid')), syncpoint), params)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_activation_details(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        endpoint = "{}/{}".format(AKAMAI_ACTIVATIONS_ENDPOINT, param.get('activationid'))
+        ret_val, activationid = self._validate_integer(action_result, param.get('activationid'), ACTIVATIONID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = "{}/{}".format(AKAMAI_ACTIVATIONS_ENDPOINT, activationid)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-        # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -623,14 +629,14 @@ class AkamaiNetworkListsConnector(BaseConnector):
         first_param = True
 
         if len(params) > 0:
-            endpoint += "?"
+            endpoint = "{}{}".format(endpoint, "?")
 
             for param, value in params.items():
                 if first_param:
-                    endpoint += "{}={}".format(param, value)
+                    endpoint = "{}{}={}".format(endpoint, param, value)
                     first_param = False
                 else:
-                    endpoint += "&{}={}".format(param, value)
+                    endpoint = "{}&{}={}".format(endpoint, param, value)
         else:
             endpoint = endpoint
 
@@ -654,8 +660,13 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Optional values should use the .get() function
         optional_config_name = config.get('optional_config_name')
         """
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
-        self._base_url = config.get('base_url')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
         self._client_token = config.get('client_token')
         self._client_secret = config.get('client_secret')
         self._access_token = config.get('access_token')
