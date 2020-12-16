@@ -731,6 +731,10 @@ class OktaConnector(BaseConnector):
         user_id = self._handle_py_ver_compat_for_input_str(param['email'])
         factor_type = param.get('factortype', 'push')
 
+        # Removing " (not yet implemented)" from the factor_type variable
+        # Remove the below line, once the action is implemented for the "sms" and the "token:software:totp" factor_types
+        factor_type = factor_type.split(" (not yet implemented)")[0]
+
         # get user
         ret_val, response_user = self._make_rest_call('/users/{}'.format(user_id), action_result, method='get')
         if (phantom.is_fail(ret_val)):
