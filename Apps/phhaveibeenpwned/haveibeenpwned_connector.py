@@ -26,7 +26,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         config = self.get_config()
         self._python_version = int(sys.version_info[0])
 
-        self._api_key = self._handle_py_ver_compat_for_input_str(config[HAVEIBEENPWNED_CONFIG_API_KEY])
+        self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
 
         return phantom.APP_SUCCESS
 
