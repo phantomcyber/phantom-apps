@@ -9,7 +9,6 @@ import requests
 import sys
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-from bs4 import UnicodeDammit
 from airwatch_consts import *
 
 
@@ -35,31 +34,15 @@ class AirWatchConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         # Fetching configuration parameters
-        self._username = self._handle_py_ver_compat_for_input_str(config['username'])
+        self._username = config['username']
         self._password = config['password']
         self._tenant = config['tenant']
-        self._base_url = self._handle_py_ver_compat_for_input_str(config['base_url'].strip("/"))
+        self._base_url = config['base_url'].strip("/")
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
         return phantom.APP_SUCCESS
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
@@ -85,19 +68,12 @@ class AirWatchConnector(BaseConnector):
             error_msg = AIRWATCH_ERR_MSG
 
         try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = AIRWATCH_UNICODE_DAMMIT_TYPE_ERR_MSG
-        except:
-            error_msg = AIRWATCH_ERR_MSG
-
-        try:
             if error_code in AIRWATCH_ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print("Error occurred while parsing error message")
+            self.debug_print(AIRWATCH_PARSE_ERR_MSG)
             error_text = AIRWATCH_PARSE_ERR_MSG
 
         return error_text
@@ -115,7 +91,7 @@ class AirWatchConnector(BaseConnector):
         self.save_progress('Trying to build body to add a device into the group')
 
         # Fetching the action parameters
-        device_uuid = self._handle_py_ver_compat_for_input_str(param.get('device_uuid'))
+        device_uuid = param.get('device_uuid')
 
         # Return the body
         return '[{{"value": "{0}","path": "/smartGroupsOperationV2/devices","op": "add"}}]'.format(device_uuid)
@@ -124,7 +100,7 @@ class AirWatchConnector(BaseConnector):
         self.save_progress('Trying to build URL to add a device into the group')
 
         # Fetching the action parameters
-        smartgroup_uuid = self._handle_py_ver_compat_for_input_str(param.get('smartgroup_uuid'))
+        smartgroup_uuid = param.get('smartgroup_uuid')
 
         # Return the URL
         return '{0}/mdm/smartgroups/{1}'.format(self._base_url, smartgroup_uuid)
@@ -146,8 +122,8 @@ class AirWatchConnector(BaseConnector):
             self.save_progress("URL: {}".format(url))
 
             # Fetching the action parameters
-            device_id = self._handle_py_ver_compat_for_input_str(param.get('device_uuid'))
-            smartgroup_uuid = self._handle_py_ver_compat_for_input_str(param.get('smartgroup_uuid'))
+            device_id = param.get('device_uuid')
+            smartgroup_uuid = param.get('smartgroup_uuid')
 
             # Try to make REST call
             try:
@@ -199,14 +175,14 @@ if __name__ == '__main__':
     import pudb
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as (f):
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = AirWatchConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print(json.dumps(json.loads(ret_val), indent=4))
     exit(0)
