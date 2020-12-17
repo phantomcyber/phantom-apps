@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "firewall",
     "main_module": "panorama_connector.py",
-    "app_version": "1.1.7",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:35:49.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
@@ -13,7 +13,8 @@
     "product_version_regex": "7\\..*\\..*",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
-    "logo": "pan.png",
+    "logo": "logo_pan.svg",
+    "logo_dark": "logo_pan_dark.svg",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "configuration": {
         "device": {
@@ -25,7 +26,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 1,
             "default": true
         },
@@ -128,7 +128,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -196,7 +200,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -289,7 +297,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -314,7 +326,7 @@
             "type": "correct",
             "identifier": "unblock_application",
             "read_only": false,
-            "verbose": "This action will remove the application from the Application group that was created/updated in the <b>block application</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
+            "verbose": "This action will remove the application from the Application group that was created/updated in the <b>block application</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.<br>Note: This action will pass for any non-existing application name as API doesn't return an error for incorrect application name.",
             "parameters": {
                 "application": {
                     "description": "Application to unblock",
@@ -357,7 +369,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -459,7 +475,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -536,7 +556,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -571,7 +595,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.@name",
@@ -599,7 +627,7 @@
                 {
                     "data_path": "action_result.data.*.used-by-malware",
                     "data_type": "string",
-                    "column_name": "Used by Malware",
+                    "column_name": "Used By Malware",
                     "column_order": 4
                 },
                 {
