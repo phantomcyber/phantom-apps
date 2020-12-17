@@ -256,9 +256,14 @@ class PassivetotalConnector(BaseConnector):
         ret_val, response, status_code = self._make_rest_call('/enrichment', {'query': query_param}, action_result)
 
         if (not ret_val):
-            message = response.get('error', {}).get('message', '')
+            if isinstance(response.get('error'), dict):
+                message = response.get('error', {}).get('message', '')
+            elif isinstance(response.get('error'), str):
+                message = response.get('message')
+            else:
+                message = ""
 
-            if ('quota has been exceeded' in message.lower()):
+            if ('quota has been exceeded' in message.lower() or 'quota exceeded for operation search_api' in message.lower()):
                 return action_result.get_status()
 
         if (ret_val) and (response):
