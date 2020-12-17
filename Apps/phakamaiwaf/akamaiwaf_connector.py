@@ -13,6 +13,10 @@ import requests
 import json
 import sys
 from bs4 import BeautifulSoup, UnicodeDammit
+try:
+    from urllib import unquote
+except:
+    from urlib.parse import unquote
 # Import Akamai Edgegrid authentication module
 from akamai.edgegrid import EdgeGridAuth
 
@@ -131,7 +135,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                self._handle_py_ver_compat_for_input_str(error_text))
+                unquote(self._handle_py_ver_compat_for_input_str(error_text)))
 
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
