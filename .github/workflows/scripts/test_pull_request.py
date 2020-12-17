@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     report = results.get('report')
     if report:
-        print(f'TEST RESULTS REPORT:\n{report}')
+        print(f'TEST RESULTS REPORT:\n{report}', flush=True)
 
     success = results['success']
     if not success:
