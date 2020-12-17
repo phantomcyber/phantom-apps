@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup, UnicodeDammit
 try:
     from urllib import unquote
 except:
-    from urlib.parse import unquote
+    from urllib.parse import unquote
 # Import Akamai Edgegrid authentication module
 from akamai.edgegrid import EdgeGridAuth
 
