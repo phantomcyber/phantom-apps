@@ -770,7 +770,7 @@ class OktaConnector(BaseConnector):
 
             if not transaction_url:
                 if factor_type == "sms":
-                    return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent push notification for the 'sms' factortype workflow")
+                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'sms' factortype workflow")
                 elif factor_type == "token:software:totp":
                     return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'token:software:totp' factortype workflow")
                 else:
