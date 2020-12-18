@@ -27,4 +27,4 @@ class InfrastructureSSL(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long), json)
+        return cls(cast(json.get('id'), int), json)

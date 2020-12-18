@@ -73,12 +73,12 @@ class Infrastructure(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long),
+        return cls(cast(json.get('id'), int),
                    json.get('ipAddress'),
                    json.get('portNumber'),
                    json.get('transport'),
                    json.get('discoveredOpen'),
-                   cast(json.get('incident').get('id'), long),
+                   cast(json.get('incident').get('id'), int),
                    json.get('incident').get('scope'),
                    json.get('incident').get('type'),
                    json.get('incident').get('subType'),

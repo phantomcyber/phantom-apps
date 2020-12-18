@@ -39,6 +39,6 @@ class DataBreachUsernameSummary(DSModel):
     def from_json(cls, json):
         cast = DSModel.cast
         return cls(json.get('username'),
-                   cast(json.get('distinctPasswordCount'), long),
-                   cast(json.get('breachCount'), long),
+                   cast(json.get('distinctPasswordCount'), int),
+                   cast(json.get('breachCount'), int),
                    json)

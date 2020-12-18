@@ -47,5 +47,5 @@ class Incident(DSModel):
 
     @classmethod
     def from_json(cls, json):
-        incident_id = DSModel.cast(json.get('id'), long)
+        incident_id = DSModel.cast(json.get('id'), int)
         return cls(incident_id, json)

@@ -47,7 +47,7 @@ class DSPaginationIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._i >= self._len:
             self._page = next(self._provider)
             self._i = 0

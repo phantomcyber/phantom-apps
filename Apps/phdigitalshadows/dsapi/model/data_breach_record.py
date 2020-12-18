@@ -63,7 +63,7 @@ class DataBreachRecord(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long),
+        return cls(cast(json.get('id'), int),
                    json.get('username'),
                    json.get('password'),
                    json.get('review'),

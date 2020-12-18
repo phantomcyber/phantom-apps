@@ -20,9 +20,9 @@ class DSAPIToPipelineTransform(object):
         date_from = json['from']
         date_until = json['until']
         for stage in json['stages']:
-            stage[unicode('date_range')] = unicode(pipeline_range)
-            stage[unicode('from')] = unicode(date_from)
-            stage[unicode('until')] = unicode(date_until)
+            stage[str('date_range')] = str(pipeline_range)
+            stage[str('from')] = str(date_from)
+            stage[str('until')] = str(date_until)
 
             stage_type = stage['type']
             if stage_type == 'INCIDENTS':
