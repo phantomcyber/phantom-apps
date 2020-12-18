@@ -768,7 +768,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If role does not exist, then,
-            # 404 error is thrown and it needs to be handled for "if role exist" action
+            # 404 error is thrown and it needs to be handled for the calling action
             if AWSIAM_ROLE_DOES_NOT_EXISTS_MSG.format(role_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
@@ -795,7 +795,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If instance profile does not exist, then,
-            # 404 error is thrown and it needs to be handled for "if role instance profile exist" action
+            # 404 error is thrown and it needs to be handled for add role action
             if AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG.format(instance_profile_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
