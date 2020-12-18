@@ -731,6 +731,10 @@ class OktaConnector(BaseConnector):
         user_id = self._handle_py_ver_compat_for_input_str(param['email'])
         factor_type = param.get('factortype', 'push')
 
+        # Removing " (not yet implemented)" from the factor_type variable
+        # Remove the below line, once the action is implemented for the "sms" and the "token:software:totp" factor_types
+        factor_type = factor_type.split(" (not yet implemented)")[0]
+
         # get user
         ret_val, response_user = self._make_rest_call('/users/{}'.format(user_id), action_result, method='get')
         if (phantom.is_fail(ret_val)):
@@ -761,8 +765,21 @@ class OktaConnector(BaseConnector):
             self.save_progress("[-] send push notification (call verify) {} - {}".format(str(response_verify), factor_link_verify_uri))
             return action_result.get_status()
 
-        transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
-        transaction_url = transaction_url.split('v1')[1]
+        try:
+            transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
+
+            if not transaction_url:
+                if factor_type == "sms":
+                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'sms' factortype workflow")
+                elif factor_type == "token:software:totp":
+                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'token:software:totp' factortype workflow")
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the polling link for the 'push' factortype workflow")
+
+            transaction_url = transaction_url.split('v1')[1]
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                "Error occurred while fetching the transaction_url for the 'send push notification' workflow. Error Details: {}".format(self._get_error_message_from_exception(e)))
 
         # response of verify
         ack_flag = False
