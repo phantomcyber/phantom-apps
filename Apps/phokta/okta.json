@@ -10,7 +10,7 @@
     "publisher": "Splunk",
     "name": "Okta",
     "license": "Copyright (c) 2018-2020 Splunk Inc.",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "product_name": "Okta",
     "app_wizard_version": "1.0.0",
     "app_version": "2.0.0",
@@ -56,6 +56,7 @@
             "type": "contain",
             "action": "send push notification",
             "description": "Validate the user prompt with push notification",
+            "verbose": "The action has not yet been implemented for the \"sms\" and the \"token:software:totp\" factortypes.<br>Currently, the action would generate a new OTP for the \"sms\" factortype and will not verify it.<br>The action would fail for the \"token:software:totp\" factortype as it has not yet been implemented.",
             "read_only": false,
             "parameters": {
                 "email": {
@@ -78,8 +79,8 @@
                     "default": "push",
                     "value_list": [
                         "push",
-                        "sms",
-                        "token:software:totp"
+                        "sms (not yet implemented)",
+                        "token:software:totp (not yet implemented)"
                     ],
                     "order": 1
                 }
@@ -139,7 +140,7 @@
                 {
                     "data_path": "action_result.message",
                     "example_values": [
-                        "Successfully sent push verification."
+                        "Successfully sent push notification."
                     ],
                     "data_type": "string"
                 },
