@@ -149,7 +149,6 @@ AWSIAM_ROLE_DELETED_MSG = 'Role {role_name} removed successfully along with all 
                           'profiles and policies'
 AWSIAM_USER_LOGIN_PROFILE_ALREADY_DELETED_MSG = 'Login profile for user {username} cannot be found'
 AWSIAM_USER_LOGIN_PROFILE_ALREADY_EXISTS_MSG = 'Login profile for user {username} already exists'
-AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG = 'Error while encoding access key id or secret key'
 AWSIAM_ROLE_DOES_NOT_EXISTS_MSG = 'Name {role_name} cannot be found'
 AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG = 'Profile {instance_profile_name} cannot be found'
 AWSIAM_ROLE_ALREADY_EXISTS_MSG = 'Role {role_name} already exists in AWS IAM account. Please provide a valid and ' \

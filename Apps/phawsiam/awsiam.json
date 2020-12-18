@@ -628,7 +628,7 @@
             "action": "add user",
             "identifier": "add_user",
             "description": "Add user to a group",
-            "type": "generic",
+            "type": "correct",
             "undo": "remove user",
             "read_only": false,
             "parameters": {
@@ -734,7 +734,7 @@
             "action": "remove user",
             "identifier": "remove_user",
             "description": "Remove user from a group",
-            "type": "generic",
+            "type": "contain",
             "undo": "add user",
             "read_only": false,
             "parameters": {
@@ -1434,7 +1434,7 @@
             "action": "attach policy",
             "identifier": "attach_policy",
             "description": "Attach managed policy to a role",
-            "type": "generic",
+            "type": "correct",
             "undo": "detach policy",
             "read_only": false,
             "parameters": {
@@ -1538,7 +1538,7 @@
             "action": "detach policy",
             "identifier": "detach_policy",
             "description": "Detach managed policy from a role",
-            "type": "generic",
+            "type": "contain",
             "undo": "attach policy",
             "read_only": false,
             "parameters": {
@@ -1642,7 +1642,7 @@
             "action": "assign policy",
             "identifier": "assign_policy",
             "description": "Assign managed policy to the user",
-            "type": "generic",
+            "type": "correct",
             "undo": "remove policy",
             "read_only": false,
             "parameters": {
@@ -1748,7 +1748,7 @@
             "action": "remove policy",
             "identifier": "remove_policy",
             "description": "Remove managed policy association with the user",
-            "type": "generic",
+            "type": "contain",
             "undo": "assign policy",
             "read_only": false,
             "parameters": {

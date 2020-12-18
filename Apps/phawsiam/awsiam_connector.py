@@ -75,12 +75,8 @@ class AwsIamConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = AWSIAM_UNKNOWN_ERROR_CODE
                     error_msg = e.args[0]
-            else:
-                error_code = AWSIAM_UNKNOWN_ERROR_CODE
-                error_msg = AWSIAM_UNKNOWN_ERROR_MSG
         except:
-            error_code = AWSIAM_UNKNOWN_ERROR_CODE
-            error_msg = AWSIAM_UNKNOWN_ERROR_MSG
+            pass
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
@@ -102,8 +98,8 @@ class AwsIamConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
-                      None)
+        error_msg = "Status code: {}. Empty response and no information in the header".format(response.status_code)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), None)
 
     def _process_xml_response(self, response, action_result):
         """ This function is used to process XML response.
@@ -324,14 +320,6 @@ class AwsIamConnector(BaseConnector):
 
         resp_json = None
 
-        try:
-            self._access_key = self._access_key
-            self._secret_key = self._secret_key
-        except:
-            self.debug_print(AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG),
-                          resp_json)
-
         if params is None:
             params = OrderedDict()
         params[AWSIAM_JSON_VERSION] = AWSIAM_API_VERSION
@@ -402,7 +390,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile does not exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for disable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_DELETED_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -473,7 +461,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for enable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_EXISTS_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -779,8 +767,8 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If role does not exist, then,
+            # 404 error is thrown and it needs to be handled for "if role exist" action
             if AWSIAM_ROLE_DOES_NOT_EXISTS_MSG.format(role_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
@@ -806,15 +794,15 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If instance profile does not exist, then,
+            # 404 error is thrown and it needs to be handled for "if role instance profile exist" action
             if AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG.format(instance_profile_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
 
             return None
 
-        # Return True for role already exists if we are successfully able to fetch the given role
+        # Return True for instance profile already exists if we are successfully able to fetch the given role
         return True
 
     def _handle_add_role(self, param):
@@ -1272,6 +1260,7 @@ class AwsIamConnector(BaseConnector):
 
         :param action_result: Object of ActionResult
         :param params: Dictionary of input parameters
+        :param key: Key parameter to retrieve the key from metadata
         :return: Dictionary of List of items retrieved from paginated response and request ID of request made
         """
 
@@ -1466,7 +1455,7 @@ if __name__ == '__main__':
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platform. Error: {0}".format(self._get_error_message_from_exception(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
