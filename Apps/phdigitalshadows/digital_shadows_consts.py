@@ -1,5 +1,4 @@
 # File: digital_shadows_consts.py
-# Copyright (c) 2020 Digital Shadows Ltd.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -68,6 +67,7 @@ BREACH_ID_KEY = "'breach_id' action parameter"
 BREACH_RECORD_ID_KEY = "'breach_record_id' action parameter"
 INCIDENT_ID_KEY = "'incident_id' action parameter"
 INTEL_INCIDENT_ID_KEY = "'intel_incident_id' action parameter"
+HISTORY_DAYS_INTERVAL_KEY = "'history_days_interval' config parameter"
 
 # Service error message
 SERVICE_ERR_MSG = "Error occurred while using the Digital Shadows Service."
