@@ -1025,7 +1025,7 @@
             "action": "enable user",
             "identifier": "enable_user",
             "description": "Enable login profile and access keys of a user",
-            "verbose": "If enable access keys parameter is marked false, only login profile is enabled. By default both are enabled. <p class=\"warn\">Please exercise caution when using this action. The password may be kept and logged in clear text.</p>",
+            "verbose": "If enable access keys parameter is marked false, only login profile is enabled. By default both are enabled. If this action is being executed on an already enabled user then other parameters won't affect the action run. <p class=\"warn\">Please exercise caution when using this action. The password may be kept and logged in clear text.</p>",
             "type": "correct",
             "undo": "disable user",
             "read_only": false,
