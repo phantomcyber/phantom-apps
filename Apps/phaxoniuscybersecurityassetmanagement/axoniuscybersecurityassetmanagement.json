@@ -3,18 +3,18 @@
     "name": "Axonius Cybersecurity Asset Management",
     "description": "This app integrates with the Axonius Cybersecurity Asset Management Platform to enrich asset data for investigations",
     "type": "identity management",
+    "logo": "logo_axoniuscybersecurityassetmanagement.svg",
     "product_vendor": "Axonius",
-    "logo": "axoniuscybersecurityassetmanagement.png",
-    "logo_dark": "axoniuscybersecurityassetmanagement_dark.png",
+    "logo_dark": "logo_axoniuscybersecurityassetmanagement_dark.svg",
     "product_name": "Axonius",
     "product_version_regex": ".*",
     "publisher": "Axonius",
-    "license": "Copyright (c) Axonius, 2018",
+    "license": "Copyright (c) Axonius, 2018-2020",
     "app_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_axoniuscybersecurityassetmanagement",
-    "main_module": "axoniuscybersecurityassetmanagement_connector.pyc",
-    "min_phantom_version": "4.9.35731",
+    "main_module": "axoniuscybersecurityassetmanagement_connector.py",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud API, February 3, 2020"
@@ -49,16 +49,15 @@
         "proxy_url": {
             "description": "HTTPS Proxy URL",
             "data_type": "string",
-            "required": false,
             "order": 3
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -66,10 +65,10 @@
         },
         {
             "action": "devices by sq",
-            "identifier": "devices_by_sq",
             "description": "Get devices by saved query",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "devices_by_sq",
+            "read_only": true,
             "parameters": {
                 "sq_name": {
                     "description": "The name of the Axonius saved query",
@@ -80,7 +79,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -125,7 +123,9 @@
                 {
                     "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
                     "data_type": "string",
-                    "contains": ["ip"]
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aggregated_os_type",
@@ -136,16 +136,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -155,15 +175,17 @@
         },
         {
             "action": "devices by hostname",
-            "identifier": "devices_by_hostname",
             "description": "Get devices by hostname",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "devices_by_hostname",
+            "read_only": true,
             "parameters": {
                 "hostname": {
                     "description": "The hostname of the Axonius asset",
                     "data_type": "string",
-                    "contains": ["host name"],
+                    "contains": [
+                        "host name"
+                    ],
                     "primary": true,
                     "required": true,
                     "order": 0
@@ -171,7 +193,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -180,7 +201,9 @@
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
-                    "contains": ["host name"]
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
@@ -201,7 +224,9 @@
                 {
                     "data_path": "action_result.data.*.aggregated_hostname",
                     "data_type": "string",
-                    "contains": ["host name"]
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aggregated_name",
@@ -218,7 +243,9 @@
                 {
                     "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
                     "data_type": "string",
-                    "contains": ["ip"]
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aggregated_os_type",
@@ -229,16 +256,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -248,15 +295,17 @@
         },
         {
             "action": "devices by ip",
-            "identifier": "devices_by_ip",
             "description": "Get devices by IP address",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "devices_by_ip",
+            "read_only": true,
             "parameters": {
                 "ip": {
                     "description": "The IP address of the Axonius asset",
                     "data_type": "string",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "primary": true,
                     "required": true,
                     "order": 0
@@ -264,7 +313,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -273,7 +321,9 @@
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
-                    "contains": ["ip"]
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
@@ -310,7 +360,9 @@
                 {
                     "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
                     "data_type": "string",
-                    "contains": ["ip"]
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aggregated_os_type",
@@ -321,16 +373,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -340,22 +412,20 @@
         },
         {
             "action": "devices by mac",
-            "identifier": "devices_by_mac",
             "description": "Get devices by MAC address",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "devices_by_mac",
+            "read_only": true,
             "parameters": {
                 "mac": {
                     "description": "The MAC address of the Axonius asset",
                     "data_type": "string",
-                    "primary": true,
                     "required": true,
                     "order": 0
                 },
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -400,7 +470,9 @@
                 {
                     "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
                     "data_type": "string",
-                    "contains": ["ip"]
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aggregated_os_type",
@@ -411,16 +483,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -430,10 +522,10 @@
         },
         {
             "action": "users by sq",
-            "identifier": "users_by_sq",
             "description": "Get users by saved query",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "users_by_sq",
+            "read_only": true,
             "parameters": {
                 "sq_name": {
                     "description": "The name of the Axonius saved query",
@@ -444,7 +536,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -491,16 +582,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -510,10 +621,10 @@
         },
         {
             "action": "users by mail",
-            "identifier": "users_by_mail",
             "description": "Get users by email address",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "users_by_mail",
+            "read_only": true,
             "parameters": {
                 "mail": {
                     "description": "The email address of the Axonius user",
@@ -524,7 +635,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -571,16 +681,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -590,10 +720,10 @@
         },
         {
             "action": "users by username",
-            "identifier": "users_by_username",
             "description": "Get users by username",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "users_by_username",
+            "read_only": true,
             "parameters": {
                 "username": {
                     "description": "The username of the Axonius user",
@@ -604,7 +734,6 @@
                 "max_rows": {
                     "description": "The maximum number of rows to be returned by Axonius",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 25,
                     "order": 1
                 }
@@ -651,16 +780,36 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

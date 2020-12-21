@@ -1,7 +1,9 @@
-"""Phantom app for Axonius."""
 # File: axoniuscybersecurityassetmanagement_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 # Phantom App imports
-# import json
+import json
 import os
 from typing import Any, List, Optional, Union
 
@@ -11,27 +13,7 @@ from axonius_api_client.api.assets.asset_mixin import AssetMixin
 from axonius_api_client.tools import dt_parse, strip_left
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-
-API_KEY: str = "api_key"
-API_SECRET: str = "api_secret"
-URL_KEY: str = "url"
-PROXY_URL_KEY: str = "proxy_url"
-SQ_NAME_KEY: str = "sq_name"
-MAX_ROWS_KEY: str = "max_rows"
-HOSTNAME_KEY: str = "hostname"
-IP_KEY: str = "ip"
-MAC_KEY: str = "mac"
-MAIL_KEY: str = "mail"
-USERNAME_KEY: str = "username"
-
-MAX_ROWS: str = 25
-"""Maximum number of assets to allow user to fetch."""
-
-SKIPS: List[str] = ["specific_data.data.image"]
-"""Fields to remove from each asset if found."""
-
-FIELDS_TIME: List[str] = ["seen", "fetch", "time", "date"]
-"""Fields to try and convert to date time if they have these words in them."""
+from axoniuscybersecurityassetmanagement_consts import *
 
 
 def get_str_arg(param: dict, key: str, required: bool = False, default: str = "") -> str:
@@ -39,36 +21,35 @@ def get_str_arg(param: dict, key: str, required: bool = False, default: str = ""
     value = param.get(key, default)
 
     if not isinstance(value, str):
-        raise ValueError(
-            f"Supplied value {value!r} for argument {key!r} is not a string."
-        )
+        raise ValueError(f"Please provide a valid string value for the parameter {key!r}")
 
     value = value.strip()
 
     if not value and required:
-        raise ValueError(f"No value supplied for argument {key!r}")
+        raise ValueError(f"No value supplied for parameter {key!r}")
 
     return value
 
 
-def get_int_arg(
-    param: dict,
-    key: str,
-    required: bool = False,
-    default: Optional[Union[str, int]] = None,
+def get_int_arg(param: dict, key: str, required: bool = False, default: Optional[Union[str, int]] = None
 ) -> int:
     """Get a key from a command arg and convert it into an int."""
-    value = param.get(key, default)
+    param_val = param.get(key, default)
 
-    if value is None and required:
+    if param_val is None and required:
         raise ValueError(f"No value supplied for argument {key!r}")
 
-    try:
-        return int(value)
-    except Exception:
-        raise ValueError(
-            f"Supplied value {value!r} for argument {key!r} is not an integer."
-        )
+    if param_val is not None:
+        try:
+            if not float(param_val).is_integer():
+                raise ValueError(VALID_INTEGER_MSG.format(key=key))
+            param_val = int(param_val)
+        except Exception:
+            raise ValueError(VALID_INTEGER_MSG.format(key=key))
+        if param_val < 0:
+            raise ValueError(NON_NEGATIVE_INTEGER_MSG.format(key=key))
+
+    return param_val
 
 
 def parse_kv(key: str, value: Any) -> Any:
@@ -115,13 +96,46 @@ class AxoniusConnector(BaseConnector):
         self._client: Connect = None
         self._client_args: dict = {}
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _create_client(self, action_result: phantom.ActionResult) -> int:
         """Create an instance of Axonius API Client."""
         try:
             self.debug_print("Creating Axonius API Client")
             self._client: Connect = Connect(**self._client_args)
         except Exception as exc:
-            status = f"Could not create Axonius API Client: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Could not create Axonius API Client: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         return phantom.APP_SUCCESS
@@ -137,7 +151,8 @@ class AxoniusConnector(BaseConnector):
         try:
             self._client.start()
         except Exception as exc:
-            status = f"Failed to login to Axonius instance at {self._url}: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to login to Axonius instance at {self._url}: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Successfully logged in to Axonius {self._client}"
@@ -169,11 +184,18 @@ class AxoniusConnector(BaseConnector):
         try:
             sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} from Saved Query {sq_name!r}"
         self.save_progress(progress)
@@ -183,17 +205,18 @@ class AxoniusConnector(BaseConnector):
                 name=sq_name, max_rows=max_rows, field_null=True, field_null_value=[]
             )
         except Exception as exc:
-            status = f"Failed to fetch Saved Query: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch Saved Query: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} from Saved Query {sq_name!r}"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -208,11 +231,18 @@ class AxoniusConnector(BaseConnector):
         try:
             hostname: str = get_str_arg(key=HOSTNAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} with host name {hostname!r}"
         self.save_progress(progress)
@@ -226,17 +256,18 @@ class AxoniusConnector(BaseConnector):
                 field_null_value=[],
             )
         except Exception as exc:
-            status = f"Failed to fetch device: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} with {hostname!r} from Axonius"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -251,11 +282,18 @@ class AxoniusConnector(BaseConnector):
         try:
             ip: str = get_str_arg(key=IP_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} with IP address {ip!r}"
         self.save_progress(progress)
@@ -269,17 +307,18 @@ class AxoniusConnector(BaseConnector):
                 field_null_value=[],
             )
         except Exception as exc:
-            status = f"Failed to fetch device: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} with {ip!r} from Axonius"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -294,11 +333,18 @@ class AxoniusConnector(BaseConnector):
         try:
             mac: str = get_str_arg(key=MAC_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} with MAC address {mac!r}"
         self.save_progress(progress)
@@ -312,17 +358,18 @@ class AxoniusConnector(BaseConnector):
                 field_null_value=[],
             )
         except Exception as exc:
-            status = f"Failed to fetch device: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} with {mac!r} from Axonius"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+        
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -337,11 +384,18 @@ class AxoniusConnector(BaseConnector):
         try:
             sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} from Saved Query {sq_name!r}"
         self.save_progress(progress)
@@ -351,17 +405,18 @@ class AxoniusConnector(BaseConnector):
                 name=sq_name, max_rows=max_rows, field_null=True, field_null_value=[]
             )
         except Exception as exc:
-            status = f"Failed to fetch Saved Query: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch Saved Query: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} from Saved Query {sq_name!r}"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -376,11 +431,18 @@ class AxoniusConnector(BaseConnector):
         try:
             mail: str = get_str_arg(key=MAIL_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} with email address {mail!r}"
         self.save_progress(progress)
@@ -394,17 +456,18 @@ class AxoniusConnector(BaseConnector):
                 field_null_value=[],
             )
         except Exception as exc:
-            status = f"Failed to fetch users: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch users: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} with {mail!r} from Axonius"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -419,11 +482,18 @@ class AxoniusConnector(BaseConnector):
         try:
             username: str = get_str_arg(key=USERNAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
-            status = f"Failed to parse parameters: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
-        apiobj: AssetMixin = getattr(self._client, obj_type)
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         progress = f"Fetching {obj_type} with username {username!r}"
         self.save_progress(progress)
@@ -437,17 +507,18 @@ class AxoniusConnector(BaseConnector):
                 field_null_value=[],
             )
         except Exception as exc:
-            status = f"Failed to fetch users: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch users: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         progress = f"Fetched {len(assets)} {obj_type} with {username!r} from Axonius"
         self.save_progress(progress)
 
-        summary: dict = action_result.update_summary({})
-        summary[f"total_{obj_type}"] = action_result.get_data_size()
-
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -477,8 +548,10 @@ class AxoniusConnector(BaseConnector):
             elif action_id == "users_by_username":
                 ret_val = self._handle_users_by_username(param=param, obj_type="users")
         except Exception as exc:
-            progress = f"Exception in {action_id}: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            progress = f"Exception in {action_id}: {err_msg}"
             self.save_progress(progress)
+            ret_val = phantom.APP_ERROR
 
         return ret_val
 
@@ -512,68 +585,67 @@ class AxoniusConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     import pudb
-#     import argparse
+    import pudb
+    import argparse
 
-#     pudb.set_trace()
+    pudb.set_trace()
 
-#     argparser = argparse.ArgumentParser()
+    argparser = argparse.ArgumentParser()
 
-#     argparser.add_argument("input_test_json", help="Input Test JSON file")
-#     argparser.add_argument("-u", "--username", help="username", required=False)
-#     argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
 
-#     args = argparser.parse_args()
-#     session_id = None
+    args = argparser.parse_args()
+    session_id = None
 
-#     username = args.username
-#     password = args.password
+    username = args.username
+    password = args.password
 
-#     if username is not None and password is None:
+    if username is not None and password is None:
+        # User specified a username but not a password, so ask
+        import getpass
 
-#         # User specified a username but not a password, so ask
-#         import getpass
+        password = getpass.getpass("Password: ")
 
-#         password = getpass.getpass("Password: ")
+    if username and password:
+        login_url = BaseConnector._get_phantom_base_url() + "login"
+        try:
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies["csrftoken"]
 
-#     if username and password:
-#         login_url = BaseConnector._get_phantom_base_url() + "login"
-#         try:
-#             print("Accessing the Login page")
-#             r = requests.get(login_url, verify=False)
-#             csrftoken = r.cookies["csrftoken"]
+            data = dict()
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
-#             data = dict()
-#             data["username"] = username
-#             data["password"] = password
-#             data["csrfmiddlewaretoken"] = csrftoken
+            headers = dict()
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
-#             headers = dict()
-#             headers["Cookie"] = "csrftoken=" + csrftoken
-#             headers["Referer"] = login_url
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies["sessionid"]
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            exit(1)
 
-#             print("Logging into Platform to get the session id")
-#             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
-#             session_id = r2.cookies["sessionid"]
-#         except Exception as e:
-#             print("Unable to get session id from the platform. Error: " + str(e))
-#             exit(1)
+    with open(args.input_test_json) as f:
+        in_json = f.read()
+        in_json = json.loads(in_json)
+        print(json.dumps(in_json, indent=4))
 
-#     with open(args.input_test_json) as f:
-#         in_json = f.read()
-#         in_json = json.loads(in_json)
-#         print(json.dumps(in_json, indent=4))
+        connector = AwsLambdaConnector()
+        connector.print_progress_message = True
 
-#         connector = AwsLambdaConnector()
-#         connector.print_progress_message = True
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
 
-#         if session_id is not None:
-#             in_json["user_session_token"] = session_id
-#             connector._set_csrf_info(csrftoken, headers["Referer"])
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
-#         ret_val = connector._handle_action(json.dumps(in_json), None)
-#         print(json.dumps(json.loads(ret_val), indent=4))
-
-#     exit(0)
+    exit(0)
