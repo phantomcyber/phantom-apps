@@ -145,7 +145,7 @@ def get_file_detail_ctx(result):
 
     if (message) and ('Not Found' in message):
         ctx_result['message'] = message
-        print message
+        print(message)
 
     data = result.get_data()
 
@@ -164,7 +164,10 @@ def get_file_detail_ctx(result):
     endpoints = data.get('file_details', {}).get('endpoint')
 
     if (endpoints):
-        data['file_details']['endpoint'] = [dict(zip(('host', 'sensor'), x.split('|'))) for x in endpoints]
+        try:
+            data['file_details']['endpoint'] = [dict(zip(('host', 'sensor'), x.split('|'))) for x in endpoints]
+        except:
+            data['file_details']['endpoint'] = [dict(list(zip(('host', 'sensor'), x.split('|')))) for x in endpoints]
 
     summary = result.get_summary()
 
@@ -189,6 +192,6 @@ def display_file_details(provides, all_app_runs, context):
             if (not ctx_result):
                 continue
             results.append(ctx_result)
-    print context
+    print(context)
 
     return 'cb_file_details.html'

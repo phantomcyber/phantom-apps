@@ -5,6 +5,8 @@
 #
 
 # Phantom imports
+import sys
+
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
@@ -28,7 +30,7 @@ import magic
 import socket
 import struct
 import ctypes
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 import datetime
 
 
@@ -76,6 +78,7 @@ class CarbonblackConnector(BaseConnector):
         self._base_url = None
         self._api_token = None
         self._state_file_path = None
+        self._python_version = None
         self._state = {}
 
     def finalize(self):
@@ -83,6 +86,12 @@ class CarbonblackConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def initialize(self):
+
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR,
+                                   "Error occurred while getting the Phantom server's Python major version.")
 
         self._state = self.load_state()
         config = self.get_config()
@@ -103,8 +112,6 @@ class CarbonblackConnector(BaseConnector):
         except Exception as e:
             self.debug_print("Handled exception", e)
             return "Unparsable Reply. Please see the log files for the response text."
-
-        return ''
 
     def _make_rest_call(self, endpoint, action_result, method="get", params={}, headers={}, files=None, data=None, parse_response_json=True, additional_succ_codes={}):
         """ treat_status_code is a way in which the caller tells the function, 'if you get a status code present in this dictionary,
@@ -324,7 +331,7 @@ class CarbonblackConnector(BaseConnector):
             return ""
 
         # Convert to an unsigned int
-        input_ip = long(input_ip)
+        input_ip = int(input_ip)
         input_ip = ctypes.c_uint32(input_ip).value
         # long(input_ip) & 0xffffffff
         # input_ip = long(input_ip)
@@ -865,9 +872,9 @@ class CarbonblackConnector(BaseConnector):
             'wait': param.get('wait', False)
         }
         if param.get('working_directory'):
-            data.update({ 'working_directory': param.get('working_directory') })
+            data.update({'working_directory': param.get('working_directory')})
         if param.get('output_file'):
-            data.update({ 'output_file': param.get('output_file') })
+            data.update({'output_file': param.get('output_file')})
 
         # First get a session id
         ret_val, session_id = self._get_live_session_id(sensor_id, action_result)
@@ -948,7 +955,7 @@ class CarbonblackConnector(BaseConnector):
         # Upload File to Server
         vault_path = str(Vault.get_file_path(vault_id))
         url = '/v1/cblr/session/{session_id}/file'.format(session_id=session_id)
-        data = { 'file': open(vault_path, 'rb') }
+        data = {'file': open(vault_path, 'rb')}
 
         ret_val, response = self._make_rest_call(url, action_result, files=data, method='post')
 
@@ -956,7 +963,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         # Get the file_id from the Upload File to Server response
-        file_id = response.get('file_id')
+        file_id = response.get('id')
 
         # Post the file to the host
         data = {'object': destination, 'file_id': file_id}
@@ -1063,7 +1070,7 @@ class CarbonblackConnector(BaseConnector):
 
             vault_ret_dict = Vault.add_attachment(zip_file_path, self.get_container_id(), file_name=file_name)
 
-            curr_data = action_result.add_data({ 'session_id': session_id, 'file_id': file_id })
+            curr_data = action_result.add_data({'session_id': session_id, 'file_id': file_id})
 
             if (vault_ret_dict['succeeded']):
                 curr_data[phantom.APP_JSON_VAULT_ID] = vault_ret_dict[phantom.APP_JSON_HASH]
@@ -1151,7 +1158,6 @@ class CarbonblackConnector(BaseConnector):
     def _sync_events(self, param):
         """ Force the sensor with the given sensor_id or ip_hostname to flush all its recorded events to the server.
           " If the sensor_id is specified it will be used, otherwise the ip_hostname will be used to query for the sensor_id
-          "
           " The flush is done by writing a future datetime to the sensor's event_log_flush_time and PUTing the new sensor data
         """
 
@@ -1622,7 +1628,7 @@ class CarbonblackConnector(BaseConnector):
         summary = CARBONBLACK_DISPLAYING_RESULTS_TOTAL.format(displaying=len(results.get('results', [])),
                 query_type=query_type, total=results.get('total_results', 'Unknown'))
 
-        action_result.set_summary({ "device_count": results.get('total_results', 'Unknown')})
+        action_result.set_summary({"device_count": results.get('total_results', 'Unknown')})
 
         return action_result.set_status(phantom.APP_SUCCESS, summary)
 
@@ -1787,7 +1793,7 @@ class CarbonblackConnector(BaseConnector):
             cont['description'] = "Unresolved CB_Response Alerts"
             cont['source_data_identifier'] = result['unique_id']
 
-            for key, value in result.iteritems():
+            for key, value in result.items():
                 cef[key] = value
                 # Create List to contain artifacts
                 artList = []
@@ -1925,7 +1931,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1938,11 +1944,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1958,6 +1964,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

@@ -2,7 +2,7 @@
     "appid": "56e81e6b-8022-4613-82ba-a779debac564",
     "name": "Carbon Black Response",
     "description": "This app supports executing various endpoint-based investigative and containment actions on Carbon Black Response",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "carbonblack_connector.py",
     "app_version": "2.0.1",
@@ -11,14 +11,14 @@
     "product_vendor": "Bit9",
     "product_name": "Carbon Black",
     "product_version_regex": "[5-6]\\.[0-4]\\.*",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On-prem, Version 6.1.0, January 22 2020"
+        "On-prem, Version 6.1.0, December 15 2020"
     ],
     "logo": "logo_carbonblack.svg",
     "logo_dark": "logo_carbonblack_dark.svg",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "configuration": {
         "device_url": {
             "data_type": "string",
@@ -29,7 +29,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 1,
             "default": false
         },
@@ -74,20 +73,19 @@
                     "description": "Type of search",
                     "data_type": "string",
                     "order": 1,
-                    "required": false,
                     "value_list": [
                         "binary",
                         "process"
                     ],
                     "contains": [
                         "carbon black query type"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "range": {
                     "description": "Range of items to return, for e.g. 0-10",
                     "data_type": "string",
                     "order": 2,
-                    "required": false,
                     "default": "0-10"
                 }
             },
@@ -103,7 +101,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -114,10 +113,8 @@
                         "md5"
                     ],
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7",
-                        "13ded573464ba7f43fe640479b309e09",
-                        "9bf50324444c46997c2492d505b47f2d",
-                        "5FB30FE90736C7FC77DE637021B1CE7C"
+                        "test91ac8d46aaf22ba8bc5c73datest",
+                        "test0FE90736C7FC77DE637021B1test"
                     ]
                 },
                 {
@@ -125,7 +122,6 @@
                     "data_type": "string",
                     "example_values": [
                         "0-10",
-                        "0-2",
                         "5-8"
                     ]
                 },
@@ -145,10 +141,7 @@
                     "data_type": "numeric",
                     "example_values": [
                         0.1120398044586182,
-                        0.04952096939086914,
-                        0.1234798431396484,
-                        0.05507302284240723,
-                        0.05384993553161621
+                        0.04952096939086914
                     ]
                 },
                 {
@@ -254,7 +247,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-01T00:00:00Z",
-                        "2015-01-01T00:00:00Z",
                         "2013-11-01T00:00:00Z"
                     ]
                 },
@@ -271,7 +263,6 @@
                     "data_type": "string",
                     "example_values": [
                         "16.0.10827.20181",
-                        "4.7.0205.0",
                         "6.1.7600.16385 (win7_rtm.090713-1255)"
                     ]
                 },
@@ -344,7 +335,6 @@
                     "data_type": "string",
                     "example_values": [
                         "CB-TEST-02",
-                        "WIN7-CLIENT1",
                         "ACCOUNTING-PC"
                     ]
                 },
@@ -375,7 +365,6 @@
                     "data_type": "string",
                     "example_values": [
                         "c:\\program files\\common files\\microsoft shared\\clicktorun\\updates\\16.0.10827.20181\\officeclicktorun.exe",
-                        "c:\\program files\\microsoft security client\\nissrv.exe",
                         "C:\\Windows\\system32\\ping.exe"
                     ],
                     "contains": [
@@ -439,7 +428,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-19T00:00:00Z",
-                        "2018-09-29T00:00:00Z",
                         "2018-10-02T00:00:00Z"
                     ]
                 },
@@ -455,9 +443,8 @@
                     "data_path": "action_result.data.*.binary.highlights.*.ids",
                     "data_type": "string",
                     "example_values": [
-                        "13DED573464BA7F43FE640479B309E09",
-                        "9BF50324444C46997C2492D505B47F2D",
-                        "5FB30FE90736C7FC77DE637021B1CE7C"
+                        "testD573464BA7F43FE640479B30test",
+                        "test0FE90736C7FC77DE637021B1test"
                     ],
                     "contains": [
                         "md5"
@@ -468,7 +455,6 @@
                     "data_type": "string",
                     "example_values": [
                         "PREPREPRE13DED573464BA7F43FE640479B309E09POSTPOSTPOST",
-                        "PREPREPRE9BF50324444C46997C2492D505B47F2DPOSTPOSTPOST",
                         "PREPREPRE5FB30FE90736C7FC77DE637021B1CE7CPOSTPOSTPOST"
                     ]
                 },
@@ -476,7 +462,7 @@
                     "data_path": "action_result.data.*.binary.results.*.alliance_data_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "5fb30fe90736c7fc77de637021b1ce7c"
+                        "test0fe90736c7fc77de637021b1test"
                     ],
                     "contains": [
                         "md5"
@@ -486,7 +472,7 @@
                     "data_path": "action_result.data.*.binary.results.*.alliance_link_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=5fb30fe90736c7fc77de637021b1ce7c"
+                        "https://services.test.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=5fb30fe90736c7fc77de637021b1ce7c"
                     ],
                     "contains": [
                         "url"
@@ -511,7 +497,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         610,
-                        510,
                         511
                     ]
                 },
@@ -527,7 +512,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         9683736,
-                        366512,
                         16896
                     ]
                 },
@@ -572,7 +556,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-14T20:23:00Z",
-                        "2015-01-30T19:14:00Z",
                         "2009-07-14T10:17:00Z"
                     ]
                 },
@@ -588,7 +571,6 @@
                     "data_type": "string",
                     "example_values": [
                         "CB-TEST-02|27",
-                        "WIN7-CLIENT1|15",
                         "DC1|19"
                     ]
                 },
@@ -613,7 +595,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Microsoft Office Click-to-Run (SxS)",
-                        "Microsoft Network Realtime Inspection Service",
                         "TCP/IP Ping Command"
                     ]
                 },
@@ -622,7 +603,6 @@
                     "data_type": "string",
                     "example_values": [
                         "16.0.10827.20181",
-                        "4.7.0205.0",
                         "6.1.7600.16385 (win7_rtm.090713-1255)"
                     ]
                 },
@@ -646,7 +626,6 @@
                     "data_type": "string",
                     "example_values": [
                         "OfficeClickToRun.exe",
-                        "NisSrv.exe",
                         "ping.exe"
                     ],
                     "contains": [
@@ -674,7 +653,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-28T10:06:02.456Z",
-                        "2018-10-28T10:06:42.455Z",
                         "2018-10-26T00:01:41.224Z"
                     ]
                 },
@@ -689,9 +667,8 @@
                     "data_path": "action_result.data.*.binary.results.*.md5",
                     "data_type": "string",
                     "example_values": [
-                        "13DED573464BA7F43FE640479B309E09",
-                        "9BF50324444C46997C2492D505B47F2D",
-                        "5FB30FE90736C7FC77DE637021B1CE7C"
+                        "testD573464BA7F43FE640479B30test",
+                        "test0FE90736C7FC77DE637021B1test"
                     ],
                     "contains": [
                         "md5"
@@ -702,7 +679,6 @@
                     "data_type": "string",
                     "example_values": [
                         "c:\\program files\\common files\\microsoft shared\\clicktorun\\updates\\16.0.10827.20181\\officeclicktorun.exe",
-                        "c:\\program files\\microsoft security client\\nissrv.exe",
                         "c:\\windows\\system32\\ping.exe"
                     ],
                     "contains": [
@@ -715,7 +691,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         9683736,
-                        366512,
                         16896
                     ]
                 },
@@ -727,7 +702,6 @@
                     ],
                     "example_values": [
                         "OfficeClickToRun.exe",
-                        "NisSrv.exe",
                         "ping.exe.mui"
                     ]
                 },
@@ -751,7 +725,6 @@
                     "data_type": "string",
                     "example_values": [
                         "16.0.10827.20181",
-                        "4.7.0205.0",
                         "6.1.7600.16385"
                     ]
                 },
@@ -760,7 +733,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-19T17:04:47.906Z",
-                        "2015-07-01T02:12:21.783Z",
                         "2015-05-15T07:23:54.846Z"
                     ]
                 },
@@ -778,7 +750,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-19T17:04:47.906Z",
-                        "2015-07-01T02:12:21.783Z",
                         "2015-05-15T07:23:54.846Z"
                     ]
                 },
@@ -809,9 +780,8 @@
                     "data_path": "action_result.data.*.binary.terms",
                     "data_type": "string",
                     "example_values": [
-                        "md5:13ded573464ba7f43fe640479b309e09",
-                        "md5:9bf50324444c46997c2492d505b47f2d",
-                        "md5:5FB30FE90736C7FC77DE637021B1CE7C"
+                        "md5:testd573464ba7f43fe640479b30test",
+                        "md5:test0FE90736C7FC77DE637021B1test"
                     ]
                 },
                 {
@@ -1023,7 +993,7 @@
                     "data_path": "action_result.data.*.process.facets.process_md5.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "test91ac8d46aaf22ba8bc5c73datest"
                     ],
                     "contains": [
                         "md5"
@@ -1135,7 +1105,7 @@
                     "data_path": "action_result.data.*.process.results.*.alliance_data_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "test91ac8d46aaf22ba8bc5c73datest"
                     ],
                     "contains": [
                         "md5"
@@ -1145,7 +1115,7 @@
                     "data_path": "action_result.data.*.process.results.*.alliance_link_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "https://testservices.testbit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=4fb491ac8d46aaf22ba8bc5c73dabef7"
                     ],
                     "contains": [
                         "url"
@@ -1198,10 +1168,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.process.results.*.emet_config",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.process.results.*.emet_count",
@@ -1354,7 +1321,7 @@
                     "data_path": "action_result.data.*.process.results.*.process_md5",
                     "data_type": "string",
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "test91ac8d46aaf22ba8bc5c73datest"
                     ],
                     "contains": [
                         "md5"
@@ -1455,7 +1422,7 @@
                     "data_path": "action_result.data.*.process.terms",
                     "data_type": "string",
                     "example_values": [
-                        "md5:4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "md5:test91ac8d46aaf22ba8bc5c73datest"
                     ]
                 },
                 {
@@ -1478,7 +1445,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Displaying 10 'process' results of total 32404",
-                        "Displaying 1 'binary' results of total 1",
                         "Displaying 0 'binary' results of total 1"
                     ]
                 },
@@ -1502,7 +1468,7 @@
         {
             "action": "create alert",
             "description": "Create an alert/watchlist",
-            "verbose": "Carbon Black Response supports 'watchlists' which are customized alerts that search for a binary or running process on an endpoint that matches a certain query. See the carbonblack_app playbook for examples.<br>This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access)",
+            "verbose": "Carbon Black Response supports 'watchlists' which are customized alerts that search for a binary or running process on an endpoint that matches a certain query. See the carbonblack_app playbook for examples.<br>This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
             "type": "generic",
             "identifier": "create_alert",
             "read_only": true,
@@ -1528,7 +1494,8 @@
                     ],
                     "contains": [
                         "carbon black query type"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "query": {
                     "data_type": "string",
@@ -1537,7 +1504,8 @@
                     "required": true,
                     "contains": [
                         "carbon black query"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "read_only": {
                     "data_type": "boolean",
@@ -1557,7 +1525,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1639,7 +1608,7 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "Id",
+                    "column_name": "ID",
                     "column_order": 1,
                     "example_values": [
                         "1939"
@@ -1797,13 +1766,13 @@
                     ],
                     "contains": [
                         "carbon black query type"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "range": {
                     "description": "Range of items to return, for e.g. 0-10",
                     "data_type": "string",
                     "order": 2,
-                    "required": false,
                     "default": "0-10"
                 }
             },
@@ -1819,7 +1788,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1830,8 +1800,6 @@
                     ],
                     "example_values": [
                         "process_name:wmiprvse.exe",
-                        "q=cb.urlver=1&%7B%27md5%27%3A%20%27abe660d049e047768d0c4f258bbad8c2%27%7D",
-                        "q=cb.urlver=1&q%3Dcb.urlver%3D1%269",
                         "company_name:Microsoft"
                     ]
                 },
@@ -1875,9 +1843,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         0.2619810104370117,
-                        0.2111611366271973,
-                        0.09917306900024414,
-                        0.06291818618774414,
                         0.1505999565124512
                     ]
                 },
@@ -1959,7 +1924,6 @@
                     "data_type": "string",
                     "example_values": [
                         "52.0",
-                        "52.5",
                         "100.0"
                     ]
                 },
@@ -1990,7 +1954,6 @@
                     "data_type": "string",
                     "example_values": [
                         "98.7",
-                        "98.6",
                         "78.1"
                     ]
                 },
@@ -1999,7 +1962,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         219,
-                        217,
                         10663
                     ]
                 },
@@ -2039,7 +2001,6 @@
                     "data_type": "string",
                     "example_values": [
                         "5.4",
-                        "5.5",
                         "13.0"
                     ]
                 },
@@ -2077,8 +2038,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         10056,
-                        222,
-                        220,
                         13657
                     ]
                 },
@@ -2094,7 +2053,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         197,
-                        195,
                         8821
                     ]
                 },
@@ -2149,8 +2107,6 @@
                     "data_type": "string",
                     "example_values": [
                         "29.1",
-                        "34.5",
-                        "34.8",
                         "21.1"
                     ]
                 },
@@ -2159,7 +2115,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         2927,
-                        95,
                         5032
                     ]
                 },
@@ -2279,7 +2234,7 @@
                     "data_path": "action_result.data.*.facets.process_md5.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7"
+                        "test91ac8d46aaf22ba8bc5c73datest"
                     ],
                     "contains": [
                         "md5"
@@ -2356,7 +2311,6 @@
                     "data_type": "string",
                     "example_values": [
                         "31.4",
-                        "31.7",
                         "45.4"
                     ]
                 },
@@ -2430,10 +2384,8 @@
                     "data_path": "action_result.data.*.highlights.*.ids",
                     "data_type": "string",
                     "example_values": [
-                        "00000013-0000-09d8-01d3-bf3c318f7da2-01623c8edd10",
-                        "C0DF4B15A1317F87B8B6BDD72BE56799",
-                        "959BF475DF91085C6E11F9788DB7630C",
-                        "E065EB559B6719B18E70977A325E6F73"
+                        "test0013-0000-09d8-01d3-bf3c318f7da2-01623c8etest",
+                        "testEB559B6719B18E70977A325Etest"
                     ],
                     "contains": [
                         "md5"
@@ -2444,7 +2396,6 @@
                     "data_type": "string",
                     "example_values": [
                         "C:\\Windows\\sysWOW64\\wbem\\PREPREPREwmiprvse.exePOSTPOSTPOST -secured -Embedding",
-                        "PREPREPRE1POSTPOSTPOST, 0, 0, PREPREPRE1POSTPOSTPOST",
                         "PREPREPREMicrosoftPOSTPOSTPOST Corporation"
                     ],
                     "contains": [
@@ -2463,8 +2414,8 @@
                     "data_path": "action_result.data.*.results.*.alliance_data_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "4fb491ac8d46aaf22ba8bc5c73dabef7",
-                        "718b2f97951b3a5f2968e91de7de74e5"
+                        "test91ac8d46aaf22ba8bc5c73datest",
+                        "test2f97951b3a5f2968e91de7detest"
                     ],
                     "contains": [
                         "md5"
@@ -2474,8 +2425,8 @@
                     "data_path": "action_result.data.*.results.*.alliance_link_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=4fb491ac8d46aaf22ba8bc5c73dabef7",
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=718b2f97951b3a5f2968e91de7de74e5"
+                        "https://testservices.test.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=4fb491ac8d46aaf22ba8bc5c73dabef7",
+                        "https://testservices.test.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=718b2f97951b3a5f2968e91de7de74e5"
                     ],
                     "contains": [
                         "url"
@@ -2540,7 +2491,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Pulse Secure, LLC",
-                        "(unknown)",
                         "Microsoft Corporation"
                     ]
                 },
@@ -2549,7 +2499,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         260056,
-                        69120,
                         797184
                     ]
                 },
@@ -2607,7 +2556,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2016-11-30T20:07:00Z",
-                        "2009-07-14T10:17:00Z",
                         "2017-03-21T08:52:00Z"
                     ]
                 },
@@ -2621,10 +2569,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.results.*.emet_config",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.results.*.emet_count",
@@ -2638,7 +2583,6 @@
                     "data_type": "string",
                     "example_values": [
                         "CB-TEST-01|27",
-                        "DC1|19",
                         "DC2|9"
                     ]
                 },
@@ -2647,7 +2591,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         100031183388672,
-                        99521540980736,
                         97837529038848
                     ]
                 },
@@ -2656,7 +2599,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         845870,
-                        495302,
                         0
                     ]
                 },
@@ -2665,7 +2607,6 @@
                     "data_type": "string",
                     "example_values": [
                         "PulseSetupClientATL ActiveX Control Module",
-                        "ContextH Application",
                         "Microsoft .NET Runtime Object Remoting"
                     ],
                     "contains": [
@@ -2677,7 +2618,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2, 1, 1, 1",
-                        "1, 0, 0, 1",
                         "4.0.30319.36388 built by: FX452RTMLDR"
                     ]
                 },
@@ -2748,7 +2688,6 @@
                     "data_type": "string",
                     "example_values": [
                         "PulseSetupClientATL",
-                        "ContextH",
                         "System.Runtime.Remoting.dll"
                     ],
                     "contains": [
@@ -2776,7 +2715,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-10-30T06:30:18.002Z",
-                        "2018-10-27T15:10:12.351Z",
                         "2017-04-25T17:27:11.523Z"
                     ]
                 },
@@ -2808,9 +2746,8 @@
                         "md5"
                     ],
                     "example_values": [
-                        "1B82C7F4A1A84F0CFFDA588CDB916887",
-                        "718B2F97951B3A5F2968E91DE7DE74E5",
-                        "CDEB051D177B442F1674818D80A7A2CB"
+                        "testC7F4A1A84F0CFFDA588CDB91test",
+                        "test051D177B442F1674818D80A7test"
                     ]
                 },
                 {
@@ -2836,7 +2773,6 @@
                     ],
                     "example_values": [
                         "c:\\program files\\vmware\\vmware tools\\vmware vgauth\\xerces-c_3_1.dll",
-                        "c:\\windows\\syswow64\\en-us\\bwcontexthandler.dll.mui",
                         "c:\\windows\\assembly\\nativeimages_v4.0.30319_32\\mscorlib\\3cca78938d1de34f45ab427f6ee8cbc0\\mscorlib.ni.dll"
                     ]
                 },
@@ -2845,7 +2781,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         260056,
-                        69120,
                         797184
                     ]
                 },
@@ -2854,7 +2789,6 @@
                     "data_type": "string",
                     "example_values": [
                         "PulseSetupClientATL.dll",
-                        "ContextH.exe",
                         "System.Runtime.Remoting.dll"
                     ],
                     "contains": [
@@ -2935,7 +2869,7 @@
                         "md5"
                     ],
                     "example_values": [
-                        "8f4ecbbfe943030acfd9e892b2513ec1"
+                        "testcbbfe943030acfd9e892b251test"
                     ]
                 },
                 {
@@ -2979,7 +2913,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2, 1, 1, 1",
-                        "1, 0, 0, 1",
                         "4.0.30319.36388"
                     ]
                 },
@@ -3012,7 +2945,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2017-08-29T13:04:45.465Z",
-                        "2018-02-16T23:05:27.36Z",
                         "2017-04-12T10:10:48.962Z"
                     ]
                 },
@@ -3044,7 +2976,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2017-08-29T13:04:45.465Z",
-                        "2018-02-16T23:05:27.36Z",
                         "2017-04-12T10:10:48.962Z"
                     ]
                 },
@@ -3070,7 +3001,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2017-08-29T13:10:02.418Z",
-                        "2018-02-16T23:10:02.944Z",
                         "2017-04-12T14:50:01.772Z"
                     ]
                 },
@@ -3096,7 +3026,6 @@
                     "example_values": [
                         "process_name:wmiprvse.exe",
                         "q=cb.urlver=1&%7B%27md5%27%3A%20%27abe660d049e047768d0c4f258bbad8c2%27%7D",
-                        "q=cb.urlver=1&q%3Dcb.urlver%3D1%269",
                         "company_name:Microsoft"
                     ],
                     "contains": [
@@ -3108,8 +3037,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         80642,
-                        222,
-                        220,
                         55073
                     ]
                 },
@@ -3126,8 +3053,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Displaying 10 'process' results of total 80642",
-                        "Displaying 10 'binary' results of total 222",
-                        "Displaying 3 'binary' results of total 220",
                         "Displaying 10 'binary' results of total 55073"
                     ]
                 },
@@ -3167,7 +3092,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3216,7 +3142,7 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "Id",
+                    "column_name": "ID",
                     "column_order": 1,
                     "example_values": [
                         "2"
@@ -3369,7 +3295,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3403,7 +3330,7 @@
                 {
                     "data_path": "action_result.data.*.computer_dns_name",
                     "data_type": "string",
-                    "column_name": "DNS Name",
+                    "column_name": "Dns Name",
                     "column_order": 3,
                     "example_values": [
                         "UHM.corp.contoso.com"
@@ -3445,10 +3372,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.emet_dump_flags",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.emet_exploit_action",
@@ -3481,22 +3405,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.emet_telemetry_path",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.emet_version",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.event_log_flush_time",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.group_id",
@@ -3526,7 +3443,7 @@
                     ],
                     "column_order": 1,
                     "example_values": [
-                        "10.17.1.42"
+                        "122.122.122.122"
                     ]
                 },
                 {
@@ -3564,7 +3481,7 @@
                     "data_path": "action_result.data.*.network_adapters",
                     "data_type": "string",
                     "example_values": [
-                        "10.17.1.42,000c29725527|"
+                        "122.122.122.122,000c29725527|"
                     ]
                 },
                 {
@@ -3593,8 +3510,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.num_eventlog_bytes",
@@ -3756,8 +3672,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.uninstalled",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.uptime",
@@ -3831,13 +3746,14 @@
                     "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
-                    "column_name": "Name/IP",
+                    "column_name": "Name/Ip",
                     "column_order": 0,
                     "contains": [
                         "host name",
@@ -3915,13 +3831,14 @@
                     "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
-                    "column_name": "Hostname/IP",
+                    "column_name": "Hostname/Ip",
                     "column_order": 0,
                     "contains": [
                         "host name",
@@ -3981,8 +3898,7 @@
                         "host name",
                         "ip"
                     ],
-                    "primary": true,
-                    "required": false
+                    "primary": true
                 },
                 "sensor_id": {
                     "data_type": "numeric",
@@ -3991,7 +3907,6 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "required": false,
                     "primary": true
                 }
             },
@@ -4000,7 +3915,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4010,7 +3926,7 @@
                         "host name",
                         "ip"
                     ],
-                    "column_name": "HostName/IP",
+                    "column_name": "Hostname/Ip",
                     "column_order": 1,
                     "example_values": [
                         "CB-LAB"
@@ -4080,8 +3996,7 @@
                         "host name",
                         "ip"
                     ],
-                    "primary": true,
-                    "required": false
+                    "primary": true
                 },
                 "sensor_id": {
                     "data_type": "numeric",
@@ -4090,7 +4005,6 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "required": false,
                     "primary": true
                 }
             },
@@ -4105,7 +4019,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4160,7 +4075,7 @@
                 {
                     "data_path": "action_result.data.*.computer_dns_name",
                     "data_type": "string",
-                    "column_name": "DNS Name",
+                    "column_name": "Dns Name",
                     "column_order": 3,
                     "example_values": [
                         "cb-lab.corp.contoso.com"
@@ -4202,10 +4117,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.emet_dump_flags",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.emet_exploit_action",
@@ -4238,22 +4150,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.emet_telemetry_path",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.emet_version",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.event_log_flush_time",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.group_id",
@@ -4280,7 +4185,7 @@
                     "column_name": "IP Addresses",
                     "column_order": 1,
                     "example_values": [
-                        "10.17.1.203"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -4321,7 +4226,7 @@
                     "data_path": "action_result.data.*.network_adapters",
                     "data_type": "string",
                     "example_values": [
-                        "10.17.1.203,000c29a01027|"
+                        "122.122.122.122,000c29a01027|"
                     ]
                 },
                 {
@@ -4568,7 +4473,6 @@
                         "ip",
                         "host name"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "sensor_id": {
@@ -4578,7 +4482,6 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "required": false,
                     "primary": true
                 }
             },
@@ -4593,7 +4496,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4767,7 +4671,6 @@
                         "ip",
                         "host name"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "sensor_id": {
@@ -4777,7 +4680,6 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "pid": {
@@ -4802,7 +4704,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4812,7 +4715,7 @@
                         "ip",
                         "host name"
                     ],
-                    "column_name": "HostName/IP",
+                    "column_name": "Hostname/Ip",
                     "column_order": 1,
                     "example_values": [
                         "cb-lab"
@@ -4824,7 +4727,7 @@
                     "contains": [
                         "pid"
                     ],
-                    "column_name": "PID",
+                    "column_name": "Pid",
                     "column_order": 2,
                     "example_values": [
                         7540,
@@ -4889,10 +4792,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.result_desc",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_type",
@@ -4904,7 +4804,7 @@
                 {
                     "data_path": "action_result.data.*.sensor_id",
                     "data_type": "numeric",
-                    "column_name": "sensor id",
+                    "column_name": "Sensor ID",
                     "column_order": 0,
                     "contains": [
                         "carbon black sensor id"
@@ -4952,7 +4852,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "",
                         "Status: complete"
                     ]
                 },
@@ -4989,13 +4888,11 @@
                         "md5",
                         "hash"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "ph_0": {
                     "description": "Placeholder",
                     "data_type": "ph",
-                    "required": false,
                     "order": 1
                 },
                 "sensor_id": {
@@ -5005,32 +4902,26 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "file_source": {
                     "description": "Source path of the file",
                     "data_type": "string",
                     "order": 3,
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "offset": {
                     "description": "When source is defined, set the byte offset to start getting the file. Supports a partial get. Optional for getting file from source",
                     "data_type": "numeric",
-                    "order": 4,
-                    "required": false,
-                    "primary": false
+                    "order": 4
                 },
                 "get_count": {
                     "description": "When source is defined, set the number of bytes to grab. Optional for getting file from source",
                     "data_type": "numeric",
-                    "order": 5,
-                    "required": false,
-                    "primary": false
+                    "order": 5
                 }
             },
             "render": {
@@ -5045,7 +4936,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -5073,8 +4965,8 @@
                         "hash"
                     ],
                     "example_values": [
-                        "75E683BC8284D99F998500162BE4CFE2",
-                        "5FB30FE90736C7FC77DE637021B1CE7C"
+                        "test83BC8284D99F998500162BE4test",
+                        "test0FE90736C7FC77DE637021B1test"
                     ]
                 },
                 {
@@ -5098,7 +4990,7 @@
                     "data_path": "action_result.data.*.file_details.alliance_data_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "5fb30fe90736c7fc77de637021b1ce7c"
+                        "test0fe90736c7fc77de637021b1test"
                     ],
                     "contains": [
                         "md5"
@@ -5108,7 +5000,7 @@
                     "data_path": "action_result.data.*.file_details.alliance_link_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=5fb30fe90736c7fc77de637021b1ce7c"
+                        "https://testservices.test.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=5fb30fe90736c7fc77de637021b1ce7c"
                     ],
                     "contains": [
                         "url"
@@ -5295,8 +5187,8 @@
                     "column_name": "MD5",
                     "column_order": 0,
                     "example_values": [
-                        "75E683BC8284D99F998500162BE4CFE2",
-                        "5FB30FE90736C7FC77DE637021B1CE7C"
+                        "test83BC8284D99F998500162BE4test",
+                        "test0FE90736C7FC77DE637021B1test"
                     ]
                 },
                 {
@@ -5434,8 +5326,8 @@
                     "data_path": "action_result.summary.cb_url",
                     "data_type": "string",
                     "example_values": [
-                        "https://192.168.0.245/#/binary/75E683BC8284D99F998500162BE4CFE2",
-                        "https://10.1.16.170/#/binary/5FB30FE90736C7FC77DE637021B1CE7C"
+                        "https://122.122.122.122/#/binary/75E683BC8284D99F998500162BE4CFE2",
+                        "https://122.122.122.122/#/binary/5FB30FE90736C7FC77DE637021B1CE7C"
                     ],
                     "contains": [
                         "url"
@@ -5477,7 +5369,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "File type: pe file\nVault id: 08f57fd06bbd8063d5b828521654225952a8155e\nName: wmiprvse.exe\nCb url: https://192.168.0.245/#/binary/75E683BC8284D99F998500162BE4CFE2",
                         "Vault id: cefbc5c62d7e1f90d250ddcd35bc388a7b01f4d4, Name: C:\\Windows\\CarbonBlack\\Sensor.LOG",
                         "File type: pe file, Vault id: 41c4e1e9abe08b218f5ea60d8ae41a5f523e7534, Name: ping.exe, Cb url: https://10.1.16.170/#/binary/5FB30FE90736C7FC77DE637021B1CE7C"
                     ]
@@ -5519,7 +5410,7 @@
                 "destination": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Destination path of the file (ie: C:\\Windows\\CarbonBlack\\MyFolder)",
+                    "description": "Destination path of the file (ie: C:\\Windows\\CarbonBlack\\MyFolder\\filename)",
                     "primary": true,
                     "required": true,
                     "contains": [
@@ -5545,14 +5436,15 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.destination",
                     "data_type": "string",
                     "example_values": [
-                        "C:\\\\Windows\\\\CarbonBlack\\\\Test1"
+                        "C:\\\\Windows\\\\CarbonBlack\\\\Test1\\\\filename"
                     ],
                     "contains": [
                         "file path"
@@ -5605,7 +5497,7 @@
                     "example_values": [
                         3
                     ],
-                    "column_name": "File Id",
+                    "column_name": "File ID",
                     "column_order": 2
                 },
                 {
@@ -5626,7 +5518,7 @@
                     "data_path": "action_result.data.*.object",
                     "data_type": "string",
                     "example_values": [
-                        "C:\\\\Windows\\\\CarbonBlack\\\\Test1"
+                        "C:\\\\Windows\\\\CarbonBlack\\\\Test1\\\\filename"
                     ],
                     "contains": [
                         "file path"
@@ -5641,10 +5533,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.result_desc",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_type",
@@ -5666,7 +5555,7 @@
                     "example_values": [
                         110
                     ],
-                    "column_name": "Session Id",
+                    "column_name": "Session ID",
                     "column_order": 1
                 },
                 {
@@ -5694,10 +5583,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -5737,15 +5623,13 @@
                     "data_type": "string",
                     "order": 1,
                     "description": "Command to run",
-                    "required": true,
-                    "primary": false
+                    "required": true
                 },
                 "data": {
                     "data_type": "string",
                     "order": 2,
                     "description": "JSON formatted body. Refer to Carbon Black REST API for command parameters",
-                    "required": true,
-                    "primary": false
+                    "required": true
                 }
             },
             "render": {
@@ -5756,7 +5640,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -5844,10 +5729,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.result_desc",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_type",
@@ -5873,7 +5755,7 @@
                         115,
                         286
                     ],
-                    "column_name": "Session Id",
+                    "column_name": "Session ID",
                     "column_order": 1
                 },
                 {
@@ -5901,10 +5783,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -5945,32 +5824,26 @@
                     "order": 1,
                     "description": "Path and command line of the executable",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "file path",
                         "file name"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "output_file": {
                     "data_type": "string",
                     "order": 2,
-                    "description": "File that STDERR and STDOUT will be redirected to",
-                    "required": false,
-                    "primary": false
+                    "description": "File that STDERR and STDOUT will be redirected to"
                 },
                 "working_directory": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "The working directory of the executable",
-                    "required": false,
-                    "primary": false
+                    "description": "The working directory of the executable"
                 },
                 "wait": {
                     "data_type": "boolean",
                     "order": 4,
-                    "description": "Wait for the process to complete execution before reporting the result",
-                    "required": false,
-                    "primary": false
+                    "description": "Wait for the process to complete execution before reporting the result"
                 }
             },
             "render": {
@@ -5981,7 +5854,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -5998,8 +5872,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.output_file",
-                    "data_type": "string",
-                    "contains": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.sensor_id",
@@ -6089,10 +5962,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.result_desc",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_type",
@@ -6118,7 +5988,7 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "column_name": "Sensor Id",
+                    "column_name": "Sensor ID",
                     "column_order": 3
                 },
                 {
@@ -6164,10 +6034,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -6208,17 +6075,15 @@
                     "order": 1,
                     "description": "Path on endpoint to save the resulting memory dump (ie: C:\\Windows\\CarbonBlack\\Folder)",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "compress": {
                     "data_type": "boolean",
                     "order": 2,
-                    "description": "Compress the memory dump",
-                    "required": false,
-                    "primary": false
+                    "description": "Compress the memory dump"
                 }
             },
             "render": {
@@ -6229,7 +6094,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -6338,10 +6204,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.result_desc",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_type",
@@ -6368,7 +6231,7 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "column_name": "Sensor Id",
+                    "column_name": "Sensor ID",
                     "column_order": 3
                 },
                 {
@@ -6405,10 +6268,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -6438,8 +6298,7 @@
                     "data_type": "numeric",
                     "order": 0,
                     "description": "Carbon Black session id",
-                    "required": true,
-                    "primary": false
+                    "required": true
                 }
             },
             "render": {
@@ -6450,7 +6309,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 0
@@ -6461,7 +6321,7 @@
                     "example_values": [
                         104
                     ],
-                    "column_name": "Session Id",
+                    "column_name": "Session ID",
                     "column_order": 2
                 },
                 {
@@ -6530,7 +6390,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -6541,9 +6402,8 @@
                         "hash"
                     ],
                     "example_values": [
-                        "75E683BC8284D99F998500162BE4CFE2",
-                        "c78655bc80301d76ed4fef1c1ea40a7d",
-                        "9bf50324444c46997c2492d505b47f2d"
+                        "test83BC8284D99F998500162BE4test",
+                        "test0324444c46997c2492d505b4test"
                     ]
                 },
                 {
@@ -6560,7 +6420,7 @@
                     "data_path": "action_result.data.*.file_details.alliance_link_srstrust",
                     "data_type": "string",
                     "example_values": [
-                        "https://services.bit9.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=c78655bc80301d76ed4fef1c1ea40a7d"
+                        "https://testservices.test.com/Services/extinfo.aspx?ak=b8b4e631d4884ad1c56f50e4a5ee9279&sg=0313e1735f6cec221b1d686bd4de23ee&md5=c78655bc80301d76ed4fef1c1ea40a7d"
                     ],
                     "contains": [
                         "url"
@@ -6585,7 +6445,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         610,
-                        511,
                         510
                     ]
                 },
@@ -6601,7 +6460,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         489984,
-                        27136,
                         366512
                     ]
                 },
@@ -6645,7 +6503,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-02-12T10:14:00Z",
-                        "2009-07-14T10:17:00Z",
                         "2015-01-30T19:14:00Z"
                     ]
                 },
@@ -6661,7 +6518,6 @@
                     "data_type": "string",
                     "example_values": [
                         "WIN10-TEST-EP|28",
-                        "DC1|19",
                         "WIN7-CLIENT1|15"
                     ]
                 },
@@ -6686,7 +6542,6 @@
                     "data_type": "string",
                     "example_values": [
                         "WMI Provider Host",
-                        "Host Process for Windows Services",
                         "Microsoft Network Realtime Inspection Service"
                     ]
                 },
@@ -6695,7 +6550,6 @@
                     "data_type": "string",
                     "example_values": [
                         "10.0.16299.248 (WinBuild.160101.0800)",
-                        "6.1.7600.16385 (win7_rtm.090713-1255)",
                         "4.7.0205.0"
                     ]
                 },
@@ -6756,7 +6610,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-03-25T06:49:27.776Z",
-                        "2018-10-28T10:01:42.469Z",
                         "2018-10-28T10:06:42.455Z"
                     ]
                 },
@@ -6777,9 +6630,8 @@
                     "column_name": "MD5",
                     "column_order": 0,
                     "example_values": [
-                        "75E683BC8284D99F998500162BE4CFE2",
-                        "C78655BC80301D76ED4FEF1C1EA40A7D",
-                        "9BF50324444C46997C2492D505B47F2D"
+                        "test783BC8284D99F998500162BE4test",
+                        "test0324444C46997C2492D505B4test"
                     ]
                 },
                 {
@@ -6800,7 +6652,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         489984,
-                        27136,
                         366512
                     ]
                 },
@@ -6809,7 +6660,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Wmiprvse.exe",
-                        "svchost.exe",
                         "NisSrv.exe"
                     ],
                     "contains": [
@@ -6835,7 +6685,6 @@
                     "data_type": "string",
                     "example_values": [
                         "10.0.16299.248",
-                        "6.1.7600.16385",
                         "4.7.0205.0"
                     ]
                 },
@@ -6844,7 +6693,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-02-15T01:48:13.517Z",
-                        "2015-11-11T11:05:21.533Z",
                         "2015-07-01T02:12:21.783Z"
                     ]
                 },
@@ -6860,7 +6708,6 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-02-15T01:48:13.517Z",
-                        "2015-11-11T11:05:21.533Z",
                         "2015-07-01T02:12:21.783Z"
                     ]
                 },
@@ -6906,9 +6753,8 @@
                     "data_path": "action_result.summary.cb_url",
                     "data_type": "string",
                     "example_values": [
-                        "https://192.168.0.245/#/binary/75E683BC8284D99F998500162BE4CFE2",
-                        "https://10.1.16.170/#/binary/c78655bc80301d76ed4fef1c1ea40a7d",
-                        "https://10.1.16.170/#/binary/9bf50324444c46997c2492d505b47f2d"
+                        "https://122.122.122.122/#/binary/75E683BC8284D99F998500162BE4CFE2",
+                        "https://122.122.122.122/#/binary/9bf50324444c46997c2492d505b47f2d"
                     ],
                     "contains": [
                         "url"
@@ -6923,7 +6769,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Wmiprvse.exe",
-                        "svchost.exe",
                         "NisSrv.exe"
                     ],
                     "contains": [
@@ -6942,7 +6787,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         489984,
-                        27136,
                         366512
                     ]
                 },
@@ -6961,7 +6805,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Os type: Windows\nSize: 489984\nArchitecture: 64 bit\nName: Wmiprvse.exe\nCb url: https://192.168.0.245/#/binary/75E683BC8284D99F998500162BE4CFE2",
-                        "Os type: Windows, Size: 27136, Architecture: 64 bit, Name: svchost.exe, Cb url: https://10.1.16.170/#/binary/c78655bc80301d76ed4fef1c1ea40a7d",
                         "Os type: Windows, Size: 366512, Architecture: 64 bit, Name: NisSrv.exe, Cb url: https://10.1.16.170/#/binary/9bf50324444c46997c2492d505b47f2d"
                     ]
                 },
@@ -7005,8 +6848,7 @@
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 }
             },
             "render": {
@@ -7020,7 +6862,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -7109,7 +6952,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -7122,7 +6966,7 @@
                     "column_name": "Hash",
                     "column_order": 0,
                     "example_values": [
-                        "180469AE0B239E31DB4C65F02FD70BC1"
+                        "test69AE0B239E31DB4C65F02FD7test"
                     ]
                 },
                 {
@@ -7175,7 +7019,7 @@
                         "ip",
                         "host name"
                     ],
-                    "required": false
+                    "primary": true
                 },
                 "process_name": {
                     "data_type": "string",
@@ -7184,7 +7028,6 @@
                     "contains": [
                         "process name"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "pid": {
@@ -7194,7 +7037,6 @@
                     "contains": [
                         "pid"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "carbonblack_process_id": {
@@ -7204,7 +7046,6 @@
                     "contains": [
                         "carbon black process id"
                     ],
-                    "required": false,
                     "primary": true
                 }
             },
@@ -7219,7 +7060,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -7323,10 +7165,10 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "Ip",
+                    "column_name": "IP",
                     "column_order": 4,
                     "example_values": [
-                        "134.170.53.30"
+                        "122.122.122.122"
                     ]
                 },
                 {
@@ -7335,7 +7177,7 @@
                     "contains": [
                         "pid"
                     ],
-                    "column_name": "PID",
+                    "column_name": "Pid",
                     "column_order": 2,
                     "example_values": [
                         948
@@ -7432,12 +7274,12 @@
                 "container_count": {
                     "data_type": "numeric",
                     "order": 2,
-                    "description": "Maximum number of container records to query for."
+                    "description": "Maximum number of container records to query for"
                 },
                 "artifact_count": {
                     "data_type": "numeric",
                     "order": 3,
-                    "description": "Maximum number of artifact records to query for."
+                    "description": "Maximum number of artifact records to query for"
                 }
             },
             "output": [],
@@ -7461,7 +7303,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -7536,8 +7379,8 @@
                     "data_path": "action_result.data.*.server_token",
                     "data_type": "string",
                     "example_values": [
-                        "asdflSADFSDAFnkjdsalkj234nadsfdj",
-                        "v3FHJ9Q06JitWj1KV9lJZYI1CBPuxt8v"
+                        "testtestDFSDAFnkjdsalkj234nadtest",
+                        "testtest6JitWj1KV9lJZYI1CBPutest"
                     ]
                 },
                 {
@@ -7552,7 +7395,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "",
                         "License valid: True"
                     ]
                 },
