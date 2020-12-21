@@ -191,7 +191,10 @@
                 },
                 {
                     "data_path": "action_result.summary.total_breaches",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -350,7 +353,10 @@
                 },
                 {
                     "data_path": "action_result.summary.total_breaches",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
