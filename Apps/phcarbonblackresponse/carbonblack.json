@@ -80,6 +80,7 @@
                     "contains": [
                         "carbon black query type"
                     ],
+                    "required": true,
                     "primary": true
                 },
                 "range": {
@@ -816,9 +817,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.process.facets.day_of_week.*.name",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
@@ -914,9 +915,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.process.facets.hour_of_day.*.name",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
-                        "0"
+                        0
                     ]
                 },
                 {
@@ -3331,7 +3332,7 @@
                     "data_path": "action_result.data.*.computer_dns_name",
                     "data_type": "string",
                     "column_name": "Dns Name",
-                    "column_order": 3,
+                    "column_order": 4,
                     "example_values": [
                         "UHM.corp.contoso.com"
                     ]
@@ -3426,7 +3427,7 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "column_name": "Sensor ID",
-                    "column_order": 5,
+                    "column_order": 8,
                     "contains": [
                         "carbon black sensor id"
                     ],
@@ -3488,7 +3489,7 @@
                     "data_path": "action_result.data.*.network_isolation_enabled",
                     "data_type": "boolean",
                     "column_name": "Isolation Enabled?",
-                    "column_order": 3,
+                    "column_order": 7,
                     "example_values": [
                         false,
                         true
@@ -3530,7 +3531,7 @@
                     "data_path": "action_result.data.*.os_environment_display_string",
                     "data_type": "string",
                     "column_name": "OS",
-                    "column_order": 4,
+                    "column_order": 6,
                     "example_values": [
                         "Windows Server 2008 R2 Server Enterprise Service Pack 1, 64-bit"
                     ]
@@ -3565,9 +3566,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.power_state",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "example_values": [
-                        0
+                        "0"
                     ]
                 },
                 {
@@ -3617,7 +3618,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "Online"
                     ]
@@ -3642,7 +3643,7 @@
                     "data_path": "action_result.data.*.supports_isolation",
                     "data_type": "boolean",
                     "column_name": "Supports Isolation?",
-                    "column_order": 4,
+                    "column_order": 5,
                     "example_values": [
                         false,
                         true
@@ -3744,7 +3745,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
@@ -3829,7 +3830,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
@@ -4076,7 +4077,7 @@
                     "data_path": "action_result.data.*.computer_dns_name",
                     "data_type": "string",
                     "column_name": "Dns Name",
-                    "column_order": 3,
+                    "column_order": 4,
                     "example_values": [
                         "cb-lab.corp.contoso.com"
                     ]
@@ -4174,7 +4175,7 @@
                     "contains": [
                         "carbon black sensor id"
                     ],
-                    "column_order": 5,
+                    "column_order": 8,
                     "example_values": [
                         27
                     ]
@@ -4233,7 +4234,7 @@
                     "data_path": "action_result.data.*.network_isolation_enabled",
                     "data_type": "boolean",
                     "column_name": "Isolation Enabled?",
-                    "column_order": 3,
+                    "column_order": 5,
                     "example_values": [
                         false,
                         true
@@ -4275,7 +4276,7 @@
                     "data_path": "action_result.data.*.os_environment_display_string",
                     "data_type": "string",
                     "column_name": "OS",
-                    "column_order": 4,
+                    "column_order": 6,
                     "example_values": [
                         "Windows 10 Enterprise, 64-bit"
                     ]
@@ -4362,7 +4363,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "Online"
                     ]
@@ -4387,7 +4388,7 @@
                     "data_path": "action_result.data.*.supports_isolation",
                     "data_type": "boolean",
                     "column_name": "Supports Isolation?",
-                    "column_order": 4,
+                    "column_order": 7,
                     "example_values": [
                         false,
                         true
@@ -5718,6 +5719,69 @@
                     "contains": [
                         "file path",
                         "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.command_line",
+                    "data_type": "string",
+                    "example_value": [
+                        "/usr/lib/systemd/systemd --switched-root --system --deserialize 22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.create_time",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1607411840
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.parent",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.parent_guid",
+                    "data_type": "string",
+                    "example_value": [
+                        "0000001e-0000-0000-0000-000000000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.path",
+                    "data_type": "string",
+                    "example_value": [
+                        "/usr/lib/systemd/systemd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.pid",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.proc_guid",
+                    "data_type": "string",
+                    "example_value": [
+                        "0000001e-0000-0001-01d6-cd322a8dc000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.sid",
+                    "data_type": "string",
+                    "example_value": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.username",
+                    "data_type": "string",
+                    "example_value": [
+                        "root"
                     ]
                 },
                 {
