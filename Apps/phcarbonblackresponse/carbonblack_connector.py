@@ -30,7 +30,7 @@ import magic
 import socket
 import struct
 import ctypes
-from bs4 import BeautifulSoup, UnicodeDammit
+from bs4 import BeautifulSoup
 import datetime
 
 
@@ -78,7 +78,6 @@ class CarbonblackConnector(BaseConnector):
         self._base_url = None
         self._api_token = None
         self._state_file_path = None
-        self._python_version = None
         self._state = {}
 
     def finalize(self):
@@ -86,12 +85,6 @@ class CarbonblackConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def initialize(self):
-
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR,
-                                   "Error occurred while getting the Phantom server's Python major version.")
 
         self._state = self.load_state()
         config = self.get_config()
