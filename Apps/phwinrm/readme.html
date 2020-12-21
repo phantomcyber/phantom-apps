@@ -11,6 +11,14 @@ Without additional configuration on the proxy server, it will not be possible to
 If authentication is set to basic, then it will still work, however.
 </p>
 <p>
+    To use the proxy settings you need to add the proxy server as an environment variable. You can add an environment variable using the below command.
+    <ul>
+        <li>For Linux/Mac: <code>export HTTP_PROXY="http://&lt;proxy server&gt;:&lt;proxy port&gt;/"</code></li>
+        <li>For Windows powershell: <code>$env:HTTP_PROXY="http://&lt;proxy server&gt;:&lt;proxy port&gt;/"</code></li>
+    </ul>
+    If the user tries to add any invalid proxy URL, the proxy will be bypassed and won't affect the app's connectivity.
+</p>
+<p>
 To use this app you must have the Windows Remote Management service running on the endpoint you wish to connect to.
 For help regarding this process, consult this link: <a href="https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx" target="_blank">https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx</a>
 </p>
