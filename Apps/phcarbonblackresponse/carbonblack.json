@@ -741,7 +741,7 @@
                     "data_path": "action_result.data.*.binary.results.*.signed",
                     "data_type": "string",
                     "column_name": "Signed",
-                    "column_order": 1,
+                    "column_order": 0,
                     "example_values": [
                         "Signed"
                     ]
@@ -3928,7 +3928,7 @@
                         "ip"
                     ],
                     "column_name": "Hostname/Ip",
-                    "column_order": 1,
+                    "column_order": 0,
                     "example_values": [
                         "CB-LAB"
                     ]
