@@ -1,6 +1,6 @@
 <!--
     File: readme.html
-    Copyright (c) 2018 Splunk Inc.
+    Copyright (c) 2018-2020 Splunk Inc.
     
     Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -11,8 +11,22 @@ Without additional configuration on the proxy server, it will not be possible to
 If authentication is set to basic, then it will still work, however.
 </p>
 <p>
-In order to use this app you must have the Windows Remote Management service running on the endpoint you wish to connect to.
-For help regarding this process, consult this link: <a href="https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx">https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx</a>
+    To use the proxy settings you need to add the proxy server as an environment variable. You can add an environment variable using the below command.
+    <ul>
+        <li>For Linux/Mac: <code>export HTTP_PROXY="http://&lt;proxy server&gt;:&lt;proxy port&gt;/"</code></li>
+        <li>For Windows powershell: <code>$env:HTTP_PROXY="http://&lt;proxy server&gt;:&lt;proxy port&gt;/"</code></li>
+    </ul>
+    If the user tries to add any invalid proxy URL, the proxy will be bypassed and won't affect the app's connectivity.
+</p>
+<p>
+To use this app you must have the Windows Remote Management service running on the endpoint you wish to connect to.
+For help regarding this process, consult this link: <a href="https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx" target="_blank">https://msdn.microsoft.com/en-us/library/aa384372(v=vs.85).aspx</a>
+</p>
+<p>
+WinRM Ports Requirements (Based on Standard Guidelines of <a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml" target="_blank">IANA ORG</a>)
+<ul>
+    <li>WinRM(service) TCP(transport layer protocol) port for Windows Remote Management Service - 47001</li>
+</ul>
 </p>
 <p>
 The protocol and port can be specified with the IP/hostname. For example, if using HTTPS on port 5986, the IP/Hostname should be <b>https://192.168.10.21:5986</b>.
@@ -53,7 +67,7 @@ a Response object (from the pywinrm module), and it is expected to return a bool
 (phantom.APP_SUCCESS and phantom.APP_ERROR are equivalent to True and False).
 </p>
 <p>
-Here is an example of a parser which will extract all the IPs from the output, and fail if there
+Here is an example of a parser that will extract all the IPs from the output, and fail if there
 is a non-zero status code.
 </p>
 <pre class="shell">
@@ -101,7 +115,7 @@ For more information on datapaths and the ActionResult object, refer to the Phan
 </p>
 <p>
 Both the <b>run script</b> and <b>run command</b> actions also support running commands asynchronously.
-By default, the app will wait for these actions to finish. In the case of starting a long running job,
+By default, the app will wait for these actions to finish. In the case of starting a long running job
 or some other command which you want to start but don't care for the output, then you can check the <b>async</b> parameter.
 After the command starts, it will return a <b>command_id</b> and <b>shell_id</b>, which you can optionally use to retrieve the
 output of that command at a later time.
