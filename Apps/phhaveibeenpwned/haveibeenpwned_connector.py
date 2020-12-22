@@ -1,5 +1,5 @@
 # File: haveibeenpwned_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -7,6 +7,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+import sys
 
 # THIS Connector imports
 from haveibeenpwned_consts import *
@@ -16,14 +17,14 @@ import simplejson as json
 
 
 class HaveIBeenPwnedConnector(BaseConnector):
-    ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
-    ACTION_ID_LOOKUP_EMAIL = "lookup_email"
 
     def __init__(self):
         super(HaveIBeenPwnedConnector, self).__init__()
 
     def initialize(self):
         config = self.get_config()
+        self._python_version = int(sys.version_info[0])
+
         self._api_key = config[HAVEIBEENPWNED_CONFIG_API_KEY]
 
         return phantom.APP_SUCCESS
@@ -51,6 +52,23 @@ class HaveIBeenPwnedConnector(BaseConnector):
             return phantom.APP_ERROR, HAVEIBEENPWNED_REST_CALL_JSON_FAILURE
 
         return phantom.APP_SUCCESS, resp_json
+
+    def _handle_test_connectivity(self, params):
+        action_result = self.add_action_result(ActionResult(dict(params)))
+
+        self.save_progress("Connecting to the Have I Been Pwned server")
+
+        endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=TEST_CONNECTIVITY_EMAIL)
+
+        ret_val, response = self._make_rest_call(endpoint, truncate=True)
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Test Connectivity Failed. Error: {0}".format(response))
+            return action_result.get_status()
+
+        self.save_progress("Login to Have I Been Pwned server is successful")
+        self.save_progress("Test Connectivity passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_domain(self, params):
         action_result = self.add_action_result(ActionResult(dict(params)))
@@ -80,7 +98,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(params)))
 
         email = params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL]
-        truncate = params[HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE] == "True"
+        truncate = params.get(HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE, "False") == "True"
         endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
@@ -103,10 +121,12 @@ class HaveIBeenPwnedConnector(BaseConnector):
 
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
-        if (action == self.ACTION_ID_LOOKUP_DOMAIN):
+        if (action == ACTION_ID_LOOKUP_DOMAIN):
             ret_val = self._lookup_domain(params)
-        elif (action == self.ACTION_ID_LOOKUP_EMAIL):
+        elif (action == ACTION_ID_LOOKUP_EMAIL):
             ret_val = self._lookup_email(params)
+        elif (action == ACTION_ID_TEST_CONNECTIVITY):
+            ret_val = self._handle_test_connectivity(params)
 
         return ret_val
 
@@ -118,7 +138,6 @@ if __name__ == '__main__':
         """
 
     # Imports
-    import sys
     import pudb
 
     # Breakpoint at runtime
@@ -141,6 +160,6 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
         # Dump the return value
-        print ret_val
+        print(ret_val)
 
     exit(0)
