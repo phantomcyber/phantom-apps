@@ -37,7 +37,27 @@ class VisualpingConnector(BaseConnector):
         # Variable to hold a base_url in case the app makes REST calls
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
-        self._base_url = None
+        # self._base_url = None
+
+    def initialize(self):
+        # Load the state in initialize, use it to store data
+        # that needs to be accessed across actions
+        self._state = self.load_state()
+
+        # get the asset config
+        config = self.get_config()
+
+        self._base_url = config.get('base_url')
+
+        # basic auth
+        self.username = config['username']
+        self.password = config['password']
+        if self.username and self.password:
+            self._auth = (self.username, self.password)
+        else:
+            self._auth = None
+
+        return phantom.APP_SUCCESS
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -143,7 +163,7 @@ class VisualpingConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
+                auth=self._auth,  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
@@ -168,23 +188,56 @@ class VisualpingConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
         # make rest call
         ret_val, response = self._make_rest_call(
-            '/endpoint', action_result, params=None, headers=None
+            '/api/status/health', action_result, params=None, headers=None
         )
+
+        # Return success
+        if 'healthy' in str(response):
+            self.save_progress("Test Connectivity Passed")
+            return action_result.set_status(phantom.APP_SUCCESS)
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed.")
-            # return action_result.get_status()
-
-        # Return success
-        # self.save_progress("Test Connectivity Passed")
-        # return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+            self.save_progress(str(response))
+            return action_result.get_status()
 
     def _handle_list_jobs(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # make rest call
+        ret_val, response = self._make_rest_call(
+            '/api/job/list', action_result, params=None, headers=None
+        )
+
+        if phantom.is_fail(ret_val):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+
+        # Add the response into the data section
+        action_result.add_data(response)
+        jobs = response['jobs']
+        active_jobs = jobs['active']
+        # action_result.add_data(active_jobs)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['active_jobs'] = active_jobs
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_show_result(self, param):
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -195,14 +248,57 @@ class VisualpingConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
-        # required_parameter = param['required_parameter']
+        id = param['id']
 
         # Optional values should use the .get() function
         # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # make rest call
         ret_val, response = self._make_rest_call(
-            '/api/job/list', action_result, params=None, headers=None
+            '/api/job/lastresult/{0}'.format(id), action_result, params=None, headers=None
+        )
+
+        if phantom.is_fail(ret_val):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # for now the return is commented out, but after implementation, return from here
+            # return action_result.get_status()
+            pass
+
+        # Now post process the data,  uncomment code as you deem fit
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        # summary = action_result.update_summary({})
+        # summary['num_data'] = len(action_result['data'])
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        # return action_result.set_status(phantom.APP_SUCCESS)
+
+        # For now return Error with a message, in case of success we don't set the message, but use the summary
+        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+
+    def _handle_get_images(self, param):
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Access action parameters passed in the 'param' dictionary
+
+        # Required values can be accessed directly
+        id = param['id']
+
+        # Optional values should use the .get() function
+        # optional_parameter = param.get('optional_parameter', 'default_value')
+
+        # make rest call
+        ret_val, response = self._make_rest_call(
+            '/api/job/lastimage/{0}'.format(id), action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
@@ -241,28 +337,13 @@ class VisualpingConnector(BaseConnector):
         elif action_id == 'list_jobs':
             ret_val = self._handle_list_jobs(param)
 
+        elif action_id == 'show_result':
+            ret_val = self._handle_show_result(param)
+
+        elif action_id == 'get_images':
+            ret_val = self._handle_get_images(param)
+
         return ret_val
-
-    def initialize(self):
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
-        self._state = self.load_state()
-
-        # get the asset config
-        config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
-
-        return phantom.APP_SUCCESS
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
