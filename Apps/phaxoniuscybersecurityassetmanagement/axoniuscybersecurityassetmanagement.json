@@ -420,6 +420,10 @@
                 "mac": {
                     "description": "The MAC address of the Axonius asset",
                     "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": true,
                     "required": true,
                     "order": 0
                 },
@@ -433,7 +437,10 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.mac",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",

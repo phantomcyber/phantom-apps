@@ -31,8 +31,7 @@ def get_str_arg(param: dict, key: str, required: bool = False, default: str = ""
     return value
 
 
-def get_int_arg(param: dict, key: str, required: bool = False, default: Optional[Union[str, int]] = None
-) -> int:
+def get_int_arg(param: dict, key: str, required: bool = False, default: Optional[Union[str, int]] = None) -> int:
     """Get a key from a command arg and convert it into an int."""
     param_val = param.get(key, default)
 
@@ -367,7 +366,7 @@ class AxoniusConnector(BaseConnector):
 
         for asset in assets:
             action_result.add_data(parse_asset(asset=asset))
-        
+
         summary: dict = action_result.update_summary({})
         summary[f"total_{obj_type}"] = action_result.get_data_size()
 
