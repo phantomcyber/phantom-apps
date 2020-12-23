@@ -11,13 +11,13 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2020 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2019-06-07T17:52:30.000000Z",
+    "utctime_updated": "2020-12-22T12:31:35.000000Z",
     "package_name": "phantom_awsiam",
     "python_version": "3",
     "main_module": "awsiam_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "Cloud, February 25 2020"
+        "Cloud, December 15 2020"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -102,6 +102,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.AttachedPolicies.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "abcd1234-12ab-ab12-ab12-abcdef123456"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Groups.*.Arn",
                     "data_type": "string",
                     "example_values": [
@@ -142,6 +149,13 @@
                     ],
                     "contains": [
                         "aws iam group path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Groups.*.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "abcd1234-ab12-12ab-ab12-abcdef123456"
                     ]
                 },
                 {
@@ -198,7 +212,6 @@
                     "description": "Group path in AWS IAM",
                     "data_type": "string",
                     "default": "/",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws iam group path"
@@ -333,7 +346,6 @@
                     "description": "Path of the user",
                     "data_type": "string",
                     "default": "/",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws iam user path"
@@ -343,7 +355,6 @@
                 "group_name": {
                     "description": "Group name",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws iam group name"
@@ -617,7 +628,7 @@
             "action": "add user",
             "identifier": "add_user",
             "description": "Add user to a group",
-            "type": "generic",
+            "type": "correct",
             "undo": "remove user",
             "read_only": false,
             "parameters": {
@@ -723,7 +734,7 @@
             "action": "remove user",
             "identifier": "remove_user",
             "description": "Remove user from a group",
-            "type": "generic",
+            "type": "contain",
             "undo": "add user",
             "read_only": false,
             "parameters": {
@@ -829,7 +840,7 @@
             "action": "delete user",
             "identifier": "delete_user",
             "description": "Delete user from AWS IAM account",
-            "verbose": "Delete user and user profile as well as all its associations with groups, policies, and access keys from AWS IAM account",
+            "verbose": "Delete user and user profile as well as all its associations with groups, policies, and access keys from AWS IAM account.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1014,7 +1025,7 @@
             "action": "enable user",
             "identifier": "enable_user",
             "description": "Enable login profile and access keys of a user",
-            "verbose": "If enable access keys parameter is marked false, only login profile is enabled. By default both are enabled. <p class=\"warn\">Please exercise caution when using this action. The password may be kept and logged in clear text.</p>",
+            "verbose": "If enable access keys parameter is marked false, only login profile is enabled. By default both are enabled. If this action is being executed on an already enabled user then other parameters won't affect the action run. <p class=\"warn\">Please exercise caution when using this action. The password may be kept and logged in clear text.</p>",
             "type": "correct",
             "undo": "disable user",
             "read_only": false,
@@ -1034,7 +1045,6 @@
                     "description": "Password",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
                 "enable_access_keys": {
@@ -1069,7 +1079,7 @@
                     "data_path": "action_result.parameter.password",
                     "data_type": "string",
                     "example_values": [
-                        ""
+                        "testpassword"
                     ]
                 },
                 {
@@ -1184,7 +1194,6 @@
                     "description": "Path to the role",
                     "data_type": "string",
                     "default": "/",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws iam role path"
@@ -1342,7 +1351,7 @@
             "action": "remove role",
             "identifier": "remove_role",
             "description": "Remove role from AWS IAM account",
-            "verbose": "Remove role and role instance profiles along with associations of role with all attached policies",
+            "verbose": "Remove role and role instance profiles along with associations of role with all attached policies.",
             "type": "generic",
             "undo": "add role",
             "read_only": false,
@@ -1425,7 +1434,7 @@
             "action": "attach policy",
             "identifier": "attach_policy",
             "description": "Attach managed policy to a role",
-            "type": "generic",
+            "type": "correct",
             "undo": "detach policy",
             "read_only": false,
             "parameters": {
@@ -1529,7 +1538,7 @@
             "action": "detach policy",
             "identifier": "detach_policy",
             "description": "Detach managed policy from a role",
-            "type": "generic",
+            "type": "contain",
             "undo": "attach policy",
             "read_only": false,
             "parameters": {
@@ -1633,7 +1642,7 @@
             "action": "assign policy",
             "identifier": "assign_policy",
             "description": "Assign managed policy to the user",
-            "type": "generic",
+            "type": "correct",
             "undo": "remove policy",
             "read_only": false,
             "parameters": {
@@ -1739,7 +1748,7 @@
             "action": "remove policy",
             "identifier": "remove_policy",
             "description": "Remove managed policy association with the user",
-            "type": "generic",
+            "type": "contain",
             "undo": "assign policy",
             "read_only": false,
             "parameters": {
