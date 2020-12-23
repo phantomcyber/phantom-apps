@@ -73,6 +73,10 @@ class VisualpingConnector(BaseConnector):
         # An html response, treat it like an error
         status_code = response.status_code
 
+        # Assume it's the /api/job/lastresult endpoint
+        if status_code == 200:
+            return self._process_json_response(response, action_result)
+
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
@@ -217,11 +221,7 @@ class VisualpingConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -245,40 +245,35 @@ class VisualpingConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
         # Required values can be accessed directly
         id = param['id']
 
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
-
         # make rest call
+        # for some reason the /api/job/lastresult returns a ContentType: text/html json response
         ret_val, response = self._make_rest_call(
             '/api/job/lastresult/{0}'.format(id), action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            # return action_result.get_status()
-            pass
+            return action_result.get_status()
 
         # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
-
+        self.debug_print('*******************************************************************************************************************************************************')
+        self.debug_print('response')
+        self.debug_print(response)
         # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
+        summary = action_result.update_summary({})
+        summary['url'] = response['url']
+        summary['description'] = response['description']
+        summary['lastCheck'] = response['lastcheck']
+        summary['percentDifference'] = response['PercentDifference']
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_images(self, param):
         # Implement the handler here
