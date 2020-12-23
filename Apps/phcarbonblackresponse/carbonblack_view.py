@@ -145,7 +145,6 @@ def get_file_detail_ctx(result):
 
     if (message) and ('Not Found' in message):
         ctx_result['message'] = message
-        print(message)
 
     data = result.get_data()
 
@@ -192,6 +191,5 @@ def display_file_details(provides, all_app_runs, context):
             if (not ctx_result):
                 continue
             results.append(ctx_result)
-    print(context)
 
     return 'cb_file_details.html'
