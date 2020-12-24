@@ -23,6 +23,10 @@ import os
 import hashlib
 import pytz
 import sys
+try:
+    from urllib import unquote
+except:
+    from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -81,7 +85,7 @@ class FireeyeEtpConnector(BaseConnector):
             error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            error_msg = error_msg
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
@@ -121,7 +125,7 @@ class FireeyeEtpConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
 
             if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+                return action_result.set_status(phantom.APP_ERROR, POSITIVE_INTEGER_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -152,6 +156,7 @@ class FireeyeEtpConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = unquote(message)
 
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -470,10 +475,13 @@ class FireeyeEtpConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         # Check and calculate the timestamp to filter by
-        if num_days:
-            timestamp = datetime.utcnow() - timedelta(days=num_days)
-            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
-            data['fromLastModifiedOn'] = date
+        try:
+            if num_days:
+                timestamp = datetime.utcnow() - timedelta(days=num_days)
+                date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
+                data['fromLastModifiedOn'] = date
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'num_days' action parameter"), None
 
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
@@ -834,7 +842,7 @@ class FireeyeEtpConnector(BaseConnector):
             data['action_override'] = action_override_param
 
             if not move_to_param:
-                action_result.set_status(phantom.APP_ERROR, "If the parameter action_override is enabled the move_to parameter also needs to be filled out")
+                action_result.set_status(phantom.APP_ERROR, "If the parameter 'action_override' is enabled the 'move_to' parameter also needs to be filled out")
                 return action_result.get_status()
             else:
                 data['move_to'] = move_to_param
@@ -1149,7 +1157,7 @@ class FireeyeEtpConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, "The maximum containers is invalid")
 
-            date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000") - timedelta(minutes=15)
+            date = (timestamp - timedelta(minutes=15)).strftime("%Y-%m-%dT%H:%M:%S.000")
             data['fromLastModifiedOn'] = date
 
         # If it is a scheduled poll, ingest from last_ingestion_time

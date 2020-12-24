@@ -29,7 +29,8 @@ TYPE_ERR_MSG = "Error occurred while connecting to the Fireeye ETP Server. Pleas
 
 # Constants relating to '_validate_integer'
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
-NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
+NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {}"
+POSITIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
 SIZE_KEY = "'size' action parameter"
 LEGACY_ID_KEY = "'legacy_id' action parameter"
 NUM_DAYS_KEY = "'num_days' action parameter"
