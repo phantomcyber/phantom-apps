@@ -1,3 +1,8 @@
+# File: cybereason_poller.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+
 import datetime
 import requests
 import hashlib
@@ -9,6 +14,7 @@ import phantom.app as phantom
 from phantom.action_result import ActionResult
 
 from cybereason_session import CybereasonSession
+from cybereason_consts import *
 
 
 class CybereasonPoller:
@@ -25,11 +31,18 @@ class CybereasonPoller:
             state = connector.get_state()
             current_time = datetime.datetime.now()
             is_first_poll = state.get("is_first_poll", True)
-            if (is_first_poll):
-                malop_historical_days = int(config["malop_historical_days"])
+
+            ret_val, malop_historical_days = connector._validate_integer(action_result, config["malop_historical_days"], MALOP_HISTORICAL_DAYS_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            ret_val, malware_historical_days = connector._validate_integer(action_result, config["malware_historical_days"], MALWARE_HISTORICAL_DAYS_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if is_first_poll:
                 connector.save_progress("This is a first time poll. We will poll for malops from the last {days} days", days=malop_historical_days)
                 malop_start_time = current_time + datetime.timedelta(days=-malop_historical_days)
-                malware_historical_days = int(config["malware_historical_days"])
                 connector.save_progress("This is a first time poll. We will poll for malware from the last {days} days", days=malware_historical_days)
                 malware_millisec_since_last_poll = malware_historical_days * 60 * 60 * 24 * 1000
                 state["is_first_poll"] = False
@@ -49,9 +62,11 @@ class CybereasonPoller:
             success = success & self._fetch_and_ingest_malops(connector, config, malop_start_time_microsec_timestamp, container_count)
             success = success & self._fetch_and_ingest_malwares(connector, config, malware_millisec_since_last_poll, container_count)
         except Exception as e:
-            connector.save_progress("Exception when polling")
-            connector.save_progress(str(e))
-            connector.save_progress(traceback.format_exc())
+            success = False
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Exception when polling")
+            connector.debug_print(err)
+            connector.debug_print(traceback.format_exc())
         finally:
             connector.save_state(state)
 
@@ -59,7 +74,7 @@ class CybereasonPoller:
             connector.save_progress("Successfully completed polling for Malop and Malware events")
             return action_result.set_status(phantom.APP_SUCCESS, "Malop and Malware ingestion completed successfully")
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error when polling for Malop and Malware. See logs for details.")
+            return action_result.set_status(phantom.APP_ERROR, "Error when polling for Malop and Malware. Please refer the logs for more details")
 
     def _fetch_and_ingest_malops(self, connector, config, start_time_microsec_timestamp, container_count):
         # Fetch Malops
@@ -79,14 +94,14 @@ class CybereasonPoller:
             if ingested_count % show_progress_after == 0:
                 percent_complete = round(float(ingested_count) / len(malop_ids) * 100)
                 connector.save_progress("{percent_complete}% complete", percent_complete=percent_complete)
-        if (percent_complete != 100):
+        if percent_complete != 100:
             connector.save_progress("100% complete")
         return success
 
     def _fetch_and_ingest_malwares(self, connector, config, malware_millisec_since_last_poll, container_count):
         # Fetch Malwares
         success = True
-        malwares_array = self._get_malware(connector, config, malware_millisec_since_last_poll, container_count)
+        malwares_array = self._get_malware(connector, malware_millisec_since_last_poll, container_count)
         connector.save_progress("Fetched {number_of_malwares} malwares from Cybereason console", number_of_malwares=len(malwares_array))
 
         # Ingest malware
@@ -100,7 +115,7 @@ class CybereasonPoller:
             if ingested_count % show_progress_after == 0:
                 percent_complete = round(float(ingested_count) / len(malwares_array) * 100)
                 connector.save_progress("{percent_complete}% complete", percent_complete=percent_complete)
-        if (percent_complete != 100):
+        if percent_complete != 100:
             connector.save_progress("100% complete")
         return success
 
@@ -109,14 +124,14 @@ class CybereasonPoller:
         feature_description = decision_feature  # Default to the name of the decision feature
         try:
             if not self.feature_translation:
-                url = connector._base_url + "/rest/translate/features/all"
+                url = "{0}/rest/translate/features/all".format(connector._base_url)
                 self.feature_translation = self.cr_session.get(url).json()
             # At this point we are guaranteed to have a feature translation
             (decision_feature_type, decision_feature_key) = self._get_decision_feature_details(decision_feature)
             feature_description = self.feature_translation[decision_feature_type][decision_feature_key]["translatedName"]
         except Exception as e:
-            connector.debug_print("Warning: Exception when getting feature translation table. " + str(e))
-            pass
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Warning: Exception when getting feature translation table. {0}".format(err))
 
         return feature_description
 
@@ -127,8 +142,7 @@ class CybereasonPoller:
         return (decision_feature_type, decision_feature_key)
 
     def _get_sensor_details(self, connector, machine_name):
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/sensors/query"
+        url = "{0}/rest/sensors/query".format(connector._base_url)
         query = {
             "filters": [
                 {
@@ -151,17 +165,20 @@ class CybereasonPoller:
         sensors = []
         hasMoreSensors = True
         iterCount = 0
-        while hasMoreSensors and iterCount < 100:
-            response = self.cr_session.post(url=url, json=query, headers=headers)
-            result = response.json()
-            sensors = sensors + result["sensors"]
-            hasMoreSensors = result["hasMoreResults"]
+        try:
+            while hasMoreSensors and iterCount < 100:
+                response = self.cr_session.post(url=url, json=query, headers=connector._headers)
+                result = response.json()
+                sensors = sensors + result["sensors"]
+                hasMoreSensors = result["hasMoreResults"]
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Unable to fetch sensor details: {0}".format(err))
 
         return sensors
 
     def _get_process_details(self, connector, malop_id):
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/visualsearch/query/simple"
+        url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
         query = {
             "queryPath": [
                 {
@@ -196,19 +213,19 @@ class CybereasonPoller:
                 "elementDisplayName"
             ]
         }
-        process_details = None
+        process_details = {}
         try:
-            res = self.cr_session.post(url=url, json=query, headers=headers)
+            res = self.cr_session.post(url=url, json=query, headers=connector._headers)
             process_details = res.json()["data"]["resultIdToElementDataMap"]
-        except:
-            pass
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Error occurred while fetching process details. {}".format(err))
 
         return process_details
 
     def _get_connection_details_for_malop(self, connector, malop_id):
-        connector.debug_print("Getting connection details for malop " + str(malop_id))
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/visualsearch/query/simple"
+        connector.debug_print("Getting connection details for malop {0}".format(str(malop_id)))
+        url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
         query = {
             "queryPath": [
                 {
@@ -251,13 +268,19 @@ class CybereasonPoller:
                 "elementDisplayName"
             ]
         }
-        res = self.cr_session.post(url=url, json=query, headers=headers)
-        return res.json()["data"]["resultIdToElementDataMap"]
+        connection_details = {}
+        try:
+            res = self.cr_session.post(url=url, json=query, headers=connector._headers)
+            connection_details = res.json()["data"]["resultIdToElementDataMap"]
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Error occurred while fetching connection details. {}".format(err))
+
+        return connection_details
 
     def _get_user_details_for_malop(self, connector, malop_id):
-        connector.debug_print("Getting user details for malop " + str(malop_id))
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/visualsearch/query/simple"
+        connector.debug_print("Getting user details for malop {0}".format(str(malop_id)))
+        url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
         query = {
             "queryPath": [
                 {
@@ -294,16 +317,23 @@ class CybereasonPoller:
                 "elementDisplayName"
             ]
         }
-        res = self.cr_session.post(url=url, json=query, headers=headers)
-        return res.json()["data"]["resultIdToElementDataMap"]
+        user_details = {}
+        try:
+            res = self.cr_session.post(url=url, json=query, headers=connector._headers)
+            user_details = res.json()["data"]["resultIdToElementDataMap"]
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Error occurred while fetching user details. {}".format(err))
+
+        return user_details
 
     def _ingest_malop(self, connector, config, malop_id, malop_data):
         success = phantom.APP_ERROR
         container = self._get_container_dict_for_malop(connector, config, malop_id, malop_data)
-        existing_container_id = self._does_container_exist_for_malop_malware(connector, config, malop_id)
+        existing_container_id = self._does_container_exist_for_malop_malware(connector, malop_id)
         if not existing_container_id:
             # Container does not exist. Go ahead and save it
-            connector.debug_print("Saving container for Malop with id " + malop_id)
+            connector.debug_print("Saving container for Malop with id {0}".format(malop_id))
             success = connector.save_container(container)
         else:
             # Container exists, which means this Malop has been ingested before. Update it.
@@ -311,14 +341,15 @@ class CybereasonPoller:
 
         return phantom.APP_SUCCESS if success else phantom.APP_ERROR
 
-    def _does_container_exist_for_malop_malware(self, connector, config, malop_id):
+    def _does_container_exist_for_malop_malware(self, connector, malop_id):
         url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(connector.get_phantom_base_url(), malop_id, connector.get_asset_id())
 
         try:
             r = requests.get(url, verify=False)
             resp_json = r.json()
         except Exception as e:
-            connector.debug_print("Unable to query Cybereason Malop container: ", e)
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Unable to query Cybereason Malop container: {0}".format(err))
             return False
 
         if (resp_json.get("count", 0) <= 0):
@@ -328,24 +359,30 @@ class CybereasonPoller:
         try:
             existing_container_id = resp_json.get('data', [])[0]['id']
         except Exception as e:
-            connector.debug_print("Container results are not proper: ", e)
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Container results are not proper: {0}".format(err))
             return False
 
         return existing_container_id
 
     def _update_container_for_malop_malware(self, connector, config, existing_container_id, container):
         # First, update the container without updating any artifacts
-        connector.debug_print("Updating container for Malop id " + container["source_data_identifier"])
-        update_json = container.copy()
-        del update_json["artifacts"]
-        url = '{0}rest/container/{1}'.format(connector.get_phantom_base_url(), existing_container_id)
-        r = requests.post(url, json=update_json, verify=False)
-        resp_json = r.json()
+        try:
+            connector.debug_print("Updating container for Malop id {0}".format(container["source_data_identifier"]))
+            update_json = container.copy()
+            del update_json["artifacts"]
+            url = '{0}rest/container/{1}'.format(connector.get_phantom_base_url(), existing_container_id)
+            r = requests.post(url, json=update_json, verify=False)
+            resp_json = r.json()
 
-        for artifact in container["artifacts"]:
-            self._save_or_update_artifact(connector, config, existing_container_id, artifact)
-        if r.status_code != 200 or resp_json.get('failed'):
-            connector.debug_print("Error 1 while updating the container. Error is: ", resp_json.get('failed'))
+            for artifact in container["artifacts"]:
+                self._save_or_update_artifact(connector, config, existing_container_id, artifact)
+            if r.status_code != 200 or resp_json.get('failed'):
+                connector.debug_print("Error while updating the container. Error is: ", resp_json.get('failed'))
+                return False
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Error occurred while updating the container. {}".format(err))
             return False
 
         return True
@@ -356,11 +393,11 @@ class CybereasonPoller:
             # We have an existing artifact. Update it.
             artifact["container_id"] = existing_artifact["container"]
             artifact["id"] = existing_artifact["id"]
-            connector.debug_print('Updating artifact ' + artifact["name"], artifact)
+            connector.debug_print('Updating artifact {0}'.format(artifact["name"]), artifact)
             connector.save_artifacts([artifact])
         else:
             # This is a new artifact. Save it directly.
-            connector.debug_print('Saving new artifact ' + artifact["name"], artifact)
+            connector.debug_print('Saving new artifact {0}'.format(artifact["name"]), artifact)
             artifact["container_id"] = container_id
             connector.save_artifact(artifact)
 
@@ -371,7 +408,8 @@ class CybereasonPoller:
             r = requests.get(url, verify=False)
             resp_json = r.json()
         except Exception as e:
-            connector.debug_print("Exception when querying for artifact ID: ", e)
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Exception when querying for artifact ID: {0}".format(err))
             return None
 
         if (resp_json.get('count', 0) <= 0):
@@ -381,13 +419,13 @@ class CybereasonPoller:
         try:
             return resp_json.get('data', [])[0]
         except Exception as e:
-            connector.debug_print("Exception when parsing artifact results: ", e)
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Exception when parsing artifact results: {0}".format(err))
             return None
 
     def _get_malops(self, connector, malop_timestamp, max_number_malops):
         malops_dict = {}
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/crimes/unified"
+        url = "{0}/rest/crimes/unified".format(connector._base_url)
         query = {
             "templateContext": "OVERVIEW",
             "queryPath": [
@@ -408,12 +446,12 @@ class CybereasonPoller:
             "perGroupLimit": max_number_malops,
             "perFeatureLimit": max_number_malops
         }
-        res = self.cr_session.post(url=url, json=query, headers=headers)
+        res = self.cr_session.post(url=url, json=query, headers=connector._headers)
         malops_dict = res.json()["data"]["resultIdToElementDataMap"]
         return malops_dict
 
     def _get_container_dict_for_malop(self, connector, config, malop_id, malop_data):
-        connector.debug_print("Building container for malop " + str(malop_id))
+        connector.debug_print("Building container for malop {0}".format(str(malop_id)))
         # Build the container JSON
         container_json = {}
         container_json["name"] = malop_data["elementValues"]["primaryRootCauseElements"]["elementValues"][0]["name"]
@@ -425,7 +463,7 @@ class CybereasonPoller:
         status_map = self._get_status_map_malop()
         container_json["status"] = status_map.get(malop_data["simpleValues"]["managementStatus"]["values"][0], "New")
         severity_map = self._get_severity_map_malop(connector, config)
-        (decision_feature_type, decision_feature_key) = self._get_decision_feature_details(decision_feature)
+        (_, decision_feature_key) = self._get_decision_feature_details(decision_feature)
         container_json["start_time"] = self._phtimestamp_from_crtimestamp(malop_data["simpleValues"]["malopStartTime"]["values"][0])
         container_json["severity"] = severity_map.get(decision_feature_key, "High")
         container_json["artifacts"] = self._get_artifacts_for_malop(connector, malop_id, malop_data)
@@ -433,7 +471,7 @@ class CybereasonPoller:
         return container_json
 
     def _get_artifacts_for_malop(self, connector, malop_id, malop_data):
-        connector.debug_print("Building artifacts for malop " + str(malop_id))
+        connector.debug_print("Building artifacts for malop {0}".format(str(malop_id)))
         artifacts = []
         artifacts = artifacts + self._get_affected_machines_artifacts(connector, malop_data)
         artifacts = artifacts + self._get_affected_users_artifacts(connector, malop_id)
@@ -446,7 +484,7 @@ class CybereasonPoller:
         return artifacts
 
     def _get_affected_machines_artifacts(self, connector, malop_data):
-        connector.debug_print("  Building affected machines artifacts")
+        connector.debug_print("Building affected machines artifacts")
         artifacts = []
         for machine in malop_data["elementValues"]["affectedMachines"]["elementValues"]:
             affected_machine_artifact = {
@@ -468,15 +506,15 @@ class CybereasonPoller:
                 cef["internalIpAddress"] = matching_sensor["internalIpAddress"]
                 affected_machine_artifact["cef"] = cef
             else:
-                connector.debug_print("  Unable to get sensor details for machine " + machine["name"])
+                connector.debug_print("Unable to get sensor details for machine {0}".format(machine["name"]))
             artifacts.append(affected_machine_artifact)
         return artifacts
 
     def _get_affected_users_artifacts(self, connector, malop_id):
-        connector.debug_print("  Building affected users artifacts")
+        connector.debug_print("Building affected users artifacts")
         artifacts = []
         all_user_details = self._get_user_details_for_malop(connector, malop_id)
-        for user_id, user_details in all_user_details.items():
+        for _, user_details in all_user_details.items():
             cef = { }
             is_admin_map = {
                 "true": "Admin",
@@ -504,7 +542,7 @@ class CybereasonPoller:
             return artifacts
 
         all_process_details = self._get_process_details(connector, malop_id)
-        for process_detail_id, process_details in all_process_details.items():
+        for _, process_details in all_process_details.items():
             cef = { }
             is_signed_map = {
                 "true": "Signed",
@@ -537,7 +575,7 @@ class CybereasonPoller:
         connector.debug_print("  Building connection artifacts")
         artifacts = []
 
-        for connection_id, connection_details in self._get_connection_details_for_malop(connector, malop_id).items():
+        for _, connection_details in self._get_connection_details_for_malop(connector, malop_id).items():
             cef = { }
             connection_type_map = { "true": "External", "false": "Internal" }
             connection_direction_map = { "true": "Incoming", "false": "Outgoing" }
@@ -574,7 +612,7 @@ class CybereasonPoller:
         return artifacts
 
     def _add_simple_value_if_exists(self, cef, cef_key, obj, simple_value_key, transform=None):
-        if (obj["simpleValues"].get(simple_value_key)):
+        if obj["simpleValues"].get(simple_value_key):
             raw_value = obj["simpleValues"][simple_value_key]["values"][0]
             if transform is None:
                 cef[cef_key] = raw_value
@@ -582,37 +620,41 @@ class CybereasonPoller:
                 cef[cef_key] = transform.get(raw_value, 'Undefined')
 
     def _add_element_value_if_exists(self, cef, cef_key, obj, element_value_key1, element_value_key2):
-        if (obj["elementValues"].get(element_value_key1)):
+        if obj["elementValues"].get(element_value_key1):
             cef[cef_key] = obj["elementValues"][element_value_key1]["elementValues"][0][element_value_key2]
 
     def _get_comments_artifacts(self, connector, malop_id):
-        connector.debug_print("  Building comments artifacts")
+        connector.debug_print("Building comments artifacts")
         artifacts = []
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/crimes/get-comments"
+        url = "{0}/rest/crimes/get-comments".format(connector._base_url)
         query = malop_id
-        res = self.cr_session.post(url=url, data=query, headers=headers)
-        comments = res.json()
-        for comment in comments:
-            cef = {
-                "message": comment["message"],
-                "timestamp": comment["timestamp"]
-            }
-            comment_artifact = {
-                "source_data_identifier": comment["commentId"],
-                "name": comment["message"],
-                "description": "User comments",
-                "type": "comment",
-                "label": "comment",
-                "cef": cef
-            }
-            artifacts.append(comment_artifact)
+        try:
+            res = self.cr_session.post(url=url, data=query, headers=connector._headers)
+            comments = res.json()
+            for comment in comments:
+                cef = {
+                    "message": comment["message"],
+                    "timestamp": comment["timestamp"]
+                }
+                comment_artifact = {
+                    "source_data_identifier": comment["commentId"],
+                    "name": comment["message"],
+                    "description": "User comments",
+                    "type": "comment",
+                    "label": "comment",
+                    "cef": cef
+                }
+                artifacts.append(comment_artifact)
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print("Error occurred while fetching comment details. {}".format(err))
+
         return artifacts
 
     def _get_link_to_cr_artifacts(self, connector, malop_id):
         connector.debug_print("  Building link-to-Cybereason-console artifacts")
         artifacts = []
-        url = connector._base_url.rstrip("/") + "/#/malop/" + malop_id
+        url = "{0}/#/malop/{1}".format(connector._base_url.rstrip("/"), malop_id)
         link_artifact = {
             "source_data_identifier": hashlib.sha1(url.encode()).hexdigest(),  # Just using the URL does not work for some reason
             "name": url,
@@ -650,22 +692,21 @@ class CybereasonPoller:
             for cef_key in cef_keys:
                 artifact["cef_types"][cef_key] = cef_type_map.get(cef_key, [])
 
-    def _get_malware(self, connector, config, malware_millisec_since_last_poll, max_number_malware):
+    def _get_malware(self, connector, malware_millisec_since_last_poll, max_number_malware):
         malwares_array = []
         has_more_malware = True
         offset = 0
         max_malwares_in_each_fetch = min(1000, max_number_malware)
         while has_more_malware and len(malwares_array) < max_number_malware:
-            res = self._get_malware_with_offset(connector, config, malware_millisec_since_last_poll, max_malwares_in_each_fetch, offset)
+            res = self._get_malware_with_offset(connector, malware_millisec_since_last_poll, max_malwares_in_each_fetch, offset)
             malware_result = res.json()
             malwares_array = malwares_array + malware_result["data"]["malwares"]
             offset = offset + 1
             has_more_malware = malware_result["data"]["hasMoreResults"]
         return malwares_array
 
-    def _get_malware_with_offset(self, connector, config, malware_millisec_since_last_poll, max_malwares_in_each_fetch, offset):
-        headers = { "Content-Type": "application/json" }
-        url = connector._base_url + "/rest/malware/query"
+    def _get_malware_with_offset(self, connector, malware_millisec_since_last_poll, max_malwares_in_each_fetch, offset):
+        url = "{0}/rest/malware/query".format(connector._base_url)
         query = {
             "filters": [{
                 "fieldName": "timestamp",
@@ -677,12 +718,12 @@ class CybereasonPoller:
             "limit": max_malwares_in_each_fetch,
             "offset": offset
         }
-        return self.cr_session.post(url=url, json=query, headers=headers, verify=config.get('verify_server_cert', False))
+        return self.cr_session.post(url=url, json=query, headers=connector._headers, verify=connector._verify_server_cert)
 
     def _ingest_malware(self, connector, config, malware):
         success = phantom.APP_ERROR
         container = self._get_container_dict_for_malware(connector, config, malware)
-        existing_container_id = self._does_container_exist_for_malop_malware(connector, config, malware["guid"])
+        existing_container_id = self._does_container_exist_for_malop_malware(connector, malware["guid"])
         if not existing_container_id:
             # Container does not exist. Go ahead and save it
             connector.debug_print("Saving container for Malware with id {}".format(malware["guid"]))
@@ -693,11 +734,11 @@ class CybereasonPoller:
         return phantom.APP_SUCCESS if success else phantom.APP_ERROR
 
     def _get_container_dict_for_malware(self, connector, config, malware):
-        connector.debug_print("Building container for malware " + str(malware["guid"]))
+        connector.debug_print("Building container for malware {0}".format(str(malware["guid"])))
 
         # Build the container JSON
         container_json = {}
-        container_json["name"] = self._get_malware_type_map().get(malware["type"], malware["type"]) + ": " + malware["name"]
+        container_json["name"] = "{0}: {1}".format(self._get_malware_type_map().get(malware["type"], malware["type"]), malware["name"])
         container_json["data"] = malware
         container_json["description"] = malware["name"]
         container_json["source_data_identifier"] = malware["guid"]
@@ -715,7 +756,7 @@ class CybereasonPoller:
         cef = {
             "name": malware["machineName"]
         }
-        composite_uid = malware["guid"] + " " + malware["machineName"]
+        composite_uid = "{0} {1}".format(malware["guid"], malware["machineName"])
         affected_machine_artifact = {
             "source_data_identifier": hashlib.sha1(composite_uid.encode()).hexdigest(),
             "name": malware["machineName"],
@@ -786,9 +827,10 @@ class CybereasonPoller:
             # If any severities have been overriden, merge them into the default and return that map.
             severity_map.update(overriden_severity_map)
         except Exception as e:
-            connector.save_progress("ERROR when merging updated severity map. Proceeding with default map.")
-            connector.save_progress(str(e))
-            pass
+            err = connector._get_error_message_from_exception(e)
+            connector.save_progress("Error when merging updated severity map. Proceeding with default map")
+            connector.save_progress(err)
+
         return severity_map
 
     def _get_cef_type_map(self):

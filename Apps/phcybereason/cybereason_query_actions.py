@@ -1,3 +1,8 @@
+# File: cybereason_query_actions.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+
 import traceback
 
 # Phantom App imports
@@ -16,11 +21,9 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = connector._get_string_param(param.get('malop_id'))
         try:
             cr_session = CybereasonSession(connector).get_session()
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -48,10 +51,14 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             processes_dict = res.json()["data"]["resultIdToElementDataMap"]
             for process_id, process_data in processes_dict.items():
                 data = {
@@ -66,9 +73,10 @@ class CybereasonQueryActions:
             summary['total_processes'] = len(processes_dict)
 
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -78,13 +86,11 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         name = connector._get_string_param(param.get('name'))
         malops_dict = {}
         try:
             cr_session = CybereasonSession(connector).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -118,10 +124,14 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             malops_dict = res.json()["data"]["resultIdToElementDataMap"]
             for machine_id, machine_data in malops_dict.items():
                 data = {
@@ -137,9 +147,10 @@ class CybereasonQueryActions:
             summary['total_machines'] = len(malops_dict)
 
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -149,13 +160,11 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         user = connector._get_string_param(param.get('user'))
         malops_dict = {}
         try:
             cr_session = CybereasonSession(connector).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -184,13 +193,17 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             malops_dict = res.json()["data"]["resultIdToElementDataMap"]
 
-            for group_id, user_data in malops_dict.items():
+            for _, user_data in malops_dict.items():
                 data = {
                     "element_name": user_data["simpleValues"]["elementDisplayName"]["values"][0]
                 }
@@ -203,9 +216,10 @@ class CybereasonQueryActions:
             summary = action_result.update_summary({})
             summary['total_results'] = len(malops_dict)
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -215,13 +229,11 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         file_name = connector._get_string_param(param.get('file_name'))
         malops_dict = {}
         try:
             cr_session = CybereasonSession(connector).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -259,10 +271,14 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             malops_dict = res.json()["data"]["resultIdToElementDataMap"]
 
             for file_id, file_data in malops_dict.items():
@@ -282,9 +298,10 @@ class CybereasonQueryActions:
             summary = action_result.update_summary({})
             summary['total_results'] = len(malops_dict)
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -294,13 +311,11 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         domain_name = connector._get_string_param(param.get('domain_name'))
         malops_dict = {}
         try:
             cr_session = CybereasonSession(connector).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -328,13 +343,17 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             malops_dict = res.json()["data"]["resultIdToElementDataMap"]
 
-            for domain, domain_data in malops_dict.items():
+            for _, domain_data in malops_dict.items():
                 data = {
                     "element_name": domain_data["simpleValues"]["elementDisplayName"]["values"][0]
                 }
@@ -347,9 +366,10 @@ class CybereasonQueryActions:
             summary = action_result.update_summary({})
             summary['total_results'] = len(malops_dict)
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, traceback.format_exc())
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -359,13 +379,11 @@ class CybereasonQueryActions:
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         connection_name = connector._get_string_param(param.get('connection_name'))
         malops_dict = {}
         try:
             cr_session = CybereasonSession(connector).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
             query = {
                 "queryPath": [
                     {
@@ -402,12 +420,16 @@ class CybereasonQueryActions:
                     "elementDisplayName"
                 ]
             }
-            url = connector._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
 
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code != 200:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
             malops_dict = res.json()["data"]["resultIdToElementDataMap"]
-            for connection, connection_data in malops_dict.items():
+            for _, connection_data in malops_dict.items():
                 # Name contains characters like ">" which will be escaped to "&gt;" when showing in the output table
                 name = connection_data["simpleValues"]["elementDisplayName"]["values"][0]
                 name = name.replace('>', ' [to] ')
@@ -431,16 +453,17 @@ class CybereasonQueryActions:
             summary = action_result.update_summary({})
             summary['total_results'] = len(malops_dict)
         except Exception as e:
-            connector.debug_print(str(e))
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
             connector.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, traceback.format_exc())
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _add_simple_value_if_exists(self, target, target_key, obj, simple_value_key):
-        if (obj["simpleValues"].get(simple_value_key)):
+        if obj["simpleValues"].get(simple_value_key):
             target[target_key] = obj["simpleValues"][simple_value_key]["values"][0]
 
     def _add_element_value_if_exists(self, target, target_key, obj, element_value_key1, element_value_key2):
-        if (obj["elementValues"].get(element_value_key1)):
+        if obj["elementValues"].get(element_value_key1):
             target[target_key] = obj["elementValues"][element_value_key1]["elementValues"][0][element_value_key2]

@@ -1,8 +1,6 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: cybereason_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -20,6 +18,7 @@ import traceback
 from cybereason_session import CybereasonSession
 from cybereason_poller import CybereasonPoller
 from cybereason_query_actions import CybereasonQueryActions
+from bs4 import BeautifulSoup
 
 
 class RetVal(tuple):
@@ -45,28 +44,101 @@ class CybereasonConnector(BaseConnector):
     def _get_string_param(self, param):
         return param
 
+    def _process_html_response(self, response, action_result):
+        # An html response, treat it like an error
+        status_code = response.status_code
+
+        try:
+            soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav", "title"]):
+                element.extract()
+            soup.prettify()
+            error_text = soup.get_text(separator="\n")
+            split_lines = error_text.split("\n")
+            split_lines = [x.strip() for x in split_lines if x.strip()]
+            error_text = "\n".join(split_lines)
+        except:
+            error_text = "Cannot parse error details"
+
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+
+        message = message.replace('{', '{{').replace('}', '}}')
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _process_response(self, r, action_result):
+
+        # Process an HTML response
+        if 'html' in r.headers.get('Content-Type', ''):
+            return self._process_html_response(r, action_result)
+
+        # everything else is actually an error at this point
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+
+        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         # Set up a session by logging in to the Cybereason console.
         cr_session = CybereasonSession(self)
-        self.save_progress('CybereasonSession created')
         cookies = cr_session.get_session_cookies()
         if (cookies.get("JSESSIONID")):
             # We have a session id cookie, so the authentication succeeded
             self.save_progress('Successfully connected to the Cybereason console and verified session cookie')
             return action_result.set_status(phantom.APP_SUCCESS, 'Successfully connected to the Cybereason console and verified session cookie')
         else:
-            self.save_progress('Connectivity failed. Unable to get session cookie from Cybereason console')
             return action_result.set_status(phantom.APP_ERROR, 'Connectivity failed. Unable to get session cookie from Cybereason console')
 
-    def _get_delete_registry_key_body(self, cr_session, malop_id, machine_name):
+    def _get_delete_registry_key_body(self, cr_session, malop_id, machine_name, action_result):
         query = {
             "queryPath": [
                 {
@@ -88,9 +160,12 @@ class CybereasonConnector(BaseConnector):
             "queryTimeout": 120000,
             "customFields": [ "ownerMachine", "hasAutorunEvidence" ]
         }
-        headers = { "Content-Type": "application/json" }
-        url = self._base_url + "/rest/visualsearch/query/simple"
-        res = cr_session.post(url=url, json=query, headers=headers)
+        url = "{0}/rest/visualsearch/query/simple".format(self._base_url)
+        res = cr_session.post(url=url, json=query, headers=self._headers)
+
+        if res.status_code != 200:
+            return self._process_response(res, action_result)
+
         results = res.json()
         remediate_body = {
             "malopId": malop_id,
@@ -98,7 +173,7 @@ class CybereasonConnector(BaseConnector):
             "initiatorUserName": ""
         }
         target_ids_added = set()
-        for process_id, process_data in results["data"]["resultIdToElementDataMap"].items():
+        for _, process_data in results["data"]["resultIdToElementDataMap"].items():
             if process_data["elementValues"].get("hasAutorunEvidence"):
                 target_id = process_data["elementValues"]["hasAutorunEvidence"]["elementValues"][0]["guid"]
                 matching_machines = list(filter(lambda machine: machine["name"].lower() == machine_name, process_data["elementValues"]["ownerMachine"]["elementValues"]))
@@ -112,60 +187,55 @@ class CybereasonConnector(BaseConnector):
                             "actionType": "DELETE_REGISTRY_KEY"
                         })
                         target_ids_added.add(target_id)
-        return remediate_body
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), remediate_body)
 
     def _handle_delete_registry_key(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         malop_id = self._get_string_param(param['malop_id'])
         machine_name = param["machine_name"].lower()
 
         # Get the remediation target
         cr_session = CybereasonSession(self).get_session()
-        remediate_body = self._get_delete_registry_key_body(cr_session, malop_id, machine_name)
+        try:
+            ret_val, remediate_body = self._get_delete_registry_key_body(cr_session, malop_id, machine_name, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        # Make the call to remediate the action
-        headers = { "Content-Type": "application/json" }
-        res = cr_session.post(self._base_url + "/rest/remediate", json=remediate_body, headers=headers)
+            # Make the call to remediate the action
+            res = cr_session.post("{0}/rest/remediate".format(self._base_url), json=remediate_body, headers=self._headers)
 
-        if res.status_code != 200:
-            action_result.set_status(phantom.APP_ERROR, res.text)
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        result = res.json()
-        action_result.add_data({
-            "remediation_id": result["remediationId"],
-            "initiating_user": result["initiatingUser"]
-        })
+            result = res.json()
+            action_result.add_data({
+                "remediation_id": result["remediationId"],
+                "initiating_user": result["initiatingUser"]
+            })
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_sensor_status(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
 
         try:
             # Set up a session by logging in to the Cybereason console.
             cr_session = CybereasonSession(self).get_session()
-            url = self._base_url + "/rest/visualsearch/query/simple"
-            headers = { "Content-Type": "application/json" }
+            url = "{0}/rest/visualsearch/query/simple".format(self._base_url)
             post_data = {
                 "queryPath": [
                     {
@@ -203,9 +273,15 @@ class CybereasonConnector(BaseConnector):
                     "elementDisplayName"
                 ]
             }
-            res = cr_session.post(url=url, headers=headers, json=post_data)
+            res = cr_session.post(url=url, headers=self._headers, json=post_data)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
             self.save_progress("Successfully fetched machine details from Cybereason console")
             machines_dict = res.json()["data"]["resultIdToElementDataMap"]
+
             for machine_id, machine_details in machines_dict.items():
                 action_result.add_data({
                     "machine_id": machine_id,
@@ -213,101 +289,103 @@ class CybereasonConnector(BaseConnector):
                     "status": "Online" if (machine_details["simpleValues"]["isConnected"]["values"][0] == "true") else "Offline"
                 })
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_add_malop_comment(self, param):
         self.save_progress("In _handle_add_malop_comment function")
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
-        self.save_progress("MALOP ID  :" + malop_id)
+        self.save_progress("MALOP ID  :{0}".format(malop_id))
 
         comment = param.get('comment', "")
-        self.save_progress("COMMENT  :" + comment)
+        self.save_progress("COMMENT  :{0}".format(comment))
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
             endpoint_url = "/rest/crimes/comment/"
-            url = self._base_url + endpoint_url + str(malop_id)
+            url = "{0}{1}{2}".format(self._base_url, endpoint_url, str(malop_id))
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
 
-            cr_session.post(url, data=comment.encode('utf-8'), headers=api_headers)
+            res = cr_session.post(url, data=comment.encode('utf-8'), headers=self._headers)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_malop_status(self, param):
         self.save_progress("In _handle_update_malop_status function")
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
 
         phantom_status = param.get('status')
         cybereason_status = PHANTOM_TO_CYBEREASON_STATUS.get(phantom_status)
         if not cybereason_status:
-            self.save_progress("Invalid status selected ")
-            self.finalize()
+            self.save_progress("Invalid status selected")
+            return action_result.set_status(phantom.APP_ERROR, "Invalid status. Please provide a valid value in the 'status' action parameter")
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
-            endpoint_url = "/rest/crimes/status"
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/crimes/status".format(self._base_url)
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
             query = json.dumps({malop_id: cybereason_status})
-            cr_session.post(url, data=query, headers=api_headers)
+            res = cr_session.post(url, data=query, headers=self._headers)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_isolate_machine(self, param):
-        # Implement the handler here
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
-
-        sensor_ids = self._get_malop_sensor_ids(malop_id)
+        ret_val, sensor_ids = self._get_malop_sensor_ids(malop_id, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
-            endpoint_url = "/rest/monitor/global/commands/isolate"
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/monitor/global/commands/isolate".format(self._base_url)
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
             query = json.dumps({"pylumIds": sensor_ids, "malopId": malop_id})
 
-            cr_session.post(url, data=query, headers=api_headers)
+            res = cr_session.post(url, data=query, headers=self._headers)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -317,24 +395,27 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param.get('malop_id'))
-
-        sensor_ids = self._get_malop_sensor_ids(malop_id)
+        ret_val, sensor_ids = self._get_malop_sensor_ids(malop_id, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
-            endpoint_url = "/rest/monitor/global/commands/un-isolate"
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/monitor/global/commands/un-isolate".format(self._base_url)
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
             query = json.dumps({"pylumIds": sensor_ids, "malopId": malop_id})
 
-            cr_session.post(url, data=query, headers=api_headers)
+            res = cr_session.post(url, data=query, headers=self._headers)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -344,7 +425,6 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param["malop_id"])
         machine_id = self._get_string_param(param["machine_id"])
         remediation_user = param["remediation_user"]
@@ -352,9 +432,7 @@ class CybereasonConnector(BaseConnector):
 
         try:
             cr_session = CybereasonSession(self).get_session()
-            endpoint_url = "/rest/remediate"
-            url = self._base_url + endpoint_url
-            api_headers = {'Content-Type': 'application/json'}
+            url = "{0}/rest/remediate".format(self._base_url)
             query = {
                 "malopId": malop_id,
                 "initiatorUserName": remediation_user,
@@ -367,7 +445,12 @@ class CybereasonConnector(BaseConnector):
                     ]
                 }
             }
-            res = cr_session.post(url, json=query, headers=api_headers)
+            res = cr_session.post(url, json=query, headers=self._headers)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
             result = res.json()
             if len(result["statusLog"]) > 0:
                 action_result.add_data({
@@ -375,9 +458,10 @@ class CybereasonConnector(BaseConnector):
                     "remediation_status": result["statusLog"][0]["status"]
                 })
         except Exception as e:
-            self.debug_print(str(e))
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
             self.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -387,16 +471,19 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         malop_id = self._get_string_param(param["malop_id"])
         remediation_user = param["remediation_user"]
         remediation_id = param["remediation_id"]
 
         try:
             cr_session = CybereasonSession(self).get_session()
-            endpoint_url = "/rest/remediate/progress/" + remediation_user + "/" + malop_id + "/" + remediation_id
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/remediate/progress/{1}/{2}/{3}".format(self._base_url, remediation_user, malop_id, remediation_id)
             res = cr_session.get(url)
+
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
             result = res.json()
             status_log_length = len(result["statusLog"])
             error_obj = result["statusLog"][status_log_length - 1]["error"]
@@ -405,54 +492,54 @@ class CybereasonConnector(BaseConnector):
                 "remediation_message": error_obj.get("message", "Unknown error") if error_obj is not None else "No error message"
             })
         except Exception as e:
-            self.debug_print(str(e))
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(err)
             self.debug_print(traceback.format_exc())
-            return action_result.set_status(phantom.APP_ERROR, e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_set_reputation(self, param):
         self.save_progress("In _handle_set_reputation function")
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
         reputation_item = self._get_string_param(param.get('reputation_item_hash'))
         custom_reputation = param.get('custom_reputation')
+        if custom_reputation not in CUSTOM_REPUTATION_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'custom_reputation' action parameter")
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
-            endpoint_url = "/rest/classification/update"
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/classification/update".format(self._base_url)
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
             if custom_reputation == 'Remove':
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": None, "prevent": False, "remove": True}])
             else:
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": custom_reputation, "prevent": False, "remove": False}])
 
-            cr_session.post(url, data=reputation, headers=api_headers)
-            self.save_progress(custom_reputation + "ed...")
+            res = cr_session.post(url, data=reputation, headers=self._headers)
+            if res.status_code != 200:
+                self._process_response(res, action_result)
+                return action_result.get_status()
 
+            self.save_progress("{0}ed...".format(custom_reputation))
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, e)
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_malop_sensor_ids(self, malop_id):
+    def _get_malop_sensor_ids(self, malop_id, action_result):
         sensor_ids = []
         try:
             cr_session = CybereasonSession(self).get_session()
 
-            endpoint_url = "/rest/visualsearch/query/simple"
-            url = self._base_url + endpoint_url
+            url = "{0}/rest/visualsearch/query/simple".format(self._base_url)
             self.save_progress(url)
-            api_headers = {'Content-Type': 'application/json'}
             query_path = {
                 "queryPath": [
                     {
@@ -491,15 +578,22 @@ class CybereasonConnector(BaseConnector):
                 ]
             }
             self.save_progress(str(query_path))
-            res = cr_session.post(url, json=query_path, headers=api_headers)
+            res = cr_session.post(url, json=query_path, headers=self._headers)
+
+            if res.status_code != 200:
+                return self._process_response(res, action_result)
+
             self.save_progress("Got result from /rest/visualsearch/query/simple")
             machines_dict = res.json()["data"]["resultIdToElementDataMap"]
-            for machine_id, machine_details in machines_dict.items():
+            for _, machine_details in machines_dict.items():
                 sensor_ids.append(str(machine_details['simpleValues']['pylumId']['values'][0]))
 
         except Exception as e:
-            self.save_progress(str(e))
-        return sensor_ids
+            err = self._get_error_message_from_exception(e)
+            self.save_progress(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -507,7 +601,7 @@ class CybereasonConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {0}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -570,27 +664,18 @@ class CybereasonConnector(BaseConnector):
         return ret_val
 
     def initialize(self):
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
         self._state = self.load_state()
         if not self._state:
             self._state = {}
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = config.get('base_url', '').rstrip('/')  # Remove trailing '/' characters (if any) from URL
         self._username = config.get('username')
         self._password = config.get('password')
+        self._verify_server_cert = config.get('verify_server_cert', False)
+        self._headers = {'Content-Type': 'application/json'}
 
         return phantom.APP_SUCCESS
 
@@ -598,7 +683,6 @@ class CybereasonConnector(BaseConnector):
         return self._state
 
     def finalize(self):
-        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
