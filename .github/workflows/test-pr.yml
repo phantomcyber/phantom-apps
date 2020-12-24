@@ -1,0 +1,55 @@
+name: Test Pull Request
+
+on:
+  issue_comment:
+    types: [ created ]
+
+env:
+  SCRIPTS_DIRECTORY: .github/workflows/scripts
+  PYTHON_REQUIREMENTS_FILE: .github/workflows/scripts/requirements.txt
+
+jobs:
+  test-pull-request:
+
+    runs-on: ubuntu-latest
+
+    # Only run if test command is invoked from a pull request comment.
+    if: |
+      github.event_name == 'issue_comment' && github.event.action == 'created'
+      && github.event.issue.pull_request != null
+      && startsWith(github.event.comment.body, '!scan')
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Mark command as processed with a reaction
+        uses: actions/github-script@0.4.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            github.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            })
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles(env.PYTHON_REQUIREMENTS_FILE) }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: pip install -r ${{ env.PYTHON_REQUIREMENTS_FILE }}
+      - name: Test pull request
+        env:
+          APPS_TEST_SERVER_URI: ${{ secrets.APPS_TEST_SERVER_URI }}
+          APPS_TEST_SERVER_API_KEY: ${{ secrets.APPS_TEST_SERVER_API_KEY }}
+        run: python ${{ env.SCRIPTS_DIRECTORY }}/test_pull_request.py ${{ github.event.issue.number }} --requester '${{ github.event.issue.user.login }}' --publish-results
