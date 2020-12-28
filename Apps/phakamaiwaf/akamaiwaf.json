@@ -86,11 +86,19 @@
                 },
                 {
                     "data_path": "action_result.parameter.extended",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.includeelements",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.networkLists.*.name",
@@ -167,6 +175,8 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
                     "example_values": [
                         "success",
                         "failed"
@@ -210,12 +220,12 @@
                 "networklistid": {
                     "description": "Unique identifier for each network list. Comma-separated list is allowed",
                     "data_type": "string",
-                    "contains": [
-                        "akamai networklist id"
-                    ],
                     "required": true,
                     "order": 0,
                     "allow_list": true,
+                    "contains": [
+                        "akamai networklist id"
+                    ],
                     "primary": true
                 },
                 "extended": {
@@ -241,11 +251,19 @@
                 },
                 {
                     "data_path": "action_result.parameter.extended",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.includeelements",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -322,6 +340,8 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
                     "example_values": [
                         "success",
                         "failed"
@@ -843,7 +863,7 @@
         },
         {
             "action": "remove element",
-            "description": "Remove the specified element(s) to a list. If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block",
+            "description": "Remove the specified element(s) from the list. If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block",
             "type": "generic",
             "identifier": "remove_element",
             "read_only": false,
@@ -859,7 +879,7 @@
                     "primary": true
                 },
                 "elements": {
-                    "description": "Element(s) to add to the network list. Comma-separated list is allowed",
+                    "description": "Element(s) to be removed from the network list. Comma-separated list is allowed",
                     "data_type": "string",
                     "required": true,
                     "order": 1,
@@ -1075,7 +1095,11 @@
                     "data_path": "action_result.data.*.fast",
                     "data_type": "boolean",
                     "column_name": "Fast",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.dispatchCount",
@@ -1140,7 +1164,7 @@
                     "primary": true
                 },
                 "environment": {
-                    "description": "Environment to activate the network to. (Default: STAGING)",
+                    "description": "The environment in which the list’s activation occurs. (Default: STAGING)",
                     "data_type": "string",
                     "required": true,
                     "default": "STAGING",
@@ -1206,7 +1230,11 @@
                     "data_path": "action_result.data.*.fast",
                     "data_type": "boolean",
                     "column_name": "Fast",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.dispatchCount",
@@ -1274,10 +1302,10 @@
                     "data_type": "numeric",
                     "required": true,
                     "order": 1,
-                    "primary": true,
                     "contains": [
                         "akamai networklist syncpoint"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "extended": {
                     "description": "When enabled provides additional response data identifying who created and updated the list and when, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
@@ -1303,7 +1331,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.extended",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -1451,7 +1483,11 @@
                     "data_path": "action_result.data.*.fast",
                     "data_type": "boolean",
                     "column_name": "Fast",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.networkList.activationComments",

@@ -176,10 +176,6 @@ class AkamaiNetworkListsConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML response, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
@@ -221,6 +217,9 @@ class AkamaiNetworkListsConnector(BaseConnector):
         except requests.exceptions.InvalidURL:
             error_message = 'Error connecting to server. Invalid URL %s' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error Details: Connection Refused from the Server"
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
@@ -240,13 +239,13 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(AKAMAI_NETWORK_LIST_ENDPOINT, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS), response
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_networks(self, param):
         """ This function is used list out all the networks lists details. We can also search by name to get a specific network list.
@@ -272,7 +271,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -301,7 +300,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
             action_result.add_data(response)
@@ -339,7 +338,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -400,7 +399,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="put", json=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -437,7 +436,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -460,7 +459,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="put", json=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -480,7 +479,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="delete")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -517,7 +516,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None, method="post", json=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -539,7 +538,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -552,7 +551,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {'extended': param.get('extended')}
+        params = {'extended': param.get('extended', False)}
 
         ret_val, syncpoint = self._validate_integer(action_result, param.get('syncpoint'), SYNCPOINT_KEY)
         if phantom.is_fail(ret_val):
@@ -564,7 +563,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -586,7 +585,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -598,7 +597,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
         :param param: dictionary which contains information about the actions to be executed
         :return: status success/failure
         """
-        self.debug_print('action_id', self.get_action_identifier())
+        self.debug_print('action_id: {}'.format(self.get_action_identifier()))
 
         action_mapping = {
             'test_connectivity': self._handle_test_connectivity,
@@ -655,22 +654,13 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
 
-        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url').strip("/"))
         self._client_token = config.get('client_token')
         self._client_secret = config.get('client_secret')
         self._access_token = config.get('access_token')
@@ -703,17 +693,17 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = AkamaiNetworkListsConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -726,11 +716,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -741,11 +731,11 @@ if __name__ == '__main__':
         connector = AkamaiNetworkListsConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
