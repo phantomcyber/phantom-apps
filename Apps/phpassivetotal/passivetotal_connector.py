@@ -189,7 +189,9 @@ class PassivetotalConnector(BaseConnector):
             self.append_to_message(PASSIVETOTAL_ERR_CONNECTIVITY_TEST)
             return phantom.APP_ERROR
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
+
+        return action_result.set_status(phantom.APP_SUCCESS, PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
 
     def _lookup_domain(self, param):
 
