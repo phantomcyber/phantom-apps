@@ -9,6 +9,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as ph_rules
 
 # THIS Connector imports
 from carbonblack_consts import *
@@ -234,7 +235,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error finding processes")
 
         if (json_resp['total_results'] == 0):
-            return action_result.set_status(phantom.APP_ERROR, "No connections found")
+            return action_result.set_status(phantom.APP_SUCCESS, "No connections found")
         # Make same call to get all of the processes
         params['rows'] = json_resp['total_results']
         ret_val, json_resp = self._make_rest_call('/v1/process', action_result, params=params)
@@ -242,6 +243,9 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         process_list = json_resp["results"]
+
+        if (len(process_list) == 0):
+            return action_result.set_status(phantom.APP_SUCCESS, "No processes found")
 
         # Now we need to get the connections for each process
         total_processes = 0
@@ -264,6 +268,10 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.update_summary({"total_processes": total_processes})
         action_result.update_summary({"total_connections": len(action_result.get_data())})
+
+        if (len(action_result.get_data()) == 0):
+            return action_result.set_status(phantom.APP_SUCCESS, "No connections found")
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved connections for process")
 
     def _get_connections_for_process_event(self, cb_id, segment_id, action_result):
@@ -944,7 +952,14 @@ class CarbonblackConnector(BaseConnector):
         self.save_progress("Got live session ID: {0}".format(session_id))
 
         # Upload File to Server
-        vault_path = str(Vault.get_file_path(vault_id))
+        _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
+        if (not vault_meta_info):
+            self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
+            return action_result.set_status(phantom.APP_ERROR, "Could not find specified vault ID in vault")
+
+        vault_meta_info = list(vault_meta_info)
+        vault_path = vault_meta_info[0]['path']
+
         url = '/v1/cblr/session/{session_id}/file'.format(session_id=session_id)
         data = {'file': open(vault_path, 'rb')}
 
