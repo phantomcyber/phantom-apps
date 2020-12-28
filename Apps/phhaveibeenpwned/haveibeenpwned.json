@@ -4,8 +4,8 @@
     "description": "Queries Have I Been Pwned for data breach information with investigative actions",
     "type": "investigative",
     "main_module": "haveibeenpwned_connector.py",
-    "app_version": "2.0.1",
-    "utctime_updated": "2020-10-28T07:55:48.000000Z",
+    "app_version": "2.0.2",
+    "utctime_updated": "2020-12-22T07:01:54.000000Z",
     "product_vendor": "Troy Hunt",
     "product_name": "Have I Been Pwned",
     "product_version_regex": ".*",
@@ -191,7 +191,10 @@
                 },
                 {
                     "data_path": "action_result.summary.total_breaches",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -350,7 +353,10 @@
                 },
                 {
                     "data_path": "action_result.summary.total_breaches",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
