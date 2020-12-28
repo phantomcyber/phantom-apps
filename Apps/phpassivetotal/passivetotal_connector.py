@@ -77,8 +77,6 @@ class PassivetotalConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
-        error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
 
         try:
             if e.args:
@@ -140,7 +138,8 @@ class PassivetotalConnector(BaseConnector):
                     params=params,
                     headers=self._headers)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_SERVER_CONNECTION, self._get_error_message_from_exception(e)), resp_json, status_code)
+            return (action_result.set_status(phantom.APP_ERROR, "{}. {}".format(PASSIVETOTAL_ERR_SERVER_CONNECTION,
+            self._get_error_message_from_exception(e))), resp_json, status_code)
 
         # It's ok if r.text is None, dump that
         action_result.add_debug_data({'r_text': r.text if r else 'r is None'})
@@ -153,8 +152,8 @@ class PassivetotalConnector(BaseConnector):
             resp_json = r.json()
         except:
             # not a json, dump whatever was returned into the action result
-            details = r.text.replace('{', '').replace('}', '')
-            action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER, status=r.status_code, message=details)
+            details = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '').replace('}', ''))
+            action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER.format(status=r.status_code, message=details))
             return (phantom.APP_ERROR, resp_json, status_code)
 
         # Check if it's a success
@@ -164,7 +163,7 @@ class PassivetotalConnector(BaseConnector):
 
         # Error, dump the cleansed json into the details
         details = json.dumps(resp_json).replace('{', '').replace('}', '')
-        action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER, status=r.status_code, message=details)
+        action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER.format(status=r.status_code, message=details))
         return (phantom.APP_ERROR, resp_json, status_code)
 
     def _test_connectivity(self, param):
@@ -177,7 +176,7 @@ class PassivetotalConnector(BaseConnector):
 
         endpoint = '/enrichment'
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(PASSIVETOTAL_MSG_GET_DOMAIN_TEST)
 
@@ -185,13 +184,12 @@ class PassivetotalConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.debug_print(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, action_result.get_message())
-            self.append_to_message(PASSIVETOTAL_ERR_CONNECTIVITY_TEST)
-            return phantom.APP_ERROR
+            self.save_progress(PASSIVETOTAL_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
         self.save_progress(PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
 
-        return action_result.set_status(phantom.APP_SUCCESS, PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_domain(self, param):
 
@@ -259,11 +257,12 @@ class PassivetotalConnector(BaseConnector):
 
         if (not ret_val):
             if isinstance(response.get('error'), dict):
-                message = response.get('error', {}).get('message', '')
+                message = self._handle_py_ver_compat_for_input_str(response.get('error', {}).get('message', ''))
             elif isinstance(response.get('error'), str):
-                message = response.get('message')
+                message = "{} {}".format(self._handle_py_ver_compat_for_input_str(response.get('error')),
+                self._handle_py_ver_compat_for_input_str(response.get('message')))
             else:
-                message = ""
+                message = self._handle_py_ver_compat_for_input_str(str(response))
 
             if ('quota has been exceeded' in message.lower() or 'quota exceeded for operation search_api' in message.lower()):
                 return action_result.get_status()
