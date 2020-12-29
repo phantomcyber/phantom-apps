@@ -1,0 +1,30 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+    <head></head>
+    <body>
+        <h4>Setup</h4>
+        In order to set up an asset, you will need to first do the following on McAfee Web Gateway:
+        <ol>
+            <li>
+                <a href="https://docs.mcafee.com/bundle/web-gateway-9.1.x-product-guide/page/GUID-F559827C-224E-49E8-AA5B-7D389EF39E4A.html">
+                    Enable the REST interface (Click HERE to go to McAfee documentation)
+                </a>
+            </li>
+            <li>
+                <a href="https://docs.mcafee.com/bundle/web-gateway-9.1.x-product-guide/page/GUID-2D0D4E6C-E96A-4B52-8602-BF322B2AC914.html">
+                    Give permission to access (Click HERE to go to McAfee documentation)
+                </a>
+            </li>
+        </ol>
+        <br/>
+        <i>Note: It is important to create a separate account for Splunk> Phantom to use since a user cannot log in more than once at a time.</i>
+
+        <h4>Block/Unblock Actions</h4>
+        <b>block</b> actions (block url|ip|domain) <i>only</i> add items to a provided list. It is up to the McAfee Web Gateway Administrators to manage the rules used for using that list in the correct rule.
+        <b>unblock</b> actions (unblock url|ip|domain) <i>only</i> remove items from a provided list. It is up to the McAfee Web Gateway Administrators to manage the rules used for using that list in the correct rule.
+    </body>
+</html>
