@@ -96,7 +96,7 @@ class PassivetotalConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MESSAGE
+            error_msg = PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG
         except:
             error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
 
@@ -264,7 +264,7 @@ class PassivetotalConnector(BaseConnector):
             else:
                 message = self._handle_py_ver_compat_for_input_str(str(response))
 
-            if ('quota has been exceeded' in message.lower() or 'quota exceeded for operation search_api' in message.lower()):
+            if (QUOTA_EXCEEDED_MSG in message.lower() or QUOTA_EXCEEDED_MSG_API in message.lower()):
                 return action_result.get_status()
 
         if (ret_val) and (response):

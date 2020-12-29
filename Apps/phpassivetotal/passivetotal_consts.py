@@ -45,4 +45,8 @@ PASSIVETOTAL_REST_API_URL = "https://api.passivetotal.org/v2"
 # Consts for _get_error_message_from_exception
 PASSIVETOTAL_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters."
+PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters."
+
+# API quota exceed messages
+QUOTA_EXCEEDED_MSG = "quota has been exceeded"
+QUOTA_EXCEEDED_MSG_API = "quota exceeded for operation search_api"
