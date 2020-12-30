@@ -15,7 +15,7 @@
 <script src="/inc/datatable/js/jquery.dataTables.min.js"></script>
 
 <div class="row-fluid" onwidgetupdate="handle_update(update_data, {{ app_id }}, this);" onwidgetresize="phantom_generic_table_resize(this);">
-
+{% if tables %}
   {% for table in tables %}
 
   <table onwidgetload="phantom_generic_table_init(this);" style="min-width: 100%; margin: 0;">
@@ -50,6 +50,9 @@
   </tbody>
 </table>
 {% endfor %}
+{% else %}
+<h4 class="wf-h4-style">No data found</h4>
+{% endif %}
 </div>
 
 <script>
