@@ -636,6 +636,10 @@
                 "mail": {
                     "description": "The email address of the Axonius user",
                     "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
                     "required": true,
                     "order": 0
                 },
@@ -649,7 +653,10 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.mail",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",

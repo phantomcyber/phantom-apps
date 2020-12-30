@@ -4,6 +4,7 @@
 
 # Phantom App imports
 import json
+import requests
 import os
 from typing import Any, List, Optional, Union
 
@@ -127,7 +128,7 @@ class AxoniusConnector(BaseConnector):
 
         return error_text
 
-    def _create_client(self, action_result: phantom.ActionResult) -> int:
+    def _create_client(self, action_result: phantom.ActionResult) -> bool:
         """Create an instance of Axonius API Client."""
         try:
             self.debug_print("Creating Axonius API Client")
@@ -139,7 +140,7 @@ class AxoniusConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _start_client(self, action_result: phantom.ActionResult) -> int:
+    def _start_client(self, action_result: phantom.ActionResult) -> bool:
         """Create an instance of Axonius API Client and start it."""
         if not self._create_client(action_result):
             return action_result.get_status()
@@ -159,7 +160,7 @@ class AxoniusConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _handle_test_connectivity(self, param: dict) -> int:
+    def _handle_test_connectivity(self, param: dict) -> bool:
         """Test that we can login to Axonius using the Axonius API Client."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -169,10 +170,9 @@ class AxoniusConnector(BaseConnector):
 
         progress = f"Test Connectivity Passed {self._client}"
         self.save_progress(progress)
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_devices_by_sq(self, param, obj_type) -> int:
+    def _handle_devices_by_sq(self, param, obj_type) -> bool:
         """Get devices by the name of a Saved Query in Axonius."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -183,8 +183,6 @@ class AxoniusConnector(BaseConnector):
         try:
             sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -219,7 +217,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_devices_by_hostname(self, param, obj_type) -> int:
+    def _handle_devices_by_hostname(self, param, obj_type) -> bool:
         """Get devices by hostname."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -230,8 +228,6 @@ class AxoniusConnector(BaseConnector):
         try:
             hostname: str = get_str_arg(key=HOSTNAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -270,7 +266,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_devices_by_ip(self, param, obj_type) -> int:
+    def _handle_devices_by_ip(self, param, obj_type) -> bool:
         """Get devices by IP address."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -281,8 +277,6 @@ class AxoniusConnector(BaseConnector):
         try:
             ip: str = get_str_arg(key=IP_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -321,7 +315,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_devices_by_mac(self, param, obj_type) -> int:
+    def _handle_devices_by_mac(self, param, obj_type) -> bool:
         """Get devices by MAC address."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -332,8 +326,6 @@ class AxoniusConnector(BaseConnector):
         try:
             mac: str = get_str_arg(key=MAC_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -372,7 +364,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_users_by_sq(self, param, obj_type) -> int:
+    def _handle_users_by_sq(self, param, obj_type) -> bool:
         """Get users by the name of a Saved Query in Axonius."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -383,8 +375,6 @@ class AxoniusConnector(BaseConnector):
         try:
             sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -419,7 +409,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_users_by_mail(self, param, obj_type) -> int:
+    def _handle_users_by_mail(self, param, obj_type) -> bool:
         """Get users by email address in Axonius."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -430,8 +420,6 @@ class AxoniusConnector(BaseConnector):
         try:
             mail: str = get_str_arg(key=MAIL_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -470,7 +458,7 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_users_by_username(self, param, obj_type) -> int:
+    def _handle_users_by_username(self, param, obj_type) -> bool:
         """Get users by username in Axonius."""
         action_result: phantom.ActionResult = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -481,8 +469,6 @@ class AxoniusConnector(BaseConnector):
         try:
             username: str = get_str_arg(key=USERNAME_KEY, param=param, required=True)
             max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
-        except ValueError as exc:
-            return action_result.set_status(phantom.APP_ERROR, exc)
         except Exception as exc:
             err_msg = self._get_error_message_from_exception(exc)
             status = f"Failed to parse parameters: {err_msg}"
@@ -521,11 +507,11 @@ class AxoniusConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def handle_action(self, param: dict) -> int:
+    def handle_action(self, param: dict) -> bool:
         """Launch point for Phantom actions."""
-        ret_val: int = phantom.APP_SUCCESS
+        ret_val: bool = phantom.APP_SUCCESS
         action_id: str = self.get_action_identifier()
-        self.debug_print("action_id", action_id)
+        self.debug_print("action_id: {}".format(action_id))
 
         try:
             if action_id == "test_connectivity":
@@ -554,7 +540,7 @@ class AxoniusConnector(BaseConnector):
 
         return ret_val
 
-    def initialize(self) -> int:
+    def initialize(self) -> bool:
         """Initialize the Phantom integration."""
         self._state: dict = self.load_state()
         config: dict = self.get_config()
@@ -577,7 +563,7 @@ class AxoniusConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def finalize(self) -> int:
+    def finalize(self) -> bool:
         """Finalize the Phantom integration."""
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
@@ -637,7 +623,7 @@ if __name__ == "__main__":
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = AwsLambdaConnector()
+        connector = AxoniusConnector()
         connector.print_progress_message = True
 
         if session_id is not None:
