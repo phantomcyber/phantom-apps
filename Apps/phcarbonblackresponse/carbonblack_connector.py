@@ -855,7 +855,12 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        try:
+            action_result.update_summary({'status': resp['status']})
+        except:
+            pass
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Run command successful")
 
     def _execute_program(self, param):
 
@@ -893,7 +898,12 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        try:
+            action_result.update_summary({'status': resp['status']})
+        except:
+            pass
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Program executed successfully")
 
     def _memory_dump(self, param):
 
@@ -927,7 +937,12 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        try:
+            action_result.update_summary({'status': resp['status']})
+        except:
+            pass
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Memory dump successful")
 
     def _put_file(self, param):
 
@@ -981,7 +996,12 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.add_data(resp)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        try:
+            action_result.update_summary({'status': resp['status']})
+        except:
+            pass
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Put file successful")
 
     def _get_file(self, param):
 
@@ -1234,6 +1254,11 @@ class CarbonblackConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
+        try:
+            action_result.update_summary({'status': 'success'})
+        except:
+            pass
+
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_QUARANTINE)
 
     def _unquarantine_device(self, param):
@@ -1246,6 +1271,11 @@ class CarbonblackConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
+
+        try:
+            action_result.update_summary({'status': 'success'})
+        except:
+            pass
 
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_UNQUARANTINE)
 
@@ -1315,6 +1345,11 @@ class CarbonblackConnector(BaseConnector):
         if ('does not exist' in response):
             return action_result.set_status(phantom.APP_ERROR, 'Supplied MD5 is not currently banned/blocked.')
 
+        try:
+            action_result.update_summary({'status': 'success'})
+        except:
+            pass
+
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_UNBLOCK if (not response or type(response) != str) else response)
 
     def _get_license(self, param):
@@ -1365,6 +1400,11 @@ class CarbonblackConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
+
+        try:
+            action_result.update_summary({'status': 'success'})
+        except:
+            pass
 
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_BLOCK if (not response or type(response) != str) else response)
 
@@ -1768,6 +1808,11 @@ class CarbonblackConnector(BaseConnector):
 
         if (response == error_msg):
             return action_result.set_status(phantom.APP_ERROR, response)
+
+        try:
+            action_result.update_summary({'status': response['status']})
+        except:
+            pass
 
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_RESET_SESSION.format(session_id=session_id))
 
