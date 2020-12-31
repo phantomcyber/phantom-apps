@@ -131,7 +131,7 @@ class CybereasonConnector(BaseConnector):
         # Set up a session by logging in to the Cybereason console.
         cr_session = CybereasonSession(self)
         cookies = cr_session.get_session_cookies()
-        if (cookies.get("JSESSIONID")):
+        if cookies.get("JSESSIONID"):
             # We have a session id cookie, so the authentication succeeded
             self.save_progress('Successfully connected to the Cybereason console and verified session cookie')
             return action_result.set_status(phantom.APP_SUCCESS, 'Successfully connected to the Cybereason console and verified session cookie')
@@ -286,7 +286,7 @@ class CybereasonConnector(BaseConnector):
                 action_result.add_data({
                     "machine_id": machine_id,
                     "machine_name": machine_details["simpleValues"]["elementDisplayName"]["values"][0],
-                    "status": "Online" if (machine_details["simpleValues"]["isConnected"]["values"][0] == "true") else "Offline"
+                    "status": "Online" if machine_details["simpleValues"]["isConnected"]["values"][0] == "true" else "Offline"
                 })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -516,7 +516,7 @@ class CybereasonConnector(BaseConnector):
 
             url = "{0}/rest/classification/update".format(self._base_url)
             self.save_progress(url)
-            if custom_reputation == 'Remove':
+            if custom_reputation == 'blacklist':
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": None, "prevent": False, "remove": True}])
             else:
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": custom_reputation, "prevent": False, "remove": False}])

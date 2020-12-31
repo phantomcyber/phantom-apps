@@ -327,7 +327,7 @@
             "read_only": false,
             "parameters": {
                 "malop_id": {
-                    "description": "The malop ID for which we want to add comment",
+                    "description": "The malop ID for which we want to add a comment",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -408,7 +408,7 @@
             "read_only": false,
             "parameters": {
                 "malop_id": {
-                    "description": "The malop ID for which we want to update status",
+                    "description": "The malop ID for which we want to update the status",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -418,7 +418,7 @@
                     "order": 0
                 },
                 "status": {
-                    "description": "Status that will be assigned to the malop",
+                    "description": "The status that will be assigned to the malop",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -647,7 +647,7 @@
             "read_only": false,
             "parameters": {
                 "malop_id": {
-                    "description": "The malop ID for which we want to kill process",
+                    "description": "The malop ID for which we want to kill the active process",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -667,7 +667,7 @@
                     "order": 1
                 },
                 "machine_id": {
-                    "description": "Machine name associated with that malop ID",
+                    "description": "Machine ID associated with that malop ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -788,7 +788,7 @@
             "read_only": true,
             "parameters": {
                 "malop_id": {
-                    "description": "The malop ID for which we want to kill process",
+                    "description": "The malop ID for which we want to get the remediation status",
                     "data_type": "string",
                     "required": true,
                     "primary": true,

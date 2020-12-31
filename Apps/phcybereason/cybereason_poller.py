@@ -224,7 +224,7 @@ class CybereasonPoller:
         return process_details
 
     def _get_connection_details_for_malop(self, connector, malop_id):
-        connector.debug_print("Getting connection details for malop {0}".format(str(malop_id)))
+        connector.debug_print("Getting connection details for malop {0}".format(malop_id))
         url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
         query = {
             "queryPath": [
@@ -279,7 +279,7 @@ class CybereasonPoller:
         return connection_details
 
     def _get_user_details_for_malop(self, connector, malop_id):
-        connector.debug_print("Getting user details for malop {0}".format(str(malop_id)))
+        connector.debug_print("Getting user details for malop {0}".format(malop_id))
         url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
         query = {
             "queryPath": [
@@ -352,7 +352,7 @@ class CybereasonPoller:
             connector.debug_print("Unable to query Cybereason Malop container: {0}".format(err))
             return False
 
-        if (resp_json.get("count", 0) <= 0):
+        if resp_json.get("count", 0) <= 0:
             connector.debug_print("No container matched, creating a new one.")
             return False
 
@@ -412,7 +412,7 @@ class CybereasonPoller:
             connector.debug_print("Exception when querying for artifact ID: {0}".format(err))
             return None
 
-        if (resp_json.get('count', 0) <= 0):
+        if resp_json.get('count', 0) <= 0:
             connector.debug_print("No artifact matched the source_data_identifier {0} and container id {1}".format(source_data_identifier, container_id))
             return None
 
@@ -451,7 +451,7 @@ class CybereasonPoller:
         return malops_dict
 
     def _get_container_dict_for_malop(self, connector, config, malop_id, malop_data):
-        connector.debug_print("Building container for malop {0}".format(str(malop_id)))
+        connector.debug_print("Building container for malop {0}".format(malop_id))
         # Build the container JSON
         container_json = {}
         container_json["name"] = malop_data["elementValues"]["primaryRootCauseElements"]["elementValues"][0]["name"]
@@ -471,7 +471,7 @@ class CybereasonPoller:
         return container_json
 
     def _get_artifacts_for_malop(self, connector, malop_id, malop_data):
-        connector.debug_print("Building artifacts for malop {0}".format(str(malop_id)))
+        connector.debug_print("Building artifacts for malop {0}".format(malop_id))
         artifacts = []
         artifacts = artifacts + self._get_affected_machines_artifacts(connector, malop_data)
         artifacts = artifacts + self._get_affected_users_artifacts(connector, malop_id)
@@ -536,7 +536,7 @@ class CybereasonPoller:
         return artifacts
 
     def _get_suspicious_processes_artifacts(self, connector, malop_id, malop_data):
-        connector.debug_print("  Building suspicious processes artifacts")
+        connector.debug_print("Building suspicious processes artifacts")
         artifacts = []
         if not malop_data["elementValues"].get("primaryRootCauseElements"):
             return artifacts
@@ -572,7 +572,7 @@ class CybereasonPoller:
         return artifacts
 
     def _get_connection_artifacts(self, connector, malop_id):
-        connector.debug_print("  Building connection artifacts")
+        connector.debug_print("Building connection artifacts")
         artifacts = []
 
         for _, connection_details in self._get_connection_details_for_malop(connector, malop_id).items():
@@ -652,7 +652,7 @@ class CybereasonPoller:
         return artifacts
 
     def _get_link_to_cr_artifacts(self, connector, malop_id):
-        connector.debug_print("  Building link-to-Cybereason-console artifacts")
+        connector.debug_print("Building link-to-Cybereason-console artifacts")
         artifacts = []
         url = "{0}/#/malop/{1}".format(connector._base_url.rstrip("/"), malop_id)
         link_artifact = {
@@ -669,7 +669,7 @@ class CybereasonPoller:
         return artifacts
 
     def _get_last_updated_time_artifact(self, connector, malop_id, malop_data):
-        connector.debug_print("  Building last updated time artifacts")
+        connector.debug_print("Building last updated time artifacts")
         artifacts = []
         link_artifact = {
             "source_data_identifier": malop_id,
@@ -734,7 +734,7 @@ class CybereasonPoller:
         return phantom.APP_SUCCESS if success else phantom.APP_ERROR
 
     def _get_container_dict_for_malware(self, connector, config, malware):
-        connector.debug_print("Building container for malware {0}".format(str(malware["guid"])))
+        connector.debug_print("Building container for malware {0}".format(malware["guid"]))
 
         # Build the container JSON
         container_json = {}
@@ -752,7 +752,7 @@ class CybereasonPoller:
         return container_json
 
     def _get_affected_host_artifact_for_malware(self, connector, malware):
-        connector.debug_print("  Building affected host artifacts")
+        connector.debug_print("Building affected host artifacts")
         cef = {
             "name": malware["machineName"]
         }
