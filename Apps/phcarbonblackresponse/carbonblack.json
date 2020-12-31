@@ -14,7 +14,7 @@
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On-prem, Version 6.1.0, December 15 2020"
+        "On-prem, Version 6.1.0"
     ],
     "logo": "logo_carbonblack.svg",
     "logo_dark": "logo_carbonblack_dark.svg",
@@ -1471,7 +1471,7 @@
             "verbose": "Carbon Black Response supports 'watchlists' which are customized alerts that search for a binary or running process on an endpoint that matches a certain query. See the carbonblack_app playbook for examples.<br>This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
             "type": "generic",
             "identifier": "create_alert",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "name": {
                     "data_type": "string",
@@ -3719,7 +3719,7 @@
             "identifier": "quarantine_device",
             "read_only": false,
             "undo": "unquarantine device",
-            "verbose": "Carbon Black Response can have multiple entries that match an ip address, even a host name. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period of time. Carbon Black Response also supports partial matches for host names, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with host name <i>WINXP</i> and <i>WIN8</i>. The action will return an <b>error</b> if multiple <b>online</b> endpoints match the input parameter.<br>This action requires administrative privileges to search for the given endpoints and set the quarantine/isolation state. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
+            "verbose": "Carbon Black Response can have multiple entries that match an ip address, even a hostname. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period. Carbon Black Response also supports partial matches for hostnames, e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with hostname <i>WINXP</i> and <i>WIN8</i>. The action will return an <b>error</b> if multiple <b>online</b> endpoints match the input parameter.<br>This action requires administrative privileges to search for the given endpoints and set the quarantine/isolation state. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
             "parameters": {
                 "ip_hostname": {
                     "description": "Hostname/IP of endpoint to quarantine",
@@ -3804,7 +3804,7 @@
             "identifier": "unquarantine_device",
             "read_only": false,
             "undo": "quarantine device",
-            "verbose": "Carbon Black Response can have multiple entries that match an ip address, even a host name. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period of time. Carbon Black Response also supports partial matches for host names, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with host name <i>WINXP</i> and <i>WIN8</i>. The action will return an <b>error</b> if multiple <b>online</b> endpoints match the input parameter.<br>This action requires administrative privileges to search for the given endpoints and re-set the quarantine/isolation state. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
+            "verbose": "Carbon Black Response can have multiple entries that match an ip address, even a hostname. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period. Carbon Black Response also supports partial matches for hostnames, e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with hostname <i>WINXP</i> and <i>WIN8</i>. The action will return an <b>error</b> if multiple <b>online</b> endpoints match the input parameter.<br>This action requires administrative privileges to search for the given endpoints and re-set the quarantine/isolation state. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
             "parameters": {
                 "ip_hostname": {
                     "description": "Hostname/IP of endpoint to unquarantine",
@@ -4463,7 +4463,7 @@
             "type": "investigate",
             "identifier": "list_processes",
             "read_only": true,
-            "verbose": "If <b>sensor_id</b> is specified, other input parameters will be ignored (and removed from the resultant <i>parameter</i> dictionary), else the App searches for endpoints that match the value specified in <b>ip_hostname</b>. Carbon Black Response can have multiple entries that match an ip address, even a host name. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period of time. Carbon Black Response also supports partial matches for host names, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with host name <i>WINXP</i> and <i>WIN8</i> and in this case, the action will try to get the <i>process list</i> for all the matching endpoints.<br>This action requires Carbon Black Response administrative privileges. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
+            "verbose": "If <b>sensor_id</b> is specified, other input parameters will be ignored (and removed from the resultant <i>parameter</i> dictionary), else the App searches for endpoints that match the value specified in <b>ip_hostname</b>. Carbon Black Response can have multiple entries that match an ip address, even a hostname. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period. Carbon Black Response also supports partial matches for hostnames, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with hostname <i>WINXP</i> and <i>WIN8</i> and in this case, the action will try to get the <i>process list</i> for all the matching endpoints.<br>This action requires Carbon Black Response administrative privileges. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
             "parameters": {
                 "ip_hostname": {
                     "data_type": "string",
@@ -4660,8 +4660,8 @@
             "description": "Kill running processes on a machine",
             "type": "contain",
             "identifier": "terminate_process",
-            "read_only": true,
-            "verbose": "If <b>sensor_id</b> is specified, other input parameters will be ignored (and removed from the resultant <i>parameter</i> dictionary), else the App searches for endpoints that match the value specified in <b>ip_hostname</b>. Carbon Black Response can have multiple entries that match an ip address, even a host name. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period of time. Carbon Black Response also supports partial matches for host names, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with host name <i>WINXP</i> and <i>WIN8</i>. If the input host name matches more than one ONLINE endpoint the action will treat this as an error.<br>This action requires Carbon Black Response administrative privileges. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
+            "read_only": false,
+            "verbose": "If <b>sensor_id</b> is specified, other input parameters will be ignored (and removed from the resultant <i>parameter</i> dictionary), else the App searches for endpoints that match the value specified in <b>ip_hostname</b>. Carbon Black Response can have multiple entries that match an ip address, even a hostname. This could happen if a machine was removed and re-added to Carbon Black Response after an extended period of time. Carbon Black Response also supports partial matches for hostnames, for e.g. if <b>ip_hostname</b> is specified as <i>WIN</i> then this will match endpoints with hostname <i>WINXP</i> and <i>WIN8</i>. If the input hostname matches more than one ONLINE endpoint the action will treat this as an error.<br>This action requires Carbon Black Response administrative privileges. If this privilege is not assigned to the asset <b>api_token</b>, the action may return an empty list or <b>HTTP 405 Method Not Allowed</b> error.",
             "parameters": {
                 "ip_hostname": {
                     "data_type": "string",
@@ -4875,7 +4875,7 @@
         {
             "action": "get file",
             "description": "Download a file from Carbon Black Response and add it to the vault",
-            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
+            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If the hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
             "type": "investigate",
             "identifier": "get_file",
             "read_only": true,
@@ -5393,7 +5393,7 @@
         {
             "action": "put file",
             "description": "Upload file to a Windows hostname",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "put_file",
             "read_only": false,
             "parameters": {
@@ -6120,8 +6120,8 @@
             "action": "memory dump",
             "identifier": "memory_dump",
             "description": "Memory dump for a specified path",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "sensor_id": {
                     "data_type": "numeric",
@@ -7069,7 +7069,7 @@
         {
             "action": "list connections",
             "description": "List all of the connections from a given process name, PID, or Carbon Black process ID",
-            "verbose": "If either a process name or PID is provided, then a hostname must be provided as well. If a PID is provided, the process name parameter will be ignored. If a Carbon Black process ID is given, all of the other parameters will be ignored. The Carbon Black process ID refers to internal ID which Carbon Black Response assigns to every process. It can be found in the action result of hunt file in <b>action_result.data.*.process.results.*.id</b> or in the output of this action.",
+            "verbose": "If either a process name or PID is provided, then a hostname must be provided as well. If a PID is provided, the process name parameter will be ignored. If a Carbon Black process ID is given, all of the other parameters will be ignored. The Carbon Black process ID refers to the internal ID which Carbon Black Response assigns to every process. It can be found in the action result of the hunt file in <b>action_result.data.*.process.results.*.id</b> or in the output of this action.",
             "type": "investigate",
             "identifier": "list_connections",
             "read_only": true,
