@@ -1819,25 +1819,40 @@ class CarbonblackConnector(BaseConnector):
     def _on_poll(self, param):
         DT_STR_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
-        if (self._state.get('first_run', True)):
-            self._state['first_run'] = False
-            self._state.update({'last_ingested_time': datetime.datetime(1970, 1, 1).strftime(DT_STR_FORMAT)})
+        # Add action result
+        action_result = self.add_action_result(phantom.ActionResult(param))
+        max_containers = None
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
-        endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(self._state['last_ingested_time'])
+        if self.is_poll_now():
+            # Manual poll
+            max_containers = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
+            endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(
+                datetime.datetime(1970, 1, 1).strftime(DT_STR_FORMAT))
+        else:
+            # Scheduled poll
+            if self._state.get('first_run', True):
+                self._state['first_run'] = False
+                self._state.update({'last_ingested_time': datetime.datetime(1970, 1, 1).strftime(DT_STR_FORMAT)})
+
+            endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(
+                self._state['last_ingested_time'])
+
         ret_val, response = self._make_rest_call(endpoint, action_result)
+        result_list = response['results']
 
         if (phantom.is_fail(ret_val)):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return phantom.APP_ERROR
         else:
-            self._state['last_ingested_time'] = datetime.datetime.now().strftime(DT_STR_FORMAT)
-            self.save_state(self._state)
+            if self.is_poll_now():
+                if max_containers:
+                    result_list = result_list[:max_containers]
+            else:
+                self._state['last_ingested_time'] = datetime.datetime.now().strftime(DT_STR_FORMAT)
+                self.save_state(self._state)
 
-        results = response['results']
-
-        for result in results:
+        for result in result_list:
             cef = {}
             cont = {}
             cont['name'] = "Unresolved CB_Response Alert: " + result['watchlist_name']
