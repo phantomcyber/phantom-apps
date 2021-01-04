@@ -5,14 +5,16 @@
     "publisher": "Phantom",
     "package_name": "phantom_nessus",
     "type": "information",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "main_module": "nessusscanner_connector.pyc",
-    "app_version": "1.0.11",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2018-2021",
+    "main_module": "nessusscanner_connector.py",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:33:35.000000Z",
     "product_vendor": "Tenable",
     "product_name": "Nessus",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.284",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [],
     "logo": "logo_nessus.svg",
     "logo_dark": "logo_nessus_dark.svg",
     "configuration": {
@@ -26,7 +28,6 @@
             "description": "Verify server certificate",
             "data_type": "boolean",
             "default": false,
-            "required": false,
             "order": 1
         },
         "listen_port": {
@@ -82,7 +83,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -96,10 +98,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -249,7 +248,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {

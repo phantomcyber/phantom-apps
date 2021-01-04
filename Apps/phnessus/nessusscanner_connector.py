@@ -1,7 +1,7 @@
 # --
 # File: nessusscanner_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2018
+# Copyright (c) Phantom Cyber Corporation, 2018-2021
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -320,7 +320,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -333,11 +333,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -353,6 +353,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
