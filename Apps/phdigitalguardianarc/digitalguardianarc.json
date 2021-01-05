@@ -1,0 +1,723 @@
+{
+    "appid": "e928b888-0e37-4b53-8de2-c0531fb0eb59",
+    "name": "Digital Guardian ARC",
+    "description": "This App integrates with Digital Guardian ARC to provide various ingestion and investigative actions",
+    "type": "siem",
+    "product_vendor": "Digital Guardian",
+    "logo": "logo_digitalguardianarc.svg",
+    "logo_dark": "logo_digitalguardianarc_dark.svg",
+    "product_name": "Digital Guardian",
+    "product_version_regex": ".*",
+    "publisher": "Digital Guardian",
+    "license": "Copyright (c) Digital Guardian, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2019-10-13T13:03:29.499585Z",
+    "package_name": "phantom_digitalguardianarc",
+    "main_module": "digitalguardianarc_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "auth_url": {
+            "description": "Authorization Server",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "arc_url": {
+            "description": "ARC URL",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "client_secret": {
+            "description": "Client Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "export_profile": {
+            "description": "Export Profile GUID",
+            "data_type": "string",
+            "required": true,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add watchlist entry",
+            "description": "Add an entry to ARC Watchlist",
+            "type": "correct",
+            "identifier": "add_watchlist_entry",
+            "undo": "remove watchlist entry",
+            "read_only": false,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "default": "atac_test",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ],
+                    "order": 0
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be added to ARC Watchlist",
+                    "data_type": "string",
+                    "default": "abc.exe",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Watchlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Add Entry to Watchlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Add Entry to ARC Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove watchlist entry",
+            "description": "Remove the entry from ARC Watchlist",
+            "type": "contain",
+            "identifier": "remove_watchlist_entry",
+            "undo": "add watchlist entry",
+            "read_only": false,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "default": "atac_test",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ],
+                    "order": 0
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be removed from ARC Watchlist",
+                    "data_type": "string",
+                    "default": "abc.exe",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Watchlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from Watchlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Remove Entry from ARC Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check watchlist entry",
+            "description": "Check for the entry in ARC Watchlist",
+            "type": "investigate",
+            "identifier": "check_watchlist_entry",
+            "read_only": true,
+            "parameters": {
+                "watchlist_name": {
+                    "description": "Watchlist Name",
+                    "data_type": "string",
+                    "default": "atac_test",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ],
+                    "order": 0
+                },
+                "watchlist_entry": {
+                    "description": "Entry value to be checked in ARC Watchlist",
+                    "data_type": "string",
+                    "default": "abc.exe",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.watchlist_name",
+                    "data_type": "string",
+                    "column_name": "Watchlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.watchlist_entry",
+                    "data_type": "string",
+                    "column_name": "Watchlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.exe"
+                    ],
+                    "contains": [
+                        "digitalguardianarc watchlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Entry in ARC Watchlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Check Entry in ARC Watchlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add componentlist entry",
+            "description": "Add an entry to Componentlist",
+            "type": "correct",
+            "identifier": "add_componentlist_entry",
+            "undo": "remove componentlist entry",
+            "read_only": false,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "default": "demo-approved-sites",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ],
+                    "order": 0
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be added to Componentlist",
+                    "data_type": "string",
+                    "default": "abc.com",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Componentlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Componentlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Add Entry to Componentlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Add Entry to Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove componentlist entry",
+            "description": "Remove the entry from Componentlist",
+            "type": "contain",
+            "identifier": "remove_componentlist_entry",
+            "undo": "add componentlist entry",
+            "read_only": false,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "default": "demo-approved-sites",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ],
+                    "order": 0
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be removed from Componentlist",
+                    "data_type": "string",
+                    "default": "abc.com",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Componentlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Componentlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from Componentlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Remove Entry from Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "check componentlist entry",
+            "description": "Check the entry in Componentlist",
+            "type": "investigate",
+            "identifier": "check_componentlist_entry",
+            "read_only": true,
+            "parameters": {
+                "componentlist_name": {
+                    "description": "Componentlist Name",
+                    "data_type": "string",
+                    "default": "demo-approved-sites",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ],
+                    "order": 0
+                },
+                "componentlist_entry": {
+                    "description": "Entry value to be checked in Componentlist",
+                    "data_type": "string",
+                    "default": "abc.com",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.componentlist_name",
+                    "data_type": "string",
+                    "column_name": "Componentlist Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Global - Webmail Domains"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.componentlist_entry",
+                    "data_type": "string",
+                    "column_name": "Componentlist Entry",
+                    "column_order": 1,
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "contains": [
+                        "digitalguardianarc componentlist entry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "Remove Entry from Componentlist action succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Check Entry in Componentlist",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Ingest alerts from ARC into Phantom as events",
+            "verbose": "The default start_time is the past 5 days and the default end_time is now.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "description": "Container IDs to limit the ingestion to",
+                    "data_type": "string",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "container_count": {
+                    "description": "Maximum number of container records to query for",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Maximum number of artifact records to query for",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
