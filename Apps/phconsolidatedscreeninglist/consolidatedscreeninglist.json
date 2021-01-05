@@ -1,0 +1,317 @@
+{
+    "appid": "68618e58-2fd8-4019-9bca-79271c942600",
+    "name": "Consolidated Screening List",
+    "description": "This app integrates with ConsolidatedScreeningList API that consolidates export screening lists of the Departments of Commerce, State and, the Treasury into a single data feed as an aid to industry in conducting electronic screens of potential parties to regulated transactions, to perform investigative actions",
+    "type": "information",
+    "product_vendor": "Splunk",
+    "logo": "logo_consolidatedscreeninglist.svg",
+    "logo_dark": "logo_consolidatedscreeninglist_dark.svg",
+    "product_name": "Consolidated Screening List",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-29T20:55:15.416688Z",
+    "package_name": "phantom_consolidatedscreeninglist",
+    "main_module": "consolidatedscreeninglist_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "auth_token": {
+            "description": "API Bearer Token",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup user",
+            "description": "Validate if a specified individual is found in the Consolidated Screening List watchlist",
+            "type": "investigate",
+            "identifier": "lookup_user",
+            "read_only": true,
+            "parameters": {
+                "name": {
+                    "description": "Searches against the 'name' and 'alt_names' fields",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "country": {
+                    "description": "2-character country code",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "limit": {
+                    "description": "Number of records to include in the response",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "fuzzy_name": {
+                    "description": "Enables users to query a name and get usable results without knowing the exact spelling of an entry",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fuzzy_name",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        135
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.search_performed_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-10T06:59:53.060+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.license_policy",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example license policy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.addresses.*.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example city"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.addresses.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example state"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.addresses.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.addresses.*.postal_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example postal code"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.addresses.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example country"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.source_list_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://example.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.standard_order",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.alt_names",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "1a3ccc08ecbb40155a4cce8d9c9ace917f54cc74"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.source",
+                    "data_type": "string",
+                    "column_name": "Source",
+                    "column_order": 2,
+                    "example_values": [
+                        "Example source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.federal_register_notice",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example register notice"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.license_requirement",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example license requirement"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.source_information_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://example.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.start_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-21"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "Example name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources_used.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources_used.*.last_imported",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-10T06:35:04.366+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources_used.*.import_rate",
+                    "data_type": "string",
+                    "example_values": [
+                        "Hourly"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sources_used.*.source_last_updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-22T15:56:51.583+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Match: True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.match",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_fetched_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
