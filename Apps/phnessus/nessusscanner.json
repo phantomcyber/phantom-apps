@@ -221,6 +221,7 @@
                 "target_to_scan": {
                     "description": "IP of host to scan",
                     "data_type": "string",
+                    "order": 0,
                     "contains": [
                         "ip",
                         "hostname"
@@ -230,6 +231,7 @@
                 "policy_id": {
                     "description": "ID of the scan policy to use",
                     "data_type": "string",
+                    "order": 1,
                     "contains": [
                         "nessus policy id"
                     ],
