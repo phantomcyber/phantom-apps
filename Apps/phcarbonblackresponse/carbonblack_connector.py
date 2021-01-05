@@ -1,5 +1,5 @@
 # File: carbonblack_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -1816,7 +1816,49 @@ class CarbonblackConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_SUCC_RESET_SESSION.format(session_id=session_id))
 
+    def _paginator(self, endpoint, action_result, max_containers=None):
+
+        result_list = list()
+
+        # Make an API call first time for retrieving total records
+        ret_val, response = self._make_rest_call(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print(action_result.get_message())
+            self.set_status(phantom.APP_ERROR, action_result.get_message())
+            return phantom.APP_ERROR
+
+        total_results = response.get('total_results')
+        result = response['results']
+
+        # start indicates records which helps to traverse the records
+        start = len(result)
+        result_list.extend(result)
+        while start < total_results:
+            endpoint_temp = endpoint + '&start={0}'.format(start)
+            ret_val, response = self._make_rest_call(endpoint_temp, action_result)
+            if phantom.is_fail(ret_val):
+                self.debug_print(action_result.get_message())
+                self.set_status(phantom.APP_ERROR, action_result.get_message())
+                return phantom.APP_ERROR
+
+            result = response['results']
+            result_list.extend(result)
+
+            # Will break the loop when total_records < max_containers in case of manual poll.
+            if len(result) == 0:
+                break
+
+            if max_containers:
+                if int(max_containers) <= len(result_list):
+                    return result_list[:max_containers]
+
+            start = start + len(result)
+
+        return result_list
+
     def _on_poll(self, param):
+
         DT_STR_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
         # Add action result
@@ -1828,6 +1870,7 @@ class CarbonblackConnector(BaseConnector):
             max_containers = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
             endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(
                 datetime.datetime(1970, 1, 1).strftime(DT_STR_FORMAT))
+            self.save_progress(endpoint)
         else:
             # Scheduled poll
             if self._state.get('first_run', True):
@@ -1837,20 +1880,12 @@ class CarbonblackConnector(BaseConnector):
             endpoint = '/v1/alert?cb.q.created_time=%5B{0}%20TO%20*%5D&cb.fq.status=Unresolved&sort=alert_severity%20desc'.format(
                 self._state['last_ingested_time'])
 
-        ret_val, response = self._make_rest_call(endpoint, action_result)
-        result_list = response['results']
+        result_list = self._paginator(endpoint, action_result, max_containers)
 
-        if (phantom.is_fail(ret_val)):
-            self.debug_print(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, action_result.get_message())
-            return phantom.APP_ERROR
-        else:
-            if self.is_poll_now():
-                if max_containers:
-                    result_list = result_list[:max_containers]
-            else:
-                self._state['last_ingested_time'] = datetime.datetime.now().strftime(DT_STR_FORMAT)
-                self.save_state(self._state)
+        if not self.is_poll_now():
+            # save last_ingested_time into the state file
+            self._state['last_ingested_time'] = datetime.datetime.now().strftime(DT_STR_FORMAT)
+            self.save_state(self._state)
 
         for result in result_list:
             cef = {}
@@ -1880,6 +1915,7 @@ class CarbonblackConnector(BaseConnector):
                 self.debug_print('stat/msg {}/{}'.format(status, msg))
                 action_result.set_status(phantom.APP_ERROR, 'Container creation failed: {}'.format(msg))
                 return status
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _test_connectivity(self, param):
