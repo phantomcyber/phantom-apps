@@ -1,0 +1,491 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": true,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top"if>rt<"bottom"p><"clear">',
+        drawCallback: function (settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable();
+</script>
+
+<style>
+
+    .greynoise a:link {
+        color: rgb(130, 175, 190);
+    }
+
+    .greynoise a:hover {
+        text-decoration: underline;
+    }
+
+    .greynoise a:visited {
+        color: mediumpurple;
+    }
+
+    .greynoise .wf-table-vertical {
+        width: initial;
+        font-size: 12px;
+    }
+
+    .greynoise .wf-table-vertical td {
+        padding: 5px;
+        border: 1px solid rgb(234, 234, 234);
+    }
+
+    .greynoise .wf-table-vertical tr td:first-child {
+        font-weight: bold;
+    }
+
+    .greynoise .wf-table-horizontal {
+        width: initial;
+        border: 1px solid rgb(234, 234, 234);
+        font-size: 12px;
+    }
+
+    .greynoise .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid rgb(234, 234, 234);
+        text-transform: uppercase;
+        font-weight: normal;
+        color: rgb(234, 234, 234);
+        padding: 5px;
+    }
+
+    .greynoise .wf-table-horizontal td {
+        border: 1px solid rgb(234, 234, 234);
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .greynoise .wf-h3-style {
+        font-size: 20px
+    }
+
+    .greynoise .wf-h4-style {
+        font-size: 16px
+    }
+
+    .greynoise .wf-h5-style {
+        font-size: 13px
+    }
+
+    .greynoise .container {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .greynoise .wf-table-div {
+        width: 50%;
+        float: left;
+        padding: 5px;
+    }
+
+    .greynoise .wf-table-div .dataTables_wrapper .dataTables_filter {
+        float: none;
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .dataTables_filter {
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .wf-table-div .dataTables_length {
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .dataTables_length {
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .wf-table-div .dataTables_wrapper .dataTables_info {
+        padding-top: 0;
+        margin-top: 0;
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .dataTables_info {
+        color: rgb(170, 170, 195);
+    }
+
+    .greynoise .wf-table-div .dataTables_filter {
+        text-align: right !important;
+        float: right;
+        color: rgb(163, 163, 190);
+    }
+
+    .greynoise .wf-table-div .dataTables_filter input {
+        border: 1px solid rgb(0, 0, 0);
+        width: 150px;
+        color: rgb(179, 179, 207);
+    }
+
+    .MaliciousClassification {
+        color: #DE4A29;
+    }
+
+    .BenignClassification {
+        color: #36A207;
+    }
+
+</style>
+<div class="greynoise" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px">
+    {% for result in results %}
+    {% if not result.data %}
+    <h4 class="wf-h4-style">No lookup information found</h4>
+    {% elif result.data.ip and result.data.code_meaning %}
+    <h3 class="wf-h3-style">IP Lookup Results</h3>
+    <table class="wf-table-horizontal">
+        <tr>
+            <th>IP</th>
+            <th>Noise</th>
+            <th>GreyNoise Information</th>
+            <th>Visualizer</th>
+        </tr>
+        <tr>
+            <td>
+                {{result.data.ip}}
+            </td>
+            <td>
+                {{result.data.noise}}
+            </td>
+            <td>
+                {{result.data.code_meaning}}
+            </td>
+            <td>
+                <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
+            </td>
+        </tr>
+    </table>
+    {% elif result.param.ips %}
+    <h3 class="wf-h3-style">Multi IP Lookup Results</h3>
+    <table class="wf-table-horizontal">
+        <tr>
+            <th>IP</th>
+            <th>Noise</th>
+            <th>GreyNoise Information</th>
+            <th>Visualizer</th>
+        </tr>
+        {% for entry in result.data.lookup_ips %}
+        <tr>
+            <td>
+                {{entry.ip}}
+            </td>
+            <td>
+                {{entry.noise}}
+            </td>
+            <td>
+                {{entry.code_meaning}}
+            </td>
+            <td>
+                <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% elif result.data.seen or result.data.first_seen == "This IP has never been seen scanning the internet" and not result.param.query %}
+    {% if result.data.seen is True %}
+    <h3 class="wf-h3-style">IP Reputation Results</h3>
+    <table class="wf-table-vertical" style="width: 100%">
+        <tr>
+            <td>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            IP
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.ip}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Classification
+                        </td>
+                        <td style="width: 80%">
+                            {% if result.data.classification == "malicious" %}
+                            <div class="MaliciousClassification">
+                                {% else %}
+                                <div class="BenignClassification">
+                                    {% endif %}
+                                    {{result.data.classification}}
+                                </div>
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            First Seen
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.first_seen}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Last Seen
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.last_seen}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Visualizer
+                        </td>
+                        <td style="width: 80%">
+                            <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Actor
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.actor}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Organization
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.organization}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            ASN
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.asn}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Country
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.country}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            City
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.city}}
+                        </td>
+                    </tr>
+                </table>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            Tags
+                        </td>
+                        <td style="width: 80%">
+                            {{result.data.tags}}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    {% else %}
+    <h3 class="wf-h3-style">IP Reputation Results</h3>
+    <table class="wf-table-horizontal">
+        <tr>
+            <th>IP</th>
+            <th>First Seen</th>
+            <th>Last Seen</th>
+        </tr>
+        <tr>
+            <td>
+                {{result.data.ip}}
+            </td>
+            <td>
+                {{result.data.first_seen}}
+            </td>
+            <td>
+                {{result.data.last_seen}}
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+    {% elif result.param.query %}
+    {% if result.data.message == "no results" %}
+    <h3 class="wf-h3-style">GNQL Results</h3>
+    <table class="wf-table-horizontal">
+        <tr>
+            <th>Query</th>
+            <th>Message</th>
+        </tr>
+        <tr>
+            <td>
+                {{result.data.query}}
+            </td>
+            <td>
+                {{result.data.message}}
+            </td>
+        </tr>
+    </table>
+    {% else %}
+    <table class="datatable wf-table-vertical" style="width: 100%">
+        <thead>
+        <tr>
+            <th>Query Visualizer: <a target="_blank" rel="noopener noreferrer" href=https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}>https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}</a></th>
+        </tr>
+        <tr>
+            <th>Results</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in result.data.gnql_query %}
+        <tr>
+            <td>
+                <table class="wf-table-vertical" style="width: 100%">
+                    <tr>
+                        <td style="width: 20%">
+                            IP
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.ip}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Classification
+                        </td>
+                        <td style="width: 80%">
+                            {% if entry.classification == "malicious" %}
+                            <div class="MaliciousClassification">
+                                {% else %}
+                                <div class="BenignClassification">
+                                    {% endif %}
+                                    {{entry.classification}}
+                                </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            First Seen
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.first_seen}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Last Seen
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.last_seen}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Visualizer
+                        </td>
+                        <td style="width: 80%">
+                            <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Actor
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.actor}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Organization
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.organization}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            ASN
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.asn}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Country
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.country}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            City
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.city}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%">
+                            Tags
+                        </td>
+                        <td style="width: 80%">
+                            {{entry.tags}}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endif %}
+{% endfor %}
+</div>
+
+
+{% endblock %}
+
