@@ -241,6 +241,8 @@ class NessusCloudConnector(BaseConnector):
             total = scan_final_data["low"] + scan_final_data["medium"] + scan_final_data["high"] + scan_final_data["critical"]
             summary = action_result.update_summary({})
             summary['total_vulns'] = total
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Response is empty. Please check the input parameters.")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
