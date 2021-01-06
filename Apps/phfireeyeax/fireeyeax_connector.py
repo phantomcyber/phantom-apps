@@ -277,7 +277,6 @@ class FireeyeAxConnector(BaseConnector):
                 verify=self._verify,
                 headers=self._header
             )
-
             # Add the authorization value to the header
             if req.status_code >= 200 and req.status_code <= 204:
                 self.save_progress('AX Auth: Process Response - Token Success')
@@ -299,7 +298,7 @@ class FireeyeAxConnector(BaseConnector):
         except requests.exceptions.InvalidSchema:
             error_message = "Error connecting to server. No connection adapters were found for %s" % (login_url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
         else:

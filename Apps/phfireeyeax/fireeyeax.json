@@ -479,7 +479,7 @@
             "read_only": false,
             "parameters": {
                 "urls": {
-                    "description": "URL(s) to detonate. Comma separated list allowed",
+                    "description": "URL(s) to detonate. Comma-separated list allowed",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -969,7 +969,7 @@
         {
             "action": "save artifacts",
             "description": "Save a ZIP file of the detonation report to the Vault",
-            "verbose": "This function downloads all the malware artifacts from a detonation as a ZIP file and adds that file to the vault.",
+            "verbose": "This action downloads all the malware artifacts from a detonation as a ZIP file and adds that file to the vault.",
             "type": "investigate",
             "identifier": "save_artifacts",
             "read_only": true,
