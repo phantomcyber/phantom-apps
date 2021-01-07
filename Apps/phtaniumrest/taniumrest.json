@@ -2355,7 +2355,7 @@
             },
             "parameters": {
                 "question_id": {
-                    "description": "Query to run (in Tanium Question Syntax)",
+                    "description": "The ID of the question",
                     "data_type": "numeric",
                     "contains": [
                         "taniumrest question id"
