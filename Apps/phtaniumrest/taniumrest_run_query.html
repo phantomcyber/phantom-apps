@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: taniumrest_run_query.html
-  Copyright (c) 2019-2020 Splunk Inc.
+  Copyright (c) 2019-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -94,90 +94,6 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-        <h3 class="wf-h3-style">Action Parameters</h3>
-        <table class="wf-table-vertical">
-            {% if result.param.query_text %}
-                <tr>
-                    <td>Query Text</td>
-                    <td>
-                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['taniumrest question text'], 'value':'{{ result.param.query_text }}' }], 0, {{ container.id }}, null, false);">
-                            {{ result.param.query_text }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.group_name %}
-                <tr>
-                    <td>Group Name</td>
-                    <td>
-                        {{ result.param.group_name }}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.is_saved_question %}
-                <tr>
-                    <td>Is Saved Question</td>
-                    <td>
-                        {{ result.param.is_saved_question }}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.timeout_seconds %}
-                <tr>
-                    <td>Timeout Seconds</td>
-                    <td>
-                        {{ result.param.timeout_seconds }}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.wait_for_results_processing %}
-                <tr>
-                    <td>Wait for Results Processing</td>
-                    <td>
-                        {{ result.param.wait_for_results_processing}}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.return_when_n_results_available %}
-                <tr>
-                    <td>Return When N Results Available</td>
-                    <td>
-                        {{ result.param.return_when_n_results_available}}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.wait_for_n_results_available %}
-                <tr>
-                    <td>Wait for N Results Available</td>
-                    <td>
-                        {{ result.param.wait_for_n_results_available}}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.sensor %}
-                <tr>
-                    <td>Sensor</td>
-                    <td>
-                        {{ result.param.sensor}}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if result.param.question_id %}
-                <tr>
-                    <td>Question ID</td>
-                    <td>
-                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['taniumrest question id'], 'value':'{{ result.param.question_id }}' }], 0, {{ container.id }}, null, false);">
-                            {{ result.param.question_id }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                </tr>
-            {% endif %}
-
-        </table>
         {% for data in result.data %}
             {% for result_set in data.data.result_sets %}
             <div class="results">
