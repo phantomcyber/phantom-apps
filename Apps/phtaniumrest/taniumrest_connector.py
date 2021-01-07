@@ -17,10 +17,7 @@ import json
 from time import sleep
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
-try:
-    from urllib.parse import unquote
-except:
-    from urllib import unquote
+
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
