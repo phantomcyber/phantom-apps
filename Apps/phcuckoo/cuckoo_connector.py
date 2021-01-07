@@ -1,7 +1,7 @@
 # --
 # File: cuckoo_connector.py
 #
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -12,7 +12,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as Rules
 
 from cuckoo_consts import *
 import math
@@ -287,7 +287,7 @@ class CuckooConnector(BaseConnector):
         if type(task_ids) == list:
             if len(task_ids) > 0:
                 return phantom.APP_SUCCESS, task_ids
-            
+
             else:
                 return action_result.set_status(phantom.APP_ERROR, "Retrieved zero length task id list"), []
 
@@ -360,13 +360,24 @@ class CuckooConnector(BaseConnector):
         dozip = param.get("zip_and_encrypt")
         zip_password = param.get( "zip_password") or "infected"
 
-        vault_info = Vault.get_file_info(vault_id=vault_id)
+        try:
+            Rules.debug('Rules.vault_info start')
+            success, message, vault_info = Rules.vault_info(vault_id=vault_id)
+            Rules.debug(
+                'Rules.vault_info results: success: {}, message: {}, info: {}'
+                .format(success, message, vault_info)
+            )
+        except requests.exceptions.HTTPError:
+            error_message = "Invalid Vault ID: %s" % (vault_id)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+
         if not vault_info:
             return action_result.set_status(
                 phantom.APP_ERROR, "Invalid Vault ID"
             )
 
         try:
+            vault_info = list(vault_info)
             file_info = vault_info[0]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -433,15 +444,15 @@ class CuckooConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
 
-        strings = "\n".join(map(lambda x:x.strip(), param['hash'].split()))
-        strings = "\n".join(map(lambda x:x.strip(), strings.split(",")))
-        strings = list(map(lambda x:x.strip(), strings.split("\n")))
-        
+        strings = "\n".join(map(lambda x: x.strip(), param['string'].split()))
+        strings = "\n".join(map(lambda x: x.strip(), strings.split(",")))
+        strings = list(map(lambda x: x.strip(), strings.split("\n")))
+
         if len(strings) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Empty hash parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Empty string parameter")
 
         if len(strings[0]) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Empty hash parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Empty string parameter")
 
         files = { 'strings': (None, strings[0]) }
         ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)

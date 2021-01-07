@@ -9,15 +9,15 @@
     "product_name": "Cuckoo",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2014-2020 Splunk Inc.",
+    "license": "Copyright (c) 2014-2021 Splunk Inc.",
     "app_version": "2.0.3",
     "utctime_updated": "2020-12-09T14:09:36.000000Z",
     "package_name": "phantom_cuckoo",
     "main_module": "cuckoo_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On prem, cuckoo-01 (version 2.x), December 12 2019"
+        "On prem, cuckoo-01 (version 2.0.3), December 12 2019"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -8617,17 +8617,16 @@
         {
             "action": "submit strings",
             "identifier": "submit_strings",
-            "description": "Add VirtualTotal compatible hash to the list of pending tasks.",
-            "type": "investigate",
+            "description": "Add VirusTotal compatible URL/Domain to the list of pending tasks",
+            "type": "generic",
             "read_only": false,
             "parameters": {
-                "hash": {
-                    "description": "Single VirtualTotal compatible hash",
+                "string": {
+                    "description": "Single VirusTotal compatible URL/Domain",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "hash",
                         "url",
                         "domain"
                     ],
@@ -8636,12 +8635,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.string",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success"
+                    "contains": [
+                        "url",
+                        "domain"
                     ]
                 },
                 {
@@ -8663,8 +8661,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.file_type",
                     "data_type": "string",
-                    "column_name": "file_type",
-                    "column_order": 5,
                     "example_values": [
                         "PE32 executable (GUI) Intel 80386, for MS Windows"
                     ]
@@ -8672,8 +8668,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.file_size",
                     "data_type": "numeric",
-                    "column_name": "file_size",
-                    "column_order": 6,
                     "example_values": [
                         2545000
                     ]
@@ -8695,8 +8689,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.sha256",
                     "data_type": "string",
-                    "column_name": "sha256",
-                    "column_order": 4,
                     "example_values": [
                         "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
                     ],
@@ -8877,19 +8869,19 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "16: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03, 17: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "url",
-                        "domain"
                     ]
                 },
                 {
