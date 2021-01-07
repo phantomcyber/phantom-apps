@@ -461,14 +461,7 @@ class FireeyeEtpConnector(BaseConnector):
         # Check the email status parmater
         email_status_param = self._handle_py_ver_compat_for_input_str(param.get('email_status'))
         if email_status_param:
-            try:
-                email_status = [x.strip() for x in email_status_param.split(',')]
-                email_status = list(filter(None, email_status))
-                if not email_status:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'email_status' action parameter"), None
-                data['attributes']['email_status'] = email_status_param
-            except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'email_status' action parameter"), None
+            data['attributes']['email_status'] = email_status_param
 
         # Check the 'num_days' parameter
         ret_val, num_days = self._validate_integer(action_result, param.get('num_days'), NUM_DAYS_KEY, True)
@@ -481,7 +474,7 @@ class FireeyeEtpConnector(BaseConnector):
                 date = timestamp.strftime("%Y-%m-%dT%H:%M:%S.000")
                 data['fromLastModifiedOn'] = date
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'num_days' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'num_days' action parameter")
 
         endpoint = FIREETEETP_LIST_ALERTS_ENDPOINT
 
@@ -503,7 +496,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             endpoint = FIREETEETP_GET_ALERT_ENDPOINT.format(alertId=self._handle_py_ver_compat_for_input_str(param.get('alert_id')))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter")
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
@@ -553,7 +546,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             endpoint = FIREETEETP_GET_MESSAGE_ATTRIBUTES_ENDPOINT.format(etp_message_id=etp_message_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result)
@@ -624,10 +617,10 @@ class FireeyeEtpConnector(BaseConnector):
                 recipients = [x.strip() for x in recipients_param.split(',')]
                 recipients = list(filter(None, recipients))
                 if not recipients:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter")
                 params['attributes']['recipients'] = {"value": recipients, "filter": "in", "includes": ["SMTP", "HEADER"]}
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter")
 
         sender_param = self._handle_py_ver_compat_for_input_str(param.get("sender"))
         if sender_param:
@@ -635,10 +628,10 @@ class FireeyeEtpConnector(BaseConnector):
                 sender = [x.strip() for x in sender_param.split(',')]
                 sender = list(filter(None, sender))
                 if not sender:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter")
                 params['attributes']['fromEmail'] = {"value": sender, "filter": "in", "includes": ["SMTP", "HEADER"]}
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender' action parameter")
 
         status_param = self._handle_py_ver_compat_for_input_str(param.get("status"))
         if status_param:
@@ -646,10 +639,10 @@ class FireeyeEtpConnector(BaseConnector):
                 status = [x.strip() for x in status_param.split(',')]
                 status = list(filter(None, status))
                 if not status:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter")
                 params['attributes']['status'] = {"value": status, "filter": "in"}
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'status' action parameter")
 
         tags_param = self._handle_py_ver_compat_for_input_str(param.get("tags"))
         if tags_param:
@@ -657,10 +650,10 @@ class FireeyeEtpConnector(BaseConnector):
                 tags = [x.strip() for x in tags_param.split(',')]
                 tags = list(filter(None, tags))
                 if not tags:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter")
                 params['attributes']['tags'] = {"value": tags, "filter": "in"}
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter")
 
         subject_param = self._handle_py_ver_compat_for_input_str(param.get("subject"))
         if subject_param:
@@ -674,10 +667,10 @@ class FireeyeEtpConnector(BaseConnector):
                 domains = [x.strip() for x in domains_param.split(',')]
                 domains = list(filter(None, domains))
                 if not domains:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter")
                 params['attributes']['domains'] = domains
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter")
 
         # Check the 'size' parameter
         ret_val, size = self._validate_integer(action_result, param.get('size'), SIZE_KEY, True)
@@ -709,7 +702,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             filename = "raw_email_{}.txt".format(etp_message_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
 
         endpoint = FIREETEETP_GET_EMAIL_ENDPOINT.format(etp_message_id=etp_message_id_param)
 
@@ -743,7 +736,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             filename = "{}_pcap.zip".format(alert_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter")
 
         endpoint = FIREETEETP_GET_ALERT_PCAP_FILES_ENDPOINT.format(alertId=alert_id_param)
 
@@ -776,7 +769,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             filename = "{}_malware.zip".format(alert_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter")
 
         endpoint = FIREETEETP_GET_ALERT_MALWARE_FILES_ENDPOINT.format(alertId=alert_id_param)
 
@@ -809,7 +802,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             filename = "{}_case.zip".format(alert_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'alert_id' action parameter")
 
         endpoint = FIREETEETP_GET_ALERT_CASE_FILES_ENDPOINT.format(alertId=alert_id_param)
 
@@ -850,7 +843,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             data['message_ids'] = ",".join(self._handle_py_ver_compat_for_input_str(param.get('etp_message_ids')))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_ids' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_ids' action parameter")
 
         endpoint = FIREETEETP_REMEDIATE_EMAILS_ENDPOINT
 
@@ -875,7 +868,7 @@ class FireeyeEtpConnector(BaseConnector):
         try:
             filename = "quarantined_email_{}.txt".format(etp_message_id_param)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
 
         endpoint = FIREEYEETP_GET_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=etp_message_id_param)
 
@@ -907,14 +900,14 @@ class FireeyeEtpConnector(BaseConnector):
             ids = [x.strip() for x in etp_message_id_param.split(',')]
             ids = list(filter(None, ids))
             if not ids:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
             if len(ids) > 1:
                 data['message_ids'] = ",".join(ids)
                 endpoint = FIREEYEETP_BULK_RELEASE_QUARANTINE_EMAILS_ENDPOINT
             else:
                 endpoint = FIREEYEETP_RELEASE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
 
         is_not_spam_param = param.get("is_not_spam")
         if is_not_spam_param:
@@ -947,14 +940,14 @@ class FireeyeEtpConnector(BaseConnector):
             ids = [x.strip() for x in etp_message_id_param.split(',')]
             ids = list(filter(None, ids))
             if not ids:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
             if len(ids) > 1:
                 data['message_ids'] = ",".join(ids)
                 endpoint = FIREEYEETP_BULK_DELETE_QUARANTINE_EMAILS_ENDPOINT
             else:
                 endpoint = FIREEYEETP_DELETE_QUARANTINED_EMAIL_ENDPOINT.format(etp_message_id=ids)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter"), None
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'etp_message_id' action parameter")
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, method="post", json=data)
@@ -967,18 +960,21 @@ class FireeyeEtpConnector(BaseConnector):
 
         # Normalize output data so it matches for both actions.
         # The endpoint called when you are delete 1 specific email produces different output data
-        if resp_data.get('data').get('deleted'):
-            resp_data['data']['successful_message_ids'] = resp_data.get('data').get('message_ids')
-            resp_data['data']['operation'] = "delete"
-            resp_data['data']['failed_message_ids'] = []
-            del resp_data['data']['message_ids']
-            del resp_data['data']['deleted']
-        else:
-            resp_data['data']['failed_message_ids'] = resp_data.get('data').get('message_ids')
-            resp_data['data']['operation'] = "delete"
-            resp_data['data']['successful_message_ids'] = []
-            del resp_data['data']['message_ids']
-            del resp_data['data']['deleted']
+        try:
+            if resp_data.get('data').get('deleted'):
+                resp_data['data']['successful_message_ids'] = resp_data.get('data').get('message_ids')
+                resp_data['data']['operation'] = "delete"
+                resp_data['data']['failed_message_ids'] = []
+                del resp_data['data']['message_ids']
+                del resp_data['data']['deleted']
+            else:
+                resp_data['data']['failed_message_ids'] = resp_data.get('data').get('message_ids')
+                resp_data['data']['operation'] = "delete"
+                resp_data['data']['successful_message_ids'] = []
+                del resp_data['data']['message_ids']
+                del resp_data['data']['deleted']
+        except:
+            self.debug_print("Failed to normalize output data")
 
         action_result.add_data(resp_data)
 
@@ -1038,10 +1034,10 @@ class FireeyeEtpConnector(BaseConnector):
                 domains = [x.strip() for x in domains_param.split(',')]
                 domains = list(filter(None, domains))
                 if not domains:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter")
                 data['attributes']['domains'] = domains
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'domains' action parameter")
 
         # Check the 'email_server' parameter
         email_server_param = self._handle_py_ver_compat_for_input_str(param.get('email_server'))
@@ -1054,7 +1050,7 @@ class FireeyeEtpConnector(BaseConnector):
             try:
                 data['attributes']['from'] = from_param.strip()
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'from' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'from' action parameter")
 
         # Check the 'reason' parameter
         reason_param = self._handle_py_ver_compat_for_input_str(param.get("reason"))
@@ -1063,10 +1059,10 @@ class FireeyeEtpConnector(BaseConnector):
                 reason = [x.strip() for x in reason_param.split(',')]
                 reason = list(filter(None, reason))
                 if not reason:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter")
                 data['attributes']['reason'] = reason
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'reason' action parameter")
 
         # Check the 'recipients' parameter
         recipients_param = self._handle_py_ver_compat_for_input_str(param.get("recipients"))
@@ -1075,10 +1071,10 @@ class FireeyeEtpConnector(BaseConnector):
                 recipients = [x.strip() for x in recipients_param.split(',')]
                 recipients = list(filter(None, recipients))
                 if not recipients:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter")
                 data['attributes']['recipients'] = recipients
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'recipients' action parameter")
 
         # Check the 'sender_domain' parameter
         sender_domain_param = self._handle_py_ver_compat_for_input_str(param.get('sender_domain'))
@@ -1086,7 +1082,7 @@ class FireeyeEtpConnector(BaseConnector):
             try:
                 data['attributes']['sender_domain'] = sender_domain_param.strip()
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender_domain' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'sender_domain' action parameter")
 
         # Check the 'subject' parameter
         subject_param = self._handle_py_ver_compat_for_input_str(param.get('subject'))
@@ -1094,7 +1090,7 @@ class FireeyeEtpConnector(BaseConnector):
             try:
                 data['attributes']['subject'] = subject_param.strip()
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'subject' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'subject' action parameter")
 
         # Check the 'tags' parameter
         tags_param = self._handle_py_ver_compat_for_input_str(param.get("tags"))
@@ -1103,11 +1099,11 @@ class FireeyeEtpConnector(BaseConnector):
                 tags = [x.strip() for x in tags_param.split(',')]
                 tags = list(filter(None, tags))
                 if not tags:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter")
                 data['attributes']['tags'] = {}
                 data['attributes']['tags']['value'] = tags
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter"), None
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'tags' action parameter")
 
         endpoint = FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT
 
