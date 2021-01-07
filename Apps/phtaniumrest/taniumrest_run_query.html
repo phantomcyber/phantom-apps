@@ -96,56 +96,59 @@
     {% else %}
         {% for data in result.data %}
             {% for result_set in data.data.result_sets %}
-            <div class="results">
-                <h4 class="wf-h4-style">Results</h4>
-
-                <!--Default View-->
-                <table class="wf-table-horizontal datatable">
-                    <thead>
-                        <tr>
-                            {% for column in result_set.columns %}
-                                <th>{{ column.name }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in result_set.rows %}
-                            <tr>
-                                {% for item in row.data %}{% for column in result_set.columns %}
-                                {% if forloop.counter == forloop.parentloop.counter %}
-                                    <td>
-                                        <ul>
-                                            {% if column.name|lower == "user name" %}
-                                                {% for x in item %}
-                                                    <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
-                                                        {{ x.text }}
-                                                        &nbsp;
-                                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                                    </a></li>
-                                                {% endfor %}
-                                            {% elif column.name|lower == "hash" %}
-                                                {% for x in item %}
-                                                    <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['hash', 'sha256'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
-                                                        {{ x.text }}
-                                                        &nbsp;
-                                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                                    </a></li>
-                                                {% endfor %}
-                                            {% else %}
-                                                {% for x in item %}
-                                                    <li>{{ x.text }}</li>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </ul>
-                                    </td>
-                                {% endif %}
-                                {% endfor %}{% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <br>
+                {% if result_set.columns or result_set.rows %}
+                    <div class="results">
+                        <h4 class="wf-h4-style">Results</h4>
+                        <!--Default View-->
+                        <table class="wf-table-horizontal datatable">
+                            <thead>
+                                <tr>
+                                    {% for column in result_set.columns %}
+                                        <th>{{ column.name }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in result_set.rows %}
+                                    <tr>
+                                        {% for item in row.data %}{% for column in result_set.columns %}
+                                        {% if forloop.counter == forloop.parentloop.counter %}
+                                            <td>
+                                                <ul>
+                                                    {% if column.name|lower == "user name" %}
+                                                        {% for x in item %}
+                                                            <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
+                                                                {{ x.text }}
+                                                                &nbsp;
+                                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                            </a></li>
+                                                        {% endfor %}
+                                                    {% elif column.name|lower == "hash" %}
+                                                        {% for x in item %}
+                                                            <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['hash', 'sha256'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
+                                                                {{ x.text }}
+                                                                &nbsp;
+                                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                            </a></li>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {% for x in item %}
+                                                            <li>{{ x.text }}</li>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </ul>
+                                            </td>
+                                        {% endif %}
+                                        {% endfor %}{% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
+                {% else %}
+                    <h4 class="wf-h4-style">No data found</h4>
+                {% endif %}
             {% endfor %}
         {% endfor %}
     {% endif %}
