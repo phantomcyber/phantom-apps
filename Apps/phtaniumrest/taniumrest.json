@@ -1382,7 +1382,7 @@
         {
             "action": "execute action",
             "description": "Execute an action on the Tanium server",
-            "verbose": "<li>See top-level app documentation for example parameters.</li><li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>reissue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in the <b>reissue_seconds</b> parameter.</li>",
+            "verbose": "<li>See top-level app documentation for example parameters.</li><li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>issue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in the <b>issue_seconds</b> parameter.</li>",
             "type": "generic",
             "identifier": "execute_action",
             "read_only": false,
