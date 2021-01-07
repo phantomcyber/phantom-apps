@@ -1,5 +1,5 @@
 # File: googlepeople_connector.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -14,10 +14,10 @@ from googlepeople_consts import *
 import requests
 import os
 import json
-import sys
 from google.oauth2 import service_account
 from bs4 import UnicodeDammit
 from html import unescape
+from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 
 init_path = '{}/dependencies/google/__init__.py'.format(
@@ -27,15 +27,6 @@ try:
     open(init_path, 'a+').close()
 except:
     pass
-
-# the following argv 'work around' is to keep apiclient happy
-# and _also_ debug the connector as a script via pudb
-try:
-    argv_temp = list(sys.argv)
-except:
-    pass
-sys.argv = ['']
-import apiclient # noqa
 
 
 class RetVal(tuple):
@@ -96,8 +87,8 @@ class GooglePeopleConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
 
-            if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+            if parameter <= 0:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_NON_ZERO_NON_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -117,7 +108,7 @@ class GooglePeopleConnector(BaseConnector):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Failed to create delegated credentials. {}".format(err_msg)), None)
 
         try:
-            client = apiclient.discovery.build('people', 'v1', credentials=credentials)
+            client = discovery.build('people', 'v1', credentials=credentials)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to create client. {}".format(err_msg)), None)
@@ -448,12 +439,12 @@ class GooglePeopleConnector(BaseConnector):
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             self.debug_print("Exception message: {}".format(err_msg))
-            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Contents of service account JSON file' asset parameter")
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Contents of service account JSON file' asset configuration parameter")
 
         self._login_email = config['login_email']
 
         if not ph_utils.is_email(self._login_email):
-            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Login email' asset parameter")
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid value for the 'Login email' asset configuration parameter")
 
         return phantom.APP_SUCCESS
 

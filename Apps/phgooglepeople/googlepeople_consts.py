@@ -1,5 +1,5 @@
 # File: googlepeople_consts.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -16,7 +16,7 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 
 # Constants relating to '_validate_integer'
 INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {}"
-INVALID_NON_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-negative integer value in the {}"
+INVALID_NON_ZERO_NON_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-zero positive integer value in the {}"
 
 LIMIT_KEY = "'limit' action parameter"
 

@@ -10,12 +10,12 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2020 Splunk Inc.",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-07-21T23:24:14.466184Z",
     "package_name": "phantom_googlepeople",
     "main_module": "googlepeople_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -54,14 +54,6 @@
             {
                 "module": "cachetools",
                 "input_file": "wheels/cachetools-2.0.1-py2.py3-none-any.whl"
-            },
-            {
-                "module": "google-api-core",
-                "input_file": "wheels/google_api_core-1.22.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "google-cloud-bigquery",
-                "input_file": "wheels/google_cloud_bigquery-1.26.1-py2.py3-none-any.whl"
             },
             {
                 "module": "google-auth-oauthlib",
@@ -106,14 +98,6 @@
             {
                 "module": "cachetools",
                 "input_file": "wheels/cachetools-2.0.1-py2.py3-none-any.whl"
-            },
-            {
-                "module": "google-api-core",
-                "input_file": "wheels/google_api_core-1.22.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "google-cloud-bigquery",
-                "input_file": "wheels/google_cloud_bigquery-1.26.1-py2.py3-none-any.whl"
             },
             {
                 "module": "google-auth-oauthlib",
