@@ -17,7 +17,10 @@ import json
 from time import sleep
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
-
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
@@ -894,6 +897,11 @@ class TaniumRestConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         question_id = param.get('question_id')
+
+        # Integer validation for 'question_id' action parameter
+        ret_val, question_id = self._validate_integer(action_result, question_id, QUESTION_ID_KEY, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         summary = action_result.update_summary({})
 
         self.save_progress("Getting results for question {}".format(question_id))
