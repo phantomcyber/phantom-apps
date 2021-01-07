@@ -5,16 +5,17 @@
     "type": "network security",
     "publisher": "Splunk Community",
     "main_module": "proofpoint_connector.pyc",
-    "app_version": "1.2.20",
-    "utctime_updated": "2020-11-19T11:47:14.000000Z",
+    "app_version": "1.2.22",
+    "utctime_updated": "2021-01-06T13:04:16.000000Z",
     "package_name": "phantom_proofpoint",
+    "python_version": "2.7",
     "product_vendor": "Proofpoint",
     "product_name": "Targeted Attack Protection",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "logo": "logo_proofpoint.svg",
     "logo_dark": "logo_proofpoint_dark.svg",
-    "license": "Copyright (c) 2017-2020 Splunk Inc.",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -898,37 +899,37 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.clusterName",
+                    "data_path": "action_result.data.*.urls.*.clusterName",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.decodedUrl",
+                    "data_path": "action_result.data.*.urls.*.decodedUrl",
                     "data_type": "string",
                     "contains": [
                         "url"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.encodedUrl",
+                    "data_path": "action_result.data.*.urls.*.encodedUrl",
                     "data_type": "string",
                     "contains": [
                         "url"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.error",
+                    "data_path": "action_result.data.*.urls.*.error",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.messageGuid",
+                    "data_path": "action_result.data.*.urls.*.messageGuid",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.recipientEmail",
+                    "data_path": "action_result.data.*.urls.*.recipientEmail",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.success",
+                    "data_path": "action_result.data.*.urls.*.success",
                     "data_type": "boolean"
                 },
                 {
