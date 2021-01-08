@@ -136,6 +136,7 @@ class AwsLambdaConnector(BaseConnector):
                     region_name=self._region,
                     aws_access_key_id=self._access_key,
                     aws_secret_access_key=self._secret_key,
+                    aws_session_token=self._session_token,
                     config=boto_config)
             else:
                 self.debug_print("Creating boto3 client without API keys")
