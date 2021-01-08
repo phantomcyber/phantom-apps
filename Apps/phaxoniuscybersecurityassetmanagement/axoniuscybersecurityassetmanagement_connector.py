@@ -166,6 +166,7 @@ class AxoniusConnector(BaseConnector):
         self.add_action_result(action_result)
 
         if not self._start_client(action_result):
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         progress = f"Test Connectivity Passed {self._client}"
