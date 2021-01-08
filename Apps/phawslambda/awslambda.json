@@ -76,17 +76,15 @@
         "access_key": {
             "description": "Access Key",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "secret_key": {
             "description": "Secret Key",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "region": {
-            "description": "Region",
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -112,6 +110,12 @@
                 "AWS GovCloud (US)"
             ],
             "order": 2
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "default": false,
+            "order": 3
         }
     },
     "actions": [
@@ -148,7 +152,6 @@
                 "invocation_type": {
                     "description": "Invocation type",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "value_list": [
                         "RequestResponse",
@@ -161,7 +164,6 @@
                 "log_type": {
                     "description": "Set to 'Tail' to include the execution log in the response",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "value_list": [
                         "None",
@@ -173,23 +175,29 @@
                 "client_context": {
                     "description": "The JSON that you want to provide to your Lambda function in the context object",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 3
                 },
                 "payload": {
                     "description": "The JSON that you want to provide to your Lambda function as input",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 4
                 },
                 "qualifier": {
                     "description": "Specify a version or alias to invoke a published version of the function",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 5
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 6
                 }
             },
             "output": [
@@ -237,6 +245,16 @@
                 {
                     "data_path": "action_result.parameter.qualifier",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ExecutedVersion",
@@ -424,7 +442,6 @@
                 "function_version": {
                     "description": "Set to 'ALL' to include entries for all published versions of each function",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 0
                 },
@@ -434,16 +451,23 @@
                     "contains": [
                         "lambda next token"
                     ],
-                    "required": false,
                     "primary": true,
                     "order": 1
                 },
                 "max_items": {
                     "description": "A value between 1 and 50 to limit the number of functions to be returned",
                     "data_type": "numeric",
-                    "required": false,
                     "primary": false,
                     "order": 2
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 3
                 }
             },
             "output": [
@@ -659,6 +683,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.next_token",
                     "data_type": "string",
                     "contains": [
@@ -745,37 +779,41 @@
                 "source_arn": {
                     "description": "For AWS services, the ARN of the AWS resource that invokes the function. For example, an Amazon S3 bucket or Amazon SNS topic",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 4
                 },
                 "source_account": {
                     "description": "For AWS services, the ID of the account that owns the resource. Use this instead of SourceArn to grant permission to resources that are owned by another account (for example, all of an account's Amazon S3 buckets). Or use it together with SourceArn to ensure that the resource is owned by the specified account. For example, an Amazon S3 bucket could be deleted by its owner and recreated by another account",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 5
                 },
                 "event_source_token": {
                     "description": "For Alexa Smart Home functions, a token that must be supplied by the invoker",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 6
                 },
                 "qualifier": {
                     "description": "Specify a version or alias to add permissions to a published version of the function",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 7
                 },
                 "revision_id": {
                     "description": "Only accepts the function's $LATEST revision ID. Use this option to avoid modifying a function policy that has changed since you last read it",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
                     "order": 8
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 9
                 }
             },
             "output": [
@@ -839,6 +877,16 @@
                     "data_type": "string",
                     "example_values": [
                         "ID-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 },
                 {
