@@ -1,7 +1,7 @@
 {
     "appid": "394f9efc-5ac5-4ab4-8e0e-fdc59a2a5e0a",
     "name": "visualping",
-    "description": "visualping is a convenient tool to monitor websites changes",
+    "description": "The visualping app is a convenient tool to monitor websites changes",
     "type": "siem",
     "product_vendor": "visualping",
     "logo": "visualping.png",
@@ -16,7 +16,7 @@
     "utctime_updated": "2020-12-22T17:55:40.648399Z",
     "package_name": "phantom_visualping",
     "main_module": "visualping_connector.py",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "4.10",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
@@ -46,7 +46,7 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
+            "verbose": "Test connectivity.",
             "type": "test",
             "read_only": true,
             "parameters": {},
