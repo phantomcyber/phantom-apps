@@ -9,15 +9,15 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "app_version": "2.0.1",
     "utctime_updated": "2020-01-29T23:47:07.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, January 27, 2020"
+        "Cloud API, January 6, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -36,7 +36,7 @@
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",

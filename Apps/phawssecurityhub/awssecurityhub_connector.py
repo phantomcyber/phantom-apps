@@ -1,5 +1,5 @@
 # File: awssecurityhub_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -123,7 +123,7 @@ class AwsSecurityHubConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result)):
             return action_result.get_status()
 
-        ret_val, response = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
+        ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
 
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
@@ -755,7 +755,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             login_url = BaseConnector._get_phantom_base_url() + '/login'
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -768,11 +768,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
