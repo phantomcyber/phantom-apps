@@ -1054,7 +1054,7 @@
             "read_only": true,
             "parameters": {
                 "size": {
-                    "description": "THe number of alerts to include in a response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "description": "The number of alerts to include in a response. Valid range: 1-200 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "default": 20,
                     "order": 0
@@ -2049,7 +2049,7 @@
         },
         {
             "action": "trace message",
-            "description": "Search for Email Message by specifying the Queue/Message-ID of the Downstream MTA or the Original Message ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable",
+            "description": "Search for Email Message by specifying the Queue/Message-ID of the Downstream MTA or the Original Message-ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable",
             "type": "investigate",
             "identifier": "trace_message",
             "read_only": true,
@@ -2664,7 +2664,7 @@
         {
             "action": "remediate emails",
             "description": "Enqueues the message IDs provided in the request for remediation from the user's Office365 mailbox",
-            "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these permission you will not be able to use this action.</p><p></p><p>Any Any ETP Messages that have a status from the list given below are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remediating an email. It is important to note that if you seleted Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mail box, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
+            "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these permission you will not be able to use this action.</p><p></p><p>Any Any ETP Messages that have a status from the list given below are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remediating an email. It is important to note that if you select Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mailbox, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
             "type": "contain",
             "identifier": "remediate_emails",
             "read_only": false,
@@ -2867,7 +2867,7 @@
             "read_only": false,
             "parameters": {
                 "etp_message_id": {
-                    "description": "The ID of the Email Security message to download. Allows for a comma-separated string of IDs",
+                    "description": "The ID of the Email Security message to unquarantine. Allows for a comma-separated string of IDs",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
