@@ -12,8 +12,6 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from visualping_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
