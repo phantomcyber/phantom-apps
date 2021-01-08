@@ -4,7 +4,6 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
-# ! /usr/bin/env python3
 
 import sys
 import os
@@ -15,7 +14,7 @@ zipexec = "/usr/bin/zip"
 
 
 def _is_exec(path):
-    if not os.path.isfile(path) or not os.access(path, os. X_OK):
+    if not os.path.isfile(path) or not os.access(path, os.X_OK):
         return False
     return True
 

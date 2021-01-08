@@ -357,8 +357,8 @@ class CuckooConnector(BaseConnector):
 
         vault_id = param['vault_id']
         file_name = param.get('file_name')
-        dozip = param.get("zip_and_encrypt")
-        zip_password = param.get( "zip_password") or "infected"
+        dozip = param.get("zip_and_encrypt", False)
+        zip_password = param.get("zip_password") or "infected"
 
         try:
             Rules.debug('Rules.vault_info start')
@@ -370,6 +370,9 @@ class CuckooConnector(BaseConnector):
         except requests.exceptions.HTTPError:
             error_message = "Invalid Vault ID: %s" % (vault_id)
             return action_result.set_status(phantom.APP_ERROR, error_message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error opening file. {}".format(err))
 
         if not vault_info:
             return action_result.set_status(
@@ -408,7 +411,8 @@ class CuckooConnector(BaseConnector):
                 payload = zae.archive_fp
 
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, f"Error: {e}")
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, f"Error: {err}")
 
         files = {
             'file': (file_name, payload)
@@ -515,6 +519,7 @@ class CuckooConnector(BaseConnector):
 if __name__ == '__main__':
 
     import pudb
+    import sys
     import argparse
 
     pudb.set_trace()
@@ -531,13 +536,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = BaseConnector._get_phantom_base_url() + "/login"
             print("Accessing the Login page")
@@ -560,7 +565,7 @@ if __name__ == '__main__':
             print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         exit(0)
 

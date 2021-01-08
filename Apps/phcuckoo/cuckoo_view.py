@@ -45,7 +45,7 @@ def _process_data(data):
         if isinstance(strings, list):
             data['report']['strings'] = "\n".join(strings)
 
-    # Creat dumped JSON string for 'other' values
+    # Create dumped JSON string for 'other' values
     for k, v in list(data['report'].items()):
         if k not in ['info', 'debug', 'static', 'behavior', 'strings', 'target', 'static']:
             # JSON dump section

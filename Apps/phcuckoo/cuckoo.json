@@ -109,10 +109,8 @@
                     "order": 1
                 },
                 "zip_and_encrypt": {
-                    "description": "option to zip and encrypt file, warning: password visible as zip command line argument.",
+                    "description": "Option to zip and encrypt file, warning: password visible as zip command line argument",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "default": false,
                     "order": 2
                 }
@@ -130,21 +128,21 @@
                 {
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
+                    "example_values": [
+                        "ac8682258ec2a9556c5b06dac4b70aa7f408146b"
+                    ],
                     "contains": [
                         "vault id",
                         "sha1"
                     ],
                     "column_name": "Vault ID",
-                    "column_order": 0,
-                    "example_values": [
-                        "ac8682258ec2a9556c5b06dac4b70aa7f408146b"
-                    ]
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.zip_and_encrypt",
                     "data_type": "string",
-                    "column_order": 2,
-                    "column_name": "zipped file"
+                    "column_name": "zipped file",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.apistats.984.CopyFileA",
@@ -3120,21 +3118,21 @@
                 {
                     "data_path": "action_result.summary.id",
                     "data_type": "numeric",
-                    "contains": [
-                        "cuckoo task id"
-                    ],
                     "example_values": [
                         27
+                    ],
+                    "contains": [
+                        "cuckoo task id"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
                     "example_values": [
                         "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -3197,8 +3195,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "340",
-                        "27"
+                        "340"
                     ]
                 },
                 {
@@ -6188,11 +6185,11 @@
                 {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
                     "example_values": [
                         "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -6244,14 +6241,14 @@
                 {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ],
                     "column_name": "URL",
                     "column_order": 0,
                     "example_values": [
                         "https://www.test.com"
+                    ],
+                    "contains": [
+                        "url",
+                        "domain"
                     ]
                 },
                 {
@@ -8565,21 +8562,21 @@
                 {
                     "data_path": "action_result.summary.id",
                     "data_type": "numeric",
-                    "contains": [
-                        "cuckoo task id"
-                    ],
                     "example_values": [
                         26
+                    ],
+                    "contains": [
+                        "cuckoo task id"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
                     "example_values": [
                         "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
