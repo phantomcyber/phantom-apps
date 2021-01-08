@@ -8618,7 +8618,7 @@
             "type": "generic",
             "read_only": false,
             "parameters": {
-                "string": {
+                "url": {
                     "description": "Single VirusTotal compatible URL/Domain",
                     "data_type": "string",
                     "required": true,
@@ -8632,7 +8632,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.string",
+                    "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
                         "url",

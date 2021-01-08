@@ -448,15 +448,15 @@ class CuckooConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
 
-        strings = "\n".join(map(lambda x: x.strip(), param['string'].split()))
+        strings = "\n".join(map(lambda x: x.strip(), param['url'].split()))
         strings = "\n".join(map(lambda x: x.strip(), strings.split(",")))
         strings = list(map(lambda x: x.strip(), strings.split("\n")))
 
         if len(strings) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Empty string parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Empty 'url' parameter")
 
         if len(strings[0]) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Empty string parameter")
+            return action_result.set_status(phantom.APP_ERROR, "Empty 'url' parameter")
 
         files = { 'strings': (None, strings[0]) }
         ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)
