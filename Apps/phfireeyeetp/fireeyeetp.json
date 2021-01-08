@@ -34,7 +34,7 @@
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -45,7 +45,7 @@
         {
             "action": "on poll",
             "description": "Callback action for the on_poll ingest functionality",
-            "verbose": "<p>Ingest alerts from ETP into Phantom. If not specified the 'start_time', the default is past 10 days. If not specified 'end_time', the default is past 10 days.</p>",
+            "verbose": "<p>Ingest alerts from ETP into Phantom. If 'start_time' is not specified, the default is past 10 days. If 'end_time' is not specified, the default is past 10 days.</p>",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
@@ -57,22 +57,22 @@
                     "allow_list": true
                 },
                 "start_time": {
-                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "description": "Start of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
                     "order": 1
                 },
                 "end_time": {
-                    "description": "End of time range, in epoch time (milliseconds)",
+                    "description": "End of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
                     "order": 2
                 },
                 "container_count": {
-                    "description": "Maximum number of container records to query for",
+                    "description": "The maximum number of container records to query for",
                     "data_type": "numeric",
                     "order": 3
                 },
                 "artifact_count": {
-                    "description": "Maximum number of artifact records to query for",
+                    "description": "The maximum number of artifact records to query for",
                     "data_type": "numeric",
                     "order": 4
                 }
@@ -116,7 +116,7 @@
                     "order": 2
                 },
                 "num_days": {
-                    "description": "Number of days to get alerts for (ETP Defaults to last 90 days)",
+                    "description": "The number of days to get alerts for (ETP Defaults to last 90 days)",
                     "data_type": "numeric",
                     "default": 90,
                     "order": 3
@@ -809,7 +809,7 @@
                     "data_path": "action_result.data.*.data.*.attributes.alert.severity",
                     "data_type": "string",
                     "example_values": [
-                        "majr"
+                        "major"
                     ]
                 },
                 {
@@ -1054,7 +1054,7 @@
             "read_only": true,
             "parameters": {
                 "size": {
-                    "description": "Number of alerts to include in a response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "description": "THe number of alerts to include in a response. Valid range: 1-200 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "default": 20,
                     "order": 0
@@ -1291,7 +1291,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.type",
                     "data_type": "string",
-                    "contains": [
+                    "example_values": [
                         "trace"
                     ]
                 },
@@ -1644,8 +1644,8 @@
         },
         {
             "action": "trace email",
-            "description": "Search for Email Message by specifying",
-            "verbose": "<p>At least one parameter must be filled out. All fields are filtered by the IN clause where applicable making the search always an AND.</p><p>The modified date always uses the greater than or equal to. For example if you want to search the last 7 days, put a timestamp from 7 days ago. IE. 2017-10-03T00:00:00.000Z. Also note that the datetime stamps need to be in UTC time otherwise the results will be off. ETP assumes all datetime stamps are in UTC.</p><p>The status field allows for the following values<ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags field allows for the following values<ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
+            "description": "Search for Email Message by specifying the parameters",
+            "verbose": "<p>At least one parameter must be filled out. All fields are filtered by the IN clause where applicable searching always an AND.</p><p>The modified date always uses the greater than or equal to. For example, if you want to search for the last 7 days, put a timestamp from 7 days ago. IE. 2017-10-03T00:00:00.000Z. Also, note that the DatetTime stamps need to be in UTC otherwise the results will be off. ETP assumes all DateTime stamps are in UTC.</p><p>The status field allows for the following values<ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags field allows for the following values<ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
             "type": "investigate",
             "identifier": "trace_email",
             "read_only": true,
@@ -1662,7 +1662,7 @@
                     "order": 1
                 },
                 "recipients": {
-                    "description": "The recipients of the email. Maximum allowed per request is 10. Comma-separated list allowed",
+                    "description": "The recipients of the email. The maximum allowed per request is 10. Comma-separated list allowed",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1672,7 +1672,7 @@
                     "order": 2
                 },
                 "sender": {
-                    "description": "The sender of the email. Maximum allowed per request is 10. Comma-separated list allowed",
+                    "description": "The sender of the email. The maximum allowed per request is 10. Comma-separated list allowed",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -1699,7 +1699,7 @@
                     "order": 6
                 },
                 "size": {
-                    "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
+                    "description": "The number of alerts to include in a response. Valid range: 1-300 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "default": 20,
                     "order": 7
@@ -2049,7 +2049,7 @@
         },
         {
             "action": "trace message",
-            "description": "Search for Email Message by specifying the Queue/Message ID of the Downstream MTA or the Original Message ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable",
+            "description": "Search for Email Message by specifying the Queue/Message-ID of the Downstream MTA or the Original Message ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable",
             "type": "investigate",
             "identifier": "trace_message",
             "read_only": true,
@@ -2073,7 +2073,7 @@
                     "order": 1
                 },
                 "size": {
-                    "description": "Number of alerts to include in response. Valid range: 1-300 (ETP Defaults to 20)",
+                    "description": "The number of alerts to include in a response. Valid range: 1-300 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "default": 20,
                     "order": 2
@@ -2664,7 +2664,7 @@
         {
             "action": "remediate emails",
             "description": "Enqueues the message IDs provided in the request for remediation from the user's Office365 mailbox",
-            "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these actions you will not be able to use this action.</p><p></p><p>Any ETP Messages that have a status in this list are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remedating an email. It is important to note that if you seleted Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mail box, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
+            "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these permission you will not be able to use this action.</p><p></p><p>Any Any ETP Messages that have a status from the list given below are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remediating an email. It is important to note that if you seleted Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mail box, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
             "type": "contain",
             "identifier": "remediate_emails",
             "read_only": false,
@@ -2983,7 +2983,7 @@
             "read_only": false,
             "parameters": {
                 "etp_message_id": {
-                    "description": "The ID of the Email Security message to download. Allows a comma-separated string of IDs",
+                    "description": "The ID of the Email Security message to delete. Allows a comma-separated string of IDs",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -3086,19 +3086,19 @@
         {
             "action": "list quarantined emails",
             "description": "Get a list of quarantined emails from a given query filter",
-            "verbose": "<p>When specifying a date in either the to or from dates, the date is assumed to be in UTC. ETP server runs on UTC time so if you are not converting the timestamp to that time the results will be off.</p>",
+            "verbose": "<p>When specifying a date in either the to or from dates, the date is assumed to be in UTC. The ETP server runs on UTC so if you are not converting the timestamp to that time the results will be off.</p>",
             "type": "investigate",
             "identifier": "list_quarantined_emails",
             "read_only": true,
             "parameters": {
                 "from_date": {
-                    "description": "Start date to use to search the by. Date in YYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
+                    "description": "Start date to use to search the by. Date in YYYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
                     "data_type": "string",
                     "required": true,
                     "order": 0
                 },
                 "to_date": {
-                    "description": "End date to use to search by. Date in YYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
+                    "description": "End date to use to search by. Date in YYYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
                     "data_type": "string",
                     "order": 1
                 },
@@ -3153,7 +3153,7 @@
                     "order": 8
                 },
                 "size": {
-                    "description": "Number of alerts to include in response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "description": "THe number of alerts to include in response. Valid range: 1-200 (ETP Defaults to 20)",
                     "data_type": "numeric",
                     "required": true,
                     "default": 20,

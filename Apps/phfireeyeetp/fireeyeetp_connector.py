@@ -298,7 +298,7 @@ class FireeyeEtpConnector(BaseConnector):
             else:
                 temp_dir = "/opt/phantom/vault/tmp/"
 
-            temp_dir = "{}{}".format(temp_dir, '/{}'.format(uuid.uuid4()))
+            temp_dir = "{}/{}".format(temp_dir, uuid.uuid4())
 
             os.makedirs(temp_dir)
 
@@ -351,7 +351,10 @@ class FireeyeEtpConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
             else:
-                limit = items.get('meta').get('total') - len(items_list)
+                try:
+                    limit = items.get('meta', {}).get('total') - len(items_list)
+                except:
+                    return action_result.set_status(phantom.APP_ERROR, "Unable to process response"), None
 
             if items.get("data"):
                 for item in items.get("data"):
@@ -359,11 +362,14 @@ class FireeyeEtpConnector(BaseConnector):
             else:
                 break
 
-            if limit and items.get('meta').get('total') >= limit:
-                if endpoint == FIREETEETP_LIST_ALERTS_ENDPOINT:
-                    data['fromLastModifiedOn'] = items.get('meta').get('fromLastModifiedOn').get('end')
-                elif endpoint == FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT:
-                    data['attributes']['date']['to_date'] = items.get('meta').get('timestamp_quarantine')
+            try:
+                if limit and items.get('meta', {}).get('total') >= limit:
+                    if endpoint == FIREETEETP_LIST_ALERTS_ENDPOINT:
+                        data['fromLastModifiedOn'] = items.get('meta', {}).get('fromLastModifiedOn', {}).get('end')
+                    elif endpoint == FIREEYEETP_LIST_QUARANTINED_EMAILS_ENDPOINT:
+                        data['attributes']['date']['to_date'] = items.get('meta', {}).get('timestamp_quarantine')
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to process response"), None
 
             if limit <= 0:
                 break
@@ -395,12 +401,15 @@ class FireeyeEtpConnector(BaseConnector):
             else:
                 break
 
-            if limit and items.get('meta').get('total') >= limit:
-                limit = limit - items.get('meta').get('total')
-                data['fromLastModifiedOn'] = items.get('meta').get('fromLastModifiedOn').get('end')
+            try:
+                if limit and items.get('meta', {}).get('total') >= limit:
+                    limit = limit - items.get('meta', {}).get('total')
+                    data['fromLastModifiedOn'] = items.get('meta', {}).get('fromLastModifiedOn', {}).get('end')
 
-            if items.get('meta').get('total') < limit:
-                break
+                if items.get('meta', {}).get('total') < limit:
+                    break
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to access attributes of items response"), None
 
         return phantom.APP_SUCCESS, items_list
 
@@ -961,14 +970,14 @@ class FireeyeEtpConnector(BaseConnector):
         # Normalize output data so it matches for both actions.
         # The endpoint called when you are delete 1 specific email produces different output data
         try:
-            if resp_data.get('data').get('deleted'):
-                resp_data['data']['successful_message_ids'] = resp_data.get('data').get('message_ids')
+            if resp_data.get('data', {}).get('deleted'):
+                resp_data['data']['successful_message_ids'] = resp_data.get('data', {}).get('message_ids')
                 resp_data['data']['operation'] = "delete"
                 resp_data['data']['failed_message_ids'] = []
                 del resp_data['data']['message_ids']
                 del resp_data['data']['deleted']
             else:
-                resp_data['data']['failed_message_ids'] = resp_data.get('data').get('message_ids')
+                resp_data['data']['failed_message_ids'] = resp_data.get('data', {}).get('message_ids')
                 resp_data['data']['operation'] = "delete"
                 resp_data['data']['successful_message_ids'] = []
                 del resp_data['data']['message_ids']
@@ -1161,7 +1170,7 @@ class FireeyeEtpConnector(BaseConnector):
             try:
                 # Get the ingestion interval
                 # If interval is not present just get the last 15 minutes
-                interval_mins = int(config.get('ingest').get('interval_mins', 15))
+                interval_mins = int(config.get('ingest', {}).get('interval_mins', 15))
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Ingestion interval is invalid")
 
@@ -1238,14 +1247,14 @@ class FireeyeEtpConnector(BaseConnector):
         container_dict = dict()
 
         # Creating a description and name for the alert
-        # ETP does not provide good data to create a name or description so I am manually creating a stardized convention
+        # ETP does not provide good data to create a name or description so I am manually creating a standardized convention
 
         description = "Fireeye ETP alert on the email with the subject {} due to {} going to the user {}.".format(
-                                                                                                                alert.get('attributes').get('email').get('headers').get('subject'),
-                                                                                                                alert.get('attributes').get('meta').get('last_malware'),
-                                                                                                                alert.get('attributes').get('email').get('headers').get('to'))
+                                                                                                    alert.get('attributes', {}).get('email', {}).get('headers', {}).get('subject'),
+                                                                                                    alert.get('attributes', {}).get('meta', {}).get('last_malware'),
+                                                                                                    alert.get('attributes', {}).get('email', {}).get('headers', {}).get('to'))
 
-        name = "Fireeye ETP Alert - {}".format(alert.get('attributes').get('meta').get('last_malware'))
+        name = "Fireeye ETP Alert - {}".format(alert.get('attributes', {}).get('meta', {}).get('last_malware'))
 
         container_dict['name'] = '{alert_name}'.format(alert_name=name)
         container_dict['source_data_identifier'] = self._create_dict_hash(alert)
@@ -1283,7 +1292,7 @@ class FireeyeEtpConnector(BaseConnector):
         if cef:
             temp_dict['cef'] = cef
             temp_dict['cef_types'] = cef_types
-            temp_dict['name'] = alert.get('attributes').get('meta').get('last_malware')
+            temp_dict['name'] = alert.get('attributes', {}).get('meta', {}).get('last_malware')
             temp_dict['container_id'] = container_id
             temp_dict['source_data_identifier'] = self._create_dict_hash(temp_dict)
 
