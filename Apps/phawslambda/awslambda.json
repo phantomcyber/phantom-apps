@@ -9,7 +9,7 @@
     "product_name": "Lambda",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_awslambda",
@@ -123,7 +123,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -134,7 +133,6 @@
             "action": "invoke lambda",
             "identifier": "invoke_lambda",
             "description": "Invoke an AWS Lambda function",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -435,7 +433,6 @@
             "action": "list functions",
             "identifier": "list_functions",
             "description": "List available AWS Lambda functions, with the version-specific configuration for each",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -740,7 +737,6 @@
             "action": "add permission",
             "identifier": "add_permission",
             "description": "Grants an AWS service or another account permission to use a function",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
