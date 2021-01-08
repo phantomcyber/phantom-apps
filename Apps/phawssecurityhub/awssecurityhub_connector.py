@@ -16,7 +16,8 @@ from datetime import datetime, timedelta
 from boto3 import client
 from botocore.config import Config
 from awssecurityhub_consts import *
-
+from bs4 import UnicodeDammit
+import sys
 
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
@@ -45,7 +46,23 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self._state = self.load_state()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_FETCHING_PYTHON_VERSION_MSG)
+
         config = self.get_config()
+
+        # integer validation for 'poll_now_days' configuration parameter
+        ret_val, self._poll_now_days = self._validate_integer(self, config['poll_now_days'], AWSSECURITYHUB_POLL_NOW_DAYS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+
+        # integer validation for 'scheduled_poll_days' configuration parameter
+        ret_val, self._scheduled_poll_days = self._validate_integer(self, config['scheduled_poll_days'], AWSSECURITYHUB_SCHEDULED_POLL_DAYS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
 
         self._region = AWSSECURITYHUB_REGION_DICT.get(config['region'])
         if not self._region:
@@ -71,6 +88,77 @@ class AwsSecurityHubConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str is not None and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(AWSSECURITYHUB_PY_2TO3_ERR_MSG)
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
+        error_msg = AWSSECURITYHUB_ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = AWSSECURITYHUB_UNICODE_DAMMIT_TYPE_ERR_MSG
+        except:
+            error_msg = AWSSECURITYHUB_ERR_MSG_UNAVAILABLE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_INT_MSG.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _create_client(self, action_result, service='securityhub'):
 
         boto_config = None
@@ -79,7 +167,6 @@ class AwsSecurityHubConnector(BaseConnector):
 
         try:
             if self._access_key and self._secret_key:
-
                 self.debug_print("Creating boto3 client with API keys")
                 self._client = client(
                         service,
@@ -88,7 +175,6 @@ class AwsSecurityHubConnector(BaseConnector):
                         aws_secret_access_key=self._secret_key,
                         config=boto_config)
             else:
-
                 self.debug_print("Creating boto3 client without API keys")
                 self._client = client(
                         service,
@@ -96,7 +182,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         config=boto_config)
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(err))
 
         return phantom.APP_SUCCESS
 
@@ -110,7 +197,8 @@ class AwsSecurityHubConnector(BaseConnector):
         try:
             resp_json = boto_func(**kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Security Hub failed', e), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Security Hub failed', err), None)
 
         return phantom.APP_SUCCESS, resp_json
 
@@ -239,14 +327,12 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _poll_from_security_hub(self, action_result, max_containers):
 
-        config = self.get_config()
-
         if phantom.is_fail(self._create_client(action_result)):
             return None
 
         end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         if self.is_poll_now():
-            days = int(config['poll_now_days'])
+            days = self._poll_now_days
             filters = {
                         "UpdatedAt": [{
                             "DateRange": {
@@ -256,7 +342,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         }]
                     }
         elif self._state.get('first_run', True):
-            days = int(config['scheduled_poll_days'])
+            days = self._scheduled_poll_days
             filters = {
                         "UpdatedAt": [{
                             "DateRange": {
@@ -268,7 +354,7 @@ class AwsSecurityHubConnector(BaseConnector):
         else:
             start_date = self._state.get('last_ingested_date')
             if not start_date:
-                start_date = end_date - timedelta(days=int(config['scheduled_poll_days']))
+                start_date = end_date - timedelta(days=self._scheduled_poll_days)
             filters = {
                         "UpdatedAt": [{
                             "Start": start_date,
@@ -300,20 +386,6 @@ class AwsSecurityHubConnector(BaseConnector):
 
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
-
-        try:
-            poll_now_days = int(config['poll_now_days'])
-            if (poll_now_days and not str(poll_now_days).isdigit()) or poll_now_days == 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='poll_now_days'))
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_DAYS.format(parameter='poll_now_days', error=str(e)))
-
-        try:
-            scheduled_poll_now_days = int(config['scheduled_poll_days'])
-            if (scheduled_poll_now_days and not str(scheduled_poll_now_days).isdigit()) or scheduled_poll_now_days == 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='scheduled_poll_days'))
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_DAYS.format(parameter='scheduled_poll_days', error=str(e)))
 
         if 'sqs_url' in config:
             findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count)
@@ -354,8 +426,10 @@ class AwsSecurityHubConnector(BaseConnector):
 
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='limit'))
+        # integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSSECURITYHUB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         resource_id = param.get('resource_id')
         resource_ec2_ipv4_addresses = param.get('resource_ec2_ipv4_addresses')
@@ -531,6 +605,8 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _validate_findings_id(self, findings_id, record_state, action_result):
 
+        valid_finding = None
+
         filters = {
                 "Id": [{
                     "Comparison": AWSSECURITYHUB_EQUALS_CONSTS,
@@ -549,12 +625,13 @@ class AwsSecurityHubConnector(BaseConnector):
                 if record_state and finding.get('RecordState') == record_state:
                     action_result.set_status(phantom.APP_SUCCESS, 'Provided findings ID is already {}'.format(record_state))
                     return (True, False, finding)
+                valid_finding = finding
                 break
         else:
             action_result.set_status(phantom.APP_ERROR, 'Please provide a valid findings ID')
             return (False, False, None)
 
-        return (True, True, finding)
+        return (True, True, valid_finding)
 
     def _handle_archive_findings(self, param):
 
