@@ -290,7 +290,10 @@ class AkamaiNetworkListsConnector(BaseConnector):
         if param.get("extended"):
             params['extended'] = param.get("extended")
         if param.get("networklistid"):
-            param_networklistid = self._handle_py_ver_compat_for_input_str(param.get("networklistid")).split(',')
+            param_networklistid = [x.strip() for x in self._handle_py_ver_compat_for_input_str(param.get("networklistid")).split(',')]
+            param_networklistid = list(filter(None, param_networklistid))
+            if not param_networklistid:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide valid input value in the 'networklistid' action parameter")
 
         # Loop through each Network ID to retrive the data.
         for networklist in param_networklistid:
@@ -319,7 +322,7 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         if len(param_elements) <= 1:
             # Create the param data to build the URI correctly. Only doing this to reuse code.
-            # Can assign manually but it wont be as flexiable if the API changes.
+            # Can assign manually but it wont be as flexible if the API changes.
             params = {'element': self._handle_py_ver_compat_for_input_str(param.get('elements'))}
 
             endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid'))), params)
@@ -351,11 +354,14 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        param_elements = self._handle_py_ver_compat_for_input_str(param.get('elements')).split(",")
+        param_elements = [x.strip() for x in self._handle_py_ver_compat_for_input_str(param.get("elements")).split(',')]
+        param_elements = list(filter(None, param_elements))
+        if not param_elements:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input value in the 'elements' action parameter")
 
         if len(param_elements) < 2:
             # Create the param data to build the URI correctly. Only doing this to reuse code.
-            # Can assign manually but it wont be as flexiable if the API changes.
+            # Can assign manually but it wont be as flexible if the API changes.
             params = {'element': self._handle_py_ver_compat_for_input_str(param.get('elements'))}
 
             endpoint = self._process_parameters("{}/{}/elements".format(AKAMAI_NETWORK_LIST_ENDPOINT, self._handle_py_ver_compat_for_input_str(param.get('networklistid'))), params)
@@ -381,8 +387,8 @@ class AkamaiNetworkListsConnector(BaseConnector):
                 # Index is used to pop the item from the list
                 index = 0
                 # Loop through the current list of addresses
-                for list in networkList:
-                    if item == list:
+                for network in networkList:
+                    if item == network:
                         networkList.pop(index)
                     index += 1
 
@@ -415,7 +421,10 @@ class AkamaiNetworkListsConnector(BaseConnector):
         # Access action parameters passed in the 'param' dictionary
         ip_data = []
 
-        ip_list = self._handle_py_ver_compat_for_input_str(param.get('list')).split(",")
+        ip_list = [x.strip() for x in self._handle_py_ver_compat_for_input_str(param.get("list")).split(',')]
+        ip_list = list(filter(None, ip_list))
+        if not ip_list:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input value in the 'list' action parameter")
 
         for ip in ip_list:
             ip_data.append(ip)
@@ -500,9 +509,14 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         # Notification parameter is used
         if param.get("notification"):
+            notifications = [x.strip() for x in self._handle_py_ver_compat_for_input_str(param.get("notification")).split(',')]
+            notifications = list(filter(None, notifications))
+            if not notifications:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide valid input value in the 'notification' action parameter")
+
             notificationEmails = []
 
-            for notificationEmail in self._handle_py_ver_compat_for_input_str(param.get("notification")).split(','):
+            for notificationEmail in notifications:
                 notificationEmails.append(notificationEmail)
 
             data['notification'] = notificationEmails
