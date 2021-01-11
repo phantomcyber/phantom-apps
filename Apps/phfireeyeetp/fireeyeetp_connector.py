@@ -1167,6 +1167,7 @@ class FireeyeEtpConnector(BaseConnector):
 
         # If it is a scheduled poll, ingest from last_ingestion_time
         else:
+            limit = data['size']
             try:
                 # Get the ingestion interval
                 # If interval is not present just get the last 15 minutes
