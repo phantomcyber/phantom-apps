@@ -55,7 +55,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -128,7 +128,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -197,7 +197,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -275,7 +275,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -347,7 +347,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -424,7 +424,7 @@ class CybereasonQueryActions:
 
             res = cr_session.post(url, json=query, headers=connector._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 connector._process_response(res, action_result)
                 return action_result.get_status()
 

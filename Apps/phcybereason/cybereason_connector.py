@@ -163,7 +163,7 @@ class CybereasonConnector(BaseConnector):
         url = "{0}/rest/visualsearch/query/simple".format(self._base_url)
         res = cr_session.post(url=url, json=query, headers=self._headers)
 
-        if res.status_code != 200:
+        if res.status_code < 200 or res.status_code >= 399:
             return self._process_response(res, action_result)
 
         results = res.json()
@@ -188,7 +188,7 @@ class CybereasonConnector(BaseConnector):
                         })
                         target_ids_added.add(target_id)
 
-        return RetVal(action_result.set_status(phantom.APP_SUCCESS), remediate_body)
+        return RetVal(phantom.APP_SUCCESS, remediate_body)
 
     def _handle_delete_registry_key(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -209,7 +209,7 @@ class CybereasonConnector(BaseConnector):
             # Make the call to remediate the action
             res = cr_session.post("{0}/rest/remediate".format(self._base_url), json=remediate_body, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -275,7 +275,7 @@ class CybereasonConnector(BaseConnector):
             }
             res = cr_session.post(url=url, headers=self._headers, json=post_data)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -316,7 +316,7 @@ class CybereasonConnector(BaseConnector):
 
             res = cr_session.post(url, data=comment.encode('utf-8'), headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -349,7 +349,7 @@ class CybereasonConnector(BaseConnector):
             query = json.dumps({malop_id: cybereason_status})
             res = cr_session.post(url, data=query, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -379,7 +379,7 @@ class CybereasonConnector(BaseConnector):
 
             res = cr_session.post(url, data=query, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -409,7 +409,7 @@ class CybereasonConnector(BaseConnector):
 
             res = cr_session.post(url, data=query, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -447,7 +447,7 @@ class CybereasonConnector(BaseConnector):
             }
             res = cr_session.post(url, json=query, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -480,7 +480,7 @@ class CybereasonConnector(BaseConnector):
             url = "{0}/rest/remediate/progress/{1}/{2}/{3}".format(self._base_url, remediation_user, malop_id, remediation_id)
             res = cr_session.get(url)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -522,7 +522,7 @@ class CybereasonConnector(BaseConnector):
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": custom_reputation, "prevent": False, "remove": False}])
 
             res = cr_session.post(url, data=reputation, headers=self._headers)
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
 
@@ -580,7 +580,7 @@ class CybereasonConnector(BaseConnector):
             self.save_progress(str(query_path))
             res = cr_session.post(url, json=query_path, headers=self._headers)
 
-            if res.status_code != 200:
+            if res.status_code < 200 or res.status_code >= 399:
                 return self._process_response(res, action_result)
 
             self.save_progress("Got result from /rest/visualsearch/query/simple")
