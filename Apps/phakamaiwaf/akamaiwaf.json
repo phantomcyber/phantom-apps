@@ -1308,7 +1308,7 @@
                     "primary": true
                 },
                 "extended": {
-                    "description": "When enabled provides additional response data identifying who created and updated the list and when, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
+                    "description": "When enabled, provides additional response data identifying who and when the lists were created and updated, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 2
@@ -1428,7 +1428,7 @@
         },
         {
             "action": "activation details",
-            "description": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the Get activation status operation",
+            "description": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the \"activation status\" action",
             "type": "investigate",
             "identifier": "activation_details",
             "read_only": true,
