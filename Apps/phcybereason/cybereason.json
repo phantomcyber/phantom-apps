@@ -1,0 +1,879 @@
+{
+    "appid": "d8bb9ae7-4c54-4fc8-80da-b66b80d30699",
+    "name": "Cybereason",
+    "description": "This app integrates with Cybereason to perform investigative, contain and corrective actions",
+    "type": "endpoint",
+    "product_vendor": "Cybereason",
+    "logo": "logo_cybereason.svg",
+    "logo_dark": "logo_cybereason_dark.svg",
+    "product_name": "Cybereason",
+    "product_version_regex": ".*",
+    "publisher": "Cybereason",
+    "license": "Copyright Cybereason 2017-2018",
+    "app_version": "1.0.7",
+    "utctime_updated": "2018-09-18T20:18:58.000000Z",
+    "package_name": "phantom_cybereason",
+    "main_module": "cybereason_connector.pyc",
+    "min_phantom_version": "3.5.210",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Environment Url",
+            "data_type": "string",
+            "required": true,
+            "default": "cybereason.net",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get malops",
+            "description": "Get and filter malops from Cybereason",
+            "verbose": "Get all malops from Cybereason based on the criteria",
+            "type": "investigate",
+            "identifier": "get_malops",
+            "read_only": true,
+            "parameters": {
+                "type": {
+                    "description": "Malop Type [All, Unread, Open, Closed (Remediated), False Positive (Not relevant)]",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0,
+                    "required": true,
+                    "value_list": [
+                        "All",
+                        "Unread",
+                        "Open",
+                        "Closed",
+                        "False Positive"
+                    ],
+                    "default": "All"
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Malops Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Open"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.affectedMachines",
+                    "data_type": "string",
+                    "example_values": [
+                        "PC_NAME"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Affected Machines",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.affectedUsers",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\administrator"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Affected Users",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.commentId",
+                    "data_type": "string",
+                    "example_values": [
+                        "d518e445-6930-4757-b2cd-2134542717bb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "comment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-16 15:45:26"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "user@cybereason.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectionType",
+                    "data_type": "string",
+                    "example_values": [
+                        "CNC"
+                    ],
+                    "column_name": "Detection Type",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.isBlocked",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ],
+                    "column_name": "Is Blocked",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.malopActivityTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "MALICIOUS_INFECTION"
+                    ],
+                    "column_name": "Activity Types",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.malopID",
+                    "data_type": "string",
+                    "example_values": [
+                        "11.8371241992421952627"
+                    ],
+                    "contains": [
+                        "malop id"
+                    ],
+                    "column_name": "MalopID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.malopLastUpdateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-30 14:07:29"
+                    ],
+                    "column_name": "Last Update Time",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.malopStartTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-30 14:05:49"
+                    ],
+                    "column_name": "Malop Start Time",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.managementStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "OPEN"
+                    ],
+                    "column_name": "Malop Status",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.rootCauseElementNames",
+                    "data_type": "string",
+                    "example_values": [
+                        "powershell.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "Root Cause",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.rootCauseElementTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Process"
+                    ],
+                    "column_name": "Root Cause Type",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.malop_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "SUCCESS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved malops"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get indicators",
+            "description": "Get all indicators from Cybereason",
+            "verbose": "Returns a list of all the Cybereason indicators on the blacklist and whitelist.",
+            "type": "generic",
+            "identifier": "get_indicators",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Indicators Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.key",
+                    "data_type": "string",
+                    "column_name": "Key",
+                    "column_order": 1,
+                    "example_values": [
+                        "0b187f80b2342a90295951e379bb8362"
+                    ],
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prevent execution",
+                    "data_type": "string",
+                    "column_name": "Prevent Execution",
+                    "column_order": 3,
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remove",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "column_name": "Reputation",
+                    "column_order": 2,
+                    "example_values": [
+                        "whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.indicator_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved indicators"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add indicators",
+            "description": "Add new indicators",
+            "verbose": "Add new indicators to the blacklist or whitelist. \"Prevention\" only works on indicators that are hash values.",
+            "undo": "delete indicators",
+            "type": "contain",
+            "identifier": "add_indicators",
+            "read_only": true,
+            "parameters": {
+                "keys": {
+                    "description": "IOC(s) to add to Cybereason",
+                    "verbose": "This is similar to calling 'Set reputation' available in the GUI.",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ],
+                    "allow_list": true,
+                    "order": 0,
+                    "required": true
+                },
+                "reputation": {
+                    "description": "Reputation (Blacklist / Whitelist)",
+                    "verbose": "This is the blacklist / whitelist which establishes what Cybereason alerts on.",
+                    "data_type": "string",
+                    "order": 1,
+                    "default": "blacklist",
+                    "value_list": [
+                        "blacklist",
+                        "whitelist"
+                    ]
+                },
+                "prevention": {
+                    "description": "Enables the prevention of specific indicators",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "default": false
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Indicators Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keys",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ],
+                    "example_values": [
+                        "0b187f80b2342a90295951e379bb8362, d611835de15e966d780879e789119194"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.prevention",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.key",
+                    "data_type": "string",
+                    "column_name": "Key",
+                    "column_order": 1,
+                    "example_values": [
+                        "0b187f80b2342a90295951e379bb8362"
+                    ],
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prevent",
+                    "data_type": "boolean",
+                    "column_name": "Prevent Execution",
+                    "column_order": 3,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "column_name": "Reputation",
+                    "column_order": 2,
+                    "example_values": [
+                        "whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.data",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.outcome",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated indicators"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete indicators",
+            "description": "Delete indicators based on the key provided",
+            "verbose": "Removes the indicator from the specified list",
+            "undo": "add indicators",
+            "type": "correct",
+            "identifier": "delete_indicators",
+            "read_only": true,
+            "parameters": {
+                "keys": {
+                    "description": "IOC(s) to delete from Cybereason",
+                    "verbose": "This is similar to calling 'Set reputation' available in the GUI.",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "primary": true,
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ],
+                    "order": 0,
+                    "required": true
+                },
+                "reputation": {
+                    "description": "Reputation (Blacklist / Whitelist)",
+                    "verbose": "This is the blacklist / whitelist which establishes what Cybereason alerts on.",
+                    "data_type": "string",
+                    "order": 1,
+                    "default": "blacklist",
+                    "value_list": [
+                        "blacklist",
+                        "whitelist"
+                    ]
+                },
+                "prevention": {
+                    "description": "Enables the prevention of specific indicators",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "default": false
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Indicators Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keys",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ],
+                    "example_values": [
+                        "0b187f80b2342a90295951e379bb8362, d611835de15e966d780879e789119194"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.prevention",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.key",
+                    "data_type": "string",
+                    "column_name": "Key",
+                    "column_order": 1,
+                    "example_values": [
+                        "0b187f80b2342a90295951e379bb8362"
+                    ],
+                    "contains": [
+                        "md5",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.prevent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Prevent Execution",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "column_name": "Reputation",
+                    "column_order": 2,
+                    "example_values": [
+                        "whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.data",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.outcome",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated indicators"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine device",
+            "description": "Quarantines a device using the Cybereason platform",
+            "verbose": "Performs an 'isolate' command in Cybereason. The device retains the ability to communicate with Cybereason.",
+            "undo": "unquarantine device",
+            "type": "contain",
+            "identifier": "quarantine_device",
+            "read_only": false,
+            "parameters": {
+                "identifier": {
+                    "description": "Hostname",
+                    "verbose": "Hostname used to identify the device.",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ],
+                    "order": 0,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Device Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.identifier",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "example_values": [
+                        "MIN-SSDSSWS1"
+                    ],
+                    "column_name": "identifier",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.pylimid",
+                    "data_type": "string",
+                    "column_name": "pylum id",
+                    "column_order": 1,
+                    "example_values": [
+                        "PYLUMCLIENT_INERNAL_MIN-SSDSSWS1_0123456789AB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2,
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.number_of_devices_to_isolate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Command (isolate) successfully complete"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine device",
+            "description": "Un-quarantines a device using the Cybereason platform",
+            "verbose": "Performs an 'un-isolate' command in Cybereason. The device gains ability to communicate internally and externally.",
+            "undo": "quarantine device",
+            "type": "correct",
+            "identifier": "unquarantine_device",
+            "read_only": false,
+            "parameters": {
+                "identifier": {
+                    "description": "Hostname",
+                    "verbose": "Hostname used to identify the device.",
+                    "data_type": "string",
+                    "primary": true,
+                    "allow_list": true,
+                    "contains": [
+                        "host name"
+                    ],
+                    "order": 0,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Device Table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.identifier",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "example_values": [
+                        "MIN-SSDSSWS1"
+                    ],
+                    "column_name": "identifier",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.pylimid",
+                    "data_type": "string",
+                    "column_name": "pylum id",
+                    "column_order": 1,
+                    "example_values": [
+                        "PYLUMCLIENT_INERNAL_MIN-SSDSSWS1_0123456789AB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2,
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.number_of_devices_to_un-isolate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Command (un-isolate) successfully complete"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
