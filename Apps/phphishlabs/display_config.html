@@ -1,0 +1,124 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: display_config.html
+  Copyright (c) 2018-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+.phishlabs-app a:hover {
+  text-decoration:underline;
+}
+
+.phishlabs-app .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.phishlabs-app .wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.phishlabs-app .wf-table-horizontal  {
+  margin-right: 10px;
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.phishlabs-app .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.phishlabs-app .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+}
+
+.phishlabs-app .wf-h3-style {
+  font-size : 20px
+}
+
+.phishlabs-app .wf-h4-style {
+  font-size : 16px
+}
+
+.phishlabs-app .wf-h5-style {
+  font-size : 14px
+}
+.phishlabs-app .wf-subheader-style {
+  font-size : 12px
+}
+
+</style>
+<div class="phishlabs-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+  {% for result in results %} <!-- loop for each result -->
+<br>
+
+<!------------------- For each Result ---------------------->
+
+<h3 class="wf-h3-style">Info</h3>
+
+    <!-- Brands -->
+    {% if result.data %}
+    <table class="wf-table-horizontal">
+      <tr><th>BRAND</th></tr>
+      {% for curr_data in result.data %}
+        {% for curr_brand in curr_data.brands %}
+        <tr>
+          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['phishlabs brand'], 'value': '{{ curr_brand.name }}' }], 0, {{ container.id }}, null, false);">
+              {{ curr_brand.name }}
+              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a></td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </table>
+    {% else %}
+    <p> No Brands in results </p>
+    {% endif %}
+
+<br>
+
+    <!-- Case Types -->
+    {% if result.data %}
+    <table class="wf-table-horizontal">
+      <tr><th>CASE TYPE</th></tr>
+      {% for curr_data in result.data %}
+        {% for curr_case_type in curr_data.case_types %}
+        <tr>
+          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['phishlabs case type'], 'value': '{{ curr_case_type.name }}' }], 0, {{ container.id }}, null, false);">
+              {{ curr_case_type.name }}
+              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a></td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </table>
+    {% else %}
+    <p> No Case Types in results </p>
+    {% endif %}
+
+<!------------------- For each Result END ---------------------->
+
+{% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+{% endblock %} <!-- Main Start Block -->

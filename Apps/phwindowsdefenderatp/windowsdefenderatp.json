@@ -9,16 +9,16 @@
     "product_name": "Windows Defender ATP",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "3.0.0",
     "utctime_updated": "2020-07-07T13:23:56.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
     "python_version": "3",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
-        "Cloud November-December 2019 Release"
+        "Cloud November 2020 Release"
     ],
     "rest_handler": "windowsdefenderatp_connector._handle_rest_request",
     "configuration": {
@@ -48,9 +48,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -58,12 +58,11 @@
         },
         {
             "action": "quarantine device",
-            "identifier": "quarantine_device",
             "description": "Quarantine the device",
             "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
+            "identifier": "quarantine_device",
             "read_only": false,
-            "undo": "unquarantine device",
             "parameters": {
                 "device_id": {
                     "description": "ID of the device to quarantine",
@@ -100,14 +99,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -279,6 +270,14 @@
                     "column_order": 4
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -325,12 +324,11 @@
         },
         {
             "action": "unquarantine device",
-            "identifier": "unquarantine_device",
             "description": "Unquarantine the device",
             "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "correct",
+            "identifier": "unquarantine_device",
             "read_only": false,
-            "undo": "quarantine device",
             "parameters": {
                 "device_id": {
                     "description": "ID of the device to unquarantine",
@@ -356,14 +354,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -518,6 +508,14 @@
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -563,9 +561,9 @@
         },
         {
             "action": "get status",
-            "identifier": "get_status",
             "description": "Get status of the event on a machine",
             "type": "investigate",
+            "identifier": "get_status",
             "read_only": true,
             "parameters": {
                 "event_id": {
@@ -580,14 +578,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.event_id",
                     "data_type": "string",
@@ -652,10 +642,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.fileInstances",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -764,6 +751,14 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_status",
                     "data_type": "string",
                     "example_values": [
@@ -799,10 +794,10 @@
         },
         {
             "action": "scan device",
-            "identifier": "scan_device",
             "description": "Scan a device for virus",
             "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 hour.",
             "type": "investigate",
+            "identifier": "scan_device",
             "read_only": true,
             "parameters": {
                 "device_id": {
@@ -840,14 +835,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -1016,6 +1003,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -1061,10 +1056,10 @@
         },
         {
             "action": "quarantine file",
-            "identifier": "quarantine_file",
             "description": "Quarantine a file",
             "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
+            "identifier": "quarantine_file",
             "read_only": false,
             "parameters": {
                 "device_id": {
@@ -1101,14 +1096,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -1213,19 +1200,13 @@
                 {
                     "data_path": "action_result.data.*.fileInstances.*.filePath",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "file path"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.fileInstances.*.status",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -1323,6 +1304,14 @@
                     "column_order": 4
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -1368,10 +1357,10 @@
         },
         {
             "action": "list devices",
-            "identifier": "list_devices",
             "description": "List of recently seen devices",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machines\" target=\"_blank\">List Machines API Documentation</a>), the user can get devices last seen in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
+            "identifier": "list_devices",
             "read_only": true,
             "parameters": {
                 "input_type": {
@@ -1398,22 +1387,19 @@
                         "domain"
                     ]
                 },
+                "query": {
+                    "description": "Additional OData V4 filters to apply",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "limit": {
                     "description": "Maximum number of devices to return (Maximum: 10,000)",
                     "data_type": "numeric",
                     "default": 100,
-                    "order": 2
+                    "order": 3
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
@@ -1439,6 +1425,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "$filter=riskScore+eq+'High'"
                     ]
                 },
                 {
@@ -1482,10 +1475,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.groupName",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.healthStatus",
@@ -1582,10 +1572,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.osVersion",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.rbacGroupId",
@@ -1610,16 +1597,21 @@
                 },
                 {
                     "data_path": "action_result.data.*.systemProductName",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.version",
                     "data_type": "string",
                     "example_values": [
                         "1809"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1658,10 +1650,10 @@
         },
         {
             "action": "list alerts",
-            "identifier": "list_alerts",
             "description": "List all alerts of a given type",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
             "type": "investigate",
+            "identifier": "list_alerts",
             "read_only": true,
             "parameters": {
                 "input_type": {
@@ -1697,14 +1689,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
@@ -1779,10 +1763,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.classification",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.comments.*.comment",
@@ -1833,10 +1814,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.determination",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.firstEventTime",
@@ -1951,6 +1929,14 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_alerts",
                     "data_type": "numeric",
                     "example_values": [
@@ -1987,10 +1973,10 @@
         },
         {
             "action": "list sessions",
-            "identifier": "list_sessions",
             "description": "List all logged in users on a machine",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-machine-log-on-users\" target=\"_blank\">List Sessions API Documentation</a>), the user can query on machines last seen in the past 30 days; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
+            "identifier": "list_sessions",
             "read_only": true,
             "parameters": {
                 "device_id": {
@@ -2005,14 +1991,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
@@ -2058,10 +2036,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.accountSid",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.firstSeen",
@@ -2096,10 +2071,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.isOnlyNetworkUser",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.lastSeen",
@@ -2113,9 +2085,6 @@
                 {
                     "data_path": "action_result.data.*.leastPrevalentMachineId",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "sha1"
                     ]
@@ -2137,11 +2106,16 @@
                 {
                     "data_path": "action_result.data.*.mostPrevalentMachineId",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
