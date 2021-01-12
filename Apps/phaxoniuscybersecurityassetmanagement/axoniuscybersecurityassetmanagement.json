@@ -9,7 +9,7 @@
     "product_name": "Axonius",
     "product_version_regex": ".*",
     "publisher": "Axonius",
-    "license": "Copyright (c) Axonius, 2018-2020",
+    "license": "Copyright (c) Axonius, 2018-2021",
     "app_version": "2.0.0",
     "utctime_updated": "2019-04-01T20:52:20.000000Z",
     "package_name": "phantom_axoniuscybersecurityassetmanagement",
@@ -55,7 +55,7 @@
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -65,7 +65,7 @@
         },
         {
             "action": "devices by sq",
-            "description": "Get devices by saved query",
+            "description": "Get devices by a saved query",
             "type": "investigate",
             "identifier": "devices_by_sq",
             "read_only": true,
@@ -529,7 +529,7 @@
         },
         {
             "action": "users by sq",
-            "description": "Get users by saved query",
+            "description": "Get users by a saved query",
             "type": "investigate",
             "identifier": "users_by_sq",
             "read_only": true,
