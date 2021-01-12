@@ -171,14 +171,14 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.alert.alert_type",
+                    "data_path": "action_result.data.*.attributes.alert.alert_type",
                     "data_type": "string",
                     "example_values": [
                         "at"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.alert.malware_md5",
+                    "data_path": "action_result.data.*.attributes.alert.malware_md5",
                     "data_type": "string",
                     "example_values": [
                         "131d79133e0f05e27095a8d75302d1e7"
@@ -189,31 +189,31 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.alert.product",
+                    "data_path": "action_result.data.*.attributes.alert.product",
                     "data_type": "string",
                     "example_values": [
                         "ETP"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.alert.timestamp",
+                    "data_path": "action_result.data.*.attributes.alert.timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2020-01-01T01:01:01.804"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.ati",
+                    "data_path": "action_result.data.*.attributes.ati",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.attachment",
+                    "data_path": "action_result.data.*.attributes.email.attachment",
                     "data_type": "string",
                     "column_order": 5,
                     "column_name": "Attachment Name"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.etp_message_id",
+                    "data_path": "action_result.data.*.attributes.email.etp_message_id",
                     "data_type": "string",
                     "example_values": [
                         "D1670833091CA91B5359A4969"
@@ -225,7 +225,7 @@
                     "column_name": "ETP Message ID"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.headers.cc",
+                    "data_path": "action_result.data.*.attributes.email.headers.cc",
                     "data_type": "string",
                     "example_values": [
                         "email@example.com"
@@ -237,7 +237,7 @@
                     "column_name": "CC"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.headers.from",
+                    "data_path": "action_result.data.*.attributes.email.headers.from",
                     "data_type": "string",
                     "example_values": [
                         "email@example.com"
@@ -247,13 +247,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.headers.subject",
+                    "data_path": "action_result.data.*.attributes.email.headers.subject",
                     "data_type": "string",
                     "column_order": 4,
                     "column_name": "Subject"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.headers.to",
+                    "data_path": "action_result.data.*.attributes.email.headers.to",
                     "data_type": "string",
                     "example_values": [
                         "email@example.com"
@@ -263,7 +263,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.smtp.mail_from",
+                    "data_path": "action_result.data.*.attributes.email.smtp.mail_from",
                     "data_type": "string",
                     "example_values": [
                         "email@example.com"
@@ -275,7 +275,7 @@
                     "column_name": "From"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.smtp.rcpt_to",
+                    "data_path": "action_result.data.*.attributes.email.smtp.rcpt_to",
                     "data_type": "string",
                     "example_values": [
                         "email@example.com"
@@ -287,7 +287,7 @@
                     "column_name": "To"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.source_ip",
+                    "data_path": "action_result.data.*.attributes.email.source_ip",
                     "data_type": "string",
                     "example_values": [
                         "1.1.1.1"
@@ -299,7 +299,7 @@
                     "column_name": "Source IP"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.status",
+                    "data_path": "action_result.data.*.attributes.email.status",
                     "data_type": "string",
                     "example_values": [
                         "ACE: Passthrough",
@@ -314,14 +314,14 @@
                     "column_name": "Status"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.email.timestamp.accepted",
+                    "data_path": "action_result.data.*.attributes.email.timestamp.accepted",
                     "data_type": "string",
                     "example_values": [
                         "2020-01-01T01:01:01.804"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.acknowledged",
+                    "data_path": "action_result.data.*.attributes.meta.acknowledged",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -329,21 +329,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.last_malware",
+                    "data_path": "action_result.data.*.attributes.meta.last_malware",
                     "data_type": "string",
                     "example_values": [
                         "Phish.LIVE.DTI.URL"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.last_modified_on",
+                    "data_path": "action_result.data.*.attributes.meta.last_modified_on",
                     "data_type": "string",
                     "example_values": [
                         "2020-01-01T01:01:01.804"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.legacy_id",
+                    "data_path": "action_result.data.*.attributes.meta.legacy_id",
                     "data_type": "numeric",
                     "example_values": [
                         123456789
@@ -355,7 +355,7 @@
                     "column_name": "Legacy ID"
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.read",
+                    "data_path": "action_result.data.*.attributes.meta.read",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -363,21 +363,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.timestamp.db_insert_time",
+                    "data_path": "action_result.data.*.attributes.meta.timestamp.db_insert_time",
                     "data_type": "string",
                     "example_values": [
                         "2020-01-01T01:01:01.804"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attributes.meta.timestamp.es_insert_time",
+                    "data_path": "action_result.data.*.attributes.meta.timestamp.es_insert_time",
                     "data_type": "string",
                     "example_values": [
                         "2020-01-01T01:01:01.804"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
                         "jsYRfJMuJu1epufQQuC3"
@@ -389,7 +389,7 @@
                     "column_name": "Alert ID"
                 },
                 {
-                    "data_path": "action_result.data.*.*.links.detail",
+                    "data_path": "action_result.data.*.links.detail",
                     "data_type": "string",
                     "example_values": [
                         "/api/v1/alerts/jsYRfJMuJu1epufQQuC3"
@@ -1644,7 +1644,7 @@
         },
         {
             "action": "trace email",
-            "description": "Search for Email Message by specifying the parameters",
+            "description": "Search for Email Message by specifying one or more filters",
             "verbose": "<p>At least one parameter must be filled out. All fields are filtered by the IN clause where applicable searching always an AND.</p><p>The modified date always uses the greater than or equal to. For example, if you want to search for the last 7 days, put a timestamp from 7 days ago. IE. 2017-10-03T00:00:00.000Z. Also, note that the DatetTime stamps need to be in UTC otherwise the results will be off. ETP assumes all DateTime stamps are in UTC.</p><p>The status field allows for the following values<ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags field allows for the following values<ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
             "type": "investigate",
             "identifier": "trace_email",
@@ -2055,7 +2055,7 @@
             "read_only": true,
             "parameters": {
                 "original_message_id": {
-                    "description": "The emails Original-Message-ID header value",
+                    "description": "The email's Original-Message-ID header value",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -2064,7 +2064,7 @@
                     "order": 0
                 },
                 "downstream_message_id": {
-                    "description": "The emails Downstream-Message-ID header value",
+                    "description": "The email's Downstream-Message-ID header value",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
@@ -2378,7 +2378,7 @@
         },
         {
             "action": "download email",
-            "description": "Download the email header as a text file and adds it to the vault",
+            "description": "Download the email header as a text file and add it to the vault",
             "type": "investigate",
             "identifier": "download_email",
             "read_only": true,
@@ -2449,7 +2449,7 @@
         },
         {
             "action": "download pcap",
-            "description": "Downloads all PCAP files of the alert for a specified alert ID and adds the files to the vault",
+            "description": "Downloads all the PCAP files of the alert for a specified alert ID and add the files to the vault",
             "type": "investigate",
             "identifier": "download_pcap",
             "read_only": true,
@@ -2520,7 +2520,7 @@
         },
         {
             "action": "download malware files",
-            "description": "Downloads all malware files of the alert for a specified alert ID and adds the files to the vault",
+            "description": "Download all malware files of the alert for a specified alert ID and add the files to the vault",
             "verbose": "<p>These files can contain viruses or other malicious software. Be cautious when opening these files!</p>",
             "type": "investigate",
             "identifier": "download_malware_files",
@@ -2592,7 +2592,7 @@
         },
         {
             "action": "download case files",
-            "description": "Downloads all case files of the alert for a specified alert ID and adds the files to the vault",
+            "description": "Download all case files of the alert for a specified alert ID and add the files to the vault",
             "type": "investigate",
             "identifier": "download_case_files",
             "read_only": true,
@@ -2790,7 +2790,7 @@
         },
         {
             "action": "get quarantined email",
-            "description": "Downloads the email file present in the quarantine for the given Email Security message ID and adds it to the vault",
+            "description": "Download the email file present in the quarantine for the given Email Security message ID and add it to the vault",
             "type": "investigate",
             "identifier": "get_quarantined_email",
             "read_only": true,
@@ -2861,7 +2861,7 @@
         },
         {
             "action": "unquarantine email",
-            "description": "Releases the email file(s) present in the Quarantine within ETP",
+            "description": "Release the email file(s) present in the Quarantine within ETP",
             "type": "correct",
             "identifier": "unquarantine_email",
             "read_only": false,
@@ -2977,7 +2977,7 @@
         },
         {
             "action": "delete quarantined email",
-            "description": "Deletes the email file(s) present in quarantine for the given Email Security message ID",
+            "description": "Delete the email file(s) present in quarantine for the given Email Security message ID",
             "type": "correct",
             "identifier": "delete_quarantined_email",
             "read_only": false,

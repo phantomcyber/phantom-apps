@@ -493,7 +493,11 @@ class FireeyeEtpConnector(BaseConnector):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        if isinstance(response, list):
+            for alert in response:
+                action_result.add_data(alert)
+        else:
+            action_result.add_data(response)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
