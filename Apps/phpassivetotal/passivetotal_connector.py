@@ -1,5 +1,5 @@
 # File: passivetotal_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -15,9 +15,11 @@ from passivetotal_consts import *
 
 from datetime import datetime
 from datetime import timedelta
+from bs4 import UnicodeDammit
 import requests
 import json
 import ipaddress
+import sys
 
 
 class PassivetotalConnector(BaseConnector):
@@ -40,6 +42,12 @@ class PassivetotalConnector(BaseConnector):
         if (self._base_url.endswith('/')):
             self._base_url = self._base_url[:-1]
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
+
         self._host = ph_utils.get_host_from_url(self._base_url)
 
         self._params = {}
@@ -47,6 +55,52 @@ class PassivetotalConnector(BaseConnector):
         self._headers = {'Content-Type': 'application/json'}
 
         return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+            else:
+                error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+                error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+        except:
+            error_code = PASSIVETOTAL_ERR_CODE_UNAVAILABLE
+            error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG
+        except:
+            error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
@@ -58,7 +112,7 @@ class PassivetotalConnector(BaseConnector):
         ip_address_input = input_ip_address
 
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            ipaddress.ip_address(str(ip_address_input))
         except:
             return False
 
@@ -84,7 +138,8 @@ class PassivetotalConnector(BaseConnector):
                     params=params,
                     headers=self._headers)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_SERVER_CONNECTION, e), resp_json, status_code)
+            return (action_result.set_status(phantom.APP_ERROR, "{}. {}".format(PASSIVETOTAL_ERR_SERVER_CONNECTION,
+            self._get_error_message_from_exception(e))), resp_json, status_code)
 
         # It's ok if r.text is None, dump that
         action_result.add_debug_data({'r_text': r.text if r else 'r is None'})
@@ -97,8 +152,8 @@ class PassivetotalConnector(BaseConnector):
             resp_json = r.json()
         except:
             # not a json, dump whatever was returned into the action result
-            details = r.text.replace('{', '').replace('}', '')
-            action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER, status=r.status_code, message=details)
+            details = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '').replace('}', ''))
+            action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER.format(status=r.status_code, message=details))
             return (phantom.APP_ERROR, resp_json, status_code)
 
         # Check if it's a success
@@ -108,7 +163,7 @@ class PassivetotalConnector(BaseConnector):
 
         # Error, dump the cleansed json into the details
         details = json.dumps(resp_json).replace('{', '').replace('}', '')
-        action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER, status=r.status_code, message=details)
+        action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_ERR_FROM_SERVER.format(status=r.status_code, message=details))
         return (phantom.APP_ERROR, resp_json, status_code)
 
     def _test_connectivity(self, param):
@@ -121,7 +176,7 @@ class PassivetotalConnector(BaseConnector):
 
         endpoint = '/enrichment'
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(PASSIVETOTAL_MSG_GET_DOMAIN_TEST)
 
@@ -129,11 +184,12 @@ class PassivetotalConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.debug_print(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, action_result.get_message())
-            self.append_to_message(PASSIVETOTAL_ERR_CONNECTIVITY_TEST)
-            return phantom.APP_ERROR
+            self.save_progress(PASSIVETOTAL_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(PASSIVETOTAL_SUCC_CONNECTIVITY_TEST)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_domain(self, param):
 
@@ -200,9 +256,15 @@ class PassivetotalConnector(BaseConnector):
         ret_val, response, status_code = self._make_rest_call('/enrichment', {'query': query_param}, action_result)
 
         if (not ret_val):
-            message = response.get('error', {}).get('message', '')
+            if isinstance(response.get('error'), dict):
+                message = self._handle_py_ver_compat_for_input_str(response.get('error', {}).get('message', ''))
+            elif isinstance(response.get('error'), str):
+                message = "{} {}".format(self._handle_py_ver_compat_for_input_str(response.get('error')),
+                self._handle_py_ver_compat_for_input_str(response.get('message')))
+            else:
+                message = self._handle_py_ver_compat_for_input_str(str(response))
 
-            if ('quota has been exceeded' in message.lower()):
+            if (QUOTA_EXCEEDED_MSG in message.lower() or QUOTA_EXCEEDED_MSG_API in message.lower()):
                 return action_result.get_status()
 
         if (ret_val) and (response):
@@ -467,22 +529,65 @@ class PassivetotalConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
-
     import pudb
+    import argparse
 
     pudb.set_trace()
 
-    with open(sys.argv[1]) as f:
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        login_url = BaseConnector._get_phantom_base_url() + "login"
+        try:
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = PassivetotalConnector()
         connector.print_progress_message = True
-        ret_val = connector._handle_action(json.dumps(in_json), None)
 
-        # ret_val is already a json string, so load it and dump it with indention
-        print json.dumps(json.loads(ret_val), indent=4)
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
