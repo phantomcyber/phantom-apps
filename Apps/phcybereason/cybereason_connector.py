@@ -516,7 +516,7 @@ class CybereasonConnector(BaseConnector):
 
             url = "{0}/rest/classification/update".format(self._base_url)
             self.save_progress(url)
-            if custom_reputation == 'blacklist':
+            if custom_reputation == 'remove':
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": None, "prevent": False, "remove": True}])
             else:
                 reputation = json.dumps([{"keys": [reputation_item], "maliciousType": custom_reputation, "prevent": False, "remove": False}])

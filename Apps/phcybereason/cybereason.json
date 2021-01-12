@@ -901,7 +901,7 @@
         },
         {
             "action": "set reputation",
-            "description": "Blacklists / Whitelists a file hash so that future malop detections can quickly identify the hash",
+            "description": "Blacklists / Whitelists / Removes a file hash reputation so that future malop detections can quickly identify the hash.",
             "type": "generic",
             "identifier": "set_reputation",
             "read_only": false,
@@ -922,7 +922,8 @@
                     "required": true,
                     "value_list": [
                         "whitelist",
-                        "blacklist"
+                        "blacklist",
+                        "remove"
                     ],
                     "order": 1
                 }

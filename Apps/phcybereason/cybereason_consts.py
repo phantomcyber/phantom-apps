@@ -10,7 +10,7 @@ PHANTOM_TO_CYBEREASON_STATUS = {
     'Reopend': "REOPEN",
     'Under Investigation': "OPEN"
 }
-CUSTOM_REPUTATION_LIST = ["whitelist", "blacklist"]
+CUSTOM_REPUTATION_LIST = ["whitelist", "blacklist", "remove"]
 
 # Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
