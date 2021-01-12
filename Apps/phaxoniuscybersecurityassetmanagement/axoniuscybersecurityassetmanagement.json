@@ -1,0 +1,581 @@
+{
+    "appid": "f2b8357e-53fa-4b2b-bd03-2218f7dec281",
+    "name": "Axonius Cybersecurity Asset Management",
+    "description": "This app integrates with the Axonius Cybersecurity Asset Management Platform to enrich asset data for investigations",
+    "type": "identity management",
+    "product_vendor": "Axonius",
+    "logo": "logo_axoniuscybersecurityassetmanagement.svg",
+    "logo_dark": "logo_axoniuscybersecurityassetmanagement_dark.svg",
+    "product_name": "Axonius",
+    "product_version_regex": ".*",
+    "publisher": "Axonius",
+    "license": "Copyright (c) Axonius, 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2018-08-23T12:23:07.225867Z",
+    "package_name": "phantom_axoniuscybersecurityassetmanagement",
+    "main_module": "axoniuscybersecurityassetmanagement_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "server_address": {
+            "description": "The axonius server name or IP",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "username": {
+            "description": "The username used to login to the axonius system",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "password": {
+            "description": "The password used to login to the axonius system",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "execute action",
+            "identifier": "execute_action",
+            "description": "Execute an action on a list of entities",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete alerts",
+            "identifier": "delete_alerts",
+            "description": "Delete alerts",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_ids": {
+                    "description": "IDs of alert to delete",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_ids",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "alert_ids",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create alert",
+            "identifier": "create_alert",
+            "description": "Create a new alert",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_object": {
+                    "description": "New alert object",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_object",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "alert_object",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alerts",
+            "identifier": "get_alerts",
+            "description": "Get configured alerts",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "skip": {
+                    "description": "How many alerts to skip (0 means none and bring alerts from the start)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "How many alerts to return (pagination)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "fields": {
+                    "description": "The fields to return back for each alerts",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "filter": {
+                    "description": "The filter to get alerts by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 3
+                },
+                "sort": {
+                    "description": "The field to sort the alerts by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.skip",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "skip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "fields",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filter",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user by id",
+            "identifier": "get_user_by_id",
+            "description": "Get user by ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "user_id": {
+                    "description": "ID of user to return",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "user_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get users",
+            "identifier": "get_users",
+            "description": "Query users",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "skip": {
+                    "description": "How many users to skip (0 means none and bring users from the start)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "How many users to return (pagination)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "fields": {
+                    "description": "The fields to return back for each device",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "filter": {
+                    "description": "The filter to get users by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 3
+                },
+                "sort": {
+                    "description": "The field to sort the users by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.skip",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "skip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "fields",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filter",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device by id",
+            "identifier": "get_device_by_id",
+            "description": "Get device by ID",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of device to return",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "device_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get devices",
+            "identifier": "get_devices",
+            "description": "Query devices",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "skip": {
+                    "description": "How many devices to skip (0 means none and bring devices from the start)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "How many devices to return (pagination)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "fields": {
+                    "description": "The fields to return back for each device",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                },
+                "filter": {
+                    "description": "The filter to get devices by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "order": 3
+                },
+                "sort": {
+                    "description": "The field to sort the devices by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.skip",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "skip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "limit",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "fields",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "filter",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sort",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
