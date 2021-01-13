@@ -1,0 +1,784 @@
+{
+    "appid": "44ecb7d2-1eb9-462e-8f83-086e3d47ea77",
+    "name": "Google Cloud Storage",
+    "description": "This app integrates with Google Cloud Storage",
+    "type": "devops",
+    "product_vendor": "Google",
+    "logo": "googlecloudstorage.svg",
+    "logo_dark": "googlecloudstorage_dark.svg",
+    "product_name": "Cloud Storage",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "contributors": "Daniel Federschmidt",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-07-10T10:07:34.904652Z",
+    "package_name": "phantom_gcloudstorage",
+    "main_module": "gcloudstorage_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "pypi": [
+            {"module": "google-api-python-client"},
+            {"module": "python-magic"}
+        ],
+        "wheel": [
+        ]
+     },
+    "configuration": {
+        "key_json": {
+            "description": "Contents of Service Account JSON file",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "project": {
+            "description": "Project ID",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete object",
+            "identifier": "delete_object",
+            "description": "Deletes object from a bucket",
+            "verbose": "Deletes an object and its metadata. Deletions are permanent if versioning is not enabled for the bucket.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "object": {
+                    "description": "Name of the object",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage object"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.object",
+                    "data_type": "string",
+                    "contains": ["gcloud storage object"],
+                    "column_name": "blob",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list objects",
+            "identifier": "list_objects",
+            "description": "Retrieves a list of objects matching the criteria from bucket.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "prefix": {
+                    "description": "Filter objects returned by prefix",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "max_objects": {
+                    "description": "Maximum number of objects to list",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.prefix",
+                    "data_type": "string",
+                    "column_name": "prefix",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.max_objects",
+                    "data_type": "numeric",
+                    "column_name": "max_objects",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_objects",
+                    "data_type": "string",
+                    "column_name": "num objects",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.md5Hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.bucket",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.crc32c",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.mediaLink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.timeStorageClassUpdated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.size",
+                    "data_type": "numeric",
+                    "example_values": [41432]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get object",
+            "identifier": "get_object",
+            "description": "Retrieves object metadata and optionally downloads contents to vault.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "object": {
+                    "description": "Name of the object",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["gcloud storage object"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "download_file": {
+                    "description": "Whether or not to download the file contents to vault",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.object",
+                    "data_type": "string",
+                    "contains": ["gcloud storage object"],
+                    "column_name": "object",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.download_file",
+                    "data_type": "boolean",
+                    "column_name": "Download File",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                },
+                {
+                    "data_path": "action_result.data.0.md5Hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.bucket",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.crc32c",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.mediaLink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeStorageClassUpdated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.size",
+                    "data_type": "numeric",
+                    "example_values": [41432]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create object",
+            "identifier": "create_object",
+            "description": "Creates object in a given bucket",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "vault_id": {
+                    "description": "Vault ID of the file to upload",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["vault id"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "path": {
+                    "description": "Path in the bucket where to place the object",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.path",
+                    "data_type": "string",
+                    "column_name": "path",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": ["vault id"],
+                    "column_name": "vault_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                },
+                {
+                    "data_path": "action_result.data.0.md5Hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.bucket",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.crc32c",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.mediaLink",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeStorageClassUpdated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.size",
+                    "data_type": "numeric",
+                    "example_values": [41432]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "describe bucket",
+            "identifier": "describe_bucket",
+            "description": "Get information about a bucket",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.locationType",
+                    "data_type": "string",
+                    "example_values": ["multi-region"]
+                },
+                {
+                    "data_path": "action_result.data.0.projectNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.location",
+                    "data_type": "string",
+                    "example_values": ["US"]
+                },
+                {
+                    "data_path": "action_result.data.0.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.selfLink",
+                    "data_type": "string",
+                    "example_values": ["https://www.googleapis.com/storage/v1/b/XXXXXXXX"]
+                },
+                {
+                    "data_path": "action_result.data.0.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list buckets",
+            "identifier": "list_buckets",
+            "description": "Retrieves list of buckets for the configured project",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric",
+                    "column_name": "Number of Buckets",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.locationType",
+                    "data_type": "string",
+                    "example_values": ["multi-region"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.projectNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.location",
+                    "data_type": "string",
+                    "example_values": ["US"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.selfLink",
+                    "data_type": "string",
+                    "example_values": ["https://www.googleapis.com/storage/v1/b/XXXXXXXX"]
+                },
+                {
+                    "data_path": "action_result.data.0.items.*.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create bucket",
+            "identifier": "create_bucket",
+            "description": "Create a new bucket",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "bucket": {
+                    "description": "Name of the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage bucket"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "location": {
+                    "description": "Location where to create the bucket",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["gcloud storage location"],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bucket",
+                    "data_type": "string",
+                    "contains": ["gcloud storage bucket"],
+                    "column_name": "bucket",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.location",
+                    "data_type": "string",
+                    "contains": ["gcloud storage location"],
+                    "column_name": "bucket location",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.timeCreated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.updated",
+                    "data_type": "string",
+                    "example_values": ["2020-07-14T11:13:15.950Z"]
+                },
+                {
+                    "data_path": "action_result.data.0.locationType",
+                    "data_type": "string",
+                    "example_values": ["multi-region"]
+                },
+                {
+                    "data_path": "action_result.data.0.projectNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.location",
+                    "data_type": "string",
+                    "example_values": ["US", "US-EAST1"]
+                },
+                {
+                    "data_path": "action_result.data.0.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.selfLink",
+                    "data_type": "string",
+                    "example_values": ["https://www.googleapis.com/storage/v1/b/XXXXXXXX"]
+                },
+                {
+                    "data_path": "action_result.data.0.storageClass",
+                    "data_type": "string",
+                    "example_values": ["STANDARD"]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
