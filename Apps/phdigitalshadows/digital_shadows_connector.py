@@ -81,7 +81,8 @@ class DigitalShadowsConnector(BaseConnector):
             on_poll_connector = DSOnPollConnector(self)
             return on_poll_connector.on_poll(param)
         else:
-            return self.set_status_save_progress(phantom.APP_ERROR, DS_ACTION_NOT_SUPPORTED.format(action_id))
+            self.save_progress(DS_ACTION_NOT_SUPPORTED.format(action_id))
+            return self.set_status(phantom.APP_ERROR, DS_ACTION_NOT_SUPPORTED.format(action_id))
 
 
 if __name__ == '__main__':

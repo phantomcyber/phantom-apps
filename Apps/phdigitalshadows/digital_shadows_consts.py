@@ -26,10 +26,8 @@ DS_POLL_BREACH_COMPLETE = 'Digital Shadows Breach {} ingested ({} of {})'
 DS_POLL_INCIDENT_COMPLETE = 'Digital Shadows Incident {} ingested ({} of {})'
 
 DS_GET_INCIDENT_SUCCESS = 'Digital Shadows incident fetched'
-# DS_GET_INCIDENT_NOT_FOUND = 'Incident not found in Digital Shadows'
 
 DS_GET_INTELLIGENCE_INCIDENT_SUCCESS = 'Digital Shadows intel-incident fetched'
-# DS_GET_INTELLIGENCE_INCIDENT_NOT_FOUND = 'Intel-incident not found in Digital Shadows'
 
 # Data Breach action messages
 DS_GET_BREACH_SUCCESS = 'Digital Shadows data breaches fetched'

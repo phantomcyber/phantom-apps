@@ -6,9 +6,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class DSModel(object):
-
-    __metaclass__ = ABCMeta
+class DSModel(object, metaclass=ABCMeta):
 
     @staticmethod
     def cast(value, to_type):

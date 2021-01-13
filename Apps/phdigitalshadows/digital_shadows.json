@@ -15,7 +15,7 @@
     "package_name": "phantom_digital_shadows",
     "logo": "logo_digital_shadows.svg",
     "logo_dark": "logo_digital_shadows_dark.svg",
-    "license": "Copyright (c) 2020 Digital Shadows Ltd.",
+    "license": "Copyright (c) 2020-2021 Digital Shadows Ltd.",
     "pip_dependencies": {
         "pypi": [
             {
@@ -236,7 +236,7 @@
         {
             "action": "get incident",
             "identifier": "get_incident_by_id",
-            "description": "Retrieve a single incident and it's details, identified by its unique integer identifier",
+            "description": "Retrieve a single incident and its details, identified by its unique integer identifier",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1044,7 +1044,7 @@
         {
             "action": "get data breach",
             "identifier": "get_data_breach_by_id",
-            "description": "Retrieve a single data breach and it's details, identified by its unique integer identifier. The records associated with the breach must be retrieved using a separate operation",
+            "description": "Retrieve a single data breach and its details, identified by its unique integer identifier. The records associated with the breach must be retrieved using a separate operation",
             "type": "investigate",
             "read_only": true,
             "parameters": {

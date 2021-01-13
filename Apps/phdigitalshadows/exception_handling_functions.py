@@ -33,7 +33,6 @@ class ExceptionHandling:
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
         return error_text
 

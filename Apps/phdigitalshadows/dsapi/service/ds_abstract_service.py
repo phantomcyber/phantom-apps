@@ -9,7 +9,7 @@ from ..httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment
 from dsapi.config.ds_proxy_config import DSProxyConfig
 
 
-class DSAbstractService(object):
+class DSAbstractService(object, metaclass=ABCMeta):
     """
     Abstract Service that provides http methods to implementing services.
 
@@ -17,8 +17,6 @@ class DSAbstractService(object):
     For more control, pass a DSProxyConfig object as the keyword argument 'proxy' to
     this class. The keyword argument will take precedence.
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, proxy=None):
         if proxy is None:

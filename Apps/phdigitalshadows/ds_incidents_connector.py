@@ -175,19 +175,20 @@ class DSIncidentsConnector(object):
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_message))
         self._connector.save_progress("response: {}".format(response))
 
-        summary = {
-            'incident_reviews_status_code': response['status'],
-            'incident_reviews_message': response['message']
-        }
-        action_result.update_summary(summary)
+        
         try:
+            summary = {
+                'incident_reviews_status_code': response['status'],
+                'incident_reviews_message': response['message']
+            }
+            action_result.update_summary(summary)
             action_result.add_data(response['content'][0])
+            if response['message'] == "SUCCESS":
+                action_result.set_status(phantom.APP_SUCCESS, "Digital Shadows Incident review posted successfully")
+            else:
+                action_result.set_status(phantom.APP_SUCCESS, "Error in incident review post request")
         except Exception as e:
             error_message = self._handle_exception_object.get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching data from response. {}".format(error_message))
-        if response['message'] == "SUCCESS":
-            action_result.set_status(phantom.APP_SUCCESS, "Digital Shadows Incident review posted successfully")
-        else:
-            action_result.set_status(phantom.APP_SUCCESS, "Error in incident review post request")
 
         return action_result.get_status()
