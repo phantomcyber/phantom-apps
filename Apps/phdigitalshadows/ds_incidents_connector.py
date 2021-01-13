@@ -175,7 +175,6 @@ class DSIncidentsConnector(object):
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_message))
         self._connector.save_progress("response: {}".format(response))
 
-        
         try:
             summary = {
                 'incident_reviews_status_code': response['status'],
