@@ -1,5 +1,5 @@
 # File: windowsdefenderatp_consts.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -29,9 +29,9 @@ DEFENDERATP_SCAN_DEVICE_ENDPOINT = '/machines/{device_id}/runAntiVirusScan'
 DEFENDERATP_UNBLOCK_HASH_ENDPOINT = '/files/{file_hash}/unblock'
 DEFENDERATP_FILE_BLOCK_ENDPOINT = '/files/{file_hash}/block'
 DEFENDERATP_TOKEN_EXPIRED = 'Status Code: 401. Error: Empty response and no information in the header'
-DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG = 'Token not available. Please run test connectivity first.'
+DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG = 'Token not available. Please run test connectivity first'
 DEFENDERATP_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
-                                     'Please specify this value in System Settings.'
+                                     'Please specify this value in System Settings'
 DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG = 'Test connectivity failed'
 DEFENDERATP_TEST_CONNECTIVITY_PASSED_MSG = 'Test connectivity passed'
 DEFENDERATP_AUTHORIZE_USER_MSG = 'Please authorize user in a separate tab using URL'
@@ -41,17 +41,10 @@ DEFENDERATP_OAUTH_URL_MSG = 'Using OAuth URL:'
 DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG = 'Generating access token'
 DEFENDERATP_ALERTS_INFO_MSG = 'Getting info about alerts'
 DEFENDERATP_RECEIVED_ALERT_INFO_MSG = 'Received alert info'
-DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG = 'Action ID not available. Please try again after sometime.'
+DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG = 'Action ID not available. Please try again after sometime'
 DEFENDERATP_FILE_HASH_UNBLOCKED_SUCCESS_MSG = 'File hash unblocked successfully'
-DEFENDERATP_NO_DATA_FOUND_MSG = 'No data found'
-DEFENDERATP_NO_DEVICE_FOUND_MSG = 'No devices found'
-DEFENDERATP_NO_FILE_DEVICE_FOUND_MSG = 'No devices or files found'
-DEFENDERATP_NO_EVENT_FOUND_MSG = 'No events found'
-DEFENDERATP_FILE_BLOCKED_MSG = 'File hash blocked successfully'
 DEFENDERATP_PARAM_VALIDATION_FAILED_MSG = 'Parameter validation failed. Invalid {}'
 DEFENDERATP_INPUT_REQUIRED_MSG = 'Input is required for the given type'
-DEFENDERATP_LIMIT_VALIDATION_MSG = 'Limit should be a non-zero positive integer'
-DEFENDERATP_TIMEOUT_VALIDATION_MSG = 'Timeout should be a non-zero positive integer'
 DEFENDERATP_CONFIG_TENANT_ID = 'tenant_id'
 DEFENDERATP_CONFIG_CLIENT_ID = 'client_id'
 DEFENDERATP_CONFIG_CLIENT_SECRET = 'client_secret'
@@ -62,6 +55,7 @@ DEFENDERATP_FILE_HASH_CONST = 'File Hash'
 DEFENDERATP_JSON_LIMIT = 'limit'
 DEFENDERATP_JSON_TIMEOUT = 'timeout'
 DEFENDERATP_JSON_INPUT = 'input'
+DEFENDERATP_JSON_QUERY = 'query'
 DEFENDERATP_JSON_DEVICE_ID = 'device_id'
 DEFENDERATP_JSON_SCAN_TYPE = 'scan_type'
 DEFENDERATP_JSON_COMMENT = 'comment'
@@ -73,7 +67,6 @@ DEFENDERATP_STATUS_PROGRESS = 'InProgress'
 DEFENDERATP_TOKEN_STRING = 'token'
 DEFENDERATP_ACCESS_TOKEN_STRING = 'access_token'
 DEFENDERATP_REFRESH_TOKEN_STRING = 'refresh_token'
-DEFENDERATP_NEXT_LINK_STRING = '@odata.nextLink'
 DEFENDERATP_TC_FILE = 'oauth_task.out'
 DEFENDERATP_STATUS_CHECK_DEFAULT = 30
 DEFENDERATP_STATUS_CHECK_SLEEP = 5
@@ -82,3 +75,21 @@ DEFENDERATP_AUTHORIZE_WAIT_TIME = 15
 DEFENDERATP_ALERT_DEFAULT_LIMIT = 100
 DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT = 60
 DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT = 3600
+
+# Constants relating to '_get_error_message_from_exception'
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Windows Defender ATP Server. Please check the asset configuration and|or the action parameters"
+
+# Constants relating to '_validate_integer'
+VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
+NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
+TIMEOUT_KEY = "'timeout' action parameter"
+LIMIT_KEY = "'limit' action parameter"
+
+# Constants relating to value_list check
+INPUT_TYPE_VALUE_LIST_ALERTS = ["All", "Domain", "File Hash", "IP"]
+TYPE_VALUE_LIST = ["Full", "Selective"]
+SCAN_TYPE_VALUE_LIST = ["Quick", "Full"]
+INPUT_TYPE_VALUE_LIST_DEVICES = ["All", "Domain", "File Hash"]
