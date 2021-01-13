@@ -98,7 +98,7 @@ class HaveIBeenPwnedConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(params)))
 
         email = params[HAVEIBEENPWNED_ACTION_PARAM_EMAIL]
-        truncate = params[HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE] == "True"
+        truncate = params.get(HAVEIBEENPWNED_ACTION_PARAM_TRUNCATE, "False") == "True"
         endpoint = HAVEIBEENPWNED_API_ENDPOINT_LOOKUP_EMAIL.format(email=email)
 
         ret_val, response = self._make_rest_call(endpoint, truncate=truncate)
