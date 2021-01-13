@@ -10,13 +10,13 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "license": "Copyright (c) 2020 Splunk Inc.",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "contributors": "Daniel Federschmidt",
     "app_version": "1.0.1",
     "utctime_updated": "2020-07-10T10:07:34.904652Z",
     "package_name": "phantom_gcloudstorage",
     "main_module": "gcloudstorage_connector.pyc",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "pypi": [
@@ -47,7 +47,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -125,8 +124,7 @@
         {
             "action": "list objects",
             "identifier": "list_objects",
-            "description": "Retrieves a list of objects matching the criteria from bucket.",
-            "verbose": "",
+            "description": "Retrieves a list of objects matching the criteria from bucket",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -257,8 +255,7 @@
         {
             "action": "get object",
             "identifier": "get_object",
-            "description": "Retrieves object metadata and optionally downloads contents to vault.",
-            "verbose": "",
+            "description": "Retrieves object metadata and optionally downloads contents to vault",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -308,13 +305,13 @@
                     "data_path": "action_result.parameter.download_file",
                     "data_type": "boolean",
                     "column_name": "Download File",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary",
@@ -383,7 +380,6 @@
             "action": "create object",
             "identifier": "create_object",
             "description": "Creates object in a given bucket",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -395,7 +391,7 @@
                     "contains": ["gcloud storage bucket"],
                     "value_list": [],
                     "default": "",
-                    "order": 1
+                    "order": 0
                 },
                 "vault_id": {
                     "description": "Vault ID of the file to upload",
@@ -405,7 +401,7 @@
                     "contains": ["vault id"],
                     "value_list": [],
                     "default": "",
-                    "order": 2
+                    "order": 1
                 },
                 "path": {
                     "description": "Path in the bucket where to place the object",
@@ -414,7 +410,7 @@
                     "primary": true,
                     "value_list": [],
                     "default": "",
-                    "order": 3
+                    "order": 2
                 }
             },
             "output": [
@@ -422,14 +418,14 @@
                     "data_path": "action_result.parameter.path",
                     "data_type": "string",
                     "column_name": "path",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.bucket",
                     "data_type": "string",
                     "contains": ["gcloud storage bucket"],
                     "column_name": "bucket",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
@@ -495,7 +491,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -511,7 +507,6 @@
             "action": "describe bucket",
             "identifier": "describe_bucket",
             "description": "Get information about a bucket",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -600,7 +595,6 @@
             "action": "list buckets",
             "identifier": "list_buckets",
             "description": "Retrieves list of buckets for the configured project",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -679,7 +673,6 @@
             "action": "create bucket",
             "identifier": "create_bucket",
             "description": "Create a new bucket",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
