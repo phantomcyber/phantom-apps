@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2014-2020 Splunk Inc.
+  Copyright (c) 2014-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -8,4 +8,14 @@
 <p>
 If you add the base URL to the Cuckoo instance's Web Interface, a link will be generated and added to the action result
 which will point to analysis summary for each action.
+</p>
+
+<h2>Playbook Backward Compatibility</h2>
+<p>
+  <ul>
+    <li>The existing action parameter have been modified in the action given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+    <ul>
+      <li>Detonate File - The new [zip_and_encrypt] parameter has been added providing option to zip and encrypt file.</li>
+    </ul>
+  </ul>
 </p>

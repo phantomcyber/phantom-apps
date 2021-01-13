@@ -1,23 +1,23 @@
 {
     "appid": "1e73d5e4-f0ac-44cc-bafb-68f982f98559",
     "name": "Cuckoo",
-    "description": "This app supports executing various investigative actions on the Cuckoo sandbox",
+    "description": "This app supports executing various investigative and generic actions on the Cuckoo sandbox",
     "type": "sandbox",
     "product_vendor": "Cuckoo",
     "logo": "logo_cuckoo.svg",
     "logo_dark": "logo_cuckoo_dark.svg",
     "product_name": "Cuckoo",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2014-2020 Splunk Inc.",
-    "app_version": "2.0.0",
-    "utctime_updated": "2020-02-03T21:52:37.000000Z",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2014-2021 Splunk Inc.",
+    "app_version": "2.0.3",
+    "utctime_updated": "2020-12-09T14:09:36.000000Z",
     "package_name": "phantom_cuckoo",
     "main_module": "cuckoo_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On prem, cuckoo-01 (version 2.x), December 12 2019"
+        "On prem, cuckoo-01 (version 2.0.3), December 12 2019"
     ],
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -36,13 +36,11 @@
         "use_https": {
             "description": "Connect with HTTPS",
             "data_type": "boolean",
-            "required": false,
             "order": 2
         },
         "verify_server_cert": {
             "description": "Verify server certificate",
             "data_type": "boolean",
-            "required": false,
             "order": 3
         },
         "timeout": {
@@ -54,34 +52,30 @@
         "username": {
             "description": "HTTP Basic Auth Username",
             "data_type": "string",
-            "required": false,
             "order": 5
         },
         "password": {
             "description": "HTTP Basic Auth Password",
             "data_type": "password",
-            "required": false,
             "order": 6
         },
         "append_uri": {
             "description": "Additional URI Path to Add to the Server",
             "data_type": "string",
-            "required": false,
             "order": 7
         },
         "web_ui_base_url": {
             "description": "Base URL to the Web Interface (e.g. https://10.16.6.42:8000/)",
             "data_type": "string",
-            "required": false,
             "order": 8
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -89,10 +83,10 @@
         },
         {
             "action": "detonate file",
-            "identifier": "detonate_file",
             "description": "Run the file in the sandbox and retrieve the analysis results",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "identifier": "detonate_file",
+            "read_only": false,
             "parameters": {
                 "vault_id": {
                     "description": "Vault ID of file to detonate",
@@ -108,57 +102,47 @@
                 "file_name": {
                     "description": "Filename to use",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "file name"
                     ],
                     "order": 1
                 },
                 "zip_and_encrypt": {
-                    "description": "option to zip and encrypt file, warning: password visible as zip command line argument.",
+                    "description": "Option to zip and encrypt file, warning: password visible as zip command line argument",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "default": false,
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.file_name",
                     "data_type": "string",
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "file_name",
+                    "column_name": "File Name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
+                    "example_values": [
+                        "ac8682258ec2a9556c5b06dac4b70aa7f408146b"
+                    ],
                     "contains": [
                         "vault id",
                         "sha1"
                     ],
-                    "column_name": "vault_id",
-                    "column_order": 0,
-                    "example_values": [
-                        "ac8682258ec2a9556c5b06dac4b70aa7f408146b"
-                    ]
+                    "column_name": "Vault ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.zip_and_encrypt",
                     "data_type": "string",
-                    "column_order": 2,
-                    "column_name": "zipped file"
+                    "column_name": "zipped file",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.apistats.984.CopyFileA",
@@ -720,10 +704,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.buffer",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.callback_function",
@@ -755,10 +736,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.database_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.desired_access",
@@ -927,10 +905,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.key_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.language_identifier",
@@ -948,10 +923,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.machine_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.milliseconds",
@@ -1108,10 +1080,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.password",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.pointer",
@@ -1192,10 +1161,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.section_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.section_offset",
@@ -1227,10 +1193,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.service_start_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.service_type",
@@ -1374,10 +1337,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.value",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.view_size",
@@ -1942,10 +1902,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.duration",
@@ -1963,17 +1920,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.fetch_head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.id",
@@ -2036,31 +1987,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.options",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.route",
@@ -2123,10 +2062,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.dirname",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.sha256",
@@ -2192,9 +2128,6 @@
                 {
                     "data_path": "action_result.data.*.report.network.domains.*.ip",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "ip"
                     ]
@@ -2279,10 +2212,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.ocr",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.path",
@@ -2378,10 +2308,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.password",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.process_handle",
@@ -2434,10 +2361,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.service_start_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.service_type",
@@ -2955,10 +2879,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.duration",
@@ -3040,10 +2961,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.machine",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.memory",
@@ -3055,24 +2973,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.priority",
@@ -3192,23 +3101,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved report"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.id",
                     "data_type": "numeric",
-                    "contains": [
-                        "cuckoo task id"
-                    ],
                     "example_values": [
                         27
+                    ],
+                    "contains": [
+                        "cuckoo task id"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
                     "example_values": [
                         "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -3219,13 +3143,6 @@
                     ],
                     "contains": [
                         "file name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved report"
                     ]
                 },
                 {
@@ -3252,9 +3169,9 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
             "description": "Query for results of an already completed detonation",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -3270,23 +3187,15 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
                         "cuckoo task id"
                     ],
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "340",
-                        "27"
+                        "340"
                     ]
                 },
                 {
@@ -3884,10 +3793,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.database_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.desired_access",
@@ -4056,10 +3962,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.key_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.language_identifier",
@@ -4077,10 +3980,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.machine_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.milliseconds",
@@ -4237,10 +4137,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.password",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.pointer",
@@ -4321,10 +4218,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.section_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.section_offset",
@@ -4356,10 +4250,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.service_start_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.service_type",
@@ -4503,10 +4394,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.value",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.view_size",
@@ -5071,10 +4959,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.duration",
@@ -5092,17 +4977,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.fetch_head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.id",
@@ -5165,31 +5044,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.options",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.route",
@@ -5252,10 +5119,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.dirname",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.sha256",
@@ -5321,9 +5185,6 @@
                 {
                     "data_path": "action_result.data.*.report.network.domains.*.ip",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "ip"
                     ]
@@ -5408,10 +5269,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.ocr",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.path",
@@ -5507,10 +5365,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.password",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.process_handle",
@@ -5563,10 +5418,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.service_start_name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.signatures.*.marks.*.call.arguments.service_type",
@@ -6084,10 +5936,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.duration",
@@ -6169,10 +6018,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.machine",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.memory",
@@ -6184,24 +6030,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.priority",
@@ -6321,6 +6158,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved report"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.id",
                     "data_type": "string",
                     "example_values": [
@@ -6333,26 +6185,16 @@
                 {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
                     "example_values": [
                         "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.target",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved report"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -6378,9 +6220,9 @@
         },
         {
             "action": "detonate url",
-            "identifier": "detonate_url",
             "description": "Load a URL in the Cuckoo sandbox and retrieve the analysis results",
-            "type": "investigate",
+            "type": "generic",
+            "identifier": "detonate_url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -6397,23 +6239,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 0,
+                    "example_values": [
+                        "https://www.test.com"
+                    ],
                     "contains": [
                         "url",
                         "domain"
-                    ],
-                    "column_name": "url",
-                    "column_order": 0,
-                    "example_values": [
-                        "https://www.google.com"
                     ]
                 },
                 {
@@ -6740,10 +6575,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.argument",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.basename",
@@ -6820,10 +6652,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.current_directory",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.desired_access",
@@ -6997,7 +6826,7 @@
                     "data_path": "action_result.data.*.report.behavior.processes.*.calls.*.arguments.src",
                     "data_type": "string",
                     "example_values": [
-                        "https://clients1.google.com/generate_204"
+                        "https://clients1.test.com/generate_204"
                     ],
                     "contains": [
                         "url"
@@ -7580,7 +7409,7 @@
                     "data_path": "action_result.data.*.report.dropped.*.urls",
                     "data_type": "string",
                     "example_values": [
-                        "https://news.google.com/nwshp?hl=en"
+                        "https://news.test.com/nwshp?hl=en"
                     ],
                     "contains": [
                         "url"
@@ -7602,10 +7431,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.duration",
@@ -7623,17 +7449,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.fetch_head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.git.head",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.id",
@@ -7696,31 +7516,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.info.options",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.info.route",
@@ -7783,10 +7591,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.dirname",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.metadata.output.pcap.sha256",
@@ -7819,7 +7624,7 @@
                     "data_path": "action_result.data.*.report.network.dns.*.request",
                     "data_type": "string",
                     "example_values": [
-                        "clients1.google.com"
+                        "clients1.test.com"
                     ]
                 },
                 {
@@ -7852,9 +7657,6 @@
                 {
                     "data_path": "action_result.data.*.report.network.domains.*.ip",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "ip"
                     ]
@@ -7871,10 +7673,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.network.http.*.body",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.network.http.*.count",
@@ -8130,7 +7929,7 @@
                     "data_path": "action_result.data.*.report.network.https_ex.*.host",
                     "data_type": "string",
                     "example_values": [
-                        "www.google.com"
+                        "www.test.com"
                     ]
                 },
                 {
@@ -8230,10 +8029,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.network.https_ex.*.response",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.network.https_ex.*.sha1",
@@ -8414,10 +8210,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.ocr",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.screenshots.*.path",
@@ -8566,7 +8359,7 @@
                     "data_path": "action_result.data.*.report.target.url",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -8602,10 +8395,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.custom",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.duration",
@@ -8687,10 +8477,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.machine",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.memory",
@@ -8702,24 +8489,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.package",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.priority",
@@ -8753,7 +8531,7 @@
                     "data_path": "action_result.data.*.task_status.target",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.test.com"
                     ],
                     "contains": [
                         "url"
@@ -8767,33 +8545,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "cuckoo task id"
-                    ],
-                    "example_values": [
-                        26
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.results_url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
-                    "example_values": [
-                        "https://10.16.6.42:8000/analysis/27/summary"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.target",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com"
-                    ],
-                    "contains": [
-                        "url"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -8801,6 +8557,36 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully retrieved report"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        26
+                    ],
+                    "contains": [
+                        "cuckoo task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.16.6.42:8000/analysis/27/summary"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.target",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://www.test.com"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -8828,17 +8614,16 @@
         {
             "action": "submit strings",
             "identifier": "submit_strings",
-            "description": "Add VirtualTotal compatible hash to the list of pending tasks.",
-            "type": "investigate",
+            "description": "Add VirusTotal compatible URL/Domain to the list of pending tasks",
+            "type": "generic",
             "read_only": false,
             "parameters": {
-                "hash": {
-                    "description": "Single VirtualTotal compatible hash",
+                "url": {
+                    "description": "Single VirusTotal compatible URL/Domain",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "hash",
                         "url",
                         "domain"
                     ],
@@ -8847,12 +8632,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.url",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success"
+                    "contains": [
+                        "url",
+                        "domain"
                     ]
                 },
                 {
@@ -8874,8 +8658,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.file_type",
                     "data_type": "string",
-                    "column_name": "file_type",
-                    "column_order": 5,
                     "example_values": [
                         "PE32 executable (GUI) Intel 80386, for MS Windows"
                     ]
@@ -8883,8 +8665,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.file_size",
                     "data_type": "numeric",
-                    "column_name": "file_size",
-                    "column_order": 6,
                     "example_values": [
                         2545000
                     ]
@@ -8906,8 +8686,6 @@
                 {
                     "data_path": "action_result.data.*.task_status.sample.sha256",
                     "data_type": "string",
-                    "column_name": "sha256",
-                    "column_order": 4,
                     "example_values": [
                         "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
                     ],
@@ -9088,19 +8866,19 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "16: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03, 17: eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "url",
-                        "domain"
                     ]
                 },
                 {

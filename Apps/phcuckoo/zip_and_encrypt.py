@@ -1,27 +1,35 @@
-#! /usr/bin/env python3
+# File: zip_and_encrypt.py
+#
+# Copyright (c) 2014-2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
-zipexec = "/usr/bin/zip"
-
-import sys, os
+import sys
+import os
 import uuid
 import subprocess
 
+zipexec = "/usr/bin/zip"
+
+
 def _is_exec(path):
-    if not os.path.isfile(path) or not os.access(path, os. X_OK):
+    if not os.path.isfile(path) or not os.access(path, os.X_OK):
         return False
     return True
+
 
 class zip_and_encrypt:
     def __init__(self, prefix, password):
         if not _is_exec(zipexec):
-            raise Exception(f"{path} is not executable")
+            raise Exception(f"{zipexec} is not executable")
 
         self._prefix = prefix
         self._password = password
         self._archive = f"{prefix}_{uuid.uuid4()}"
         self._fp = None
         self._output = None
-        
+
     @property
     def output(self):
         return self._output
@@ -74,6 +82,7 @@ class zip_and_encrypt:
     def __del__(self):
         self.cleanup()
 
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
@@ -83,7 +92,7 @@ if __name__ == "__main__":
     try:
         zae = zip_and_encrypt("/tmp/phcuckoo_app_", "password")
         if zae.add(sys.argv[1]) is True:
-            print(f"file archived")
+            print("file archived")
 
     except Exception as e:
         print(f"Error: {e}")
