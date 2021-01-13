@@ -318,7 +318,10 @@ class AkamaiNetworkListsConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        param_elements = self._handle_py_ver_compat_for_input_str(param.get('elements')).split(",")
+        param_elements = [x.strip() for x in self._handle_py_ver_compat_for_input_str(param.get("elements")).split(',')]
+        param_elements = list(filter(None, param_elements))
+        if not param_elements:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input value in the 'elements' action parameter")
 
         if len(param_elements) <= 1:
             # Create the param data to build the URI correctly. Only doing this to reuse code.

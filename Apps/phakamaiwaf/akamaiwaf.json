@@ -56,7 +56,7 @@
         {
             "action": "list networks",
             "description": "Get a network list",
-            "verbose": "List all network lists available for an authenticated user who belongs to a group, optionally filtered by listType or based on a search string. Results appear within the networkLists array, which might be empty if no network lists are available to the client.",
+            "verbose": "List all network lists available for an authenticated user who belongs to a group, optionally filtered by listType or based on a search string. For <strong>extended</strong> parameter, when enabled, provides additional response data identifying who and when the lists were created and updated, and the network list's deployment status in both STAGING and PRODUCTION environments. For <strong>includeelements</strong> parameter, if enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects. Results appear within the networkLists array, which might be empty if no network lists are available to the client.",
             "type": "investigate",
             "identifier": "list_networks",
             "read_only": true,
@@ -67,13 +67,13 @@
                     "order": 0
                 },
                 "extended": {
-                    "description": "When enabled provides additional response data identifying who created and updated the list and when, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
+                    "description": "When enabled, provides additional response data (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
                 },
                 "includeelements": {
-                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects. (Default: false)",
+                    "description": "If enabled, the response list includes all items (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 2
@@ -213,6 +213,7 @@
         {
             "action": "get network",
             "description": "Gets a network list's most recent syncPoint version",
+            "verbose": "For <strong>extended</strong> parameter, when enabled, provides additional response data identifying who and when the lists were created and updated, and the network list's deployment status in both STAGING and PRODUCTION environments. For <strong>includeelements</strong> parameter, if enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects.",
             "type": "investigate",
             "identifier": "get_network",
             "read_only": true,
@@ -229,13 +230,13 @@
                     "primary": true
                 },
                 "extended": {
-                    "description": "When enabled provides additional response data identifying who created and updated the list and when, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
+                    "description": "When enabled, provides additional response data (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
                 },
                 "includeelements": {
-                    "description": "If enabled, the response list includes all items. For large network lists, this may slow responses and yield large response objects. (Default: false)",
+                    "description": "If enabled, the response list includes all items (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 2
@@ -519,7 +520,8 @@
         },
         {
             "action": "delete network",
-            "description": "Removes a network list. You can only remove network lists that never activated. To deactivate a list, you can empty its list of elements",
+            "description": "Removes a network list",
+            "verbose": "You can only remove network lists that never activated. To deactivate a list, you can empty its list of elements.",
             "type": "generic",
             "identifier": "delete_network",
             "read_only": false,
@@ -607,7 +609,8 @@
         },
         {
             "action": "update network",
-            "description": "Update the network list items and properties. Allows you to set the name, description, and set of network list items to the resource. The current state of the list will be replaced with the properties and items you provide. The type cannot be changed",
+            "description": "Update the network list items and properties",
+            "verbose": "Allows you to set the name, description, and set of network list items to the resource. The current state of the list will be replaced with the properties and items you provide. The type cannot be changed.",
             "type": "generic",
             "identifier": "update_network",
             "read_only": false,
@@ -733,7 +736,8 @@
         },
         {
             "action": "add element",
-            "description": "Adds the specified element(s) to a list. If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block",
+            "description": "Adds the specified element(s) to a list",
+            "verbose": "If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "identifier": "add_element",
             "read_only": false,
@@ -863,7 +867,8 @@
         },
         {
             "action": "remove element",
-            "description": "Remove the specified element(s) from the list. If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block",
+            "description": "Remove the specified element(s) from the list",
+            "verbose": "If the network list's type is IP, the value needs to be a URL-encoded IP address or CIDR block.",
             "type": "generic",
             "identifier": "remove_element",
             "read_only": false,
@@ -1010,7 +1015,7 @@
                     "primary": true
                 },
                 "environment": {
-                    "description": "Environment to activate the network to. (Default: STAGING)",
+                    "description": "Environment to activate the network (Default: STAGING)",
                     "data_type": "string",
                     "required": true,
                     "default": "STAGING",
@@ -1148,7 +1153,7 @@
         },
         {
             "action": "activation status",
-            "description": "Shows a network list's activation status on either the STAGING or PRODUCTION environment",
+            "description": "Shows a network list activation status on either the STAGING or PRODUCTION environment",
             "type": "investigate",
             "identifier": "activation_status",
             "read_only": true,
@@ -1164,7 +1169,7 @@
                     "primary": true
                 },
                 "environment": {
-                    "description": "The environment in which the list’s activation occurs. (Default: STAGING)",
+                    "description": "The environment in which the list activation occurs (Default: STAGING)",
                     "data_type": "string",
                     "required": true,
                     "default": "STAGING",
@@ -1282,7 +1287,8 @@
         },
         {
             "action": "activation snapshot",
-            "description": "Gets a version of a network list in its state when activated, with each version identified by its syncPoint value. You can only get syncPoint versions that have been activated",
+            "description": "Gets a version of a network list",
+            "verbose": "Gets a version of a network list in its state when activated, with each version identified by its syncPoint value. You can only get syncPoint versions that have been activated. For <strong>extended</strong> parameter, when enabled, provides additional response data identifying who and when the lists were created and updated, and the network list's deployment status in both STAGING and PRODUCTION environments.",
             "type": "investigate",
             "identifier": "activation_snapshot",
             "read_only": true,
@@ -1308,7 +1314,7 @@
                     "primary": true
                 },
                 "extended": {
-                    "description": "When enabled, provides additional response data identifying who and when the lists were created and updated, and the network list's deployment status in both STAGING and PRODUCTION environments. (Default: false)",
+                    "description": "When enabled, provides additional response data (Default: false)",
                     "data_type": "boolean",
                     "default": false,
                     "order": 2
@@ -1428,7 +1434,8 @@
         },
         {
             "action": "activation details",
-            "description": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the \"activation status\" action",
+            "description": "Provides detailed status for a given activation",
+            "verbose": "Provides detailed status for a given activation, including progress on fast activation and other audit information, in addition to information ordinarily available from the \"activation status\" action.",
             "type": "investigate",
             "identifier": "activation_details",
             "read_only": true,
