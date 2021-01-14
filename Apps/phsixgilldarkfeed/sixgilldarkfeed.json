@@ -1,7 +1,7 @@
 {
     "appid": "c0bed536-ffe4-423f-aece-dd84f4fed16b",
     "name": "Sixgill Darkfeed",
-    "description": "Sixgill's premium underground intelligence collection capabilities, real-time collection, and advanced warning about IOCs help you keep your edge against unknown threats.",
+    "description": "Sixgill's premium underground intelligence collection capabilities, real-time collection, and advanced warning about IOCs help you keep your edge against unknown threats",
     "type": "siem",
     "product_vendor": "Sixgill",
     "logo": "sixgill_logo.png",
@@ -15,7 +15,7 @@
     "utctime_updated": "2020-07-17T07:51:35.336915Z",
     "package_name": "phantom_sixgilldarkfeed",
     "main_module": "sixgilldarkfeed_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
 	"pip_dependencies": {
       "wheel": [
@@ -35,14 +35,14 @@
         },
         "sixgill_client_secret_key": {
             "description": "Sixgill Client Secret Key",
-            "data_type": "string",
+            "data_type": "password",
             "required": true,
             "value_list": [],
             "order": 1
         },
         "phantom_auth_token": {
             "description": "Phantom authorization token",
-            "data_type": "string",
+            "data_type": "password",
             "required": true,
             "value_list": [],
             "order": 2
