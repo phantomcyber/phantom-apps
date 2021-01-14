@@ -1,0 +1,1050 @@
+{
+    "appid": "c0bed536-ffe4-423f-aece-dd84f4fed16b",
+    "name": "Sixgill Darkfeed",
+    "description": "Sixgill's premium underground intelligence collection capabilities, real-time collection, and advanced warning about IOCs help you keep your edge against unknown threats.",
+    "type": "siem",
+    "product_vendor": "Sixgill",
+    "logo": "sixgill_logo.png",
+    "logo_dark": "sixgill_logo_white.svg",
+    "product_name": "Darkfeed",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Sixgill",
+    "license": "Copyright (c) Cybersixgill, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-07-17T07:51:35.336915Z",
+    "package_name": "phantom_sixgilldarkfeed",
+    "main_module": "sixgilldarkfeed_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+	"pip_dependencies": {
+      "wheel": [
+            {
+                "module": "sixgill_clients",
+                "input_file": "wheels/sixgill_clients-0.1.7-py2.py3-none-any.whl"
+            }
+        ]
+	},
+    "configuration": {
+        "sixgill_client_id": {
+            "description": "Sixgill Client ID",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "order": 0
+        },
+        "sixgill_client_secret_key": {
+            "description": "Sixgill Client Secret Key",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "order": 1
+        },
+        "phantom_auth_token": {
+            "description": "Phantom authorization token",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "order": 2
+        },
+		"verify_ssl": {
+            "description": "Use/do not use SSL",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Scheduled/Automated ingestion of all new Darkfeed IOCs detected since last ingestion",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "container_id": {
+                    "description": "Container IDs to limit the ingestion to",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "start_time": {
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "container_count": {
+                    "description": "Maximum number of container records to query for",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "10",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Maximum number of artifact records to query for",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                }
+            },
+			"render": {
+                "type": "table"
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "enrich ip",
+            "identifier": "enrich_ip",
+            "description": "Query the Sixgill Darkfeed for the specified IP and receive all IOCs matching that IP",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "Enrich IP Address indicator with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": ["ip"],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": ["ip"],
+					"example_values": [
+                        "1.1.1.1"
+                      ],
+                    "column_name": "IP",
+                    "column_order": 0
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 4
+                },
+				{
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 5
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 7
+                },
+				{
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 8
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "malicious-activity",
+						"malware",
+						"build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 12
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed IP Reputation"
+
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "enrich url",
+            "identifier": "enrich_url",
+            "description": "Query the Sixgill Darkfeed for the specified URL and receive all IOCs matching that URL",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "Enrich URL indicator with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": ["url"],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": ["url"],
+					"example_values": [
+                        "https://testurl.com"
+                      ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 4
+                },
+				{
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 5
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 7
+                },
+				{
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 8
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "malicious-activity",
+						"malware",
+						"build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 12
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed URL Reputation"
+
+            },
+            "versions": "EQ(*)"
+        },
+		{
+            "action": "enrich domain",
+            "identifier": "enrich_domain",
+            "description": "Query the Sixgill Darkfeed for the specified domain and receive all IOCs matching that domain",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Enrich Domain indicator with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": ["domain"],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": ["domain"],
+					          "example_values": [
+                        "testurl.com"
+                      ],
+                    "column_name": "Domain",
+                    "column_order": 0
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 4
+                },
+				        {
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 5
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 7
+                },
+				        {
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 8
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "malicious-activity",
+						            "malware",
+						            "build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 12
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed Domain Reputation"
+
+            },
+            "versions": "EQ(*)"
+        },
+		{
+            "action": "enrich hash",
+            "identifier": "enrich_hash",
+            "description": "Query the Sixgill Darkfeed for the specified hash and receive all IOCs matching that hash",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "Enrich Hash indicator with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": ["hash"],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": ["hash"],
+					          "example_values": [
+                        "61adfe7zhg456178314d8f86532b3cd1c60bda"
+                      ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 4
+                },
+				        {
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 5
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 7
+                },
+				        {
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 8
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "malicious-activity",
+						"malware",
+						"build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					  "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 12
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed Hash Reputation"
+
+            },
+            "versions": "EQ(*)"
+        },
+		{
+            "action": "enrich post id",
+            "identifier": "enrich_post_id",
+            "description": "Query the Sixgill Darkfeed for the specified Sixgill Post ID (i.e. unique identifier of a specific post shared in the underground) and receive all IOCs shared in that post",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "postid": {
+                    "description": "Enrich Post ID with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Indicator Type",
+                    "column_order": 0
+                },
+				        {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Indicator Value",
+                    "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 4
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 5
+                },
+				        {
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 7
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 8
+                },
+				        {
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "malicious-activity",
+						            "malware",
+						            "build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 12
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 13
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed Post ID Reputation"
+
+            },
+            "versions": "EQ(*)"
+        },
+		    {
+            "action": "enrich threat actor",
+            "identifier": "enrich_threat_actor",
+            "description": "Query the Sixgill Darkfeed and receive all IOCs shared by that threat actor",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "actor": {
+                    "description": "Enrich Actor indicator with Sixgill Darkfeed",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [],
+                    "value_list": [],
+                    "order": 0
+                }
+            },
+            "output": [
+              {
+                    "data_path": "action_result.data.*.indicator_type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Indicator Type",
+                    "column_order": 0
+                },
+				        {
+                    "data_path": "action_result.data.*.indicator_value",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "Indicator Value",
+                    "column_order": 1
+                },
+                {
+                      "data_path": "action_result.data.*.valid_from",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "2015-01-01T15:38:42.969Z"
+                      ],
+                      "column_name": "Valid From Date",
+                      "column_order": 2
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_severity",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Severity",
+                      "column_order": 3
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_confidence",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "90"
+                      ],
+                      "column_name": "Sixgill Confidence",
+                      "column_order": 4
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_feedname",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "dark_web_hashes"
+                      ],
+                      "column_name": "Sixgill Feedname",
+                      "column_order": 5
+                },
+				        {
+                      "data_path": "action_result.data.*.description",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Hash attributed to malware that was discovered in the dark and deep web"
+                      ],
+                      "column_name": "Description",
+                      "column_order": 6
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_posttitle",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Sixgill Posttitle",
+                      "column_order": 7
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_source",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "forum_pediy"
+                      ],
+                      "column_name": "Sixgill Source",
+                      "column_order": 8
+                },
+				        {
+                      "data_path": "action_result.data.*.sixgill_actor",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "Samurai Panda"
+                      ],
+                      "column_name": "Sixgill Actor",
+                      "column_order": 9
+                },
+                {
+                      "data_path": "action_result.data.*.Mitre_Pattern",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Mitre Attack",
+                      "column_order": 10
+                },
+                {
+                      "data_path": "action_result.data.*.Virus_Total",
+                      "data_type": "string",
+                      "contains": [],
+                      "column_name": "Virus Total",
+                      "column_order": 11
+                },
+                {
+                      "data_path": "action_result.data.*.labels",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "malicious-activity",
+						            "malware",
+						            "build-capabilities"
+                      ],
+                      "column_name": "Labels",
+                      "column_order": 12
+                },
+                {
+                      "data_path": "action_result.data.*.sixgill_postid",
+                      "data_type": "string",
+                      "contains": [],
+					            "example_values": [
+                        "8086096cac4da7bb2df28ea09bb46d129662edda"
+                      ],
+                      "column_name": "Sixgill Postid",
+                      "column_order": 13
+                }
+            ],
+            "render": {
+                      "type": "table",
+                      "width": 16,
+                      "height": 6,
+                      "title": "Sixgill Darkfeed Actor Reputation"
+
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
