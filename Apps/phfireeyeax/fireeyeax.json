@@ -429,7 +429,7 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric"
                 },
                 {
@@ -803,7 +803,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.submission_details.*.id",
+                    "data_path": "action_result.data.*.submission_details.*.id",
                     "data_type": "string",
                     "contains": [
                         "fireeyeax submission id"
@@ -812,13 +812,13 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.*.submission_details.*.job_ids",
+                    "data_path": "action_result.data.*.submission_details.*.job_ids",
                     "data_type": "string",
                     "column_name": "Job IDs",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.*.submission_details.*.uuid",
+                    "data_path": "action_result.data.*.submission_details.*.uuid",
                     "data_type": "string",
                     "contains": [
                         "fireeyeax submission uuid"
@@ -827,7 +827,7 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.*.submission_details.*.vnc_port",
+                    "data_path": "action_result.data.*.submission_details.*.vnc_port",
                     "data_type": "numeric",
                     "example_values": [
                         8080
@@ -836,7 +836,7 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "numeric"
                 },
                 {

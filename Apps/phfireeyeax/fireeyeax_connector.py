@@ -497,7 +497,7 @@ class FireeyeAxConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
+        # Now post process the data, uncomment code as you deem fit
         try:
             resp_data = response[0]
         except Exception as e:
@@ -511,7 +511,11 @@ class FireeyeAxConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response. {}".format(err))
 
         # Add the response into the data section
-        action_result.add_data(resp_data)
+        if isinstance(resp_data, list):
+            for alert in resp_data:
+                action_result.add_data(alert)
+        else:
+            action_result.add_data(resp_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -601,7 +605,11 @@ class FireeyeAxConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response. {}".format(err))
 
-        action_result.add_data(resp_data)
+        if isinstance(resp_data, list):
+            for alert in resp_data:
+                action_result.add_data(alert)
+        else:
+            action_result.add_data(resp_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
