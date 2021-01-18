@@ -123,36 +123,26 @@
                 "container_id": {
                     "description": "Container IDs to limit the ingestion to",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "start_time": {
                     "description": "Start of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "end_time": {
                     "description": "End of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 },
                 "container_count": {
                     "description": "Maximum number of container records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "artifact_count": {
                     "description": "Maximum number of artifact records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 }
             },
@@ -163,14 +153,13 @@
             "action": "get findings",
             "identifier": "get_findings",
             "description": "Lists and describes Security Hub aggregated findings that are specified by a single filter attribute",
-            "verbose": "If none of the filter parameters are provided, all the findings will be fetched controlled by the limit parameter. For the parameters resource_ec2_ipv4_addresses and network_source_ipv4, if the user provides comma-separated values and one or more values are incorrect, then those values will be simply ignored and only correct values will be used for further filtering of the findings.",
+            "verbose": "If none of the filter parameters are provided, all the findings will be fetched controlled by the limit parameter. For the parameters 'resource_ec2_ipv4_addresses' and 'network_source_ipv4', if the user provides comma-separated values and one or more values are incorrect, then those values will be simply ignored and only correct values will be used for further filtering of the findings.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "resource_id": {
                     "description": "The canonical identifier for the given resource type",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub resource id",
@@ -181,7 +170,6 @@
                 "resource_ec2_ipv4_addresses": {
                     "description": "Comma-separated IPv4 addresses associated with the instance",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub resource ip"
@@ -191,7 +179,6 @@
                 "network_source_ipv4": {
                     "description": "Comma-separated source IPv4 addresses of network-related information about a finding",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub network source ip"
@@ -201,7 +188,6 @@
                 "network_source_mac": {
                     "description": "The source media access control (MAC) address of network-related information about a finding",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "mac address"
@@ -211,7 +197,6 @@
                 "resource_region": {
                     "description": "The canonical AWS external region name where this resource is located",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 4,
                     "contains": [
@@ -221,15 +206,11 @@
                 "limit": {
                     "description": "Maximum number of findings to be fetched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 },
                 "is_archived": {
                     "description": "Flag to fetch the archived findings",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 6
                 }
             },
@@ -267,9 +248,6 @@
                 {
                     "data_path": "action_result.parameter.network_source_mac",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "mac address"
                     ]
@@ -1548,7 +1526,6 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef"
                     ],
                     "contains": [
@@ -2213,15 +2190,11 @@
                 "note": {
                     "description": "The text of a note",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
                     "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
@@ -2402,15 +2375,11 @@
                 "note": {
                     "description": "The text of a note",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
                     "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
@@ -2427,7 +2396,6 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef"
                     ],
                     "contains": [
@@ -2592,14 +2560,11 @@
                     "description": "The text of a note",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
                     "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
@@ -2618,7 +2583,6 @@
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab"
                     ],
                     "contains": [

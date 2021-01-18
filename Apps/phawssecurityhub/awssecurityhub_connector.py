@@ -19,6 +19,7 @@ from awssecurityhub_consts import *
 from bs4 import UnicodeDammit
 import sys
 
+
 class RetVal(tuple):
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
@@ -313,7 +314,7 @@ class AwsSecurityHubConnector(BaseConnector):
                 if message_dict and message_dict.get('detail', {}).get('findings', []):
                     findings.extend(json.loads(message['Body'])['detail']['findings'])
                 else:
-                    self.debug_print("skipping the following sqs message because of failure to extract finding object: {}".format(message_dict))
+                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(message_dict))
                     continue
 
                 ret_val, resp_json = self._make_boto_call(action_result, 'delete_message', QueueUrl=url, ReceiptHandle=message['ReceiptHandle'])
@@ -865,6 +866,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
