@@ -344,6 +344,17 @@ class AwsGuarddutyConnector(BaseConnector):
                 if finding.get('Severity'):
                     finding['Severity'] = AWSGUARDDUTY_SEVERITY_REVERSE_MAP.get(finding.get('Severity'))
 
+                    # parse S3 bucket details
+                    try:
+                        s3BucketDetails_list = finding['Resource']['S3BucketDetails']
+                        if s3BucketDetails_list:
+                            s3BucketDetails_dict = {}
+                            for element in s3BucketDetails_list:
+                                s3BucketDetails_dict[element['Arn']] = element
+                            finding['Resource']['S3BucketDetails'] = s3BucketDetails_dict
+                    except:
+                        continue
+
             all_findings.extend(findings_data)
 
             del list_findings[:min(50, len(list_findings))]
