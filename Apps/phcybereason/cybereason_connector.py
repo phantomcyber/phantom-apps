@@ -319,7 +319,9 @@ class CybereasonConnector(BaseConnector):
             if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
-
+        except requests.exceptions.ConnectionError:
+            err = "Error Details: Connection refused from the server"
+            return action_result.set_status(phantom.APP_ERROR, err)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
@@ -491,6 +493,9 @@ class CybereasonConnector(BaseConnector):
                 "remediation_status": result["statusLog"][status_log_length - 1]["status"],
                 "remediation_message": error_obj.get("message", "Unknown error") if error_obj is not None else "No error message"
             })
+        except requests.exceptions.ConnectionError:
+            err = "Error Details: Connection refused from the server"
+            return action_result.set_status(phantom.APP_ERROR, err)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print(err)
