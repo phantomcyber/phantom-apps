@@ -251,9 +251,6 @@ class CuckooConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
 
-        print("request", r.request.headers)
-        print("response", r.text)
-
         return self._process_response(r, action_result)
 
     def _check_version(self, action_result):
@@ -361,9 +358,9 @@ class CuckooConnector(BaseConnector):
         zip_password = param.get("zip_password") or "infected"
 
         try:
-            Rules.debug('Rules.vault_info start')
+            self.debug_print('Rules.vault_info start')
             success, message, vault_info = Rules.vault_info(vault_id=vault_id)
-            Rules.debug(
+            self.debug_print(
                 'Rules.vault_info results: success: {}, message: {}, info: {}'
                 .format(success, message, vault_info)
             )
@@ -463,22 +460,6 @@ class CuckooConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
         return self._poll_for_task(action_result, task_ids[0], key=strings[0])
-
-        """
-        summary = {}
-        action_ret_val = phantom.APP_ERROR
-        for x in strings:
-            files = { 'strings': (None, x) }
-            ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)
-            if phantom.is_fail(ret_val):
-                continue
-            action_ret_val = phantom.APP_SUCCESS
-            self._poll_for_task(action_result, task_ids[0], key=x)
-            summary.update({str(task_ids[0]): x})
-
-        action_result.set_summary(summary)
-        return action_result.set_status(action_ret_val)
-        """
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
