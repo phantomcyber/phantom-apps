@@ -138,6 +138,31 @@ class AwsGuarddutyConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _sanitize_dates(self, cur_obj):
+
+        try:
+            json.dumps(cur_obj)
+            return cur_obj
+        except:
+            pass
+
+        if isinstance(cur_obj, dict):
+            new_dict = {}
+            for k, v in cur_obj.items():
+                new_dict[k] = self._sanitize_dates(v)
+            return new_dict
+
+        if isinstance(cur_obj, list):
+            new_list = []
+            for v in cur_obj:
+                new_list.append(self._sanitize_dates(v))
+            return new_list
+
+        if isinstance(cur_obj, datetime):
+            return cur_obj.strftime("%Y-%m-%d %H:%M:%S")
+
+        return cur_obj
+
     def _handle_test_connectivity(self, param):
         """ This function is used to handle the test connectivity action.
 
@@ -361,6 +386,11 @@ class AwsGuarddutyConnector(BaseConnector):
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, '{0}. {1}'.format(AWSGUARDDUTY_BOTO3_CONN_FAILED_MSG, err_msg)), None)
+
+        try:
+            resp_json = self._sanitize_dates(resp_json)
+        except:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_PROCESS_RESPONSE_ERR_MSG), None)
 
         return phantom.APP_SUCCESS, resp_json
 

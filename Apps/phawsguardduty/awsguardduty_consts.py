@@ -50,6 +50,7 @@ AWSGUARDDUTY_CREATE_CONTAINER_ERR_MSG = "Error occurred while creating container
 AWSGUARDDUTY_CREATE_ARTIFACT_ERR_MSG = "Error while creating artifacts for container with ID {container_id}"
 AWSGUARDDUTY_CREATE_ARTIFACT_MSG = "Artifacts created successfully"
 AWSGUARDDUTY_INVALID_METHOD_ERR_MSG = "Invalid method: {method}"
+AWSGUARDDUTY_PROCESS_RESPONSE_ERR_MSG = "Error occurred while processing response"
 AWSGUARDDUTY_BOTO3_CONN_FAILED_MSG = 'Boto3 call to Guardduty failed'
 AWSGUARDDUTY_INVALID_FINDING_ID_ERR_MSG = "Please provide a valid input value in the 'finding_id' action parameter"
 AWSGUARDDUTY_INVALID_FEEDBACK_ERR_MSG = "Please provide a valid input value in the 'feedback' action parameter"
