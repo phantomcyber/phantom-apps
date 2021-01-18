@@ -9,12 +9,16 @@
     "product_name": "GuardDuty",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.4",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-06-12T20:47:16.000000Z",
     "package_name": "phantom_awsguardduty",
-    "main_module": "awsguardduty_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "awsguardduty_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API, January 11, 2021"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -66,35 +70,38 @@
             "data_type": "string",
             "required": true,
             "value_list": [
-                "US East (N. Virginia)",
-                "US East (Ohio)",
-                "US West (N. California)",
-                "US West (Oregon)",
-                "Asia Pacific (Mumbai)",
-                "Canada (Central)",
-                "Asia Pacific (Tokyo)",
-                "Asia Pacific (Seoul)",
-                "Asia Pacific (Singapore)",
-                "Asia Pacific (Sydney)",
-                "EU (Frankfurt)",
-                "EU (Ireland)",
-                "EU (London)",
-                "EU (Paris)",
-                "South America (Sao Paulo)"
+                "US East(N. Virginia) us-east-1",
+                "US East(Ohio) us-east-2",
+                "US West(N. California) us-west-1",
+                "US West(Oregon) us-west-2",
+                "Africa(Cape Town) af-south-1",
+                "Asia Pacific(Hong Kong) ap-east-1",
+                "Asia Pacific(Mumbai) ap-south-1",
+                "Asia Pacific(Seoul) ap-northeast-2",
+                "Asia Pacific(Singapore) ap-southeast-1",
+                "Asia Pacific(Sydney) ap-southeast-2",
+                "Asia Pacific(Tokyo) ap-northeast-1",
+                "Canada(Central) ca-central-1",
+                "Europe(Frankfurt) eu-central-1",
+                "Europe(Ireland) eu-west-1",
+                "Europe(London) eu-west-2",
+                "Europe(Milan) eu-south-1",
+                "Europe(Paris) eu-west-3",
+                "Europe(Stockholm) eu-north-1",
+                "Middle East(Bahrain) me-south-1",
+                "South America(Sao Paulo) sa-east-1"
             ],
-            "default": "us-east-1",
+            "default": "US East(N. Virginia) us-east-1",
             "order": 2
         },
         "filter_name": {
             "description": "Name of the saved filter on UI of AWS GuardDuty",
             "data_type": "string",
-            "required": false,
             "order": 3
         },
         "poll_now_days": {
             "description": "Number of days prior current date to start polling (Default: 30)",
             "data_type": "numeric",
-            "required": false,
             "default": 30,
             "order": 4
         }
@@ -120,36 +127,26 @@
                 "container_id": {
                     "description": "Container IDs to limit the ingestion to",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "start_time": {
                     "description": "Start of time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "end_time": {
                     "description": "End of time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 },
                 "container_count": {
                     "description": "Maximum number of container records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "artifact_count": {
                     "description": "Maximum number of artifact records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 }
             },
@@ -160,8 +157,9 @@
             "action": "update finding",
             "identifier": "update_finding",
             "description": "Updates specified Amazon GuardDuty findings as useful or not useful",
+            "verbose": "For the parameter 'finding_id', if the user provides comma-separated values and one or more values are invalid, then those values will be simply ignored and only correct values will be used for further processing.",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "detector_id": {
                     "description": "The ID of the detector",
@@ -174,20 +172,20 @@
                     "order": 0
                 },
                 "finding_id": {
-                    "description": "The ID of the finding",
+                    "description": "The IDs of the findings(Comma separated IDs allowed)",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "aws guardduty finding id"
                     ],
+                    "allow_list": true,
                     "order": 1
                 },
                 "feedback": {
                     "description": "Feedback value of the finding",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "USEFUL",
                         "NOT_USEFUL"
@@ -198,8 +196,6 @@
                 "comment": {
                     "description": "Additional feedback about the finding",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 }
             },
@@ -297,10 +293,9 @@
         {
             "action": "run query",
             "identifier": "run_query",
-            "description": "Bring the findings as per the filters are applied",
-            "type": "generic",
+            "description": "Fetch the findings as per the filters applied",
+            "type": "investigate",
             "read_only": true,
-            "verbose": "Based on the API documentation, maximum number of findings that can be fetched is 50",
             "parameters": {
                 "detector_id": {
                     "description": "The ID of the detector",
@@ -315,7 +310,6 @@
                 "instance_id": {
                     "description": "The ID of the EC2 instance",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws guardduty instance id"
@@ -325,7 +319,6 @@
                 "severity": {
                     "description": "The severity of the finding",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 2,
                     "value_list": [
@@ -341,7 +334,6 @@
                 "public_ip": {
                     "description": "Public IP address of the EC2 instance",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "ip"
@@ -351,7 +343,6 @@
                 "private_ip": {
                     "description": "Private IP address of the EC2 instance",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "ip"
@@ -359,10 +350,8 @@
                     "order": 4
                 },
                 "limit": {
-                    "description": "The maximum number of results to be fetched",
+                    "description": "The maximum number of results to be fetched. If not provided, then all the results will be fetched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 }
             },
@@ -496,10 +485,52 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Resource.AccessKeyDetails.AccessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASIASJL6J5BVKZILIA9BC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.AccessKeyDetails.PrincipalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "157568067690"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.AccessKeyDetails.UserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.AccessKeyDetails.UserType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resource.InstanceDetails.AvailabilityZone",
                     "data_type": "string",
                     "example_values": [
                         "us-east-1d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.IamInstanceProfile.Arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::157568067690:instance-profile/phantom-sts-ec2-instance"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resource.InstanceDetails.IamInstanceProfile.Id",
+                    "data_type": "string",
+                    "example_values": [
+                        "AIPASJL6J5BVOWSURYNAB"
                     ]
                 },
                 {
@@ -675,6 +706,97 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.Api",
+                    "data_type": "string",
+                    "example_values": [
+                        "DescribeEventAggregates"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.CallerType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Remote IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.ErrorCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "NoSuchEntityException"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.City.CityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Silvassa"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.Country.CountryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "India"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.GeoLocation.Lat",
+                    "data_type": "numeric",
+                    "example_values": [
+                        20.2688
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.GeoLocation.Lon",
+                    "data_type": "numeric",
+                    "example_values": [
+                        73.0162
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.IpAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "103.101.58.60"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.Organization.Asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "45117"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.Organization.AsnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "A's Network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.Organization.Isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "A's Network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.RemoteIpDetails.Organization.Org",
+                    "data_type": "string",
+                    "example_values": [
+                        "A's Network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.AwsApiCallAction.ServiceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "health.amazonaws.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.Blocked",
                     "data_type": "boolean",
                     "example_values": [
@@ -687,6 +809,13 @@
                     "data_type": "string",
                     "example_values": [
                         "INBOUND"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Service.Action.NetworkConnectionAction.LocalIpDetails.IpAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.49.114"
                     ]
                 },
                 {
@@ -918,6 +1047,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Service.Evidence.ThreatIntelligenceDetails.*.ThreatListName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ProofPoint"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Service.ResourceRole",
                     "data_type": "string",
                     "example_values": [
@@ -1015,8 +1151,9 @@
             "action": "archive finding",
             "identifier": "archive_finding",
             "description": "Archives Amazon GuardDuty findings specified by the detector ID and list of finding IDs",
-            "type": "generic",
-            "read_only": true,
+            "verbose": "For the parameter 'finding_id', if the user provides comma-separated values and one or more values are invalid, then those values will be simply ignored and only correct values will be used for further processing.",
+            "type": "contain",
+            "read_only": false,
             "undo": "unarchive finding",
             "parameters": {
                 "detector_id": {
@@ -1030,13 +1167,14 @@
                     "order": 0
                 },
                 "finding_id": {
-                    "description": "The ID of the finding",
+                    "description": "The IDs of the findings(Comma separated IDs allowed)",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "aws guardduty finding id"
                     ],
+                    "allow_list": true,
                     "order": 1
                 }
             },
@@ -1076,95 +1214,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
-                    "data_type": "string",
-                    "example_values": [
-                        "keep-alive"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
-                    "data_type": "string",
-                    "example_values": [
-                        "0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/json"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
-                    "data_type": "string",
-                    "example_values": [
-                        "Tue, 23 Apr 2019 11:48:14 GMT"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.via",
-                    "data_type": "string",
-                    "example_values": [
-                        "1.1 2ac6b2644462a8466362b046856a127e.cloudfront.net (CloudFront)"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "Ylw7rFSVoAMFkLg="
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-cf-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "CzBMnUw0eypQ0Iy43U2XUVsOMjV_V94IU5wHAlIKcHq1hCw-Ea0dTg=="
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
-                    "data_type": "string",
-                    "example_values": [
-                        "ad2750ba-65bd-11e9-8f47-bdaca0b9b9d2"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "Root=1-5cbefb7d-79b0bee0a13019e04e183f60;Sampled=0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-cache",
-                    "data_type": "string",
-                    "example_values": [
-                        "Miss from cloudfront"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
-                    "data_type": "numeric",
-                    "example_values": [
-                        200
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
-                    "data_type": "string",
-                    "example_values": [
-                        "ad2750ba-65bd-11e9-8f47-bdaca0b9b9d2"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_findings",
@@ -1204,8 +1255,9 @@
             "action": "unarchive finding",
             "identifier": "unarchive_finding",
             "description": "Unarchives Amazon GuardDuty findings specified by the detector ID and list of finding IDs",
-            "type": "generic",
-            "read_only": true,
+            "verbose": "For the parameter 'finding_id', if the user provides comma-separated values and one or more values are invalid, then those values will be simply ignored and only correct values will be used for further processing.",
+            "type": "correct",
+            "read_only": false,
             "undo": "archive finding",
             "parameters": {
                 "detector_id": {
@@ -1219,13 +1271,14 @@
                     "order": 0
                 },
                 "finding_id": {
-                    "description": "The ID of the finding",
+                    "description": "The IDs of the findings(Comma separated IDs allowed)",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "aws guardduty finding id"
                     ],
+                    "allow_list": true,
                     "order": 1
                 }
             },
@@ -1236,7 +1289,8 @@
                     "column_name": "Status",
                     "column_order": 2,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1264,95 +1318,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
-                    "data_type": "string",
-                    "example_values": [
-                        "keep-alive"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
-                    "data_type": "string",
-                    "example_values": [
-                        "0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/json"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
-                    "data_type": "string",
-                    "example_values": [
-                        "Tue, 23 Apr 2019 11:48:40 GMT"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.via",
-                    "data_type": "string",
-                    "example_values": [
-                        "1.1 2ac6b2644462a8466362b046856a127e.cloudfront.net (CloudFront)"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-apigw-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "Ylw_rG4poAMFV8g="
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amz-cf-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "ZLfJasiNAwBJFVhtZstwdYLa8YWxyLXvKJ39qF3UxMKT6mZAeiV4QA=="
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
-                    "data_type": "string",
-                    "example_values": [
-                        "bc6cc547-65bd-11e9-a555-9398d727948b"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-trace-id",
-                    "data_type": "string",
-                    "example_values": [
-                        "Root=1-5cbefb97-0d4bfbe8f0e2b2dc0b995358;Sampled=0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-cache",
-                    "data_type": "string",
-                    "example_values": [
-                        "Miss from cloudfront"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
-                    "data_type": "numeric",
-                    "example_values": [
-                        200
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
-                    "data_type": "string",
-                    "example_values": [
-                        "bc6cc547-65bd-11e9-a555-9398d727948b"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_findings",
@@ -1409,8 +1376,6 @@
                 "limit": {
                     "description": "The maximum number of filters to be fetched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -1419,7 +1384,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1496,6 +1462,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.updatedAt.GreaterThan",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1609439400000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.updatedAt.Gt",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1609439400000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.updatedAt.LessThan",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1612290540000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.FindingCriteria.Criterion.updatedAt.Lt",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1612290540000
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Name",
                     "data_type": "string",
                     "example_values": [
@@ -1564,11 +1558,9 @@
                     "order": 0
                 },
                 "limit": {
-                    "description": "The maximum number of threat intel sets to be fetched (Maximum Threat Intel Sets: 7)",
+                    "description": "The maximum number of threat intel sets to be fetched. If not provided, then all the threat intel sets will be fetched",
                     "data_type": "numeric",
                     "default": 7,
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -1699,11 +1691,9 @@
                     "order": 0
                 },
                 "limit": {
-                    "description": "The maximum number of IP sets to be fetched (Maximum IP Sets: 7)",
+                    "description": "The maximum number of IP sets to be fetched. If not provided, then all the IP sets will be fetched",
                     "data_type": "numeric",
                     "default": 7,
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -1820,7 +1810,7 @@
             "action": "list detectors",
             "identifier": "list_detectors",
             "description": "Lists detectorIds of all the existing Amazon GuardDuty detector resources",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {},
             "output": [
@@ -1837,6 +1827,34 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-11-14T23:10:26.234Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DataSources.CloudTrail.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENABLED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DataSources.DNSLogs.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENABLED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DataSources.FlowLogs.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENABLED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DataSources.S3Logs.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "DISABLED"
                     ]
                 },
                 {
