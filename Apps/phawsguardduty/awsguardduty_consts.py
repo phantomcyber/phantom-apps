@@ -40,7 +40,7 @@ AWSGUARDDUTY_REGION_DICT = {
         "South America(Sao Paulo) sa-east-1": "sa-east-1"
     }
 
-# constants relating to error messages
+# Constants relating to error messages
 AWSGUARDDUTY_ERR_FETCHING_PYTHON_VERSION_MSG = "Error occurred while fetching the Phantom server's Python major version"
 AWSGUARDDUTY_PY_2TO3_ERR_MSG = "Error occurred while handling python 2to3 compatibility for the input string"
 AWSGUARDDUTY_CREATE_CLIENT_ERR_MSG = "Could not create boto3 client"
@@ -61,17 +61,17 @@ AWSGUARDDUTY_INVALID_SEVERITY_ERR_MSG = "Please provide a valid input value in t
 AWSGUARDDUTY_FINDING_ID_NOT_FOUND_ERR_MSG = "Please provide valid Finding IDs"
 AWSGUARDDUTY_FINDING_ID_IN_RECORD_STATE_ERR_MSG = "The provided finding IDs are already in {record_state}"
 
-# constants relating to 'get_error_message_from_exception'
+# Constants relating to 'get_error_message_from_exception'
 AWSGUARDDUTY_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 AWSGUARDDUTY_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 AWSGUARDDUTY_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the AWS GuardDuty server. Please check the asset configuration and|or the action parameters."
 
-# constants relating to 'validate_integer'
+# Constants relating to 'validate_integer'
 AWSGUARDDUTY_VALID_INT_MSG = "Please provide a valid integer value in the {param}"
 AWSGUARDDUTY_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in {param}"
 AWSGUARDDUTY_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {param}"
 AWSGUARDDUTY_LIMIT_KEY = "'limit' action parameter"
 AWSGUARDDUTY_POLL_NOW_DAYS_KEY = "'poll_now_days' configuration parameter"
 
-# constants relating to value list
+# Constants relating to value list
 AWSGUARDDUTY_FEEDBACK_LIST = ['USEFUL', 'NOT_USEFUL']

@@ -176,7 +176,7 @@ class AwsGuarddutyConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result)):
             return action_result.get_status()
 
-        ret_val, response = self._make_boto_call(action_result, 'list_invitations', MaxResults=1)
+        ret_val, _ = self._make_boto_call(action_result, 'list_invitations', MaxResults=1)
 
         if phantom.is_fail(ret_val):
             self.save_progress(AWSGUARDDUTY_TEST_CONN_FAILED_MSG)
@@ -343,7 +343,7 @@ class AwsGuarddutyConnector(BaseConnector):
                 if finding.get('Severity'):
                     finding['Severity'] = AWSGUARDDUTY_SEVERITY_REVERSE_MAP.get(finding.get('Severity'))
 
-                    # parse S3 bucket details
+                    # Parse S3 bucket details
                     try:
                         s3BucketDetails_list = finding['Resource']['S3BucketDetails']
                         if s3BucketDetails_list:
@@ -422,7 +422,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         finding_ids = param['finding_id']
 
-        # comma separated handling for 'finding_id'
+        # Comma separated list handling for 'finding_id'
         finding_ids = [x.strip() for x in finding_ids.split(',')]
         finding_ids = list(filter(None, finding_ids))
         if not finding_ids:
@@ -531,7 +531,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         finding_ids = param['finding_id']
 
-        # comma separated handling for 'finding_id'
+        # Comma separated list handling for 'finding_id'
         finding_ids = [x.strip() for x in finding_ids.split(',')]
         finding_ids = list(filter(None, finding_ids))
         if not finding_ids:
@@ -573,7 +573,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         finding_ids = param['finding_id']
 
-        # comma separated handling for 'finding_id'
+        # Comma separated list handling for 'finding_id'
         finding_ids = [x.strip() for x in finding_ids.split(',')]
         finding_ids = list(filter(None, finding_ids))
         if not finding_ids:
@@ -652,7 +652,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        # integer validation for 'limit' action parameter
+        # Integer validation for 'limit' action parameter
         ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -710,7 +710,7 @@ class AwsGuarddutyConnector(BaseConnector):
         private_ip = param.get('private_ip')
         limit = param.get('limit')
 
-        # integer validation for 'limit' action parameter
+        # Integer validation for 'limit' action parameter
         ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -805,7 +805,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        # integer validation for 'limit' action parameter
+        # Integer validation for 'limit' action parameter
         ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -853,7 +853,7 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        # integer validation for 'limit' action parameter
+        # Integer validation for 'limit' action parameter
         ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -959,7 +959,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         self._days = config.get('poll_now_days', AWSGUARDDUTY_POLL_NOW_DAYS)
 
-        # integer validation for 'poll_now_days' configuration parameter
+        # Integer validation for 'poll_now_days' configuration parameter
         ret_val, self._days = self._validate_integer(self, self._days, AWSGUARDDUTY_POLL_NOW_DAYS_KEY)
         if phantom.is_fail(ret_val):
             return self.get_status()
