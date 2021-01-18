@@ -20,27 +20,31 @@
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+                "input_file": "boto3/boto3-1.16.47-py2.py3-none-any.whl"
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+                "input_file": "boto3/botocore-1.19.47-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+                "input_file": "boto3/s3transfer-0.3.3-py2.py3-none-any.whl"
             },
             {
-                "module": "futures",
-                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
+                "module": "six",
+                "input_file": "boto3/six-1.15.0-py2.py3-none-any.whl"
             },
             {
-                "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "module": "urllib3",
+                "input_file": "boto3/urllib3-1.26.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "boto3/python_dateutil-2.8.1-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
-                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+                "input_file": "boto3/jmespath-0.10.0-py2.py3-none-any.whl"
             }
         ]
     },
