@@ -725,29 +725,44 @@ class SlackConnector(phantom.BaseConnector):
 
         caption += 'Uploaded from Phantom'
 
-        vault_id = param['file']
+        kwargs = {}
+        params = {'channels': param['destinati on'], 'initial_comment': caption}
 
-        # check the vault for a file with the supplied ID
-        try:
-            file_info = Vault.get_file_info(vault_id)
-            if not file_info:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="info"))
+        if 'filetype' in param:
+            params['filetype'] = param['filetype']
 
-            file_path = file_info[0].get("path")
-            if not file_path:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
+        if 'parent_message_ts' in param:
+            # Support for replying in thread
+            params['thread_ts'] = param['parent_message_ts']
 
-            file_name = file_info[0].get("name")
-            if not file_name:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="name"))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not find the specified Vault ID in vault")
+        if 'file' in param:
+            vault_id = param['file']
 
-        upfile = open(file_path, 'rb')
+            # check the vault for a file with the supplied ID
+            try:
+                file_info = Vault.get_file_info(vault_id)
+                if not file_info:
+                    return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="info"))
 
-        params = {'channels': param['destination'], 'initial_comment': caption, 'filename': file_name}
+                file_path = file_info[0].get("path")
+                if not file_path:
+                    return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_UPLOAD_FILE, params, files={'file': upfile})
+                file_name = file_info[0].get("name")
+                if not file_name:
+                    return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="name"))
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Could not find the specified Vault ID in vault")
+
+            upfile = open(file_path, 'rb')
+            params['filename'] = file_name
+            kwargs['files'] = {'file': upfile}
+        elif 'content' in param:
+            params['content'] = self._handle_py_ver_compat_for_input_str(param['content'])
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Need to provide either a Vault ID or file content")
+
+        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_UPLOAD_FILE, params, **kwargs)
 
         if not ret_val:
             return ret_val
