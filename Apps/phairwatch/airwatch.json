@@ -1,0 +1,134 @@
+{
+    "appid": "7ca9ffa9-9a85-4d01-b8f3-9634ec68817a",
+    "name": "AirWatch",
+    "description": "This app interacts with Airwatch",
+    "type": "generic",
+    "product_vendor": "Mhike",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "product_name": "AirWatch",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.2",
+    "utctime_updated": "2020-12-17T10:29:02.000000Z",
+    "package_name": "phantom_airwatch",
+    "main_module": "airwatch_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "tenant": {
+            "description": "AirWatch Tenant Code",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "username": {
+            "description": "Basic Auth Username for AirWatch API",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "password": {
+            "description": "Basic Auth Password for AirWatch API",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "base_url": {
+            "description": "Base URL for AirWatch API",
+            "data_type": "string",
+            "required": true,
+            "default": "https://cn251.awmdm.com/api",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add to group",
+            "description": "Add device UUID to AirWatch Group",
+            "type": "generic",
+            "identifier": "add_to_group",
+            "read_only": false,
+            "parameters": {
+                "smartgroup_uuid": {
+                    "description": "AirWatch Smartgroup UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "device_uuid": {
+                    "description": "Device UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.smartgroup_uuid",
+                    "data_type": "string",
+                    "column_name": "AirWatch Smartgroup UUID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.device_uuid",
+                    "data_type": "string",
+                    "column_name": "Device UUID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

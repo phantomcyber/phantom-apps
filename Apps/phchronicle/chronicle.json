@@ -1,6 +1,6 @@
 {
     "appid": "8925dbb5-abe1-4e5d-b053-326e35e1e194",
-    "name":  "Chronicle",
+    "name": "Chronicle",
     "description": "This app enables the end-user to search, analyze, and ingest the enterprise security data stored in the Chronicle using investigative, reputation, and ingestion actions",
     "type": "investigative",
     "product_vendor": "Google Cloud",
@@ -11,8 +11,8 @@
     "product_version_regex": ".*",
     "publisher": "Google",
     "license": "Copyright (c) 2020 Google LLC.",
-    "app_version": "1.0.0",
-    "utctime_updated": "2020-06-22T14:30:17.171269Z",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-10-22T18:48:21.000000Z",
     "package_name": "phantom_chronicle",
     "main_module": "chronicle_connector.py",
     "min_phantom_version": "4.8.24304",
@@ -409,7 +409,7 @@
             "action": "list iocs",
             "identifier": "list_iocs",
             "description": "List all of the IoCs discovered within the enterprise within the specified time period",
-            "verbose" : "The action will fetch the list of all of the IoCs discovered within the enterprise within the specified time. If the user receives ‘moreDataAvailable’ as a true value in the action output datapaths, there might still be more IoCs within the user’s Chronicle account. The user can narrow the time range and run the action again to ensure visibility into all possible IoCs. If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "verbose": "The action will fetch the list of all of the IoCs discovered within the enterprise within the specified time. If the user receives \u2018moreDataAvailable\u2019 as a true value in the action output datapaths, there might still be more IoCs within the user\u2019s Chronicle account. The user can narrow the time range and run the action again to ensure visibility into all possible IoCs. If the user doesn\u2019t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -624,7 +624,7 @@
             "action": "list assets",
             "identifier": "list_assets",
             "description": "List all of the assets that accessed the specified artifact within the specified time period",
-            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "verbose": "If the user doesn\u2019t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -868,7 +868,7 @@
             "action": "list events",
             "identifier": "list_events",
             "description": "List all of the events discovered within the enterprise on a particular device within the specified time period",
-            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the ‘Reference Time’ action parameter is not given, the action will consider start time as reference time. And if the value is given for it, the value will be validated and used in the search request. If the user provides ‘Time Range’ and other time-related action parameters, the priority will be given to the ‘Time Range’ action parameter and the search will be performed according to its given value.",
+            "verbose": "If the user doesn\u2019t provide any of the time-related action parameters, the action will perform a search for the last three days. If the \u2018Reference Time\u2019 action parameter is not given, the action will consider start time as reference time. And if the value is given for it, the value will be validated and used in the search request. If the user provides \u2018Time Range\u2019 and other time-related action parameters, the priority will be given to the \u2018Time Range\u2019 action parameter and the search will be performed according to its given value.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1546,7 +1546,7 @@
             "action": "list alerts",
             "identifier": "list_alerts",
             "description": "List all of the security alerts tracked within the enterprise on particular assets for the specified time period",
-            "verbose": "If the user doesn’t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
+            "verbose": "If the user doesn\u2019t provide any of the time-related action parameters, the action will perform a search for the last three days. If the user provides [Time Range] and other time-related action parameters, the priority will be given to the [Time Range] action parameter and the search will be performed according to its given value.",
             "type": "investigate",
             "read_only": true,
             "parameters": {

@@ -30,3 +30,6 @@ LAMBDA_REGION_DICT = {
         "AWS GovCloud (US-East)": "us-gov-east-1",
         "AWS GovCloud (US)": "us-gov-west-1"
     }
+
+LAMBDA_BAD_ASSET_CONFIG_MSG = "Please provide access keys or select assume role check box in asset configuration"
+EC2_ROLE_CREDENTIALS_FAILURE_MSG = "Failed to get EC2 role credentials"
