@@ -14,6 +14,7 @@ SLACK_PHANTOM_ASSET_INFO_URL = "{url}rest/asset/{asset_id}"
 SLACK_PHANTOM_SYS_INFO_URL = "{url}rest/system_info"
 SLACK_PHANTOM_ICON = "https://www.phantom.us/img/phantom_icon_160x160.png"
 
+SLACK_ADD_REACTION = "reactions.add"
 SLACK_CHANNEL_CREATE_ENDPOINT = "conversations.create"
 SLACK_INVITE_TO_CHANNEL = "conversations.invite"
 SLACK_LIST_CHANNEL = "conversations.list"

@@ -172,6 +172,7 @@ class SlackConnector(phantom.BaseConnector):
     ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
     ACTION_ID_LIST_CHANNELS = "list_channels"
     ACTION_ID_POST_MESSAGE = "send_message"
+    ACTION_ID_ADD_REACTION = "add_reaction"
     ACTION_ID_ASK_QUESTION = "ask_question"
     ACTION_ID_GET_RESPONSE = "get_response"
     ACTION_ID_UPLOAD_FILE = "upload_file"
@@ -713,6 +714,24 @@ class SlackConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Message sent successfully")
 
+    def _add_reaction(self, param):
+
+        self.debug_print("param", param)
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
+        emoji = self._handle_py_ver_compat_for_input_str(param['emoji'])
+
+        params = {'channel': param['destination'], 'name': emoji, 'timestamp': param['message_ts']}
+
+        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_ADD_REACTION, params)
+
+        if not ret_val:
+            return ret_val
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Message sent successfully")
+
     def _upload_file(self, param):
 
         self.debug_print("param", param)
@@ -1069,6 +1088,8 @@ class SlackConnector(phantom.BaseConnector):
             ret_val = self._list_channels(param)
         elif action_id == self.ACTION_ID_POST_MESSAGE:
             ret_val = self._send_message(param)
+        elif action_id == self.ACTION_ID_ADD_REACTION:
+            ret_val = self._add_reaction(param)
         elif action_id == self.ACTION_ID_ASK_QUESTION:
             ret_val = self._ask_question(param)
         elif action_id == self.ACTION_ID_GET_RESPONSE:
