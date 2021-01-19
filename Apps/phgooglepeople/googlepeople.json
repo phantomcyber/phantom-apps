@@ -211,6 +211,8 @@
                 {
                     "data_path": "action_result.data.*.names.*.displayName",
                     "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 2,
                     "example_values": [
                         "Test user"
                     ]
@@ -1263,6 +1265,8 @@
                 {
                     "data_path": "action_result.data.*.names.*.displayName",
                     "data_type": "string",
+                    "column_name": "Display Name",
+                    "column_order": 2,
                     "example_values": [
                         "Test user"
                     ]

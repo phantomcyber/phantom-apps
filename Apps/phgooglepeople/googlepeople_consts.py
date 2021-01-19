@@ -17,6 +17,7 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 # Constants relating to '_validate_integer'
 INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {}"
 INVALID_NON_ZERO_NON_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-zero positive integer value in the {}"
+INVALID_COMMA_SEPARATED_ERR_MSG = "Please provide valid comma-seprated value in the '{}' action parameter"
 
 LIMIT_KEY = "'limit' action parameter"
 

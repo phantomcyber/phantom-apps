@@ -199,6 +199,15 @@ class GooglePeopleConnector(BaseConnector):
 
         read_mask = param.get('read_mask', 'names,emailAddresses')
 
+        # Validation for comma-separated value
+        masks = [x.strip() for x in read_mask.split(",")]
+        masks = list(filter(None, masks))
+
+        if not masks:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_ERR_MSG.format('read mask'))
+
+        read_mask = ",".join(masks)
+
         limit = param.get('limit')
         # Validate 'limit' action parameter
         ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
@@ -251,6 +260,16 @@ class GooglePeopleConnector(BaseConnector):
         data = {}
 
         copy_mask = param.get('copy_mask', 'names,emailAddresses,phoneNumbers')
+
+        # Validation for comma-separated value
+        masks = [x.strip() for x in copy_mask.split(",")]
+        masks = list(filter(None, masks))
+
+        if not masks:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_ERR_MSG.format('copy mask'))
+
+        copy_mask = ",".join(masks)
+
         data.update({'copyMask': copy_mask})
 
         try:
@@ -285,6 +304,15 @@ class GooglePeopleConnector(BaseConnector):
             return action_result.get_status()
 
         read_mask = param.get('read_mask', 'names,emailAddresses')
+
+        # Validation for comma-separated value
+        masks = [x.strip() for x in read_mask.split(",")]
+        masks = list(filter(None, masks))
+
+        if not masks:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_ERR_MSG.format('read mask'))
+
+        read_mask = ",".join(masks)
 
         limit = param.get('limit')
         # Validate 'limit' action parameter
@@ -336,6 +364,15 @@ class GooglePeopleConnector(BaseConnector):
         kwargs = {'sources': ['READ_SOURCE_TYPE_CONTACT']}
 
         person_fields = param.get('person_fields', 'names,emailAddresses')
+
+        # Validation for comma-separated value
+        fields = [x.strip() for x in person_fields.split(",")]
+        fields = list(filter(None, fields))
+
+        if not fields:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_ERR_MSG.format('person fields'))
+
+        person_fields = ",".join(fields)
         kwargs.update({'personFields': person_fields})
 
         try:
@@ -370,6 +407,15 @@ class GooglePeopleConnector(BaseConnector):
             return action_result.get_status()
 
         person_fields = param.get('person_fields', 'names,emailAddresses')
+
+        # Validation for comma-separated value
+        fields = [x.strip() for x in person_fields.split(",")]
+        fields = list(filter(None, fields))
+
+        if not fields:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_ERR_MSG.format('person fields'))
+
+        person_fields = ",".join(fields)
 
         limit = param.get('limit')
         # Validate 'limit' action parameter
