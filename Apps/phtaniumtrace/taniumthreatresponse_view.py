@@ -1,5 +1,5 @@
 # File: taniumthreatresponse_view.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2020-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)def get_events(headers, data):
 
@@ -142,7 +142,7 @@ def display_events(provides, all_app_runs, context):
     for summary, action_results in all_app_runs:
         for result in action_results:
             params = result.get_param()
-            headers = headers_map[params['event_type']]
+            headers = headers_map.get(params['event_type'])
 
             results.append({
                 'headers': headers,
