@@ -226,7 +226,6 @@ class CuckooConnector(BaseConnector):
         # Create a URL to connect to
         url = "{0}{1}".format(self._base_url, endpoint)
 
-        print("auth", self._auth, "headers", headers, "data", data, "json", json, "files", files)
         try:
             r = request_func(
                 url,
@@ -449,10 +448,7 @@ class CuckooConnector(BaseConnector):
         strings = "\n".join(map(lambda x: x.strip(), strings.split(",")))
         strings = list(map(lambda x: x.strip(), strings.split("\n")))
 
-        if len(strings) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Empty 'url' parameter")
-
-        if len(strings[0]) == 0:
+        if len(strings) == 0 or len(strings[0]) == 0:
             return action_result.set_status(phantom.APP_ERROR, "Empty 'url' parameter")
 
         files = { 'strings': (None, strings[0]) }

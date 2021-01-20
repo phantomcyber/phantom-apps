@@ -8637,12 +8637,15 @@
                     "contains": [
                         "url",
                         "domain"
+                    ],
+                    "example_values": [
+                        "test.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.task_status.started_on",
                     "data_type": "string",
-                    "column_name": "started_on",
+                    "column_name": "Started On",
                     "column_order": 3
                 },
                 {
@@ -8719,10 +8722,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.task_status.owner",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.task_status.sample_id",
@@ -8751,7 +8751,8 @@
                     "data_path": "action_result.data.*.task_status.category",
                     "data_type": "string",
                     "example_values": [
-                        "file"
+                        "file",
+                        "url"
                     ]
                 },
                 {
@@ -8818,6 +8819,9 @@
                     "data_type": "string",
                     "example_values": [
                         "/tmp/cuckoo-tmp/tmpwwgL_J/eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -8882,23 +8886,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.17",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.id",
+                    "data_type": "numeric",
                     "example_values": [
-                        "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
-                    ],
-                    "contains": [
-                        "sha256"
+                        1505
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.16",
+                    "data_path": "action_result.summary.target",
                     "data_type": "string",
                     "example_values": [
-                        "eb221521e2eb2651a9318e1487041cca36c75714ee4be548c8bbac160bf0ce03"
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://10.1.16.69:8000/analysis/1505"
                     ],
                     "contains": [
-                        "sha256"
+                        "url"
                     ]
                 },
                 {
