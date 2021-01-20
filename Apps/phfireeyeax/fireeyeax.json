@@ -1,0 +1,1173 @@
+{
+    "appid": "5e808b3f-f930-43f9-8931-a6152f3f23c3",
+    "name": "Fireeye AX",
+    "description": "This app provides connectivity to the Fireeye Advanced Malware Analysis tool",
+    "type": "sandbox",
+    "product_vendor": "Fireeye",
+    "logo": "logo_fireeyeax.svg",
+    "logo_dark": "logo_fireeyeax_dark.svg",
+    "product_name": "Advanced Malware Analysis",
+    "python_version": "2.7",
+    "product_version_regex": ".*",
+    "publisher": "Robert Drouin",
+    "license": "Copyright (c) Robert Drouin, 2021",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-09-25T17:44:07.565949Z",
+    "package_name": "phantom_fireeyeax",
+    "main_module": "fireeyeax_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL for the console, i.e., https://<console IP or FQDN>",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "username": {
+            "description": "Username to log into the console",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "password": {
+            "description": "Password for the username",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "description": "Run a file in the sandbox and retrieve the analysis results",
+            "verbose": "Detonate a file in the AX console.",
+            "type": "generic",
+            "identifier": "detonate_file",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of the file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "order": 0
+                },
+                "priority": {
+                    "description": "Sets the analysis priority, default is Normal",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Normal",
+                        "Urgent"
+                    ],
+                    "default": "Normal",
+                    "order": 1
+                },
+                "analysis_type": {
+                    "description": "Specifies the analysis mode",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Live",
+                        "Sandbox"
+                    ],
+                    "default": "Sandbox",
+                    "order": 2
+                },
+                "force": {
+                    "description": "Perform an analysis on the file even if the file exactly matches an analysis that has already been performed on this file",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 3
+                },
+                "prefetch": {
+                    "description": "Determine the file target based on an internal determination rather than browsing to the target location",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 4
+                },
+                "enable_vnc": {
+                    "description": "Enable VNC while submitting on a Malware Analysis appliance, default is False",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 5
+                },
+                "profile": {
+                    "description": "Select the Malware Analysis profile to use for analysis",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "win7-sp1",
+                        "winxp-sp3",
+                        "win7x64-sp1",
+                        "win10x64"
+                    ],
+                    "default": "win10x64",
+                    "order": 6
+                },
+                "application": {
+                    "description": "Specifies the ID of the application to be used for the analysis",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Auto",
+                        "Adobe Acrobat Reader DC 15.008",
+                        "Adobe Reader 10.0",
+                        "Adobe Reader 10.1",
+                        "Adobe Reader 11.0",
+                        "Adobe Reader 11.0.01",
+                        "Adobe Reader 7.0",
+                        "Adobe Reader 8.0",
+                        "Adobe Reader 9.0",
+                        "Adobe Reader 9.4",
+                        "CMSTP",
+                        "CMSTP64",
+                        "Chrome 26.0",
+                        "Chrome 36.0",
+                        "Chrome 40.0",
+                        "Command Prompt",
+                        "Firefox 17.0",
+                        "Firefox 19.0",
+                        "Firefox 38.0",
+                        "Firefox 42.0",
+                        "Generic 1.0",
+                        "Hancom Handler 2018",
+                        "IIS_Server64 1.0",
+                        "Ichitaro 2013",
+                        "InternetExplorer (64-bit) 11.0",
+                        "InternetExplorer 10.0",
+                        "InternetExplorer 11.0",
+                        "InternetExplorer 6.0",
+                        "InternetExplorer 7.0",
+                        "InternetExplorer 8.0",
+                        "InternetExplorer 9.0",
+                        "InternetExplorer X",
+                        "Java JDK JRE 7.13",
+                        "Java JDK JRE 8.0",
+                        "MS Access 2013",
+                        "MS Excel 2003 SP2",
+                        "MS Excel 2003 SP3",
+                        "MS Excel 2007",
+                        "MS Excel 2010 SP2",
+                        "MS Excel 2013",
+                        "MS Excel 2013 SP1",
+                        "MS OneNote 2013",
+                        "MS Outlook 2007",
+                        "MS Outlook 2013",
+                        "MS Outlook 2013 SP1",
+                        "MS PowerPoint 2003 SP2",
+                        "MS PowerPoint 2003 SP3",
+                        "MS PowerPoint 2007",
+                        "MS PowerPoint 2010 SP2",
+                        "MS PowerPoint 2013",
+                        "MS PowerPoint 2013 SP1",
+                        "MS Publisher 2013",
+                        "MS Publisher 2013 SP1",
+                        "MS Word 2003 SP2",
+                        "MS Word 2003 SP3",
+                        "MS Word 2007",
+                        "MS Word 2010 SP2",
+                        "MS Word 2013",
+                        "MS Word 2013 SP1",
+                        "Microsoft Compiled HTML Help",
+                        "Microsoft Edge (64-bit) 20.10240",
+                        "Microsoft HTML Application Host 10.0",
+                        "Microsoft HTML Application Host 11.0",
+                        "Microsoft HTML Application Host 8.0",
+                        "Microsoft Windows Help File",
+                        "Multiple Adobe Reader X",
+                        "Multiple MS Excel X",
+                        "Multiple MS PowerPoint X",
+                        "Multiple MS Word X",
+                        "PHP WebShell 1.0",
+                        "QuickTime Player 7.6",
+                        "QuickTime Player 7.7",
+                        "RealPlayer 12.0",
+                        "RealPlayer 16.0",
+                        "RegSVR 32.0",
+                        "Regedit",
+                        "RunDLL 1.0",
+                        "Shellcode32 1.0",
+                        "Shellcode64 1.0",
+                        "VLC Media Player 2.0",
+                        "VLC Media Player 2.1",
+                        "WAB",
+                        "WMIC 1.0",
+                        "Windows Explorer",
+                        "Windows Media Player 11.0",
+                        "Windows Media Player 12.0",
+                        "Windows PowerShell",
+                        "Windows Scripting Host",
+                        "XML Handler",
+                        "XPS Viewer 1.0"
+                    ],
+                    "default": "Auto",
+                    "order": 7
+                },
+                "timeout": {
+                    "description": "Specifies the timeout period for the analysis in seconds",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 500,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.analysis_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.force",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.prefetch",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_vnc",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.profile",
+                    "data_type": "string",
+                    "example_values": [
+                        "win7-sp1",
+                        "winxp-sp3",
+                        "win7x64-sp1",
+                        "win10x64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.application",
+                    "data_type": "string",
+                    "example_values": [
+                        "Auto",
+                        "Adobe Acrobat Reader DC 15.008",
+                        "Adobe Reader 10.0",
+                        "Adobe Reader 10.1",
+                        "Adobe Reader 11.0",
+                        "Adobe Reader 11.0.01",
+                        "Adobe Reader 7.0",
+                        "Adobe Reader 8.0",
+                        "Adobe Reader 9.0",
+                        "Adobe Reader 9.4",
+                        "CMSTP",
+                        "CMSTP64",
+                        "Chrome 26.0",
+                        "Chrome 36.0",
+                        "Chrome 40.0",
+                        "Command Prompt",
+                        "Firefox 17.0",
+                        "Firefox 19.0",
+                        "Firefox 38.0",
+                        "Firefox 42.0",
+                        "Generic 1.0",
+                        "Hancom Handler 2018",
+                        "IIS_Server64 1.0",
+                        "Ichitaro 2013",
+                        "InternetExplorer (64-bit) 11.0",
+                        "InternetExplorer 10.0",
+                        "InternetExplorer 11.0",
+                        "InternetExplorer 6.0",
+                        "InternetExplorer 7.0",
+                        "InternetExplorer 8.0",
+                        "InternetExplorer 9.0",
+                        "InternetExplorer X",
+                        "Java JDK JRE 7.13",
+                        "Java JDK JRE 8.0",
+                        "MS Access 2013",
+                        "MS Excel 2003 SP2",
+                        "MS Excel 2003 SP3",
+                        "MS Excel 2007",
+                        "MS Excel 2010 SP2",
+                        "MS Excel 2013",
+                        "MS Excel 2013 SP1",
+                        "MS OneNote 2013",
+                        "MS Outlook 2007",
+                        "MS Outlook 2013",
+                        "MS Outlook 2013 SP1",
+                        "MS PowerPoint 2003 SP2",
+                        "MS PowerPoint 2003 SP3",
+                        "MS PowerPoint 2007",
+                        "MS PowerPoint 2010 SP2",
+                        "MS PowerPoint 2013",
+                        "MS PowerPoint 2013 SP1",
+                        "MS Publisher 2013",
+                        "MS Publisher 2013 SP1",
+                        "MS Word 2003 SP2",
+                        "MS Word 2003 SP3",
+                        "MS Word 2007",
+                        "MS Word 2010 SP2",
+                        "MS Word 2013",
+                        "MS Word 2013 SP1",
+                        "Microsoft Compiled HTML Help",
+                        "Microsoft Edge (64-bit) 20.10240",
+                        "Microsoft HTML Application Host 10.0",
+                        "Microsoft HTML Application Host 11.0",
+                        "Microsoft HTML Application Host 8.0",
+                        "Microsoft Windows Help File",
+                        "Multiple Adobe Reader X",
+                        "Multiple MS Excel X",
+                        "Multiple MS PowerPoint X",
+                        "Multiple MS Word X",
+                        "PHP WebShell 1.0",
+                        "QuickTime Player 7.6",
+                        "QuickTime Player 7.7",
+                        "RealPlayer 12.0",
+                        "RealPlayer 16.0",
+                        "RegSVR 32.0",
+                        "Regedit",
+                        "RunDLL 1.0",
+                        "Shellcode32 1.0",
+                        "Shellcode64 1.0",
+                        "VLC Media Player 2.0",
+                        "VLC Media Player 2.1",
+                        "WAB",
+                        "WMIC 1.0",
+                        "Windows Explorer",
+                        "Windows Media Player 11.0",
+                        "Windows Media Player 12.0",
+                        "Windows PowerShell",
+                        "Windows Scripting Host",
+                        "XML Handler",
+                        "XPS Viewer 1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission id"
+                    ],
+                    "column_name": "Submission ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.job_ids",
+                    "data_type": "string",
+                    "column_name": "Job IDs",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.vnc_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8080
+                    ],
+                    "column_name": "VNC Port",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "description": "Run a URL in the sandbox",
+            "verbose": "Detonate a URL in the AX console.",
+            "type": "generic",
+            "identifier": "detonate_url",
+            "read_only": false,
+            "parameters": {
+                "urls": {
+                    "description": "URL(s) to detonate. Comma-separated list allowed",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "priority": {
+                    "description": "Sets the analysis priority, default is Normal",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Normal",
+                        "Urgent"
+                    ],
+                    "default": "Normal",
+                    "order": 1
+                },
+                "analysis_type": {
+                    "description": "Specifies the analysis mode",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Live",
+                        "Sandbox"
+                    ],
+                    "default": "Sandbox",
+                    "order": 2
+                },
+                "force": {
+                    "description": "Perform an analysis on the file even if the file exactly matches an analysis that has already been performed on this file",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 3
+                },
+                "prefetch": {
+                    "description": "Determine the file target based on an internal determination rather than browsing to the target location",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 4
+                },
+                "enable_vnc": {
+                    "description": "Enable VNC while submitting on a Malware Analysis appliance, default is False",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 5
+                },
+                "profile": {
+                    "description": "Select the Malware Analysis profile to use for analysis",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "win7-sp1",
+                        "winxp-sp3",
+                        "win7x64-sp1",
+                        "win10x64"
+                    ],
+                    "default": "win10x64",
+                    "order": 6
+                },
+                "application": {
+                    "description": "Specifies the ID of the application to be used for the analysis",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Auto",
+                        "Adobe Acrobat Reader DC 15.008",
+                        "Adobe Reader 10.0",
+                        "Adobe Reader 10.1",
+                        "Adobe Reader 11.0",
+                        "Adobe Reader 11.0.01",
+                        "Adobe Reader 7.0",
+                        "Adobe Reader 8.0",
+                        "Adobe Reader 9.0",
+                        "Adobe Reader 9.4",
+                        "CMSTP",
+                        "CMSTP64",
+                        "Chrome 26.0",
+                        "Chrome 36.0",
+                        "Chrome 40.0",
+                        "Command Prompt",
+                        "Firefox 17.0",
+                        "Firefox 19.0",
+                        "Firefox 38.0",
+                        "Firefox 42.0",
+                        "Generic 1.0",
+                        "Hancom Handler 2018",
+                        "IIS_Server64 1.0",
+                        "Ichitaro 2013",
+                        "InternetExplorer (64-bit) 11.0",
+                        "InternetExplorer 10.0",
+                        "InternetExplorer 11.0",
+                        "InternetExplorer 6.0",
+                        "InternetExplorer 7.0",
+                        "InternetExplorer 8.0",
+                        "InternetExplorer 9.0",
+                        "InternetExplorer X",
+                        "Java JDK JRE 7.13",
+                        "Java JDK JRE 8.0",
+                        "MS Access 2013",
+                        "MS Excel 2003 SP2",
+                        "MS Excel 2003 SP3",
+                        "MS Excel 2007",
+                        "MS Excel 2010 SP2",
+                        "MS Excel 2013",
+                        "MS Excel 2013 SP1",
+                        "MS OneNote 2013",
+                        "MS Outlook 2007",
+                        "MS Outlook 2013",
+                        "MS Outlook 2013 SP1",
+                        "MS PowerPoint 2003 SP2",
+                        "MS PowerPoint 2003 SP3",
+                        "MS PowerPoint 2007",
+                        "MS PowerPoint 2010 SP2",
+                        "MS PowerPoint 2013",
+                        "MS PowerPoint 2013 SP1",
+                        "MS Publisher 2013",
+                        "MS Publisher 2013 SP1",
+                        "MS Word 2003 SP2",
+                        "MS Word 2003 SP3",
+                        "MS Word 2007",
+                        "MS Word 2010 SP2",
+                        "MS Word 2013",
+                        "MS Word 2013 SP1",
+                        "Microsoft Compiled HTML Help",
+                        "Microsoft Edge (64-bit) 20.10240",
+                        "Microsoft HTML Application Host 10.0",
+                        "Microsoft HTML Application Host 11.0",
+                        "Microsoft HTML Application Host 8.0",
+                        "Microsoft Windows Help File",
+                        "Multiple Adobe Reader X",
+                        "Multiple MS Excel X",
+                        "Multiple MS PowerPoint X",
+                        "Multiple MS Word X",
+                        "PHP WebShell 1.0",
+                        "QuickTime Player 7.6",
+                        "QuickTime Player 7.7",
+                        "RealPlayer 12.0",
+                        "RealPlayer 16.0",
+                        "RegSVR 32.0",
+                        "Regedit",
+                        "RunDLL 1.0",
+                        "Shellcode32 1.0",
+                        "Shellcode64 1.0",
+                        "VLC Media Player 2.0",
+                        "VLC Media Player 2.1",
+                        "WAB",
+                        "WMIC 1.0",
+                        "Windows Explorer",
+                        "Windows Media Player 11.0",
+                        "Windows Media Player 12.0",
+                        "Windows PowerShell",
+                        "Windows Scripting Host",
+                        "XML Handler",
+                        "XPS Viewer 1.0"
+                    ],
+                    "default": "Auto",
+                    "order": 7
+                },
+                "timeout": {
+                    "description": "Specifies the timeout period for the analysis in seconds",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 500,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.urls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.analysis_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.force",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.prefetch",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_vnc",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.profile",
+                    "data_type": "string",
+                    "example_values": [
+                        "win7-sp1",
+                        "winxp-sp3",
+                        "win7x64-sp1",
+                        "win10x64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.application",
+                    "data_type": "string",
+                    "example_values": [
+                        "Auto",
+                        "Adobe Acrobat Reader DC 15.008",
+                        "Adobe Reader 10.0",
+                        "Adobe Reader 10.1",
+                        "Adobe Reader 11.0",
+                        "Adobe Reader 11.0.01",
+                        "Adobe Reader 7.0",
+                        "Adobe Reader 8.0",
+                        "Adobe Reader 9.0",
+                        "Adobe Reader 9.4",
+                        "CMSTP",
+                        "CMSTP64",
+                        "Chrome 26.0",
+                        "Chrome 36.0",
+                        "Chrome 40.0",
+                        "Command Prompt",
+                        "Firefox 17.0",
+                        "Firefox 19.0",
+                        "Firefox 38.0",
+                        "Firefox 42.0",
+                        "Generic 1.0",
+                        "Hancom Handler 2018",
+                        "IIS_Server64 1.0",
+                        "Ichitaro 2013",
+                        "InternetExplorer (64-bit) 11.0",
+                        "InternetExplorer 10.0",
+                        "InternetExplorer 11.0",
+                        "InternetExplorer 6.0",
+                        "InternetExplorer 7.0",
+                        "InternetExplorer 8.0",
+                        "InternetExplorer 9.0",
+                        "InternetExplorer X",
+                        "Java JDK JRE 7.13",
+                        "Java JDK JRE 8.0",
+                        "MS Access 2013",
+                        "MS Excel 2003 SP2",
+                        "MS Excel 2003 SP3",
+                        "MS Excel 2007",
+                        "MS Excel 2010 SP2",
+                        "MS Excel 2013",
+                        "MS Excel 2013 SP1",
+                        "MS OneNote 2013",
+                        "MS Outlook 2007",
+                        "MS Outlook 2013",
+                        "MS Outlook 2013 SP1",
+                        "MS PowerPoint 2003 SP2",
+                        "MS PowerPoint 2003 SP3",
+                        "MS PowerPoint 2007",
+                        "MS PowerPoint 2010 SP2",
+                        "MS PowerPoint 2013",
+                        "MS PowerPoint 2013 SP1",
+                        "MS Publisher 2013",
+                        "MS Publisher 2013 SP1",
+                        "MS Word 2003 SP2",
+                        "MS Word 2003 SP3",
+                        "MS Word 2007",
+                        "MS Word 2010 SP2",
+                        "MS Word 2013",
+                        "MS Word 2013 SP1",
+                        "Microsoft Compiled HTML Help",
+                        "Microsoft Edge (64-bit) 20.10240",
+                        "Microsoft HTML Application Host 10.0",
+                        "Microsoft HTML Application Host 11.0",
+                        "Microsoft HTML Application Host 8.0",
+                        "Microsoft Windows Help File",
+                        "Multiple Adobe Reader X",
+                        "Multiple MS Excel X",
+                        "Multiple MS PowerPoint X",
+                        "Multiple MS Word X",
+                        "PHP WebShell 1.0",
+                        "QuickTime Player 7.6",
+                        "QuickTime Player 7.7",
+                        "RealPlayer 12.0",
+                        "RealPlayer 16.0",
+                        "RegSVR 32.0",
+                        "Regedit",
+                        "RunDLL 1.0",
+                        "Shellcode32 1.0",
+                        "Shellcode64 1.0",
+                        "VLC Media Player 2.0",
+                        "VLC Media Player 2.1",
+                        "WAB",
+                        "WMIC 1.0",
+                        "Windows Explorer",
+                        "Windows Media Player 11.0",
+                        "Windows Media Player 12.0",
+                        "Windows PowerShell",
+                        "Windows Scripting Host",
+                        "XML Handler",
+                        "XPS Viewer 1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission id"
+                    ],
+                    "column_name": "Submission ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.job_ids",
+                    "data_type": "string",
+                    "column_name": "Job IDs",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.vnc_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8080
+                    ],
+                    "column_name": "VNC Port",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Get results of an already completed detonation",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Detonation ID to get the report of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeax submission id"
+                    ],
+                    "order": 0
+                },
+                "extended": {
+                    "description": "Get additional information from the console about this report",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.extended",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert.*.malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alert.*.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alert.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "fireeyeax_view.display_report",
+                "title": "Get Report"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "save artifacts",
+            "description": "Save a ZIP file of the detonation report to the Vault",
+            "verbose": "This action downloads all the malware artifacts from a detonation as a ZIP file and adds that file to the vault.",
+            "type": "investigate",
+            "identifier": "save_artifacts",
+            "read_only": true,
+            "parameters": {
+                "uuid": {
+                    "description": "UUID of detonation to get the results of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get status",
+            "description": "Gets the status of a detonation report",
+            "type": "investigate",
+            "identifier": "get_status",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Submission ID of the detonation report to get the status of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeax submission id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "12345"
+                    ],
+                    "contains": [
+                        "fireeyeax submission id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.analysisStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "In Progress",
+                        "Done",
+                        "Submission not found"
+                    ],
+                    "column_name": "Analysis Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.submissionStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "running",
+                        "done"
+                    ],
+                    "column_name": "Submission Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "malicious",
+                        "non-malicious"
+                    ],
+                    "column_name": "Verdict",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.vnc_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8080
+                    ],
+                    "column_name": "VNC Port",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.job_ids",
+                    "data_type": "string",
+                    "column_name": "Job IDs",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.uuid",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyeax submission uuid"
+                    ],
+                    "column_name": "UUID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.submission_details.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "12345"
+                    ],
+                    "contains": [
+                        "fireeyeax submission id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
