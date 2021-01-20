@@ -139,7 +139,7 @@
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
+                    "description": "Comma-separated list of fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
@@ -393,7 +393,7 @@
                     "order": 0
                 },
                 "copy_mask": {
-                    "description": "Comma-separated fields to be copied into the new contact",
+                    "description": "Comma-separated list of fields to be copied into the new contact",
                     "data_type": "string",
                     "default": "names,emailAddresses,phoneNumbers",
                     "order": 1
@@ -721,7 +721,7 @@
             "read_only": true,
             "parameters": {
                 "read_mask": {
-                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
+                    "description": "Comma-separated list of fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
@@ -946,7 +946,7 @@
                     "order": 0
                 },
                 "person_fields": {
-                    "description": "Comma-separated fields to be returned for the person",
+                    "description": "Comma-separated list of fields to be returned for the person",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 1
@@ -1200,7 +1200,7 @@
             "read_only": true,
             "parameters": {
                 "person_fields": {
-                    "description": "Comma-separated fields to be returned for each person. If not provided, default values will be used",
+                    "description": "Comma-separated list of fields to be returned for each person. If not provided, default values will be used",
                     "data_type": "string",
                     "default": "names,emailAddresses",
                     "order": 0
