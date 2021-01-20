@@ -9,7 +9,7 @@
     "product_name": "CrowdStrike",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "2.0.5",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, August 24 2020, API version: v1, v2"
@@ -18,7 +18,7 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.8.23319",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -314,6 +314,24 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cpu_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "329300"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.serial_number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reduced_functionality_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
                     ]
                 },
                 {
@@ -812,7 +830,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device fetched successfully"
+                        "Total devices: 2"
                     ]
                 },
                 {
@@ -1005,7 +1023,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Groups listed successfully"
+                        "Total host groups: 2"
                     ]
                 },
                 {
@@ -2193,7 +2211,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Sessions listed successfully"
+                        "Total sessions: 2"
                     ]
                 },
                 {
@@ -4391,14 +4409,17 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_crowdscores",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Crowdscores listed successfully"
+                        "Total crowdscores: 2"
                     ]
                 },
                 {
@@ -4729,7 +4750,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.hosts.*.platform_id",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "example_values": [
                         0
                     ]
@@ -4833,8 +4854,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_incidents",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -5015,14 +5039,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_incident_behaviors",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Incident behaviors listed successfully"
+                        "Total incident behaviors: 2"
                     ]
                 },
                 {
@@ -5225,14 +5252,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_incidents",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Incidents listed successfully"
+                        "Total incidents: 2"
                     ]
                 },
                 {
@@ -5523,11 +5553,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -7189,7 +7225,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Put files listed successfully"
+                        "Total files: 2"
                     ]
                 },
                 {
