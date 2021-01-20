@@ -1725,8 +1725,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.errors",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.offline_queued",
@@ -1871,8 +1870,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.scripts.*.args.*.options",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.scripts.*.args.*.arg_name",
@@ -2010,8 +2008,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.scripts.*.sub_commands.*.args.*.options",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.scripts.*.sub_commands.*.args.*.arg_name",
@@ -2104,7 +2101,7 @@
                     "contains": [
                         "crowdstrike rtr session id"
                     ],
-                    "column_name": "session id",
+                    "column_name": "Session ID",
                     "column_order": "0",
                     "example_values": [
                         "cdc3b485-6d71-4417-b091-939336154e83"
@@ -2494,7 +2491,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "data to include with command",
+                    "description": "Data to include with command",
                     "order": 3
                 }
             },
@@ -2607,7 +2604,7 @@
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
                     ],
-                    "column_name": "stdout",
+                    "column_name": "Stdout",
                     "column_order": 2
                 },
                 {
@@ -2632,7 +2629,7 @@
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
                     ],
-                    "column_name": "stderr",
+                    "column_name": "Stderr",
                     "column_order": 3
                 },
                 {
@@ -2728,7 +2725,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "data to include with command",
+                    "description": "Data to include with command",
                     "order": 3
                 }
             },
@@ -2841,7 +2838,7 @@
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
                     ],
-                    "column_name": "stdout",
+                    "column_name": "Stdout",
                     "column_order": 2
                 },
                 {
@@ -2866,7 +2863,7 @@
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
                     ],
-                    "column_name": "stderr",
+                    "column_name": "Stderr",
                     "column_order": 3
                 },
                 {
@@ -3013,7 +3010,7 @@
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
                     ],
-                    "column_name": "stdout",
+                    "column_name": "Stdout",
                     "column_order": 2
                 },
                 {
@@ -3038,7 +3035,7 @@
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
                     ],
-                    "column_name": "stderr",
+                    "column_name": "Stderr",
                     "column_order": 3
                 }
             ],
@@ -3132,7 +3129,7 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "sha256",
+                    "column_name": "SHA256",
                     "column_order": 1
                 },
                 {
@@ -3144,7 +3141,7 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "name",
+                    "column_name": "Name",
                     "column_order": 0
                 },
                 {
@@ -3176,7 +3173,7 @@
                     "contains": [
                         "crowdstrike rtr session id"
                     ],
-                    "column_name": "session id",
+                    "column_name": "Session ID",
                     "column_order": 2
                 },
                 {
@@ -3190,8 +3187,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.deleted_at",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.id",
@@ -3601,24 +3597,12 @@
                 "add_tag": {
                     "data_type": "string",
                     "description": "Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list",
-                    "order": 1,
-                    "example_values": [
-                        "False Positive",
-                        "Ignored",
-                        "Testing",
-                        "True Positive"
-                    ]
+                    "order": 1
                 },
                 "delete_tag": {
                     "data_type": "string",
                     "description": "Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list",
-                    "order": 2,
-                    "example_values": [
-                        "False Positive",
-                        "Ignored",
-                        "Testing",
-                        "True Positive"
-                    ]
+                    "order": 2
                 },
                 "update_name": {
                     "data_type": "string",
@@ -3899,9 +3883,6 @@
                     "required": true,
                     "primary": true,
                     "order": 0,
-                    "example_values": [
-                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
-                    ],
                     "contains": [
                         "crowdstrike unique user id"
                     ]
@@ -4105,9 +4086,6 @@
                     "required": true,
                     "primary": true,
                     "order": 0,
-                    "example_values": [
-                        "fce7f157-1a2b-4eec-a333-fec0d1fb63fd"
-                    ],
                     "contains": [
                         "crowdstrike user role id"
                     ]
@@ -5386,7 +5364,7 @@
                         "sha1",
                         "vault id"
                     ],
-                    "column_name": "vault id",
+                    "column_name": "Vault ID",
                     "column_order": 0
                 },
                 {
@@ -5398,7 +5376,7 @@
                     "contains": [
                         "sha1"
                     ],
-                    "column_name": "hash",
+                    "column_name": "Hash",
                     "column_order": 1
                 },
                 {
@@ -5582,7 +5560,8 @@
                     "required": true,
                     "contains": [
                         "crowdstrike device id"
-                    ]
+                    ],
+                    "order": 0
                 }
             },
             "render": {
@@ -5954,8 +5933,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.device_policies.sensor_update.applied_date",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.device_policies.sensor_update.assigned_date",
@@ -6267,7 +6245,8 @@
                         "falcon process id"
                     ],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 }
             },
             "render": {
@@ -6394,7 +6373,7 @@
                 {
                     "data_path": "action_result.data.*.stop_timestamp_raw",
                     "data_type": "string",
-                    "column_name": "Stop TimestampRaw",
+                    "column_name": "Stop Timestamp Raw",
                     "column_order": 8
                 },
                 {
@@ -6428,12 +6407,14 @@
                         "md5"
                     ],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 },
                 "count_only": {
                     "description": "Get endpoint count only",
                     "data_type": "boolean",
-                    "default": false
+                    "default": false,
+                    "order": 1
                 }
             },
             "render": {
@@ -6528,12 +6509,14 @@
                         "domain"
                     ],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 },
                 "count_only": {
                     "description": "Get endpoint count only",
                     "data_type": "boolean",
-                    "default": false
+                    "default": false,
+                    "order": 1
                 }
             },
             "render": {
@@ -7412,19 +7395,23 @@
             "parameters": {
                 "start_time": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 0
                 },
                 "end_time": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 1
                 },
                 "container_count": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 2
                 },
                 "artifact_count": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 3
                 }
             },
             "output": [],
@@ -7450,7 +7437,8 @@
                         "domain"
                     ],
                     "required": true,
-                    "primary": true
+                    "primary": true,
+                    "order": 0
                 },
                 "id": {
                     "description": "Crowdstrike Device ID to search on",
@@ -7459,7 +7447,8 @@
                         "crowdstrike device id"
                     ],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 1
                 }
             },
             "render": {
@@ -7720,7 +7709,8 @@
                         "domain"
                     ],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 }
             },
             "render": {
