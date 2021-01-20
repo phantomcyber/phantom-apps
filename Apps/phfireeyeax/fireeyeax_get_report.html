@@ -1,0 +1,185 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+​
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+​
+{% block widget_content %} <!-- Main Start Block -->
+​
+<!-- File: fireeyeax_get_report.html
+​
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+​
+<style>
+​
+​
+.dns-display-ip a:hover {
+  text-decoration:underline;
+}
+​
+​
+.dns-display-ip .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+​
+.dns-display-ip .wf-table-vertical a {
+  padding: 5px;
+}
+.dns-display-ip .wf-table-vertical td {
+  border: 1px solid;
+  padding: 10px;
+  padding-left: 4px;
+}
+.dns-display-ip .wf-table-vertical th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 10px;
+}
+​
+
+.dns-display-ip .wf-table-horizontal {
+  width: initial;
+  font-size: 12px;
+}
+​
+.dns-display-ip .wf-table-horizontal a {
+  padding: 5px;
+}
+.dns-display-ip .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 10px;
+  padding-left: 4px;
+}
+.dns-display-ip .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 10px;
+}
+​
+.dns-display-ip .wf-h3-style {
+  font-size : 20px
+}
+​
+.dns-display-ip .wf-h4-style {
+  font-size : 16px
+}
+​
+.dns-display-ip .wf-h5-style {
+  font-size : 14px
+}
+.dns-display-ip .wf-subheader-style {
+  font-size : 12px
+}
+​
+</style>
+<div class="dns-display-ip" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+  {% for result in results %} <!-- loop for each result -->
+<br>
+​
+<!------------------- For each Result ---------------------->
+​
+<h3 class="wf-h3-style">Parameters</h3>
+<table class="wf-table-vertical">
+{% if result.param.id %}
+<tr>
+  <td><b>Submission ID</b></td>
+  <td>
+    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['fireeyeax submission id'], 'value': '{{ result.param.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
+    {{ result.param.id }}
+     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    </a>
+  </td>
+</tr>
+<tr>
+    <td><b>Extended</b></td>
+    <td>
+        {{ result.param.extended }}
+    </td>
+</tr>
+{% endif %}
+</table>
+​
+<br>
+​
+<!-- IPs -->
+{% if result.data.alert %}
+<table class="wf-table-horizontal">
+  <tr>
+  <th>Name</th>
+  <th>Note</th>
+  <th>Application</th>
+  <th>User</th>
+  <th>Type</th>
+  <th>SID</th>
+  <th>Original</th>
+  <th>MD5</th>
+  <th>SHA256</th>
+  </tr>
+    {% for alert in result.data.alert %}
+        {% for explan, value in alert.explanation.items %}
+            {% if value %}
+                {% for explan_value in value.malware %}
+                <tr>
+                <td>
+                    {{ explan_value.name }}
+                </td>
+                <td>
+                    {{ explan_value.note }}
+                </td>
+                <td>
+                    {{ explan_value.application }}
+                </td>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['user'], 'value': '{{ explan_value.user|escapejs }}' }], 0, {{ container.id }}, null, false);">
+                    {{ explan_value.user }}
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td>
+                    {{ explan_value.type }}
+                </td>
+                <td>
+                    {{ explan_value.sid }}
+                </td>
+                <td>
+                    {{ explan_value.original }}
+                </td>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['fileHash','fileHashMd5','md5'], 'value': '{{ explan_value.md5Sum|escapejs }}' }], 0, {{ container.id }}, null, false);">
+                    {{ explan_value.md5Sum }}
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['fileHash', 'fileHashSha256'], 'value': '{{ explan_value.sha256|escapejs }}' }], 0, {{ container.id }}, null, false);">
+                    {{ explan_value.sha256 }}
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</table>
+<br>
+{% else %}
+<p> No Record Info in results </p>
+{% endif %}
+​
+​
+<!------------------- For each Result END ---------------------->
+​
+{% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+​
+{% endblock %} <!-- Main Start Block -->
