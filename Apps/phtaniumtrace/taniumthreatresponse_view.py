@@ -142,7 +142,7 @@ def display_events(provides, all_app_runs, context):
     for summary, action_results in all_app_runs:
         for result in action_results:
             params = result.get_param()
-            headers = headers_map.get(params['event_type'])
+            headers = headers_map.get(params['event_type'], [])
 
             results.append({
                 'headers': headers,

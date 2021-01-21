@@ -1134,10 +1134,10 @@ class TaniumThreatResponseConnector(BaseConnector):
                 group_list = []
 
                 for i, _filter in enumerate(fields):
-                    params["f{}".format(i)] = fields[i]
-                    params["o{}".format(i)] = operators[i]
-                    params["v{}".format(i)] = value[i]
-                    group_list.append(i)
+                    params["f{}".format(str(i))] = fields[i]
+                    params["o{}".format(str(i))] = operators[i]
+                    params["v{}".format(str(i))] = value[i]
+                    group_list.append(str(i))
 
                 params["gm1"] = filter_type
                 params["g1"] = ",".join(group_list)
@@ -1473,8 +1473,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         params = {
             'limit': limit
         }
-        for p in self._handle_py_ver_compat_for_input_str(param['query']).split('&'):
-            if len(p.split('=')) > 1:
+        try:
+            for p in self._handle_py_ver_compat_for_input_str(param['query']).split('&'):
                 k = p.split('=')[0]
                 k = self._handle_py_ver_compat_for_input_str(k)
                 v = p.split('=')[1]
@@ -1482,6 +1482,10 @@ class TaniumThreatResponseConnector(BaseConnector):
                     params[k] = int(v)
                 except ValueError:
                     params[k] = v
+        except:
+            self.debug_print("Unable to parse provided query")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to parse provided query")
+
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
         if phantom.is_fail(ret_val):

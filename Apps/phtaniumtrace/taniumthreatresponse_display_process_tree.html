@@ -64,75 +64,75 @@
         }
     </style>
     {%  for result in results %}
-    <br>
-    <div class="divInfo">
-        Connection ID: {{ result.parameter.connection_id }}<br>
-        Process Table ID: {{ result.parameter.process_table_id }}<br>
-    </div>
-    <br>
-    <!-- 2 level table -->
-    {% if not result.data %}
-        <h4 class="wf-h4-style">No data found</h4>
-    {% else %}
-        <div class="divTable processTable">
-            <div class="divTableHeading">
-                <div class="divTableRow">
-                    <div class="divTableHead">PTID</div>
-                    <div class="divTableHead">NAME</div>
-                </div>
-            </div>
-            {% for process in result.data %}
-            <div class="divTableBody">
-                <div class="divTableRow">
-                    <div class="divTableCell">
-                        {% if process.ptid == result.parameter.process_table_id|add:"0" %}
-                            <span class="fa fa-check-circle"></span>
-                        {% endif %}
-                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ process.ptid }}' }], 0, {{ container.id }}, null, false);">
-                            {{ process.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
-                        </a>
-                    </div>
-                    <div class="divTableCell">{{ process.name }}</div>
-                </div>
-                {% if process.children %}
-                <div class="divTableRow">
-                    <div class="divTableCell">
-                        Children:<br>
-                        <span class="fa fa-level-up fa-rotate-90"></span>
-                    </div>
-                    <div class="divTableCell" id="children">
-                        {% with data=process.children %}
-                        <div class="divTable processTable">
-                            <div class="divTableHeading">
-                                <div class="divTableRow">
-                                    <div class="divTableHead">PTID</div>
-                                    <div class="divTableHead">NAME</div>
-                                </div>
-                            </div>
-                            {% for childprocess in process.children %}
-                            <div class="divTableBody">
-                                <div class="divTableRow">
-                                    <div class="divTableCell">
-                                        {% if childprocess.ptid == result.parameter.process_table_id|add:"0" %}
-                                            <span class="fa fa-check-circle"></span>
-                                        {% endif %}
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ childprocess.ptid }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ childprocess.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
-                                        </a>
-                                    </div>
-                                    <div class="divTableCell">{{ childprocess.name }}</div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endwith %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
+        <br>
+        <div class="divInfo">
+            Connection ID: {{ result.parameter.connection_id }}<br>
+            Process Table ID: {{ result.parameter.process_table_id }}<br>
         </div>
         <br>
+        <!-- 2 level table -->
+        {% if not result.data %}
+            <h4 class="wf-h4-style">No data found</h4>
+        {% else %}
+            <div class="divTable processTable">
+                <div class="divTableHeading">
+                    <div class="divTableRow">
+                        <div class="divTableHead">PTID</div>
+                        <div class="divTableHead">NAME</div>
+                    </div>
+                </div>
+                {% for process in result.data %}
+                <div class="divTableBody">
+                    <div class="divTableRow">
+                        <div class="divTableCell">
+                            {% if process.ptid == result.parameter.process_table_id|add:"0" %}
+                                <span class="fa fa-check-circle"></span>
+                            {% endif %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ process.ptid }}' }], 0, {{ container.id }}, null, false);">
+                                {{ process.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
+                            </a>
+                        </div>
+                        <div class="divTableCell">{{ process.name }}</div>
+                    </div>
+                    {% if process.children %}
+                    <div class="divTableRow">
+                        <div class="divTableCell">
+                            Children:<br>
+                            <span class="fa fa-level-up fa-rotate-90"></span>
+                        </div>
+                        <div class="divTableCell" id="children">
+                            {% with data=process.children %}
+                            <div class="divTable processTable">
+                                <div class="divTableHeading">
+                                    <div class="divTableRow">
+                                        <div class="divTableHead">PTID</div>
+                                        <div class="divTableHead">NAME</div>
+                                    </div>
+                                </div>
+                                {% for childprocess in process.children %}
+                                <div class="divTableBody">
+                                    <div class="divTableRow">
+                                        <div class="divTableCell">
+                                            {% if childprocess.ptid == result.parameter.process_table_id|add:"0" %}
+                                                <span class="fa fa-check-circle"></span>
+                                            {% endif %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ childprocess.ptid }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ childprocess.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
+                                            </a>
+                                        </div>
+                                        <div class="divTableCell">{{ childprocess.name }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <br>
         {% endif %}
     {%  endfor %}
 {% endblock %}
