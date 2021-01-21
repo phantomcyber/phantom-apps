@@ -381,10 +381,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             if len(response.get('errors', [])):
                 error = response.get('errors')[0]
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                return None
 
             if offset is None or total is None:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
+                return None
 
             if response.get("resources"):
                 list_ids.extend(response.get("resources"))
