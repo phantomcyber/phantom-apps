@@ -14,8 +14,8 @@
     "latest_tested_versions": [
         "Build (Windows): 7.3.314.4269 | Console: 1.3.3.0150"
     ],
-    "app_version": "2.0.3",
-    "utctime_updated": "2020-04-17T09:06:28.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-01-18T06:20:26.000000Z",
     "package_name": "phantom_taniumrest",
     "main_module": "taniumrest_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1960,7 +1960,7 @@
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
-            "lock" : {
+            "lock": {
                 "enabled": false
             },
             "parameters": {
@@ -1994,7 +1994,7 @@
                 },
                 "wait_for_results_processing": {
                     "description": "Flag to wait for endpoint to return full results",
-                    "verbose" : "If an endpoint takes longer than usual to evaluate a sensor, it might initially supply the answer[current results unavailable] to the answer message that it passes along the linear chain and ultimately to the Tanium Server. However, the sensor process continues on the endpoint after supplying that initial answer and, upon completing the process, the endpoint sends its updated answer. Reference Link: ~https://docs.tanium.com/interact/interact/results.html",
+                    "verbose": "If an endpoint takes longer than usual to evaluate a sensor, it might initially supply the answer[current results unavailable] to the answer message that it passes along the linear chain and ultimately to the Tanium Server. However, the sensor process continues on the endpoint after supplying that initial answer and, upon completing the process, the endpoint sends its updated answer. Reference Link: ~https://docs.tanium.com/interact/interact/results.html",
                     "data_type": "boolean",
                     "default": false,
                     "order": 4
@@ -2350,7 +2350,7 @@
             "type": "investigate",
             "identifier": "get_question_results",
             "read_only": true,
-            "lock" : {
+            "lock": {
                 "enabled": false
             },
             "parameters": {
