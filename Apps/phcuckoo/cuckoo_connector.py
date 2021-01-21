@@ -408,7 +408,7 @@ class CuckooConnector(BaseConnector):
 
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, f"Error: {err}")
+                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(err))
 
         files = {
             'file': (file_name, payload)
