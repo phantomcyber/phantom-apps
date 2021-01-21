@@ -146,7 +146,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Date Range (EX:- P30D)",
+                    "description": "Date Range",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -169,6 +169,9 @@
                     "column_name": "Date Range",
                     "contains": [
                         "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
                     ],
                     "column_order": 0
                 },
@@ -319,7 +322,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Incident Date Range (EX:- P30D)",
+                    "description": "Incident Date Range",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -349,6 +352,9 @@
                     "column_name": "Incident Date Range",
                     "contains": [
                         "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
                     ],
                     "column_order": 2
                 },
@@ -608,7 +614,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Intelligence Incident Date Range (EX:- P30D)",
+                    "description": "Intelligence Incident Date Range",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -639,6 +645,9 @@
                     "column_name": "Incident Date Range",
                     "contains": [
                         "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
                     ],
                     "column_order": 2
                 },
@@ -903,7 +912,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach Date Range (EX:- P30D)",
+                    "description": "Data Breach Date Range",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -945,7 +954,7 @@
                     ]
                 },
                 "user_name": {
-                    "description": "User Name (use '*' for wildcard matching)",
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
                     "order": 4
                 }
@@ -958,6 +967,9 @@
                     "column_name": "Published Date Range",
                     "contains": [
                         "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
                     ],
                     "column_order": 2
                 },
@@ -1134,7 +1146,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach record Date Range (EX:- P30D)",
+                    "description": "Data Breach record Date Range",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -1171,7 +1183,7 @@
                     ]
                 },
                 "user_name": {
-                    "description": "User Name (use '*' for wildcard matching)",
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
                     "order": 4
                 },
@@ -1189,6 +1201,9 @@
                     "column_name": "Data Breach Record Date Range",
                     "contains": [
                         "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
                     ],
                     "column_order": 2
                 },
@@ -1371,7 +1386,7 @@
             "read_only": true,
             "parameters": {
                 "user_name": {
-                    "description": "User Name (use '*' for wildcard matching)",
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -1382,7 +1397,7 @@
                     "order": 1
                 },
                 "published_date_range": {
-                    "description": "Published Date Range (ex:- P30M)",
+                    "description": "Published Date Range",
                     "data_type": "string",
                     "order": 2
                 },
@@ -1403,6 +1418,9 @@
                     "data_path": "action_result.parameter.published_date_range",
                     "data_type": "string",
                     "column_name": "Data Breach Record Published Date Range",
+                    "example_values": [
+                        "P30M"
+                    ],
                     "column_order": 4
                 },
                 {
