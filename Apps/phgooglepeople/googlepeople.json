@@ -883,6 +883,45 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.phoneNumbers.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "107701908237315216077"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "DOMAIN_PROFILE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.metadata.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phoneNumbers.*.formattedType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Work"
+                    ]
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -1078,6 +1117,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Test, user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.names.*.honorificSuffix",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
                     ]
                 },
                 {
@@ -1357,6 +1403,90 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "26162f4b8f0439b6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "#G/xJmvdEqkU="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sources.*.updateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-11-27T05:26:14.900Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "PERSON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.date.day",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.date.year",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1990
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.date.month",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.text",
+                    "data_type": "string",
+                    "example_values": [
+                        "1990-01-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.metadata.source.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "75b1dd3c0f20cb95"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.metadata.source.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONTACT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.birthdays.*.metadata.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
                     ]
                 },
                 {
