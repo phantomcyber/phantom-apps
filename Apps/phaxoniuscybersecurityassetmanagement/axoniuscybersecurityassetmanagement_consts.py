@@ -2,28 +2,27 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-from typing import List
 
-API_KEY: str = "api_key"
-API_SECRET: str = "api_secret"
-URL_KEY: str = "url"
-PROXY_URL_KEY: str = "proxy_url"
-SQ_NAME_KEY: str = "sq_name"
-MAX_ROWS_KEY: str = "max_rows"
-HOSTNAME_KEY: str = "hostname"
-IP_KEY: str = "ip"
-MAC_KEY: str = "mac"
-MAIL_KEY: str = "mail"
-USERNAME_KEY: str = "username"
+API_KEY = "api_key"
+API_SECRET = "api_secret"
+PROXY_URL_KEY = "url"
+PROXY_URL_KEY = "proxy_url"
+SQ_NAME_KEY = "sq_name"
+MAX_ROWS_KEY = "max_rows"
+HOSTNAME_KEY = "hostname"
+IP_KEY = "ip"
+MAC_KEY = "mac"
+MAIL_KEY = "mail"
+USERNAME_KEY = "username"
 
 # Maximum number of assets to allow user to fetch
-MAX_ROWS: int = 25
+MAX_ROWS = 25
 
 # Fields to remove from each asset if found
-SKIPS: List[str] = ["specific_data.data.image"]
+SKIPS = ["specific_data.data.image"]
 
 # Fields to try and convert to date time if they have these words in them
-FIELDS_TIME: List[str] = ["seen", "fetch", "time", "date"]
+FIELDS_TIME = ["seen", "fetch", "time", "date"]
 
 # exception handling
 ERR_CODE_MSG = "Error code unavailable"
