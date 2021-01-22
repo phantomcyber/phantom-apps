@@ -52,7 +52,7 @@
             "verbose": "The supported size types are:<ul><li>Tiny: (120 x 90px)</li><li>Small: (200 x 150px)</li><li>Normal: (400 x 300px)</li><li>Medium: (640 x 480px)</li><li>Large: (800 x 600px)</li><li>Full Page: complete page from the top to the bottom (can be pretty long)</li></ul><p>Sizes are passed with their full names (e.g. <b>Tiny</b>, or <b>Full Page</b>). The default size is <b>Full Page</b> if no size is defined.",
             "parameters": {
                 "url": {
-                    "description": "url to screenshot",
+                    "description": "URL to screenshot",
                     "data_type": "string",
                     "contains": [
                         "url",
@@ -63,7 +63,7 @@
                     "order": 0
                 },
                 "size": {
-                    "description": "size of the screenshot",
+                    "description": "Size of the screenshot",
                     "data_type": "string",
                     "value_list": [
                         "Full Page",
