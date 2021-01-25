@@ -1,0 +1,744 @@
+{
+    "appid": "d2ecc6e9-8156-458d-92c7-e8e7f58660e4",
+    "name": "CRXcavator",
+    "description": "Connects to CRXCavator.io service that provides reputation and risk scoring for Chrome Extensions",
+    "type": "reputation",
+    "product_vendor": "DUO Security",
+    "logo": "logo_crxcavator.svg",
+    "logo_dark": "logo_crxcavator_dark.svg",
+    "product_name": "CRXcavator",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-06-05T05:11:29.309490Z",
+    "package_name": "phantom_crxcavator",
+    "main_module": "crxcavator_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "CRXcavator API endpoint",
+            "data_type": "string",
+            "required": true,
+            "default": "https://api.crxcavator.io/v1",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get metadata",
+            "description": "Retrieve metadata about the extension",
+            "type": "investigate",
+            "identifier": "extension_metadata",
+            "read_only": true,
+            "parameters": {
+                "extension_id": {
+                    "description": "Chrome extension id",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.extension_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "column_name": "Extension ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.extension_id",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.icon",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rating",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rating_users",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.short_description",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.users",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.versions.*.version",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.short_description",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ],
+                    "column_name": "Short Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.rating",
+                    "data_type": "numeric",
+                    "contains": [
+                        "crxcavator number"
+                    ],
+                    "column_name": "Rating",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.total_versions",
+                    "data_type": "numeric",
+                    "contains": [
+                        "crxcavator number"
+                    ],
+                    "column_name": "Total Versions",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.latest_version",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator version number"
+                    ],
+                    "column_name": "Latest Version",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Gets a report on a specific version of an extension. If no version supplied, attempts to get the latest version of the extension",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "parameters": {
+                "extension_id": {
+                    "description": "Chrome extension id",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "order": 0
+                },
+                "version": {
+                    "description": "Extension version number",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "crxcavator version number"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.extension_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "column_name": "Extension ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.version",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator version number"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.csp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.csp.object-src",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.csp.script-src",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.dangerousfunctions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entrypoints",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extcalls",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.background",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.background.page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.browser_action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.browser_action.default_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.chrome_url_overrides",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.chrome_url_overrides.newtab",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.content_security_policy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.default_locale",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.externally_connectable",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.externally_connectable.matches",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.icons",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.manifest_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.optional_permissions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.permissions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.short_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.update_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.manifest.web_accessible_resources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.related",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.child-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.connect-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.font-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.form-action",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.frame-ancestors",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.frame-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.img-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.manifest-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.media-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.object-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.plugin-types",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.sandbox",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.script-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.strict-dynamic",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.style-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.upgrade-insecure-requests",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.csp.worker-src",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.optional_permissions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.optional_permissions.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.permissions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.permissions.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.address",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.last_updated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.rating_users",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.support_site",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.users",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.webstore.website",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.risk.metadata",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.icon",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.last_updated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.offered_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.permission_warnings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.privacy_policy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.rating",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.rating_users",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.short_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.support_site",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.users",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.website",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webstore.price",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extension_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.extension_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator extension id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.version",
+                    "data_type": "string",
+                    "column_name": "Version",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_risk",
+                    "data_type": "numeric",
+                    "contains": [
+                        "crxcavator number"
+                    ],
+                    "column_name": "Total Risk",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.total_versions",
+                    "data_type": "numeric",
+                    "contains": [
+                        "crxcavator number"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "submit extension",
+            "description": "Submit an extension ID to be scanned",
+            "type": "generic",
+            "identifier": "submit_extension",
+            "read_only": false,
+            "parameters": {
+                "extension_id": {
+                    "description": "Extension ID to be scanned",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.extension_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator extension id"
+                    ],
+                    "column_name": "Extension ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.extensionID",
+                    "data_type": "string",
+                    "contains": [
+                        "crxcavator extension id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.code",
+                    "data_type": "numeric",
+                    "column_name": "Code",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.extension_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.version",
+                    "data_type": "string",
+                    "column_name": "Version",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
