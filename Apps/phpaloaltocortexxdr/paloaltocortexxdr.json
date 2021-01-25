@@ -1,0 +1,1924 @@
+{
+    "appid": "dcc6e9d8-ca68-4ce9-966d-b4ea4c40c97a",
+    "name": "Palo Alto Cortex XDR",
+    "description": "This app integrates with the Palo Alto Cortex XDR",
+    "type": "endpoint",
+    "product_vendor": "Palo Alto",
+    "logo": "paloaltocortexxdr.svg",
+    "logo_dark": "paloaltocortexxdr_dark.svg",
+    "product_name": "Cortex XDR",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Cyberforce Limited",
+    "license": "Copyright (c) Cyberforce Limited, 2021",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-01-15T08:19:08.941127Z",
+    "package_name": "phantom_paloaltocortexxdr",
+    "main_module": "paloaltocortexxdr_connector.pyc",
+    "min_phantom_version": "4.9.35731",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "advanced": {
+            "description": "Advanced Key",
+            "data_type": "boolean",
+            "required": true,
+            "default": false,
+            "order": 1
+        },
+        "api_key_id": {
+            "description": "API Key ID",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "fqdn": {
+            "description": "FQDN",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Container IDs to limit the ingestion to.",
+                    "allow_list": true
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is past 10 days"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is now"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Maximum number of container records to query for."
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "order": 4,
+                    "description": "Maximum number of artifact records to query for."
+                }
+              },
+            "output": [],
+            "versions":"EQ(*)"
+        },
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list endpoints",
+            "identifier": "list_endpoints",
+            "description": "List all the endpoints/sensors configured on the device",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get policy",
+            "identifier": "get_policy",
+            "description": "Get the policy name for a specific endpoint",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "Endpoint ID to get policy name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get action status",
+            "identifier": "get_action_status",
+            "description": "Retrieve the status of the requested actions according to the action ID",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "action_id": {
+                    "description": "Action ID to be queried",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.action_id",
+                    "data_type": "string",
+                    "column_name": "action_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "retrieve file",
+            "identifier": "retrieve_file",
+            "description": "Retrieve files from a specified endpoint",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "Endpoint ID to retrieve the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "windows_path": {
+                    "description": "File path in Windows",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "linux_path": {
+                    "description": "File path in Linux",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "macos_path": {
+                    "description": "File path in Mac OS",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.windows_path",
+                    "data_type": "string",
+                    "column_name": "files_windows",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.linux_path",
+                    "data_type": "string",
+                    "column_name": "files_linux",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.macos_path",
+                    "data_type": "string",
+                    "column_name": "files_macos",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "retrieve file details",
+            "identifier": "retrieve_file_details",
+            "description": "View the file retrieved by the Retrieve File request according to the action ID",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "action_id": {
+                    "description": "Action ID of the file retrieval action",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.action_id",
+                    "data_type": "string",
+                    "column_name": "action_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine file",
+            "identifier": "quarantine_file",
+            "description": "Quarantine file on a specified endpoint",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "Endpoint ID to quarantine the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "file_path": {
+                    "description": "Path of the file you want to quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "file_hash": {
+                    "description": "Hash of the file you want to quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_path",
+                    "data_type": "string",
+                    "column_name": "file_path",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "file_hash",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine file",
+            "identifier": "unquarantine_file",
+            "description": "Restore a quarantined file on a specified endpoint",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "file_hash": {
+                    "description": "File hash to restore",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "endpoint_id": {
+                    "description": "Endpoint ID to restore file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "file_hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block hash",
+            "identifier": "block_hash",
+            "description": "Add hash which does not exist in the allow or block lists to a block list",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "file_hash": {
+                    "description": "File hash in SHA256 to be added to the block list",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Additional information regarding the action",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "incident_id": {
+                    "description": "Incident ID related to the file hash",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "file_hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "comment",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "column_name": "incident_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "allow hash",
+            "identifier": "allow_hash",
+            "description": "Add files which do not exist in the allow or block lists to an allow list",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "file_hash": {
+                    "description": "File hash in SHA256 to be added to the allow list",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Additional information regarding the action",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "incident_id": {
+                    "description": "Incident ID related to the file hash",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "comment",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "column_name": "incident_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine device",
+            "identifier": "quarantine_device",
+            "description": "Quarantine the endpoint",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "Endpoint ID to be isolated",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine device",
+            "identifier": "unquarantine_device",
+            "description": "Unquarantine the endpoint",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "Endpoint ID to be unisolated",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "scan endpoint",
+            "identifier": "scan_endpoint",
+            "description": "Run a scan on selected endpoints",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "scan_all": {
+                    "description": "Scan all endpoints",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 0
+                },
+                "endpoint_id": {
+                    "description": "Endpoint ID to scan",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "dist_name": {
+                    "description": "Name of the distribution list",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "first_seen": {
+                    "description": "When an endpoint was first seen",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "last_seen": {
+                    "description": "When an endpoint was last seen",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "ip_list": {
+                    "description": "IP address to scan",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "group_name": {
+                    "description": "Name of endpoint group",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 6
+                },
+                "platform": {
+                    "description": "Type of operating system",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "windows",
+                        "linux",
+                        "macos",
+                        "android"
+                    ],
+                    "default": "",
+                    "order": 7
+                },
+                "alias": {
+                    "description": "Endpoint alias name",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 8
+                },
+                "isolate": {
+                    "description": "If an endpoint has been isolated",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 9
+                },
+                "hostname": {
+                    "description": "Name of host",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 10
+                },
+                "scan_status": {
+                    "description": "Scan status of an endpoint (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "none",
+                        "pending",
+                        "in_progress",
+                        "canceled",
+                        "aborted",
+                        "pending_cancellation",
+                        "success",
+                        "error"
+                    ],
+                    "default": "",
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.scan_all",
+                    "data_type": "boolean",
+                    "column_name": "scan_all",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.dist_name",
+                    "data_type": "string",
+                    "column_name": "dist_name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.first_seen",
+                    "data_type": "numeric",
+                    "column_name": "first_seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.last_seen",
+                    "data_type": "numeric",
+                    "column_name": "last_seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.ip_list",
+                    "data_type": "string",
+                    "column_name": "ip_list",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "column_name": "group_name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.platform",
+                    "data_type": "string",
+                    "column_name": "platform",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.alias",
+                    "data_type": "string",
+                    "column_name": "alias",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.isolate",
+                    "data_type": "boolean",
+                    "column_name": "isolate",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "column_name": "hostname",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.parameter.scan_status",
+                    "data_type": "string",
+                    "column_name": "hostname",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "cancel scan endpoint",
+            "identifier": "cancel_scan_endpoint",
+            "description": "Cancel the scan of selected endpoints",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "scan_all": {
+                    "description": "Cancel all endpoints",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 0
+                },
+                "endpoint_id": {
+                    "description": "Endpoint ID to cancel the scan",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "dist_name": {
+                    "description": "Name of the distribution list",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "first_seen": {
+                    "description": "When an endpoint was first seen",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "last_seen": {
+                    "description": "When an endpoint was last seen",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "ip_list": {
+                    "description": "IP Address to cancel the scan",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "group_name": {
+                    "description": "Name of endpoint group",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 6
+                },
+                "platform": {
+                    "description": "Type of operating system",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "windows",
+                        "linux",
+                        "macos",
+                        "android"
+                    ],
+                    "default": "",
+                    "order": 7
+                },
+                "alias": {
+                    "description": "Endpoint alias name",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 8
+                },
+                "isolate": {
+                    "description": "If an endpoint has been isolated",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 9
+                },
+                "hostname": {
+                    "description": "Name of host",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 10
+                },
+                "scan_status": {
+                    "description": "Scan status of an endpoint (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "none",
+                        "pending",
+                        "in_progress",
+                        "canceled",
+                        "aborted",
+                        "pending_cancellation",
+                        "success",
+                        "error"
+                    ],
+                    "default": "",
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.scan_all",
+                    "data_type": "boolean",
+                    "column_name": "scan_all",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex endpoint id"
+                    ],
+                    "column_name": "endpoint_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.dist_name",
+                    "data_type": "string",
+                    "column_name": "dist_name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.first_seen",
+                    "data_type": "numeric",
+                    "column_name": "first_seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.last_seen",
+                    "data_type": "numeric",
+                    "column_name": "last_seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.ip_list",
+                    "data_type": "string",
+                    "column_name": "ip_list",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "column_name": "group_name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.platform",
+                    "data_type": "string",
+                    "column_name": "platform",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.alias",
+                    "data_type": "string",
+                    "column_name": "alias",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.isolate",
+                    "data_type": "boolean",
+                    "column_name": "isolate",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "column_name": "hostname",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.parameter.scan_status",
+                    "data_type": "string",
+                    "column_name": "hostname",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incidents",
+            "identifier": "get_incidents",
+            "description": "Get a list of incidents filtered by a list of incident IDs, modification time, or creation time",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "modification_time": {
+                    "description": "Modification time of the incident in timestamp epoch milliseconds",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "creation_time": {
+                    "description": "Creation time of the incident in timestamp epoch milliseconds",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "incident_id": {
+                    "description": "Incident ID to be searched",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "description": {
+                    "description": "Incident description to be searched",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "alert_sources": {
+                    "description": "Source which detected the alert",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "status": {
+                    "description": "Status of the incident to be searched (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "new",
+                        "under_investigation",
+                        "resolved_threat_handled",
+                        "resolved_known_issue",
+                        "resolved_false_positive",
+                        "resolved_other",
+                        "resolved_auto"
+                    ],
+                    "default": "",
+                    "order": 5
+                },
+                "search_from": {
+                    "description": "Starting offset within the query result set from which you want incidents returned",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 6
+                },
+                "search_to": {
+                    "description": "End offset within the result set after which you do not want incidents returned",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 7
+                },
+                "sort": {
+                    "description": "Sorting of the returned results",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 8
+                },
+                "sort_field": {
+                    "description": "Sorting field (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "modification_time",
+                        "creation_time"
+                    ],
+                    "default": "creation_time",
+                    "order": 9
+                },
+                "sort_order": {
+                    "description": "Sorting order (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "asc",
+                        "desc"
+                    ],
+                    "default": "desc",
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.modification_time",
+                    "data_type": "numeric",
+                    "column_name": "modification_time",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.creation_time",
+                    "data_type": "numeric",
+                    "column_name": "creation_time",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "column_name": "incident_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "column_name": "description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.alert_sources",
+                    "data_type": "string",
+                    "column_name": "alert_sources",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.search_from",
+                    "data_type": "numeric",
+                    "column_name": "search_from",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.search_to",
+                    "data_type": "numeric",
+                    "column_name": "search_to",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "boolean",
+                    "column_name": "sort",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.sort_field",
+                    "data_type": "string",
+                    "column_name": "sort_field",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.sort_order",
+                    "data_type": "string",
+                    "column_name": "sort_order",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incident details",
+            "identifier": "get_incident_details",
+            "description": "Get extra data fields of a specific incident including alerts and key artifacts",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "incident_id": {
+                    "description": "Incident ID to be investigated",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "alerts_limit": {
+                    "description": "Maximum unmber of related alerts to be returned",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cortex incident id"
+                    ],
+                    "column_name": "incident_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.alerts_limit",
+                    "data_type": "string",
+                    "column_name": "alerts_limit",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.is_malicious",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.file_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.file_sha256",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alerts",
+            "identifier": "get_alerts",
+            "description": "Get a list of alerts with multiple events",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "alert_id": {
+                    "description": "Alert ID to be searched",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cortex alert id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "alert_source": {
+                    "description": "Source which detected the alert",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "severity": {
+                    "description": "Severity of the alert to be searched (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "info",
+                        "low",
+                        "medium",
+                        "high",
+                        "unknown"
+                    ],
+                    "default": "",
+                    "order": 2
+                },
+                "creation_time": {
+                    "description": "Creation time of the alert in timestamp epoch milliseconds",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "search_from": {
+                    "description": "Starting offset within the query result set from which you want incidents returned",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "search_to": {
+                    "description": "End offset within the result set after which you do not want incidents returned",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "sort": {
+                    "description": "Sorting of the returned results",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 6
+                },
+                "sort_field": {
+                    "description": "Sorting field (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "severity",
+                        "creation_time"
+                    ],
+                    "default": "creation_time",
+                    "order": 7
+                },
+                "sort_order": {
+                    "description": "Sorting order (select from defined values)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "asc",
+                        "desc"
+                    ],
+                    "default": "desc",
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cortex alert id"
+                    ],
+                    "column_name": "alert_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.alert_source",
+                    "data_type": "string",
+                    "column_name": "alert_source",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "column_name": "severity",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.creation_time",
+                    "data_type": "numeric",
+                    "column_name": "creation_time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.search_from",
+                    "data_type": "numeric",
+                    "column_name": "search_from",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.search_to",
+                    "data_type": "numeric",
+                    "column_name": "search_to",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "boolean",
+                    "column_name": "sort",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.sort_field",
+                    "data_type": "string",
+                    "column_name": "sort_field",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.sort_order",
+                    "data_type": "string",
+                    "column_name": "sort_order",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
