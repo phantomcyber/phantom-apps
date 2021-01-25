@@ -32,7 +32,7 @@ class SsmachineConnector(BaseConnector):
 
         # Call the BaseConnectors init first
         super(SsmachineConnector, self).__init__()
-
+        self._verify = None
         self._headers = None
 
     def initialize(self):
@@ -41,6 +41,7 @@ class SsmachineConnector(BaseConnector):
 
         self._api_key = config.get("ssmachine_key")
         self._api_phrase = config.get("ssmachine_hash")
+        self._verify = config.get("verify_server_cert", False)
         self._rest_url = "{0}".format(SSMACHINE_JSON_DOMAIN)
         return phantom.APP_SUCCESS
 
@@ -110,7 +111,7 @@ class SsmachineConnector(BaseConnector):
             return result.set_status(phantom.APP_ERROR, "Invalid method call: {0} for requests module".format(method)), None
 
         try:
-            r = request_func(url, headers=headers, params=params, json=json, stream=stream)
+            r = request_func(url, headers=headers, params=params, json=json, stream=stream, verify=True)
         except Exception as e:
             return result.set_status(phantom.APP_ERROR, "REST Api to server failed", e), None
 
@@ -125,7 +126,7 @@ class SsmachineConnector(BaseConnector):
     def _test_connectivity(self):
 
         params = dict()
-        params['url'] = "http://www.screenshotmachine.com"
+        params['url'] = "https://www.screenshotmachine.com"
         self.save_progress("Checking to see if Screenshotmachine.com is online...")
 
         params['key'] = self._api_key
