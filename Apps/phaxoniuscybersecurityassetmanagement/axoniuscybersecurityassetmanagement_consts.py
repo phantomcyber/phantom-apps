@@ -5,7 +5,7 @@
 
 API_KEY = "api_key"
 API_SECRET = "api_secret"
-PROXY_URL_KEY = "url"
+URL_KEY = "url"
 PROXY_URL_KEY = "proxy_url"
 SQ_NAME_KEY = "sq_name"
 MAX_ROWS_KEY = "max_rows"
