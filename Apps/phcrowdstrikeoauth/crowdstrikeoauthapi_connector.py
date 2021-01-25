@@ -1,5 +1,5 @@
 # File: crowdstrikeoauthapi_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -8,6 +8,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as phantom_rules
 
 # THIS Connector imports
 from crowdstrikeoauthapi_consts import *
@@ -380,10 +381,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             if len(response.get('errors', [])):
                 error = response.get('errors')[0]
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                return None
 
             if offset is None or total is None:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results")
+                return None
 
             if response.get("resources"):
                 list_ids.extend(response.get("resources"))
@@ -425,8 +428,8 @@ class CrowdstrikeConnector(BaseConnector):
 
         id_list = self._paginator(action_result, endpoint, param)
 
-        if not id_list:
-            return None
+        if id_list is None:
+            return id_list
 
         if is_str:
             id_list = list(map(str, id_list))
@@ -628,7 +631,10 @@ class CrowdstrikeConnector(BaseConnector):
         for id in id_list:
             action_result.add_data(id)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Incidents listed successfully")
+        summary = action_result.update_summary({})
+        summary['total_incidents'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_incident_behaviors(self, param):
 
@@ -654,7 +660,10 @@ class CrowdstrikeConnector(BaseConnector):
         for id in id_list:
             action_result.add_data(id)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Incident behaviors listed successfully")
+        summary = action_result.update_summary({})
+        summary['total_incident_behaviors'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_incident_details(self, param):
 
@@ -680,7 +689,7 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(incident)
 
         summary = action_result.update_summary({})
-        summary['total_sessions'] = action_result.get_data_size()
+        summary['total_incidents'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Incidents fetched: {}".format(len(details_list)))
 
@@ -737,9 +746,9 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(crowdscore)
 
         summary = action_result.update_summary({})
-        summary['total_sessions'] = action_result.get_data_size()
+        summary['total_crowdscores'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Crowdscores listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_incident(self, param):
 
@@ -954,7 +963,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_devices'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Device fetched successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_groups(self, param):
 
@@ -1013,7 +1022,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_host_groups'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Groups listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_custom_indicators(self, param):
 
@@ -1140,7 +1149,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_files'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Put files listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _check_params(self, action_result, param):
 
@@ -1457,7 +1466,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['total_sessions'] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Sessions listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_run_command(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1639,7 +1648,8 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
-            file_info = Vault.get_file_info(file_id)[0]
+            success, message, file_info = phantom_rules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
         except Exception as e:
@@ -1923,21 +1933,6 @@ class CrowdstrikeConnector(BaseConnector):
                 self._state['last_offset_id'] = last_offset_id + 1
 
         return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _get_file_dict(self, param, action_result):
-        vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
-
-        try:
-            if hasattr(Vault, 'get_file_path'):
-                payload = open(Vault.get_file_path(vault_id), 'rb')
-            else:
-                payload = open(Vault.get_vault_file(vault_id), 'rb')
-        except:
-            return action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id)), None
-
-        files = {'file': (param['file_name'], payload)}
-
-        return phantom.APP_SUCCESS, files
 
     def _handle_list_processes(self, param):
 
