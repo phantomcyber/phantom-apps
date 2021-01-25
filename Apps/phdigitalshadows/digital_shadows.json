@@ -29,33 +29,33 @@
     "configuration": {
         "ds_api_key": {
             "data_type": "string",
-            "description": "Digital Shadows API Key",
+            "description": "The account key of Digital Shadows portal which is used to configure the app",
             "order": 0,
             "required": true
         },
         "ds_api_secret_key": {
             "data_type": "password",
-            "description": "Digital Shadows API Secret Key",
+            "description": "A secured key which is linked with the API key used to configure the app",
             "order": 1,
             "required": true
         },
         "private_incident": {
             "data_type": "boolean",
-            "description": "Private Incidents for Ingest",
+            "description": "A private incident is an event that could lead to loss of, or disruption to, an organization's operations, services or functions",
             "default": false,
             "order": 2,
             "required":true
         },
         "global_incident": {
             "data_type": "boolean",
-            "description": "Global Incidents for Ingest (Subscribed intelligence incidents will be pushed through private incident queue)",
+            "description": "A global incident is an type of event that can remotely lead to the loss of organizations resources",
             "default": false,
             "order": 3,
             "required":true
         },
         "history_days_interval": {
             "data_type": "string",
-            "description": "History Data Interval (in days)",
+            "description": "Historical days for which data needs to be polled by the application. Example input - 10 (for last 10 days data)",
             "order": 4,
             "required": true
         },
@@ -65,42 +65,42 @@
         },
         "inc_typ_data_leakage": {
             "data_type": "boolean",
-            "description": "Data Leakage",
+            "description": "The severity of this incident is based on the observation that sensitive client systems information, with credentials, is publicly available",
             "default": false,
             "order": 6,
             "required": true
         },
         "inc_typ_brand_protection": {
             "data_type": "boolean",
-            "description": "Brand Protection",
+            "description": "Brand Protection is a type of incident in which attackers impersonate domains, social accounts, people, and mobile applications",
             "default": false,
             "order": 7,
             "required": true
         },
         "inc_typ_infrastructure": {
             "data_type": "boolean",
-            "description": "Infrastructure",
+            "description": "This type of incident occurs when an internal network protocol is exposed to the internet.",
             "default": false,
             "order": 8,
             "required": true
         },
         "inc_typ_physical_security": {
             "data_type": "boolean",
-            "description": "Physical Security",
+            "description": "This type of incident occurs when the certificate of domain has security issues",
             "default": false,
             "order": 9,
             "required": true
         },
         "inc_typ_social_media_compliance": {
             "data_type": "boolean",
-            "description": "Social Media Compliance",
+            "description": "This type of incidents consist of exploiting secured information such as passwords on social media",
             "default": false,
             "order": 10,
             "required": true
         },
         "inc_typ_cyber_threat": {
             "data_type": "boolean",
-            "description": "Cyber Threat",
+            "description": "This type of incidents usually consist of company's account information to be sold and accessed by unauthorised personnel",
             "default": false,
             "order": 11,
             "required": true
@@ -125,12 +125,12 @@
             "read_only": true,
             "parameters": {
                 "start_time": {
-                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "description": "Start of the polling time range for which the app will fetch all the events after this time. It should be in epoch time (milliseconds). Example - 1611587778000",
                     "data_type": "numeric",
                     "order": 0
                 },
                 "end_time": {
-                    "description": "End of time range, in epoch time (milliseconds)",
+                    "description": "End of the polling time range for which the app will fetch all the events before this time. It should be in epoch time (milliseconds). Example - 1611587778000",
                     "data_type": "numeric",
                     "order": 1
                 }
@@ -1402,7 +1402,7 @@
                     "order": 2
                 },
                 "review_statuses": {
-                    "description": "Review Statuses (comma separated)",
+                    "description": "Review Statuses (comma separated). Example: open, read, closed",
                     "data_type": "string",
                     "order": 3
                 }
@@ -1580,13 +1580,13 @@
                     "order": 0
                 },
                 "review_note": {
-                    "description": "Breach Record Review Note",
+                    "description": "Update an individual breach record's notes using this action",
                     "data_type": "string",
                     "required": true,
                     "order": 1
                 },
                 "review_status": {
-                    "description": "Breach Record Review Status",
+                    "description": "Update an individual breach record's status using this action",
                     "data_type": "string",
                     "required": true,
                     "order": 2,
