@@ -166,7 +166,7 @@ class TestConnector(BaseConnector):
 
         api_key = config['api_key']
         advanced = config['advanced']
-        api_key_id = config['api_key_id']
+        api_key_id = config['api_id']
 
         if advanced:
             # Generate a 64 bytes random string
