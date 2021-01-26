@@ -3181,7 +3181,7 @@
             "read_only": true,
             "parameters": {
                 "intel_doc_id": {
-                    "description": "The ID of an intel document",
+                    "description": "ID of the intel document to scan",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -3191,7 +3191,7 @@
                     ]
                 },
                 "computer_group_name": {
-                    "description": "The name of a Tanium computer group",
+                    "description": "Name of a Tanium computer group to scan",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
