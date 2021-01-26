@@ -91,7 +91,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.*.*.status",
                     "example_values": [
                         "success",
                         "failed"
