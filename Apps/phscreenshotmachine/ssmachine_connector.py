@@ -32,7 +32,6 @@ class SsmachineConnector(BaseConnector):
 
         # Call the BaseConnectors init first
         super(SsmachineConnector, self).__init__()
-        self._verify = None
         self._headers = None
 
     def initialize(self):
@@ -41,7 +40,6 @@ class SsmachineConnector(BaseConnector):
 
         self._api_key = config.get("ssmachine_key")
         self._api_phrase = config.get("ssmachine_hash")
-        self._verify = config.get("verify_server_cert", False)
         self._rest_url = "{0}".format(SSMACHINE_JSON_DOMAIN)
         return phantom.APP_SUCCESS
 
@@ -144,7 +142,7 @@ class SsmachineConnector(BaseConnector):
             self.append_to_message('Test connectivity failed')
             return self.get_status()
 
-        return self.set_status_save_progress(ret_val, "Connectivity to Screenshot Machine was successful.")
+        return self.set_status_save_progress(ret_val, "Test Connectivity Passed")
 
     def _handle_post_url(self, param):
 
