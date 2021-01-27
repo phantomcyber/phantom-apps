@@ -1188,8 +1188,8 @@
                     "order": 4
                 },
                 "password": {
-                    "description": "Password (use '' for wildcard matching)",
-                    "data_type": "string",
+                    "description": "Password (use '*' for wildcard matching)",
+                    "data_type": "password",
                     "order": 5
                 }
             },
