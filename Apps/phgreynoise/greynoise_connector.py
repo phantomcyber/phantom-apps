@@ -1,28 +1,21 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom Greynoise App Connector python file
-# -----------------------------------------
+# File: greynoise_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
-
-# import math
-# from datetime import datetime
-# from datetime import timedelta
 
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# from greynoisedev_consts import *
+from greynoise_consts import *
 import requests
-# from dateutil.parser import parse
 import json
-import traceback
 from requests.utils import requote_uri
 from six.moves.urllib.parse import urljoin as _urljoin
+import urllib.parse
 
 
 def urljoin(base, url):
@@ -30,29 +23,69 @@ def urljoin(base, url):
 
 
 class GreyNoiseConnector(BaseConnector):
-    _session = None
-    _app_version = None
+    """Connector for GreyNoise App."""
 
-    def validate_parameters(self, param):
-        # Disable BaseConnector's validate functionality, since this App supports unicode domains and the
-        # validation routines don't
-        return phantom.APP_SUCCESS
+    def __init__(self):
+        """GreyNoise App Constructor."""
+        super(GreyNoiseConnector, self).__init__()
+        self._session = None
+        self._app_version = None
+        self._api_key = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def get_session(self):
         if self._session is None:
-            config = self.get_config()
             self._session = requests.Session()
             self._session.params.update({
-                "api-key": config["api_key"]
+                "api-key": self._api_key
             })
         return self._session
-
-    def get_app_version(self):
-        if self._app_version is None:
-            app_json = self.get_app_json()
-            self._app_version = app_json["app_version"]
-
-        return self._app_version
 
     def _make_rest_call(self, action_result, method, *args, error_on_404=True, **kwargs):
         session = self.get_session()
@@ -65,27 +98,32 @@ class GreyNoiseConnector(BaseConnector):
                 r.raise_for_status()
             status_code = r.status_code
         except requests.exceptions.HTTPError as e:
+            err_msg = self._get_error_message_from_exception(e)
+            err_msg = urllib.parse.unquote(err_msg)
             ret_val = action_result.set_status(phantom.APP_ERROR,
-                                               "HTTP error making REST call: %s" % e.response.text)
-        except Exception:
+                                               "HTTP error occurred while making REST call: {0}".format(err_msg))
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             ret_val = action_result.set_status(phantom.APP_ERROR,
-                                               "General error making REST call: %s" % traceback.format_exc())
+                                               "General error occurred while making REST call: {0}".format(err_msg))
         else:
-            ret_val = action_result.set_status(phantom.APP_SUCCESS)
-            response_json = r.json()
+            try:
+                response_json = r.json()
+                ret_val = action_result.set_status(phantom.APP_SUCCESS)
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                ret_val = action_result.set_status(phantom.APP_ERROR,
+                                                   "Unable to parse JSON response. Error: {0}".format(err))
 
         return (ret_val, response_json, status_code)
 
     def _check_apikey(self, action_result):
         self.save_progress("Testing API key")
-        config = self.get_config()
-        app_version = self.get_app_version()
         ret_val, response_json, status_code = self._make_rest_call(
             action_result,
             "get",
-            "https://api.greynoise.io/v2/meta/ping",
-            headers={"Accept": "application/json", "key": config["api_key"],
-                     "User-Agent": "greynoise-phantom-integration-v" + str(app_version)}
+            API_KEY_CHECK_URL,
+            headers=self._headers
         )
         if phantom.is_fail(ret_val):
             self.save_progress("API key check Failed")
@@ -93,13 +131,16 @@ class GreyNoiseConnector(BaseConnector):
 
         if response_json is None:
             self.save_progress("No response from API")
-            response_json = json.dumps(response_json)
-            return action_result.set_status(phantom.APP_ERROR, "No response from API: %s" % response_json)
+            # response_json = json.dumps(response_json)
+            return action_result.set_status(phantom.APP_ERROR, "No response from API")
         elif response_json["message"] == "pong":
             return action_result.set_status(phantom.APP_SUCCESS, "Validated API key")
         else:
             self.save_progress("Invalid response from API")
-            response_json = json.dumps(response_json)
+            try:
+                response_json = json.dumps(response_json)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Invalid response from API")
             return action_result.set_status(phantom.APP_ERROR, "Invalid response from API: %s" % response_json)
 
     def _test_connectivity(self, param):
@@ -115,111 +156,103 @@ class GreyNoiseConnector(BaseConnector):
     def _lookup_ip(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_apikey(action_result)
-        config = self.get_config()
-        app_version = self.get_app_version()
         if phantom.is_fail(ret_val):
             return ret_val
 
         ret_val, response_json, status_code = self._make_rest_call(
             action_result,
             "get",
-            "https://api.greynoise.io/v2/noise/quick/%s" % param["ip"],
-            headers={"Accept": "application/json", "key": config["api_key"],
-                     "User-Agent": "greynoise-phantom-integration-v" + str(app_version)}
+            LOOKUP_IP_URL.format(ip=param["ip"]),
+            headers=self._headers
         )
         if phantom.is_fail(ret_val):
             return ret_val
 
         result_data = {}
-        action_result.add_data(result_data)
-
         result_data.update(response_json)
 
-        result_data["visualization"] = "https://viz.greynoise.io/ip/" + str(result_data["ip"])
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+            if result_data["code"] in CODES:
+                result_data["code_meaning"] = CODES[result_data["code"]]
+            else:
+                result_data["code_meaning"] = "This code is unmapped"
+        except KeyError:
+            self.debug_print("Error occurred while processing API response")
 
-        if result_data["code"] == "0x00":
-            result_data["code_meaning"] = "The IP has never been observed scanning the Internet"
-        elif result_data["code"] == "0x01":
-            result_data["code_meaning"] = "The IP has been observed by the GreyNoise sensor network"
-        elif result_data["code"] == "0x02":
-            result_data["code_meaning"] = "The IP has been observed scanning the GreyNoise sensor network, " \
-                                          "but has not completed a full connection, meaning this can be spoofed"
-        elif result_data["code"] == "0x03":
-            result_data["code_meaning"] = "The IP is adjacent to another host that has been directly observed by the" \
-                                          " GreyNoise sensor network"
-        elif result_data["code"] == "0x04":
-            result_data["code_meaning"] = "Reserved"
-        elif result_data["code"] == "0x05":
-            result_data["code_meaning"] = "This IP is commonly spoofed in Internet-scan activity"
-        elif result_data["code"] == "0x06":
-            result_data["code_meaning"] = "This IP has been observed as noise, " \
-                                          "but this host belongs to a cloud provider where IPs can be cycled frequently"
-        elif result_data["code"] == "0x07":
-            result_data["code_meaning"] = "This IP is invalid"
-        elif result_data["code"] == "0x08":
-            result_data["code_meaning"] = "This IP was classified as noise, " \
-                                          "but has not been observed engaging in Internet-wide scans or attacks " \
-                                          "in over 60 days"
-        else:
-            result_data["code_meaning"] = "This code is unmapped"
+        action_result.add_data(result_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_apikey(action_result)
-        config = self.get_config()
-        app_version = self.get_app_version()
         if phantom.is_fail(ret_val):
             return ret_val
 
         ret_val, response_json, status_code = self._make_rest_call(
             action_result,
             "get",
-            "https://api.greynoise.io/v2/noise/context/%s" % param["ip"],
-            headers={"Accept": "application/json", "key": config["api_key"],
-                     "User-Agent": "greynoise-phantom-integration-v" + str(app_version)}
+            IP_REPUTATION_URL.format(ip=param["ip"]),
+            headers=self._headers
         )
         if phantom.is_fail(ret_val):
             return ret_val
 
         result_data = {}
-        action_result.add_data(result_data)
-
         result_data.update(response_json)
-        result_data["visualization"] = "https://viz.greynoise.io/ip/" + str(result_data["ip"])
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+        except KeyError:
+            self.debug_print("Error occurred while processing API response")
+
+        action_result.add_data(result_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _gnql_query(self, param, is_poll=False):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+    def _gnql_query(self, param, is_poll=False, action_result=None):
+        if not is_poll:
+            action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_apikey(action_result)
-        config = self.get_config()
-        app_version = self.get_app_version()
         if phantom.is_fail(ret_val):
-            return ret_val
+            if is_poll:
+                return ret_val, None
+            else:
+                return ret_val
 
         first_flag = True
         remaining_results_flag = True
         scroll_token = ""
         full_response = {}
+        size = param["size"]
+        # Validate 'size' action parameter
+        ret_val, size = self._validate_integer(action_result, size, SIZE_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            if is_poll:
+                return action_result.get_status(), None
+            else:
+                return action_result.get_status()
 
         while remaining_results_flag:
             if first_flag:
                 ret_val, response_json, status_code = self._make_rest_call(
                     action_result,
                     "get",
-                    "https://api.greynoise.io/v2/experimental/gnql",
-                    headers={"Accept": "application/json", "key": config["api_key"],
-                             "User-Agent": "greynoise-phantom-integration-v" + str(app_version)},
+                    GNQL_QUERY_URl,
+                    headers=self._headers,
                     params=(('query', param["query"]),
-                            ('size', param["size"]))
+                            ('size', size))
                 )
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
                 full_response.update(response_json)
 
             if "scroll" in full_response:
                 scroll_token = full_response["scroll"]
-            if "complete" in full_response or len(full_response["data"]) >= param["size"]:
+            if "complete" in full_response or len(full_response["data"]) >= size:
                 remaining_results_flag = False
             elif "message" in full_response:
                 if full_response["message"] == "no results":
@@ -231,13 +264,17 @@ class GreyNoiseConnector(BaseConnector):
                 ret_val, response_json, status_code = self._make_rest_call(
                     action_result,
                     "get",
-                    "https://api.greynoise.io/v2/experimental/gnql",
-                    headers={"Accept": "application/json", "key": config["api_key"],
-                             "User-Agent": "greynoise-phantom-integration-v" + str(app_version)},
+                    GNQL_QUERY_URl,
+                    headers=self._headers,
                     params=(('query', param["query"]),
-                            ('size', param["size"]),
+                            ('size', size),
                             ('scroll', scroll_token))
                 )
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
                 full_response["complete"] = response_json["complete"]
                 if "scroll" in response_json:
                     full_response["scroll"] = response_json["scroll"]
@@ -246,7 +283,7 @@ class GreyNoiseConnector(BaseConnector):
 
             if "scroll" in full_response:
                 scroll_token = full_response["scroll"]
-            if "complete" in full_response or len(full_response["data"]) >= param["size"]:
+            if "complete" in full_response or len(full_response["data"]) >= size:
                 remaining_results_flag = False
             elif "message" in full_response:
                 if full_response["message"] == "no results":
@@ -254,16 +291,17 @@ class GreyNoiseConnector(BaseConnector):
             else:
                 remaining_results_flag = True
 
-        if phantom.is_fail(ret_val):
-            return ret_val
-
         result_data = {}
-        action_result.add_data(result_data)
-
-        for entry in full_response["data"]:
-            entry["visualization"] = "https://viz.greynoise.io/ip/" + str(entry["ip"])
+        try:
+            for entry in full_response["data"]:
+                result_data["visualization"] = VISUALIZATION_URL.format(ip=entry["ip"])
+        except KeyError:
+            self.debug_print("Error occurred while processing API response")
 
         result_data.update(full_response)
+
+        action_result.add_data(result_data)
+
         if is_poll:
             return ret_val, result_data
         else:
@@ -272,115 +310,108 @@ class GreyNoiseConnector(BaseConnector):
     def _lookup_ips(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._check_apikey(action_result)
-        config = self.get_config()
-        app_version = self.get_app_version()
-        ips_string = requote_uri(param["ips"])
         if phantom.is_fail(ret_val):
             return ret_val
+
+        try:
+            ips_string = requote_uri(param["ips"])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing 'ips' action parameter. {0}".format(err)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         ret_val, response_json, status_code = self._make_rest_call(
             action_result,
             "get",
-            "https://api.greynoise.io/v2/noise/multi/quick?ips=%s" % ips_string,
-            headers={"Accept": "application/json", "key": config["api_key"],
-                     "User-Agent": "greynoise-phantom-integration-v" + str(app_version)}
+            LOOKUP_IPS_URL.format(ips=ips_string),
+            headers=self._headers
         )
         if phantom.is_fail(ret_val):
             return ret_val
 
         result_data = []
-        action_result.add_data(result_data)
-
         try:
             for result in response_json:
-                if result["code"] == "0x00":
-                    result["code_meaning"] = "The IP has never been observed scanning the Internet"
-                elif result["code"] == "0x01":
-                    result["code_meaning"] = "The IP has been observed by the GreyNoise sensor network"
-                elif result["code"] == "0x02":
-                    result["code_meaning"] = "The IP has been observed scanning the GreyNoise sensor network, " \
-                                             "but has not completed a full connection, meaning this can be spoofed"
-                elif result["code"] == "0x03":
-                    result["code_meaning"] = "The IP is adjacent to another host that has been directly observed by the" \
-                                             " GreyNoise sensor network"
-                elif result["code"] == "0x04":
-                    result["code_meaning"] = "Reserved"
-                elif result["code"] == "0x05":
-                    result["code_meaning"] = "This IP is commonly spoofed in Internet-scan activity"
-                elif result["code"] == "0x06":
-                    result["code_meaning"] = "This IP has been observed as noise, " \
-                                             "but this host belongs to a cloud provider where IPs can be cycled frequently"
-                elif result["code"] == "0x07":
-                    result["code_meaning"] = "This IP is invalid"
-                elif result["code"] == "0x08":
-                    result["code_meaning"] = "This IP was classified as noise, " \
-                                             "but has not been observed engaging in Internet-wide scans or attacks " \
-                                             "in over 60 days"
+                if result["code"] in CODES:
+                    result["code_meaning"] = CODES[result["code"]]
                 else:
                     result["code_meaning"] = "This code is unmapped"
-                result["visualization"] = "https://viz.greynoise.io/ip/" + str(result["ip"])
+
+                result["visualization"] = VISUALIZATION_URL.format(ip=result["ip"])
                 result_data.append(result)
+
+            action_result.add_data(result_data)
             return action_result.set_status(phantom.APP_SUCCESS)
-        except Exception as err:
-            message = "Error processing results: %s" % str(err)
-            return action_result.set_status(phantom.APP_ERROR, message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing results: {0}".format(err)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
     def _process_query(self, data):
         # spawn container for every item returned
-        ret_val = ""
-        if data["count"] > 0:
-            for entry in data["data"]:
-                ip = entry["ip"]
-                self.save_progress("Processing IP address {}".format(ip))
-                container = {
-                    "custom_fields": {},
-                    "data": {},
-                    "name": "",
-                    "description": "Container added by GreyNoise",
-                    "label": self.get_config().get("ingest", {}).get("container_label"),
-                    "sensitivity": "amber",
-                    "source_data_identifier": "",
-                    "tags": entry["tags"],
-                }
+        if data and "count" in data:
+            if data["count"] > 0:
+                for entry in data["data"]:
+                    ip = entry["ip"]
+                    self.save_progress("Processing IP address {}".format(ip))
+                    container = {
+                        "custom_fields": {},
+                        "data": {},
+                        "name": "",
+                        "description": "Container added by GreyNoise",
+                        "label": self.get_config().get("ingest", {}).get("container_label"),
+                        "sensitivity": "amber",
+                        "source_data_identifier": "",
+                        "tags": entry["tags"],
+                    }
 
-                if entry["classification"] == "malicious":
-                    container["severity"] = "high"
-                else:
-                    container["severity"] = "low"
+                    if entry["classification"] == "malicious":
+                        container["severity"] = "high"
+                    else:
+                        container["severity"] = "low"
 
-                artifact_cef = {
-                    'ip': entry['ip'],
-                    'classification': entry['classification'],
-                    'first_seen': entry['first_seen'],
-                    'last_seen': entry['last_seen'],
-                    'actor': entry['actor'],
-                    'organization': entry['metadata']['organization'],
-                    'asn': entry['metadata']['asn']
-                }
-                if entry['metadata']['country']:
-                    artifact_cef['country'] = entry['metadata']['country']
-                if entry['metadata']['city']:
-                    artifact_cef['city'] = entry['metadata']['city']
+                    artifact_cef = {
+                        'ip': entry['ip'],
+                        'classification': entry['classification'],
+                        'first_seen': entry['first_seen'],
+                        'last_seen': entry['last_seen'],
+                        'actor': entry['actor'],
+                        'organization': entry['metadata']['organization'],
+                        'asn': entry['metadata']['asn']
+                    }
+                    if entry['metadata']['country']:
+                        artifact_cef['country'] = entry['metadata']['country']
+                    if entry['metadata']['city']:
+                        artifact_cef['city'] = entry['metadata']['city']
 
-                container["artifacts"] = [{
-                    "cef": artifact_cef,
-                    "description": "Artifact added by GreyNoise",
-                    "label": container["label"],
-                    "name": "GreyNoise Query Language Entry",
-                    "source_data_identifier": container["source_data_identifier"],
-                    "severity": container["severity"]
-                }]
+                    container["artifacts"] = [{
+                        "cef": artifact_cef,
+                        "description": "Artifact added by GreyNoise",
+                        "label": container["label"],
+                        "name": "GreyNoise Query Language Entry",
+                        "source_data_identifier": container["source_data_identifier"],
+                        "severity": container["severity"]
+                    }]
 
-                container["name"] = "GreyNoise Query Language Entry"
+                    container["name"] = "GreyNoise Query Language Entry"
 
-                ret_val, _, container_id = self.save_container(container)
-                self.save_progress("Created %s" % container_id)
-
-            return ret_val
+                    try:
+                        ret_val, _, container_id = self.save_container(container)
+                        self.save_progress("Created %s" % container_id)
+                    except:
+                        self.save_progress("Error occurred while saving the container")
+                        return phantom.APP_ERROR
+                    else:
+                        if phantom.is_fail(ret_val):
+                            self.save_progress("Error occurred while saving the container")
+                            return phantom.APP_ERROR
+                return phantom.APP_SUCCESS
+            else:
+                self.save_progress("No results matching your GNQL query were found")
+                return phantom.APP_SUCCESS
         else:
-            self.save_progress("No results matching your GNQL query were found.")
-            ret_val = phantom.APP_SUCCESS
-            return ret_val
+            self.save_progress("No results matching your GNQL query were found")
+            return phantom.APP_SUCCESS
 
     def _on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -392,17 +423,18 @@ class GreyNoiseConnector(BaseConnector):
                                'create a container for each artifact.')
 
         config = self.get_config()
-        param["query"] = config["on_poll_query"]
+        param["query"] = config.get("on_poll_query")
+
         if self.is_poll_now():
             param["size"] = param.get(phantom.APP_JSON_CONTAINER_COUNT)
         else:
-            param["size"] = config["on_poll_size"]
+            param["size"] = config.get("on_poll_size")
 
-        if param["query"] == "Please refer to the readme":
+        if param["query"] == "Please refer to the documentation":
             self.save_progress("Default on poll query unchanged, please enter a valid GNQL query")
             return action_result.set_status(phantom.APP_ERROR, "Default on poll query unchanged")
 
-        ret_val, data = self._gnql_query(param, is_poll=True)
+        ret_val, data = self._gnql_query(param, is_poll=True, action_result=action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -410,9 +442,9 @@ class GreyNoiseConnector(BaseConnector):
         ret_val = self._process_query(data)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, ret_val)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to process the query")
         else:
-            return self.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -433,3 +465,92 @@ class GreyNoiseConnector(BaseConnector):
             ret_val = self._on_poll(param)
 
         return ret_val
+
+    def initialize(self):
+        """Initialize the Phantom integration."""
+        self._state = self.load_state()
+        config = self.get_config()
+
+        self._api_key = config['api_key']
+        app_json = self.get_app_json()
+        self._app_version = app_json["app_version"]
+
+        self._headers = {
+            "Accept": "application/json",
+            "key": self._api_key,
+            "User-Agent": "greynoise-phantom-integration-v{0}".format(self._app_version)
+        }
+
+        return phantom.APP_SUCCESS
+
+    def finalize(self):
+        """Finalize the Phantom integration."""
+        # Save the state, this data is saved across actions and app upgrades
+        self.save_state(self._state)
+        return phantom.APP_SUCCESS
+
+
+if __name__ == "__main__":
+
+    import pudb
+    import argparse
+
+    pudb.set_trace()
+
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if username is not None and password is None:
+        # User specified a username but not a password, so ask
+        import getpass
+
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        login_url = BaseConnector._get_phantom_base_url() + "login"
+        try:
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies["csrftoken"]
+
+            data = dict()
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
+
+            headers = dict()
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies["sessionid"]
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
+        in_json = f.read()
+        in_json = json.loads(in_json)
+        print(json.dumps(in_json, indent=4))
+
+        connector = GreyNoiseConnector()
+        connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
+
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
+
+    exit(0)
