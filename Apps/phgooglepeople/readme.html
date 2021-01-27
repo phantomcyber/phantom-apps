@@ -1,0 +1,88 @@
+<!-- File: readme.html
+  Copyright (c) 2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<html>
+
+<head></head>
+
+<body>
+  <h2>SDK and SDK Licensing details for the app</h2>
+    <p>
+      <h4>cachetools</h4>
+      This app uses the cachetools module, which is licensed under the MIT License (MIT), Copyright (c) 2014-2020 Thomas Kemmer.
+    </p>
+    <p>
+      <h4>google-api-python-client</h4>
+      This app uses the google-api-python-client module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google LLC.
+    </p>
+    <p>
+      <h4>google-auth-httplib2</h4>
+      This app uses the google-auth-httplib2 module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h4>google-auth-oauthlib</h4>
+      This app uses the google-auth-oauthlib module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h4>google-auth</h4>
+      This app uses the google-auth module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Cloud Platform.
+    </p>
+    <p>
+      <h4>httplib2</h4>
+      This app uses the httplib2 module, which is licensed under the MIT License (MIT), Copyright (c) Joe Gregorio.
+    </p>
+    <p>
+      <h4>oauth2client</h4>
+      This app uses the oauth2client module, which is licensed under the Apache Software License (Apache 2.0), Copyright (c) Google Inc.
+    </p>
+    <p>
+      <h4>pyasn1-modules</h4>
+      This app uses the pyasn1-modules module, which is licensed under the BSD License (BSD-2-Clause), Copyright (c) Ilya Etingof.
+    </p>
+    <p>
+      <h4>rsa</h4>
+      This app uses the rsa module, which is licensed under the Apache Software License (ASL 2), Copyright (c) Sybren A. Stuvel.
+    </p>
+    <p>
+      <h4>uritemplate</h4>
+      This app uses the uritemplate module, which is licensed under the OSI Approved, Apache Software License, BSD License (BSD 3-Clause License or Apache License, Version 2.0), Copyright (c) Ian Stapleton Cordasco.
+    </p>
+
+  <h3>Service Account</h3>
+    <p>
+      This app requires a pre-configured service account to operate. Please follow the procedure outlined at <a href="https://support.google.com/a/answer/7378726?hl=en" target="_blank">this link</a> to create a service account.<br>
+      The following APIs will need to be enabled:
+      <ul>
+        <li>AdminSDK</li>
+        <li>Google People API</li>
+      </ul> 
+      At the end of the creation process, the admin console should ask you to save the config as a JSON file. Copy the contents of the JSON file in the clipboard and paste it as the value of the "Contents of Service Account JSON file" asset configuration parameter.
+    </p>
+  <h3>Scopes</h3>
+    <p>
+      Once the service account has been created and APIs enabled, the next step is to configure scopes on these APIs to allow the App to access them. Every action requires different scopes to operate, these are listed in the action documentation.<br>To enable scopes please complete the following steps:
+      <ul>
+        <li>Go to your G Suite domain's <a href="http://admin.google.com/" target="_blank">Admin console</a>.</li>
+        <li>Select <b>Security</b> from the list of controls.
+        <li>Select <b>API Controls</b> then select <b>Manage Domain Wide Delegation</b> under <b>Domain Wide Delegation</b></li>
+        <li>In the <b>Client Name</b> field enter the service account's <b>Client ID</b>. You can find your service account's client ID in the <a href="https://console.developers.google.com/apis/credentials" target="_blank">Service accounts credentials page</a> or the service account JSON file (key named <b>client_id</b>).</li>
+        <li>Click <b>Add new</b> to add another API client or use an existing client if you have one.
+            Hover over the newly created API client then select <b>Edit</b> to add the scopes that you wish to grant access to the App.
+            For example, to enable all the scopes required by this app enter:
+            <ul>
+                <li>'https://www.googleapis.com/auth/contacts'</li>
+                <li>'https://www.googleapis.com/auth/contacts.other.readonly'</li>
+                <li>'https://www.googleapis.com/auth/directory.readonly'</li>
+                <li>'https://www.googleapis.com/auth/userinfo.profile'</li>
+            </ul>
+        </li>
+        <li>Click <b>Authorize</b>.</li>
+      </ul>
+    </p>
+  
+</body>
+
+</html>
