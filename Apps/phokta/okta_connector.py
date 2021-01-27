@@ -1,5 +1,5 @@
 # File: okta_connector.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -15,6 +15,7 @@ from okta_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup, UnicodeDammit
+from urllib.parse import unquote
 import time
 import sys
 
@@ -44,7 +45,7 @@ class OktaConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -53,8 +54,8 @@ class OktaConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            # Remove the script, style, footer and navigation part from the HTML message
-            for element in soup(["script", "style", "footer", "nav"]):
+            # Remove the script, style, footer, navigation and title from the HTML message
+            for element in soup(["script", "style", "footer", "nav", "title"]):
                 element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
@@ -64,7 +65,7 @@ class OktaConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                self._handle_py_ver_compat_for_input_str(error_text))
+                unquote(self._handle_py_ver_compat_for_input_str(error_text)))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -163,34 +164,36 @@ class OktaConnector(BaseConnector):
         return input_str
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
 
         try:
-            if hasattr(e, 'args'):
+            if e.args:
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = "Error occurred while connecting to the Okta server. Please check the asset configuration and|or the action parameters."
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return error_text
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, json=None, data=None, method="get"):
 
@@ -202,11 +205,11 @@ class OktaConnector(BaseConnector):
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
-        url = self._base_url + '/api/v1' + endpoint
+        url = "{}/api/v1{}".format(self._base_url, endpoint)
 
-        # Okta requries a User-Agent value in the HTTP header.  See
+        # Okta requires a User-Agent value in the HTTP header.  See
         #   https://developer.okta.com/use_cases/isv/security-analytics#common-guidance-and-requirements
-        user_agent = OKTA_APP_USER_AGENT_BASE + self._app_version
+        user_agent = "{}{}".format(OKTA_APP_USER_AGENT_BASE, self._app_version)
 
         headers = {
             'Accept': 'application/json',
@@ -241,9 +244,7 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/me', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             self.save_progress(OKTA_TEST_CONNECTIVITY_FAILED)
             return action_result.set_status(phantom.APP_ERROR, OKTA_TEST_CONNECTIVITY_FAILED)
 
@@ -265,7 +266,7 @@ class OktaConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call(endpoint, action_result, params=params, headers=headers)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return None
 
             # Fetch response list from the request response
@@ -327,7 +328,7 @@ class OktaConnector(BaseConnector):
             if parameter < 0:
                 return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
             if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_INVALID_MSG_ERR), None
+                return action_result.set_status(phantom.APP_ERROR, OKTA_LIMIT_NON_ZERO_POSITIVE_MSG_ERR), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -418,6 +419,8 @@ class OktaConnector(BaseConnector):
 
         user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         receive_type = param['receive_type']
+        if receive_type not in RECEIVE_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(RECEIVE_TYPE_VALUE_LIST, 'receive_type'))
 
         params = dict()
         params['sendEmail'] = True
@@ -427,7 +430,7 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/lifecycle/reset_password'.format(user_id), action_result, params=params, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -449,14 +452,14 @@ class OktaConnector(BaseConnector):
 
         request = {
             "credentials": {
-                "password": { "value": new_password }
+                "password": {"value": new_password }
             }
         }
 
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}'.format(user_id), action_result, json=request, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -478,7 +481,7 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/lifecycle/suspend'.format(user_id), action_result, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "Cannot suspend a user that is not active" in message:
                 return action_result.set_status(phantom.APP_SUCCESS, OKTA_ALREADY_DISABLED_USER_ERR)
@@ -503,10 +506,10 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/sessions'.format(user_id), action_result, method='delete')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "Empty response and no information in the header" == message:
-                # This occurs because the delet call in the Okta API only returns a 204 success
+                # This occurs because the delete call in the Okta API only returns a 204 success
                 return action_result.set_status(phantom.APP_SUCCESS, OKTA_CLEAR_USER_SESSIONS_SUCC)
             return action_result.get_status()
 
@@ -529,7 +532,7 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/lifecycle/unsuspend'.format(user_id), action_result, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "Cannot unsuspend a user that is not suspended" in message:
                 return action_result.set_status(phantom.APP_SUCCESS, OKTA_ALREADY_ENABLED_USER_ERR)
@@ -554,11 +557,17 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}'.format(user_id), action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        if isinstance(response, dict):
+            action_result.add_data(response)
+        elif isinstance(response, list):
+            for data in response:
+                action_result.add_data(data)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -576,11 +585,17 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/groups/{}'.format(group_id), action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        if isinstance(response, dict):
+            action_result.add_data(response)
+        elif isinstance(response, list):
+            for data in response:
+                action_result.add_data(data)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -606,7 +621,7 @@ class OktaConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/groups', action_result, json=request, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "An object with this field already exists in the current organization" in message:
                 return action_result.set_status(phantom.APP_SUCCESS, OKTA_ALREADY_ADDED_GROUP_ERR)
@@ -641,7 +656,7 @@ class OktaConnector(BaseConnector):
         params = {
             'limit': 200,
             'q': query,
-            'type_param': type_param
+            'type': type_param
         }
 
         providers_list = self._get_paginated_results('/idps', limit, action_result, params=params, headers=None)
@@ -700,10 +715,13 @@ class OktaConnector(BaseConnector):
         user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         type_param = param['type']
 
+        if type_param not in ROLE_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(ROLE_TYPE_VALUE_LIST, 'type'))
+
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/roles'.format(user_id), action_result, json={'type': type_param}, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'The role specified is already assigned to the user' in message:
                 return action_result.set_status(phantom.APP_SUCCESS, OKTA_ALREADY_ASSIGN_ROLE_ERR)
@@ -728,13 +746,13 @@ class OktaConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/users/{}'.format(user_id), action_result, params=None, headers=None)
 
         # Check the user is valid or not
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, OKTA_INVALID_USER_MSG)
 
         # make rest call
         ret_val, response = self._make_rest_call('/users/{}/roles/{}'.format(user_id, role_id),
                             action_result, method='delete')
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'Empty response and no information in the header' in message:
                 # Add the response into the data section
@@ -756,6 +774,8 @@ class OktaConnector(BaseConnector):
 
         user_id = self._handle_py_ver_compat_for_input_str(param['email'])
         factor_type = param.get('factortype', 'push')
+        if factor_type not in FACTOR_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(FACTOR_TYPE_VALUE_LIST, 'factortype'))
 
         # Removing " (not yet implemented)" from the factor_type variable
         # Remove the below line, once the action is implemented for the "sms" and the "token:software:totp" factor_types
@@ -763,37 +783,36 @@ class OktaConnector(BaseConnector):
 
         # get user
         ret_val, response_user = self._make_rest_call('/users/{}'.format(user_id), action_result, method='get')
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("[-] Okta /users/{}: {}".format(user_id, str(response_user)))
             return action_result.get_status()
 
         # get factors
-        user_id = response_user['id']
-        ret_val, response_factor = self._make_rest_call('/users/{}/factors'.format(user_id), action_result, method='get')
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("[-] get /users/{}/factors: {}".format(user_id, str(response_factor)))
-            return action_result.get_status()
-
-        factor_link_verify_uri = None
-        # process factors
-        for factor in response_factor:
-            factor_link_verify_href = factor.get('_links', {}).get('verify', {}).get('href', {})
-            if factor_type in factor['factorType'] and len(factor_link_verify_href) > 0:
-                self.save_progress("[-] process factor -- factor_link_verify_href: " + factor_link_verify_href)
-                factor_link_verify_uri = factor_link_verify_href.split('v1')[1]
-        if not factor_link_verify_uri:
-            self.save_progress("[-] error retriving factor_type: " + factor_type)
-            return action_result.set_status(phantom.APP_ERROR, OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG.format(factor_type=factor_type, user_id=user_id))
-
-        # call verify
-        ret_val, response_verify = self._make_rest_call(factor_link_verify_uri, action_result, method='post')
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("[-] send push notification (call verify) {} - {}".format(str(response_verify), factor_link_verify_uri))
-            return action_result.get_status()
-
         try:
-            transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
+            user_id = response_user['id']
+            ret_val, response_factor = self._make_rest_call('/users/{}/factors'.format(user_id), action_result, method='get')
+            if phantom.is_fail(ret_val):
+                self.save_progress("[-] get factors /users/{}/factors: {}".format(user_id, str(response_factor)))
+                return action_result.get_status()
 
+            factor_link_verify_uri = None
+            # process factors
+            for factor in response_factor:
+                factor_link_verify_href = factor.get('_links', {}).get('verify', {}).get('href', {})
+                if factor_type in factor['factorType'] and len(factor_link_verify_href) > 0:
+                    self.save_progress("[-] process factor -- factor_link_verify_href: " + factor_link_verify_href)
+                    factor_link_verify_uri = factor_link_verify_href.split('v1')[1]
+            if not factor_link_verify_uri:
+                self.save_progress("[-] error retriving factor_type: " + factor_type)
+                return action_result.set_status(phantom.APP_ERROR, OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG.format(factor_type=factor_type, user_id=user_id))
+
+            # call verify
+            ret_val, response_verify = self._make_rest_call(factor_link_verify_uri, action_result, method='post')
+            if phantom.is_fail(ret_val):
+                self.save_progress("[-] send push notification (call verify) {} - {}".format(str(response_verify), factor_link_verify_uri))
+                return action_result.get_status()
+
+            transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
             if not transaction_url:
                 if factor_type == "sms":
                     return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'sms' factortype workflow")
@@ -803,27 +822,26 @@ class OktaConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the polling link for the 'push' factortype workflow")
 
             transaction_url = transaction_url.split('v1')[1]
+
+            # response of verify
+            ack_flag = False
+            hard_limit = 25
+            while ack_flag is False:
+                # Wait for 5 seconds and check result
+                time.sleep(5)
+                hard_limit -= 1
+                self.save_progress("[-] {} - Awaiting Okta Push response".format(hard_limit))
+                ret_val, response_verify_ack = self._make_rest_call(transaction_url, action_result, method='get')
+                if phantom.is_fail(ret_val):
+                    self.save_progress("[-] Okta Verify ACK (loop): {}".format(response_verify_ack))
+                    return action_result.get_status()
+                # self.save_progress("[-] VERIFY ACK: {}".format(response_verify_ack))
+
+                if response_verify_ack['factorResult'] in ["TIMEOUT", "REJECTED", "SUCCESS"] or hard_limit == 0:
+                    ack_flag = True
+                    self.save_progress("[-] Okta Verify ACK: {}".format(str(response_verify_ack)))
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR,
-                "Error occurred while fetching the transaction_url for the 'send push notification' workflow. Error Details: {}".format(self._get_error_message_from_exception(e)))
-
-        # response of verify
-        ack_flag = False
-        hard_limit = 25
-        while (ack_flag is False):
-            # Wait for 5 seconds and check result
-            time.sleep(5)
-            hard_limit -= 1
-            self.save_progress("[-] {} - Awaiting Okta Push response".format(hard_limit))
-            ret_val, response_verify_ack = self._make_rest_call(transaction_url, action_result, method='get')
-            if (phantom.is_fail(ret_val)):
-                self.save_progress("[-] Okta Verify ACK (loop): {}".format(str(response_verify_ack)))
-                return action_result.get_status()
-            # self.save_progress("[-] VERIFY ACK: {}".format(response_verify_ack))
-
-            if response_verify_ack['factorResult'] in ["TIMEOUT", "REJECTED", "SUCCESS"] or hard_limit == 0:
-                ack_flag = True
-                self.save_progress("[-] Okta Verify ACK: {}".format(str(response_verify_ack)))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing reponse from server. {}".format(self._get_error_message_from_exception(e)))
 
         action_result.add_data(response_verify_ack)
 
@@ -836,7 +854,7 @@ class OktaConnector(BaseConnector):
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent push notification.")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent push notification")
 
     def handle_action(self, param):
 
@@ -911,7 +929,7 @@ class OktaConnector(BaseConnector):
         self._api_token = config[OKTA_API_TOKEN]
         self._base_url = self._handle_py_ver_compat_for_input_str(config[OKTA_BASE_URL])
 
-        # The current verison of this app as defined in the app json
+        # The current version of this app as defined in the app json
         self._app_version = self.get_app_json().get('app_version', '')
 
         return phantom.APP_SUCCESS
@@ -942,13 +960,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = BaseConnector._get_phantom_base_url() + '/login'
             print("Accessing the Login page")
@@ -979,7 +997,7 @@ if __name__ == '__main__':
         connector = OktaConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 

@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_identity_providers.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -32,8 +32,7 @@
 }
 
 .okta-app .wf-table-horizontal  {
-  margin-right: 10px;
-  width: initial;
+  width: 100%;
   border: 1px solid;
   font-size: 12px;
 }
@@ -50,6 +49,7 @@
   border: 1px solid;
   padding: 5px;
   padding-left: 4px;
+  text-align: center;
 }
 
 .okta-app .wf-h3-style {
@@ -81,22 +81,16 @@
       <table class="wf-table-horizontal">
         <tr><th colspan="2">INFO</th></tr>
         <tr><th>STATUS</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'value': '{{ curr_idps.status }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_idps.status }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
+          <td>{{ curr_idps.status }}
+          </td>
         </tr>
         <tr><th>TYPE</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'value': '{{ curr_idps.type }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_idps.type }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
+          <td>{{ curr_idps.type }}
+          </td>
         </tr>
         <tr><th>ID</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta idps id'], 'value': '{{ curr_idps.id }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_idps.id }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
+          <td>{{ curr_idps.id }}
+          </td>
         </tr>
       </table>
       <br>
@@ -104,10 +98,8 @@
         <tr><th>SCOPES</th></tr>
         {% for scope in curr_idps.protocol.scopes %}
         <tr>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'value': '{{ scope }}' }], 0, {{ container.id }}, null, false);">
-              {{ scope }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
+          <td>{{ scope }}
+          </td>
         </tr>
         {% endfor %}
       </table>
@@ -138,7 +130,7 @@
       </table>
     {% endfor %}
   {% else %}
-  <p> No Identity Providers found </p>
+  <p class="wf-h4-style"> No Identity Providers found </p>
   {% endif %}
 
 <br>

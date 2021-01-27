@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_add_group.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -100,8 +100,10 @@
       </table>
       <br>
     {% endfor %}
+  {% elif result.status and result.message %}
+  <p class="wf-h4-style"> {{result.message}} </p>
   {% else %}
-  <p> Group not added </p>
+  <p class="wf-h4-style"> Group is not added </p>
   {% endif %}
 
 <br>

@@ -1,5 +1,5 @@
 # File: okta_view.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -12,14 +12,20 @@ def get_ctx_result(result):
     param = result.get_param()
     summary = result.get_summary()
     data = result.get_data()
+    message = result.get_message()
+    status = result.get_status()
 
     ctx_result['param'] = param
+    ctx_result['status'] = status
 
     if (data):
         ctx_result['data'] = data
 
     if (summary):
         ctx_result['summary'] = summary
+
+    if (message):
+        ctx_result['message'] = message
 
     return ctx_result
 
