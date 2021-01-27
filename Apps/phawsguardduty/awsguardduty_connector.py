@@ -1,5 +1,5 @@
 # File: awsguardduty_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -15,6 +15,8 @@ from boto3 import client
 from datetime import datetime, timedelta
 from botocore.config import Config
 from awsguardduty_consts import *
+from bs4 import UnicodeDammit
+import sys
 
 
 class RetVal(tuple):
@@ -36,6 +38,77 @@ class AwsGuarddutyConnector(BaseConnector):
         self._base_url = None
         self._proxy = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :param always_encode: Used if the string needs to be encoded for python 3
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str is not None and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(AWSGUARDDUTY_PY_2TO3_ERR_MSG)
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = AWSGUARDDUTY_ERR_CODE_UNAVAILABLE
+        error_msg = AWSGUARDDUTY_ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSGUARDDUTY_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = AWSGUARDDUTY_UNICODE_DAMMIT_TYPE_ERR_MSG
+        except:
+            error_msg = AWSGUARDDUTY_ERR_MSG_UNAVAILABLE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_VALID_INT_MSG.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_VALID_INT_MSG.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_NON_NEG_INT_MSG.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _create_client(self, action_result):
 
         boto_config = None
@@ -44,29 +117,50 @@ class AwsGuarddutyConnector(BaseConnector):
 
         try:
             if self._access_key and self._secret_key:
-
                 self.debug_print("Creating boto3 client with API keys")
-
                 self._client = client(
                         'guardduty',
                         region_name=self._region,
                         aws_access_key_id=self._access_key,
                         aws_secret_access_key=self._secret_key,
                         config=boto_config)
-
             else:
-
                 self.debug_print("Creating boto3 client without API keys")
-
                 self._client = client(
                         'guardduty',
                         region_name=self._region,
                         config=boto_config)
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{0}. {1}".format(AWSGUARDDUTY_CREATE_CLIENT_ERR_MSG, err_msg))
 
         return phantom.APP_SUCCESS
+
+    def _sanitize_dates(self, cur_obj):
+
+        try:
+            json.dumps(cur_obj)
+            return cur_obj
+        except:
+            pass
+
+        if isinstance(cur_obj, dict):
+            new_dict = {}
+            for k, v in cur_obj.items():
+                new_dict[k] = self._sanitize_dates(v)
+            return new_dict
+
+        if isinstance(cur_obj, list):
+            new_list = []
+            for v in cur_obj:
+                new_list.append(self._sanitize_dates(v))
+            return new_list
+
+        if isinstance(cur_obj, datetime):
+            return cur_obj.strftime("%Y-%m-%d %H:%M:%S")
+
+        return cur_obj
 
     def _handle_test_connectivity(self, param):
         """ This function is used to handle the test connectivity action.
@@ -82,14 +176,13 @@ class AwsGuarddutyConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result)):
             return action_result.get_status()
 
-        ret_val, response = self._make_boto_call(action_result, 'list_invitations', MaxResults=1)
+        ret_val, _ = self._make_boto_call(action_result, 'list_invitations', MaxResults=1)
 
-        if phantom.is_fail(ret_val) or response is None:
-            self.save_progress("Test Connectivity Failed")
+        if phantom.is_fail(ret_val):
+            self.save_progress(AWSGUARDDUTY_TEST_CONN_FAILED_MSG)
             return action_result.get_status()
 
-        self.save_progress("Test Connectivity Passed")
-
+        self.save_progress(AWSGUARDDUTY_TEST_CONN_PASSED_MSG)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_container(self, finding):
@@ -108,9 +201,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         if phantom.is_fail(container_creation_status):
             self.debug_print(container_creation_msg)
-            self.save_progress('Error while creating container for finding {finding_id}. '
-                               '{error_message}'.format(finding_id=finding['Id'],
-                                                        error_message=container_creation_msg))
+            self.save_progress('{}. {error_message}'.format(AWSGUARDDUTY_CREATE_CONTAINER_ERR_MSG.format(finding_id=finding['Id']), error_message=container_creation_msg))
             return None
 
         return container_id
@@ -134,14 +225,14 @@ class AwsGuarddutyConnector(BaseConnector):
         if phantom.is_fail(create_artifact_status):
             return phantom.APP_ERROR, create_artifact_msg
 
-        return phantom.APP_SUCCESS, 'Artifacts created successfully'
+        return phantom.APP_SUCCESS, AWSGUARDDUTY_CREATE_ARTIFACT_MSG
 
-    def _handle_on_poll(self, param):
+    def _handle_on_poll(self, param):  # noqa: C901
         """ This function is used to handle on_poll.
 
-       :param param: Dictionary of input parameters
-       :return: status success/failure
-       """
+        :param param: Dictionary of input parameters
+        :return: status success/failure
+        """
 
         self.debug_print("In action handler for: {0}".format(self.get_action_identifier()))
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -150,27 +241,21 @@ class AwsGuarddutyConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result)):
             return action_result.get_status()
 
-        config = self.get_config()
-        days = config.get('poll_now_days', AWSGUARDDUTY_POLL_NOW_DAYS)
-        filter_name = config.get('filter_name')
-
-        # Validation of the poll_now_days
-        if (days and not str(days).isdigit()) or days == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_LIMIT.format(param_name='poll_now_days in asset configuration'))
+        filter_name = self._filter_name
 
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
 
         end_time = datetime.now()
 
         # Fetch the start_time of polling for the first run
-        initial_time = int(time.mktime((end_time - timedelta(int(days))).timetuple()) * 1000)
+        initial_time = int(time.mktime((end_time - timedelta(self._days)).timetuple()) * 1000)
 
         if self._state.get('first_run', True) or self.is_poll_now() or ((filter_name or self._state.get('filter_name')) and filter_name != self._state.get('filter_name')):
             criteria_dict = { 'updatedAt': { 'Gt': initial_time } }
             if not self.is_poll_now() and self._state.get('first_run', True):
                 self._state['first_run'] = False
 
-            # Store the poll_now_days in state file to determine if the value of this parameter gets changed at an interim state
+            # Store the 'filter_name' in state file to determine if the value of this parameter gets changed at an interim state
             if filter_name:
                 self._state['filter_name'] = filter_name
             elif not filter_name and self._state.get('filter_name'):
@@ -205,7 +290,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
             finding_criteria = response.get('FindingCriteria', {})
 
-        # Removing the existing filter criteria of updatedAt and explicitly using the start_time calculated above for the OnPoll logic
+        # Removing the existing filter criteria of updatedAt and explicitly using the start_time calculated above for the On Poll logic
         try:
             finding_criteria['Criterion'].pop('updatedAt')
         except KeyError:
@@ -258,6 +343,17 @@ class AwsGuarddutyConnector(BaseConnector):
                 if finding.get('Severity'):
                     finding['Severity'] = AWSGUARDDUTY_SEVERITY_REVERSE_MAP.get(finding.get('Severity'))
 
+                    # Parse S3 bucket details
+                    try:
+                        s3BucketDetails_list = finding['Resource']['S3BucketDetails']
+                        if s3BucketDetails_list:
+                            s3BucketDetails_dict = {}
+                            for element in s3BucketDetails_list:
+                                s3BucketDetails_dict[element['Arn']] = element
+                            finding['Resource']['S3BucketDetails'] = s3BucketDetails_dict
+                    except:
+                        continue
+
             all_findings.extend(findings_data)
 
             del list_findings[:min(50, len(list_findings))]
@@ -282,8 +378,7 @@ class AwsGuarddutyConnector(BaseConnector):
                                                                                        container_id=container_id)
 
             if phantom.is_fail(artifacts_creation_status):
-                self.debug_print('Error while creating artifacts for container with ID {container_id}. {error_msg}'.
-                                 format(container_id=container_id, error_msg=artifacts_creation_msg))
+                self.debug_print('{}. {error_msg}'.format(AWSGUARDDUTY_CREATE_ARTIFACT_ERR_MSG.format(container_id=container_id), error_msg=artifacts_creation_msg))
 
         self.save_progress('Total findings available on the UI of AWS GuardDuty: {}'.format(len(all_findings)))
 
@@ -291,17 +386,23 @@ class AwsGuarddutyConnector(BaseConnector):
 
     def _make_boto_call(self, action_result, method, **kwargs):
 
-            try:
-                boto_func = getattr(self._client, method)
-            except AttributeError:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
+        try:
+            boto_func = getattr(self._client, method)
+        except AttributeError:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_METHOD_ERR_MSG.format(method=method)), None)
 
-            try:
-                resp_json = boto_func(**kwargs)
-            except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Guardduty failed', e), None)
+        try:
+            resp_json = boto_func(**kwargs)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, '{0}. {1}'.format(AWSGUARDDUTY_BOTO3_CONN_FAILED_MSG, err_msg)), None)
 
-            return phantom.APP_SUCCESS, resp_json
+        try:
+            resp_json = self._sanitize_dates(resp_json)
+        except:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_PROCESS_RESPONSE_ERR_MSG), None)
+
+        return phantom.APP_SUCCESS, resp_json
 
     def _handle_update_finding(self, param):
         """
@@ -320,56 +421,99 @@ class AwsGuarddutyConnector(BaseConnector):
 
         detector_id = param['detector_id']
         finding_ids = param['finding_id']
+
+        # Comma separated list handling for 'finding_id'
+        finding_ids = [x.strip() for x in finding_ids.split(',')]
+        finding_ids = list(filter(None, finding_ids))
+        if not finding_ids:
+            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_FINDING_ID_ERR_MSG)
+
         feedback = param['feedback']
-        comments = param.get('comment')
+        if feedback not in AWSGUARDDUTY_FEEDBACK_LIST:
+            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_FEEDBACK_ERR_MSG)
 
-        if comments:
-            ret_val, response = self._make_boto_call(action_result,
-                                                    'update_findings_feedback',
-                                                    DetectorId=detector_id,
-                                                    FindingIds=[finding_ids],
-                                                    Feedback=feedback,
-                                                    Comments=comments)
-        else:
-            ret_val, response = self._make_boto_call(action_result, 'update_findings_feedback', DetectorId=detector_id, FindingIds=[finding_ids], Feedback=feedback)
-
-        if phantom.is_fail(ret_val):
+        ret_val, valid_findings_ids = self._validate_findings_id(finding_ids, None, action_result, detector_id)
+        if not ret_val:
             return action_result.get_status()
+        self.debug_print("Valid finding IDs are: \n{}".format(valid_findings_ids))
 
-        try:
-            del response['ResponseMetadata']
-        except:
-            pass
+        comments = param.get('comment')
+        while valid_findings_ids:
+            if comments:
+                ret_val, response = self._make_boto_call(action_result,
+                                                        'update_findings_feedback',
+                                                        DetectorId=detector_id,
+                                                        FindingIds=valid_findings_ids[:min(50, len(valid_findings_ids))],
+                                                        Feedback=feedback,
+                                                        Comments=comments)
+            else:
+                ret_val, response = self._make_boto_call(action_result,
+                                                        'update_findings_feedback',
+                                                        DetectorId=detector_id,
+                                                        FindingIds=valid_findings_ids[:min(50, len(valid_findings_ids))],
+                                                        Feedback=feedback)
 
-        action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        summary = action_result.update_summary({})
-        summary['total_updated_findings'] = action_result.get_data_size()
+            try:
+                del response['ResponseMetadata']
+            except:
+                pass
+            action_result.add_data(response)
+            del valid_findings_ids[:min(50, len(valid_findings_ids))]
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, AWSGUARDDUTY_UPDATE_FINDING_SUCC_MSG)
 
     def _validate_findings_id(self, findings_ids, record_state, action_result, detector_id):
 
-        # Validation of the correctness of the findings_id
-        ret_val, res = self._make_boto_call(action_result, 'get_findings', DetectorId=detector_id, FindingIds=findings_ids)
+        # Validation of the correctness of the findings_ids
+        valid_finding_ids = []
 
-        if phantom.is_fail(ret_val):
-            return False
+        # Check for valid ID found
+        valid_id_found = False
 
-        if not res.get('Findings'):
-            action_result.set_status(phantom.APP_ERROR, 'Please provide a valid Finding ID')
-            return False
-        else:
-            finding = res.get('Findings')[0]
-            finding_details = finding.get('Service')
-            if finding_details:
-                is_archived = finding_details.get('Archived')
+        while findings_ids:
+            ret_val, res = self._make_boto_call(action_result, 'get_findings', DetectorId=detector_id, FindingIds=findings_ids[:min(50, len(findings_ids))])
 
-            if (is_archived and record_state == 'ARCHIVED') or (not is_archived and record_state == 'UNARCHIVED'):
-                action_result.set_status(phantom.APP_SUCCESS, 'The provided finding is already {}'.format(record_state))
-                return False
+            if phantom.is_fail(ret_val):
+                return False, valid_finding_ids
 
-        return True
+            if not res.get('Findings'):
+                del findings_ids[:min(50, len(findings_ids))]
+                continue
+
+            if self.get_action_identifier() == "update_finding":
+                for finding in res.get('Findings'):
+                    if not valid_id_found:
+                        valid_id_found = True
+                    valid_finding_ids.append(finding['Id'])
+            else:
+                for finding in res.get('Findings'):
+                    if not valid_id_found:
+                        valid_id_found = True
+                    finding_details = finding.get('Service')
+                    if finding_details:
+                        is_archived = finding_details.get('Archived')
+                    else:
+                        self.debug_print("No finding details for finding ID: {}".format(finding['Id']))
+                        continue
+
+                    if (is_archived and record_state == 'ARCHIVED') or (not is_archived and record_state == 'UNARCHIVED'):
+                        self.debug_print("The finding ID {} is already in {}".format(finding['Id'], record_state))
+                        continue
+                    valid_finding_ids.append(finding['Id'])
+
+            del findings_ids[:min(50, len(findings_ids))]
+
+        if not valid_id_found:
+            action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_FINDING_ID_NOT_FOUND_ERR_MSG)
+            return False, valid_finding_ids
+
+        if not valid_finding_ids:
+            action_result.set_status(phantom.APP_SUCCESS, AWSGUARDDUTY_FINDING_ID_IN_RECORD_STATE_ERR_MSG.format(record_state=record_state))
+            return False, valid_finding_ids
+        return True, valid_finding_ids
 
     def _handle_archive_finding(self, param):
         """
@@ -385,37 +529,41 @@ class AwsGuarddutyConnector(BaseConnector):
             return action_result.get_status()
 
         detector_id = param['detector_id']
-        finding_id = param['finding_id']
+        finding_ids = param['finding_id']
 
-        valid_findings_id = self._validate_findings_id([finding_id], 'ARCHIVED', action_result, detector_id)
+        # Comma separated list handling for 'finding_id'
+        finding_ids = [x.strip() for x in finding_ids.split(',')]
+        finding_ids = list(filter(None, finding_ids))
+        if not finding_ids:
+            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_FINDING_ID_ERR_MSG)
 
-        if not valid_findings_id:
+        ret_val, valid_findings_ids = self._validate_findings_id(finding_ids, 'ARCHIVED', action_result, detector_id)
+        self.debug_print("Valid finding IDs are: \n{}".format(valid_findings_ids))
+        if not ret_val:
             return action_result.get_status()
 
-        ret_val, response = self._make_boto_call(action_result, 'archive_findings', DetectorId=detector_id, FindingIds=[finding_id])
+        while valid_findings_ids:
+            ret_val, response = self._make_boto_call(action_result, 'archive_findings', DetectorId=detector_id, FindingIds=valid_findings_ids[:min(50, len(valid_findings_ids))])
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            try:
+                del response['ResponseMetadata']
+            except:
+                pass
 
-        try:
-            del response['ResponseMetadata']
-        except:
-            pass
+            action_result.add_data(response)
+            del valid_findings_ids[:min(50, len(valid_findings_ids))]
 
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['total_findings'] = action_result.get_data_size()
-
-        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully archived the findings')
+        return action_result.set_status(phantom.APP_SUCCESS, AWSGUARDDUTY_ARCHIVE_FINDING_SUCC_MSG)
 
     def _handle_unarchive_finding(self, param):
         """
-        Unarchives Amazon GuardDuty findings specified by the detector ID and list of finding IDs
+        Unarchive Amazon GuardDuty findings specified by the detector ID and list of finding IDs
 
         :param detector_id: The ID of the detector
         :param finding_id: The ID of the finding
-        return: Details of unarchived finding
+        return: Details of unarchived findings
         """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -423,29 +571,33 @@ class AwsGuarddutyConnector(BaseConnector):
             return action_result.get_status()
 
         detector_id = param['detector_id']
-        finding_id = param['finding_id']
+        finding_ids = param['finding_id']
 
-        valid_findings_id = self._validate_findings_id([finding_id], 'UNARCHIVED', action_result, detector_id)
+        # Comma separated list handling for 'finding_id'
+        finding_ids = [x.strip() for x in finding_ids.split(',')]
+        finding_ids = list(filter(None, finding_ids))
+        if not finding_ids:
+            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_FINDING_ID_ERR_MSG)
 
-        if not valid_findings_id:
+        ret_val, valid_findings_ids = self._validate_findings_id(finding_ids, 'UNARCHIVED', action_result, detector_id)
+        if not ret_val:
             return action_result.get_status()
+        self.debug_print("Valid finding IDs are: \n{}".format(valid_findings_ids))
 
-        ret_val, response = self._make_boto_call(action_result, 'unarchive_findings', DetectorId=detector_id, FindingIds=[finding_id])
+        while valid_findings_ids:
+            ret_val, response = self._make_boto_call(action_result, 'unarchive_findings', DetectorId=detector_id, FindingIds=valid_findings_ids[:min(50, len(valid_findings_ids))])
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            try:
+                del response['ResponseMetadata']
+            except:
+                pass
 
-        try:
-            del response['ResponseMetadata']
-        except:
-            pass
+            action_result.add_data(response)
+            del valid_findings_ids[:min(50, len(valid_findings_ids))]
 
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['total_findings'] = action_result.get_data_size()
-
-        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully unarchived the findings')
+        return action_result.set_status(phantom.APP_SUCCESS, AWSGUARDDUTY_UNARCHIVE_FINDING_SUCC_MSG)
 
     def _paginator(self, method_name, limit, action_result, **kwargs):
         """
@@ -500,8 +652,10 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_LIMIT.format(param_name='limit'))
+        # Integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         kwargs = {'DetectorId': detector_id}
 
@@ -529,7 +683,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
     def _handle_run_query(self, param):
         """
-        Fetches all the findings controlled by the filters which provided as input
+        Fetches all the findings controlled by the filters which are provided as input
 
         :param detector_id: The ID of the detector
         :param instance_id: The ID of the EC2 instance
@@ -546,16 +700,20 @@ class AwsGuarddutyConnector(BaseConnector):
 
         detector_id = param['detector_id']
         instance_id = param.get('instance_id')
-        if param.get('severity'):
+        severity = param.get('severity')
+        if severity:
             severity = AWSGUARDDUTY_SEVERITY_MAP.get(param.get('severity'))
-        else:
-            severity = None
+            if not severity:
+                return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_SEVERITY_ERR_MSG)
+
         public_ip = param.get('public_ip')
         private_ip = param.get('private_ip')
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_LIMIT.format(param_name='limit'))
+        # Integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         criterion = {}
         finding_criteria = {
@@ -637,11 +795,8 @@ class AwsGuarddutyConnector(BaseConnector):
         :param limit: Maximum results to be fetched
         """
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if phantom.is_fail(self._create_client(action_result)):
@@ -650,8 +805,10 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_LIMIT.format(param_name='limit'))
+        # Integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         kwargs = {'DetectorId': detector_id}
 
@@ -686,11 +843,8 @@ class AwsGuarddutyConnector(BaseConnector):
         :param limit: Maximum results to be fetched
         """
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if phantom.is_fail(self._create_client(action_result)):
@@ -699,8 +853,10 @@ class AwsGuarddutyConnector(BaseConnector):
         detector_id = param['detector_id']
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSGUARDDUTY_INVALID_LIMIT.format(param_name='limit'))
+        # Integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSGUARDDUTY_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         kwargs = {'DetectorId': detector_id}
 
@@ -793,7 +949,22 @@ class AwsGuarddutyConnector(BaseConnector):
 
         self._state = self.load_state()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, AWSGUARDDUTY_ERR_FETCHING_PYTHON_VERSION_MSG)
+
         config = self.get_config()
+
+        self._days = config.get('poll_now_days', AWSGUARDDUTY_POLL_NOW_DAYS)
+
+        # Integer validation for 'poll_now_days' configuration parameter
+        ret_val, self._days = self._validate_integer(self, self._days, AWSGUARDDUTY_POLL_NOW_DAYS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+
+        self._filter_name = config.get('filter_name')
 
         if 'access_key' in config:
             self._access_key = config['access_key']
@@ -846,7 +1017,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             login_url = BaseConnector._get_phantom_base_url() + '/login'
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -859,11 +1030,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -879,6 +1050,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

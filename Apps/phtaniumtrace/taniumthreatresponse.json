@@ -9,12 +9,12 @@
     "product_name": "Threat Response",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "license": "Copyright (c) 2020 Splunk Inc.",
-    "app_version": "1.0.23",
+    "license": "Copyright (c) 2020-2021 Splunk Inc.",
+    "app_version": "1.0.24",
     "utctime_updated": "2020-04-16T23:14:40.000000Z",
     "package_name": "phantom_taniumthreatresponse",
     "main_module": "taniumthreatresponse_connector.pyc",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -24,8 +24,8 @@
             "order": 0
         },
         "verify_server_cert": {
-            "data_type": "boolean",
             "description": "Verify Server Certificate",
+            "data_type": "boolean",
             "default": false,
             "order": 1
         },
@@ -45,9 +45,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -55,9 +55,9 @@
         },
         {
             "action": "list computers",
-            "identifier": "list_computers",
             "description": "Get top 10 suggestions for computers where name or IP contains <name>",
             "type": "investigate",
+            "identifier": "list_computers",
             "read_only": true,
             "parameters": {
                 "name": {
@@ -73,14 +73,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string",
                     "contains": [
@@ -90,10 +82,6 @@
                     "example_values": [
                         "test_laptop"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -106,6 +94,16 @@
                     ],
                     "example_values": [
                         "test_laptop.domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -149,12 +147,16 @@
         },
         {
             "action": "initialize computers list",
-            "identifier": "initialize_computers_list",
             "description": "Start background question for computers list",
             "type": "generic",
+            "identifier": "initialize_computers_list",
             "read_only": false,
             "parameters": {},
             "output": [
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -164,10 +166,6 @@
                         "success",
                         "failed"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -203,24 +201,12 @@
         },
         {
             "action": "list connections",
-            "identifier": "list_connections",
             "description": "Get a list of connections",
             "type": "investigate",
+            "identifier": "list_connections",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.data.*.info.createTime",
                     "data_type": "string",
@@ -307,6 +293,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -354,9 +348,9 @@
         },
         {
             "action": "create connection",
-            "identifier": "create_connection",
             "description": "Create a new local or remote connection",
             "type": "generic",
+            "identifier": "create_connection",
             "read_only": false,
             "parameters": {
                 "dst": {
@@ -396,16 +390,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.conntimeout",
                     "data_type": "numeric"
                 },
@@ -437,6 +421,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -472,9 +466,9 @@
         },
         {
             "action": "get connection",
-            "identifier": "get_connection",
             "description": "Gets connection information",
             "type": "investigate",
+            "identifier": "get_connection",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -490,28 +484,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "column_name": "Connection ID",
-                    "column_order": 1,
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
+                    "column_name": "Connection ID",
+                    "column_order": 1,
                     "contains": [
                         "threatresponse connection id"
                     ],
                     "example_values": [
                         "test_laptop"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.createTime",
@@ -572,6 +554,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -605,9 +595,9 @@
         },
         {
             "action": "delete connection",
-            "identifier": "delete_connection",
             "description": "Deletes connection",
             "type": "generic",
+            "identifier": "delete_connection",
             "read_only": false,
             "parameters": {
                 "connection_id": {
@@ -623,16 +613,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -645,6 +625,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -680,25 +670,13 @@
         },
         {
             "action": "list local snapshots",
-            "identifier": "list_local_snapshots",
             "description": "Get a list of local snapshots",
             "verbose": "This action will fetch only those snapshots which are captured through Tanium UI. The API endpoint used for this action will be deprecated soon so it is suggested to use the 'list snapshot' action.",
             "type": "investigate",
+            "identifier": "list_local_snapshots",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.data.*.bytesReceived",
                     "data_type": "string",
@@ -754,6 +732,14 @@
                     "column_order": 5
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -794,9 +780,9 @@
         },
         {
             "action": "create snapshot",
-            "identifier": "create_snapshot",
             "description": "Capture a new snapshot",
             "type": "generic",
+            "identifier": "create_snapshot",
             "read_only": false,
             "parameters": {
                 "connection_id": {
@@ -812,16 +798,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -834,6 +810,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -869,10 +855,10 @@
         },
         {
             "action": "delete local snapshot",
-            "identifier": "delete_local_snapshot",
             "description": "Delete a local snapshot",
             "verbose": "The status of the snapshot deleted using this action may not reflect in the Tanium UI. Also, the API endpoint for this action will be deprecated soon so it is suggested to use the 'delete snapshot' action.",
             "type": "generic",
+            "identifier": "delete_local_snapshot",
             "read_only": false,
             "parameters": {
                 "connection_id": {
@@ -898,16 +884,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -930,6 +906,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -965,23 +951,13 @@
         },
         {
             "action": "list snapshots",
-            "identifier": "list_snapshots",
             "description": "Get a list of all the snapshots",
             "verbose": "This action will fetch all the screenshots that are available on the Tanium Server, i.e., the snapshot files that are uploaded manually and the snapshots that are captured through Tanium UI.",
             "type": "investigate",
+            "identifier": "list_snapshots",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.host",
                     "data_type": "string",
@@ -1009,17 +985,31 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
                     "example_values": [
-                        "Total snapshots: 4"
+                        "success",
+                        "failed"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_snapshots",
                     "data_type": "numeric",
                     "example_values": [
                         4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total snapshots: 4"
                     ]
                 },
                 {
@@ -1045,10 +1035,10 @@
         },
         {
             "action": "delete snapshot",
-            "identifier": "delete_snapshot",
             "description": "Delete a snapshot",
             "verbose": "This action can be used to delete the snapshots that are uploaded manually and the snapshots that are captured through Tanium UI.",
             "type": "generic",
+            "identifier": "delete_snapshot",
             "read_only": false,
             "parameters": {
                 "host": {
@@ -1075,16 +1065,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.host",
                     "data_type": "string",
                     "contains": [
@@ -1108,6 +1088,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1143,9 +1133,9 @@
         },
         {
             "action": "get process",
-            "identifier": "get_process",
             "description": "Get information for a process",
             "type": "investigate",
+            "identifier": "get_process",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1171,16 +1161,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 7,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -1199,10 +1179,6 @@
                     "example_values": [
                         790986
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.create_time",
@@ -1302,6 +1278,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 7,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -1335,9 +1321,9 @@
         },
         {
             "action": "get process timeline",
-            "identifier": "get_process_timeline",
             "description": "Get process timeline",
             "type": "investigate",
+            "identifier": "get_process_timeline",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1362,14 +1348,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
@@ -1428,6 +1406,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -1461,9 +1447,9 @@
         },
         {
             "action": "get process tree",
-            "identifier": "get_process_tree",
             "description": "Get process tree for a process instance",
             "type": "investigate",
+            "identifier": "get_process_tree",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1489,16 +1475,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -1517,10 +1493,6 @@
                     "example_values": [
                         790986
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.children.*.id",
@@ -1599,6 +1571,16 @@
                     ],
                     "contains": [
                         "threatresponse process table id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1636,9 +1618,9 @@
         },
         {
             "action": "get parent process tree",
-            "identifier": "get_parent_process_tree",
             "description": "Get parent process tree for a process instance",
             "type": "investigate",
+            "identifier": "get_parent_process_tree",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1664,16 +1646,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -1692,10 +1664,6 @@
                     "contains": [
                         "threatresponse process table id"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.children.*.id",
@@ -1777,6 +1745,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -1811,9 +1789,9 @@
         },
         {
             "action": "get children process tree",
-            "identifier": "get_children_process_tree",
             "description": "Get children process tree for a process instance",
             "type": "investigate",
+            "identifier": "get_children_process_tree",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1839,16 +1817,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -1867,10 +1835,6 @@
                     "example_values": [
                         790986
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -1917,6 +1881,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -1951,9 +1925,9 @@
         },
         {
             "action": "get events",
-            "identifier": "get_events",
             "description": "Build a query to get events of a certain type from a connection",
             "type": "investigate",
+            "identifier": "get_events",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -1970,7 +1944,6 @@
                     "description": "Type of event",
                     "data_type": "string",
                     "required": true,
-                    "order": 1,
                     "value_list": [
                         "combined",
                         "dns",
@@ -1981,7 +1954,8 @@
                         "registry",
                         "sid",
                         "image"
-                    ]
+                    ],
+                    "order": 1
                 },
                 "limit": {
                     "description": "Maximum number of results to return",
@@ -2027,16 +2001,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 6,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -2049,6 +2013,8 @@
                 {
                     "data_path": "action_result.parameter.event_type",
                     "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 0,
                     "example_values": [
                         "process",
                         "file",
@@ -2057,9 +2023,7 @@
                         "driver",
                         "sid",
                         "dns"
-                    ],
-                    "column_name": "Type",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.fields",
@@ -2087,10 +2051,6 @@
                 },
                 {
                     "data_path": "action_result.parameter.filter_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -2378,6 +2338,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -2447,9 +2417,9 @@
         },
         {
             "action": "get events summary",
-            "identifier": "get_events_summary",
-            "description": "Return counts of each type of event",
+            "description": "Returns counts of each type of event",
             "type": "investigate",
+            "identifier": "get_events_summary",
             "read_only": true,
             "parameters": {
                 "connection_id": {
@@ -2465,14 +2435,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "contains": [
@@ -2481,10 +2443,6 @@
                     "example_values": [
                         "test_laptop"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.category",
@@ -2511,6 +2469,14 @@
                     "column_order": 1,
                     "example_values": [
                         "DriverLoaded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2568,20 +2534,12 @@
         },
         {
             "action": "list files",
-            "identifier": "list_files",
             "description": "List downloaded files in Tanium Threat Response",
             "type": "investigate",
+            "identifier": "list_files",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.comments",
                     "data_type": "string"
@@ -2708,6 +2666,18 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.file_count",
                     "data_type": "numeric",
                     "example_values": [
@@ -2744,9 +2714,9 @@
         },
         {
             "action": "save file",
-            "identifier": "save_file",
             "description": "Save a file from a remote connection to Tanium Threat Response",
             "type": "generic",
+            "identifier": "save_file",
             "read_only": false,
             "parameters": {
                 "connection_id": {
@@ -2772,16 +2742,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.connection_id",
                     "data_type": "string",
                     "example_values": [
@@ -2804,6 +2764,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -2839,9 +2809,9 @@
         },
         {
             "action": "delete file",
-            "identifier": "delete_file",
             "description": "Delete a downloaded file from Tanium Threat Response",
             "type": "generic",
+            "identifier": "delete_file",
             "read_only": false,
             "parameters": {
                 "file_id": {
@@ -2857,16 +2827,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
-                {
                     "data_path": "action_result.parameter.file_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -2879,6 +2839,16 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.summary",
@@ -2914,9 +2884,9 @@
         },
         {
             "action": "get file",
-            "identifier": "get_file",
             "description": "Download a file from Tanium Threat Response to the Phantom Vault",
             "type": "investigate",
+            "identifier": "get_file",
             "read_only": true,
             "parameters": {
                 "file_id": {
@@ -2931,14 +2901,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.file_id",
                     "data_type": "numeric",
@@ -2956,9 +2918,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         4
-                    ],
-                    "contains": [
-                        "phantom container id"
                     ]
                 },
                 {
@@ -3030,6 +2989,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -3039,6 +3006,450 @@
                     "example_values": [
                         "File downloaded to vault"
                     ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "upload intel doc",
+            "description": "Upload intel document to Tanium Threat Response",
+            "type": "generic",
+            "identifier": "upload_intel_doc",
+            "read_only": false,
+            "parameters": {
+                "intel_doc": {
+                    "description": "The text of the intel document",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "threatresponse intel doc"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.intel_doc",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.revisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "openioc",
+                        "stix",
+                        "yara",
+                        "tanium-signal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.typeVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0",
+                        "2.3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intrinsicId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "8E1B0946948CCC0BC1FA3CB70374A795"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "contains": [
+                        "threatresponse intel doc description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc file size"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.unresolvedAlertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start quick scan",
+            "description": "Scan a computer group for hashes in intel document",
+            "type": "investigate",
+            "identifier": "start_quick_scan",
+            "read_only": true,
+            "parameters": {
+                "intel_doc_id": {
+                    "description": "ID of the intel document to scan",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                "computer_group_name": {
+                    "description": "Name of a Tanium computer group to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "tanium computer group name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.intel_doc_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.computer_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium computer group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intel_doc_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computer_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "tanium computer group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.revisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.questionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Tanium Threat Response"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "description": "List alerts with optional filtering",
+            "type": "investigate",
+            "identifier": "list_alerts",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Query to filter alerts (e.g. 'intelDocId=1&priority=high')",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "The maximum number of alerts to return",
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 1,
+                    "default": 100
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocId",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatresponse intel doc id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelDocRevisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.scanConfigRevisionId",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.computerName",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerIpAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.matchType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.event_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
