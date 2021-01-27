@@ -990,7 +990,7 @@ class MimecastConnector(BaseConnector):
 
         if self._auth_type == "Bypass (Access Key)":
             self._access_key = config['access_key']
-            self._secret_key = config['secret_key']            
+            self._secret_key = config['secret_key']
         else:
             self._access_key = self._state.get('access_key')
             self._secret_key = self._state.get('secret_key')
