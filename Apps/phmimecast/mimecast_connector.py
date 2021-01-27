@@ -362,8 +362,9 @@ class MimecastConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         uri = '/api/ttp/url/get-all-managed-urls'
-        self._access_key = None
-        self._secret_key = None
+        if self._auth_type != "Bypass (Access Key)":
+            self._access_key = None
+            self._secret_key = None
         headers = self._get_request_headers(uri, action_result)
         if headers is None:
             self.save_progress("Test Connectivity Failed")
@@ -986,16 +987,21 @@ class MimecastConnector(BaseConnector):
         self._app_id = config['app_id']
         self._app_key = config['app_key']
         self._auth_type = config['auth_type']
-        self._access_key = self._state.get('access_key')
-        self._secret_key = self._state.get('secret_key')
 
+        if self._auth_type == "Bypass (Access Key)":
+            self._access_key = config['access_key']
+            self._secret_key = config['secret_key']            
+        else:
+            self._access_key = self._state.get('access_key')
+            self._secret_key = self._state.get('secret_key')
         return phantom.APP_SUCCESS
 
     def finalize(self):
 
         # Save the state, this data is saved across actions and app upgrades
-        self._state['access_key'] = self._access_key
-        self._state['secret_key'] = self._secret_key
+        if self._auth_type != "Bypass (Access Key)":
+            self._state['access_key'] = self._access_key
+            self._state['secret_key'] = self._secret_key
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 

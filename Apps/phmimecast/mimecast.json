@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.0",
+    "app_version": "2.0.0.1",
     "python_version": "3",
     "utctime_updated": "2020-10-26T08:53:47.000000Z",
     "package_name": "phantom_mimecast",
@@ -34,7 +34,8 @@
             "order": 1,
             "value_list": [
                 "Domain",
-                "Cloud"
+                "Cloud",
+                "Bypass (Access Key)"
             ]
         },
         "username": {
@@ -60,6 +61,18 @@
             "data_type": "password",
             "required": true,
             "order": 5
+        },
+        "access_key": {
+            "description": "Mimecast access key for Bypass Authentication",
+            "data_type": "string",
+            "required": false,
+            "order": 6
+        },
+        "secret_key": {
+            "description": "Mimecast secret key for Bypass Authentication",
+            "data_type": "password",
+            "required": false,
+            "order": 7
         }
     },
     "actions": [
