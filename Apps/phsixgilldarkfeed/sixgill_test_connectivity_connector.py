@@ -1,6 +1,8 @@
+# File: sixgill_test_connectivity_connector.py
 #
-# Copyright (c) 2020 Cybersixgill Ltd.
+# Copyright (c) 2021 Cybersixgill Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 import phantom.app as phantom
 
@@ -8,10 +10,8 @@ import phantom.app as phantom
 from sixgill.sixgill_base_client import SixgillBaseClient
 from sixgill.sixgill_exceptions import AuthException
 
-# Usage of the consts file is recommended
-from sixgilldarkfeed_consts import SIXGILL_API_ID_CFG, SIXGILL_API_SECRET_KEY_CFG
-from sixgilldarkfeed_consts import SIXGILL_CHANNEL_ID, SIXGILL_TEST_CONNECTIVITY_MSG
-from sixgilldarkfeed_consts import SIXGILL_TEST_CONNECTIVITY_MSG_PASS, SIXGILL_TEST_CONNECTIVITY_MSG_FAIL
+from sixgilldarkfeed_consts import *
+from phantom.action_result import ActionResult
 
 
 class SixgillTestConnectivityConnector(object):
@@ -27,6 +27,7 @@ class SixgillTestConnectivityConnector(object):
         self._sixgill_phantom_channel_id = SIXGILL_CHANNEL_ID
 
     def test_connectivity(self):
+        action_result = self._connector.add_action_result(ActionResult(dict()))
         self._connector.save_progress(SIXGILL_TEST_CONNECTIVITY_MSG)
         sixgill_valid_credentials = SixgillBaseClient(
             self._sixgill_client_id, self._sixgill_api_secret_key, self._sixgill_phantom_channel_id
@@ -34,6 +35,11 @@ class SixgillTestConnectivityConnector(object):
         try:
             if sixgill_valid_credentials._get_access_token():
                 self._connector.save_progress(SIXGILL_TEST_CONNECTIVITY_MSG_PASS)
-                return self._connector.set_status(phantom.APP_SUCCESS, SIXGILL_TEST_CONNECTIVITY_MSG_PASS)
+                return action_result.set_status(phantom.APP_SUCCESS, SIXGILL_TEST_CONNECTIVITY_MSG_PASS)
+            return action_result.set_status(phantom.APP_ERROR, SIXGILL_TEST_CONNECTIVITY_MSG_FAIL)
         except AuthException:
-            return self._connector.set_status(phantom.APP_ERROR, SIXGILL_TEST_CONNECTIVITY_MSG_FAIL)
+            return action_result.set_status(phantom.APP_ERROR, SIXGILL_TEST_CONNECTIVITY_MSG_FAIL)
+        except Exception as e:
+            err = self._connector._get_error_message_from_exception(e)
+            self._connector.debug_print("Error message: {}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, SIXGILL_TEST_CONNECTIVITY_MSG_FAIL)

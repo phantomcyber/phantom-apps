@@ -1,6 +1,8 @@
+# File: sixgill_utils.py
 #
-# Copyright (c) 2020 Cybersixgill Ltd.
+# Copyright (c) 2021 Cybersixgill Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 from sixgilldarkfeed_consts import *
 
@@ -84,16 +86,15 @@ class SixgillUtils(object):
     def delete_event(self, feed_dict, indicator, sixgill_container, sixgill_artifact, verify_ssl):
         # If the indicator includes a "revoked" = true flag, the indicator will get deleted from the phantom SOAR platform
         if indicator.get(REVOKED, False) is TRUE and CONTAINER in feed_dict:
-            for count in range(int(TRY_AGAIN)):
-                delete_container = sixgill_container.delete_container(container_id, verify_ssl)
-                if delete_container is not None and delete_container.status_code == 200:
-                    break
             for artifact_id in feed_dict.get(ARTIFACT_LIST):
                 for count in range(int(TRY_AGAIN)):
                     delete_artifact = sixgill_artifact.delete_artifact(artifact_id, verify_ssl)
                     if delete_artifact is not None and delete_artifact.status_code == 200:
                         break
-            action_result.set_status(phantom.APP_SUCCESS)
+            for count in range(int(TRY_AGAIN)):
+                delete_container = sixgill_container.delete_container(feed_dict[CONTAINER], verify_ssl)
+                if delete_container is not None and delete_container.status_code == 200:
+                    break
 
     def sixgill_get_sixgill_pattern_type(self, indicator):
         """This method parses the 'Pattern' of the darkfeed to retrieve the IOC's

@@ -1,6 +1,9 @@
+# File: sixgill_reputation.py
 #
-# Copyright (c) 2020 Cybersixgill Ltd.
+# Copyright (c) 2021 Cybersixgill Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 from phantom.action_result import ActionResult
 
 # Phantom App imports
@@ -49,9 +52,13 @@ class SixgillReputation(object):
         action_result.append_to_message(f"No.of Indicator Found: {len(enrich_indicators)}")
 
     def _enrich(self, indicator_type, indicator_value, action_result):
-        enrich_indicators = self._enrich_client.enrich_ioc(indicator_type, indicator_value)
-        self._get_enrich_data(enrich_indicators, action_result)
-        return action_result.get_status()
+        try:
+            enrich_indicators = self._enrich_client.enrich_ioc(indicator_type, indicator_value)
+            self._get_enrich_data(enrich_indicators, action_result)
+            return action_result.get_status()
+        except Exception as e:
+            err = self._connector._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
     def ip_reputation(self, param):
         """This method Query the Sixgill Darkfeed for a specific IP and receive all IOCs matching that IP.
@@ -137,9 +144,13 @@ class SixgillReputation(object):
         self._connector.add_action_result(action_result)
         self._postid_value = param[SIXGILL_POSTID]
 
-        enrich_indicators = self._enrich_client.enrich_postid(self._postid_value)
-        self._get_enrich_data(enrich_indicators, action_result)
-        return action_result.get_status()
+        try:
+            enrich_indicators = self._enrich_client.enrich_postid(self._postid_value)
+            self._get_enrich_data(enrich_indicators, action_result)
+            return action_result.get_status()
+        except Exception as e:
+            err = self._connector._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
     def actor_reputation(self, param):
         """This method Query the Sixgill Darkfeed and receive all IOCs shared by that threat actor
@@ -156,6 +167,10 @@ class SixgillReputation(object):
         self._connector.add_action_result(action_result)
         self._actor_value = param[SIXGILL_ACTOR]
 
-        enrich_indicators = self._enrich_client.enrich_actor(self._actor_value)
-        self._get_enrich_data(enrich_indicators, action_result)
-        return action_result.get_status()
+        try:
+            enrich_indicators = self._enrich_client.enrich_actor(self._actor_value)
+            self._get_enrich_data(enrich_indicators, action_result)
+            return action_result.get_status()
+        except Exception as e:
+            err = self._connector._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)

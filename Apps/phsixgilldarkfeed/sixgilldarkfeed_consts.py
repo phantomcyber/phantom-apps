@@ -1,4 +1,7 @@
-# Define your constants here
+# File: sixgilldarkfeed_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 
 SIXGILL_API_ID_CFG = "sixgill_client_id"
 SIXGILL_API_SECRET_KEY_CFG = "sixgill_client_secret_key"
@@ -102,3 +105,10 @@ SIXGILL_HASH = "hash"
 SIXGILL_POSTID = "postid"
 SIXGILL_ACTOR = "actor"
 SIXGILL_DOMAIN = "domain"
+
+# Constants relating to '_get_error_message_from_exception'
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+SIXGILL_ACTION_NOT_SUPPORTED = "The requested action {} is not supported"

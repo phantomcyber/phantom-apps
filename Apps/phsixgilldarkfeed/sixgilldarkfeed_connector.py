@@ -1,8 +1,6 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: sixgilldarkfeed_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -11,7 +9,6 @@ from __future__ import print_function, unicode_literals
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 
-# Usage of the consts file is recommended
 from sixgilldarkfeed_consts import *
 
 # Importing Test Connectivity Connector
@@ -34,6 +31,38 @@ class SixgillDarkfeedConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def handle_action(self, param):
         action_id = self.get_action_identifier()
@@ -63,7 +92,7 @@ class SixgillDarkfeedConnector(BaseConnector):
             actor_reputation_connector = SixgillReputation(self)
             return actor_reputation_connector.actor_reputation(param)
         else:
-            return self.set_status_save_progress(phantom.APP_ERROR, SIXGILL_ACTION_NOT_SUPPORTED.format(action_id))
+            return self.set_status(phantom.APP_ERROR, SIXGILL_ACTION_NOT_SUPPORTED.format(action_id))
 
 
 def main():

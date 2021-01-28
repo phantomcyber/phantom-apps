@@ -1,6 +1,8 @@
+# File: sixgill_artifact.py
 #
-# Copyright (c) 2020 Cybersixgill Ltd.
+# Copyright (c) 2021 Cybersixgill Ltd.
 #
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 from sixgilldarkfeed_consts import *
 from sixgill_utils import SixgillUtils
