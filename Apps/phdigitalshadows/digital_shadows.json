@@ -29,26 +29,26 @@
     "configuration": {
         "ds_api_key": {
             "data_type": "string",
-            "description": "The account key of Digital Shadows portal which is used to configure the app",
+            "description": "The account key of the Digital Shadows portal that is used to configure this app",
             "order": 0,
             "required": true
         },
         "ds_api_secret_key": {
             "data_type": "password",
-            "description": "A secured key which is linked with the API key used to configure the app",
+            "description": "A secured key that is linked with the API key used to configure this app",
             "order": 1,
             "required": true
         },
         "private_incident": {
             "data_type": "boolean",
-            "description": "A private incident is an event that could lead to loss of, or disruption to, an organization's operations, services or functions",
+            "description": "A private incident is an event that could lead to loss of, or disruption to, an organization's operations, services, or functions",
             "default": false,
             "order": 2,
             "required":true
         },
         "global_incident": {
             "data_type": "boolean",
-            "description": "A global incident is an type of event that can remotely lead to the loss of organizations resources",
+            "description": "A global incident is a type of event that can remotely lead to the loss of an organization's resources",
             "default": false,
             "order": 3,
             "required":true
@@ -79,28 +79,28 @@
         },
         "inc_typ_infrastructure": {
             "data_type": "boolean",
-            "description": "This type of incident occurs when an internal network protocol is exposed to the internet.",
+            "description": "This type of incident occurs when an internal network protocol is exposed to the internet",
             "default": false,
             "order": 8,
             "required": true
         },
         "inc_typ_physical_security": {
             "data_type": "boolean",
-            "description": "This type of incident occurs when the certificate of domain has security issues",
+            "description": "This type of incident occurs when the certificate of a domain has security issues",
             "default": false,
             "order": 9,
             "required": true
         },
         "inc_typ_social_media_compliance": {
             "data_type": "boolean",
-            "description": "This type of incidents consist of exploiting secured information such as passwords on social media",
+            "description": "This type of incident consists of exploiting secured information such as passwords on social media",
             "default": false,
             "order": 10,
             "required": true
         },
         "inc_typ_cyber_threat": {
             "data_type": "boolean",
-            "description": "This type of incidents usually consist of company's account information to be sold and accessed by unauthorised personnel",
+            "description": "This type of incident usually consists of a company's account information to be sold and accessed by unauthorized personnel",
             "default": false,
             "order": 11,
             "required": true
@@ -146,7 +146,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Date Range",
+                    "description": "Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -322,7 +322,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Incident Date Range",
+                    "description": "Incident Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -614,7 +614,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Intelligence Incident Date Range",
+                    "description": "Intelligence Incident Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -912,7 +912,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach Date Range",
+                    "description": "Data Breach Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -994,7 +994,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "User Name",
+                    "column_name": "Username",
                     "column_order": 6
                 },
                 {
@@ -1146,7 +1146,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach record Date Range",
+                    "description": "Data Breach record Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -1234,7 +1234,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "User Name",
+                    "column_name": "Username",
                     "column_order": 6
                 },
                 {
@@ -1397,7 +1397,7 @@
                     "order": 1
                 },
                 "published_date_range": {
-                    "description": "Published Date Range",
+                    "description": "Published Date Range. Example input - P30D(for Past 30 Days)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -1419,7 +1419,7 @@
                     "data_type": "string",
                     "column_name": "Data Breach Record Published Date Range",
                     "example_values": [
-                        "P30M"
+                        "P30D"
                     ],
                     "column_order": 4
                 },
@@ -1432,7 +1432,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "Data Breach Record User Name",
+                    "column_name": "Data Breach Record Username",
                     "column_order": 2
                 },
                 {
