@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: visualping_connector.py
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -12,6 +11,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
+from visualping_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -35,7 +35,7 @@ class VisualpingConnector(BaseConnector):
         # Variable to hold a base_url in case the app makes REST calls
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
-        # self._base_url = None
+        self._base_url = None
 
     def initialize(self):
         # Load the state in initialize, use it to store data
@@ -45,7 +45,7 @@ class VisualpingConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config.get('base_url')
+        self._base_url = config.get('base_url').rstrip("/")
 
         # basic auth
         self.username = config['username']
@@ -57,13 +57,45 @@ class VisualpingConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -77,6 +109,9 @@ class VisualpingConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -86,7 +121,7 @@ class VisualpingConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -94,9 +129,10 @@ class VisualpingConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(error_message)
                 ), None
             )
 
@@ -107,7 +143,7 @@ class VisualpingConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -160,7 +196,7 @@ class VisualpingConnector(BaseConnector):
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -169,29 +205,31 @@ class VisualpingConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection refused from the server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_message)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
 
         self.save_progress("Connecting to endpoint")
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/api/status/health', action_result, params=None, headers=None
-        )
+        ret_val, response = self._make_rest_call('/api/status/health', action_result, params=None, headers=None)
 
         # Return success
         if 'healthy' in str(response):
@@ -199,117 +237,97 @@ class VisualpingConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS)
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
-            self.save_progress(str(response))
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
+        self.save_progress("Test Connectivity Failed")
+        return action_result.set_status(phantom.APP_ERROR)
+
     def _handle_list_jobs(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/api/job/list', action_result, params=None, headers=None
-        )
+        ret_val, response = self._make_rest_call('/api/job/list', action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
-        jobs = response['jobs']
-        active_jobs = jobs['active']
-        # action_result.add_data(active_jobs)
+        try:
+            jobs = response['jobs']
+            active_jobs = jobs['active']
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Error message: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['active_jobs'] = active_jobs
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_show_result(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Required values can be accessed directly
         id = param['id']
 
         # make rest call
         # for some reason the /api/job/lastresult returns a ContentType: text/html json response
-        ret_val, response = self._make_rest_call(
-            '/api/job/lastresult/{0}'.format(id), action_result, params=None, headers=None
-        )
+        ret_val, response = self._make_rest_call('/api/job/lastresult/{0}'.format(id), action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         action_result.add_data(response)
-        self.debug_print('*******************************************************************************************************************************************************')
-        self.debug_print('response')
-        self.debug_print(response)
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['url'] = response['url']
-        summary['description'] = response['description']
-        summary['lastCheck'] = response['lastcheck']
-        summary['percentDifference'] = response['PercentDifference']
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
+        try:
+            summary['url'] = response['url']
+            summary['description'] = response['description']
+            summary['lastCheck'] = response['lastcheck']
+            summary['percentDifference'] = response['PercentDifference']
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Error message: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_images(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         id = param['id']
 
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
-
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/api/job/lastimage/{0}'.format(id), action_result, params=None, headers=None
-        )
+        ret_val, response = self._make_rest_call('/api/job/lastimage/{0}'.format(id), action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['created'] = response['created']
-        summary['image_previous'] = response['image_previous']
-        summary['image_diff'] = response['image_diff']
+        try:
+            summary['created'] = response['created']
+            summary['image_previous'] = response['image_previous']
+            summary['image_diff'] = response['image_diff']
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Error message: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -318,7 +336,7 @@ class VisualpingConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)

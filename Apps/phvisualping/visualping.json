@@ -4,8 +4,8 @@
     "description": "The visualping app is a convenient tool to monitor websites changes",
     "type": "siem",
     "product_vendor": "visualping",
-    "logo": "visualping.png",
-    "logo_dark": "visualping_dark.png",
+    "logo": "logo_visualping.svg",
+    "logo_dark": "logo_visualping_dark.svg",
     "product_name": "visualping",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -16,21 +16,19 @@
     "utctime_updated": "2020-12-22T17:55:40.648399Z",
     "package_name": "phantom_visualping",
     "main_module": "visualping_connector.py",
-    "min_phantom_version": "4.10",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
             "description": "User name to authenticate using HTTP Basic Authentication",
             "data_type": "string",
             "required": true,
-            "default": "",
             "order": 0
         },
         "password": {
             "description": "Password to authenticate using HTTP Basic Authentication",
             "data_type": "password",
             "required": true,
-            "default": "",
             "order": 1
         },
         "base_url": {
@@ -44,10 +42,10 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "verbose": "Test connectivity.",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -55,43 +53,13 @@
         },
         {
             "action": "list jobs",
-            "identifier": "list_jobs",
             "description": "List visualping jobs",
             "verbose": "List all your VisualPing jobs, sorted by the job status.",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "identifier": "list_jobs",
+            "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Active jobs: [{'jobid': '3003726', 'id': 'bd84977cdd2b45c', 'created': '2020-12-21 15:27:48', 'url': 'https://do.usembassy.gov/u-s-citizen-services/covid-19-information/', 'description': 'Entry-Specific-Rule', 'runs': '3', 'trigger': '1', 'interval': '1440', 'mode': 'WEB', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 16:30:19'}, {'jobid': '2969557', 'id': '3941f47390034e8', 'created': '2020-11-24 16:17:17', 'url': 'https://do.usembassy.gov/u-s-citizen-services/covid-19-information/', 'description': 'Coronavirus Information for the Dominican Republic | U.S. Embassy in the Dominican Republic', 'runs': '29', 'trigger': '1', 'interval': '1440', 'mode': 'TEXT', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 01:28:27'}]"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.jobs.active.*.id",
                     "data_type": "string",
@@ -103,7 +71,7 @@
                     "data_path": "action_result.data.*.jobs.active.*.url",
                     "data_type": "string",
                     "example_values": [
-                        "https://do.usembassy.gov/u-s-citizen-services/covid-19-information/"
+                        "https://example.com/"
                     ],
                     "contains": [
                         "url"
@@ -174,9 +142,27 @@
                 },
                 {
                     "data_path": "action_result.data.*.success",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active jobs: [{'jobid': '3003726', 'id': 'bd84977cdd2b45c', 'created': '2020-12-21 15:27:48', 'url': 'https://example.com/', 'description': 'Entry-Specific-Rule', 'runs': '3', 'trigger': '1', 'interval': '1440', 'mode': 'WEB', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 16:30:19'}, {'jobid': '2969557', 'id': '3941f47390034e8', 'created': '2020-11-24 16:17:17', 'url': 'https://example.com/', 'description': 'Example description', 'runs': '29', 'trigger': '1', 'interval': '1440', 'mode': 'TEXT', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 01:28:27'}]"
                     ]
                 },
                 {
@@ -190,7 +176,7 @@
                     "data_path": "action_result.summary.active_jobs.*.url",
                     "data_type": "string",
                     "example_values": [
-                        "https://do.usembassy.gov/u-s-citizen-services/covid-19-information/"
+                        "https://example.com/"
                     ],
                     "contains": [
                         "url"
@@ -258,57 +244,6 @@
                     "example_values": [
                         "Entry-Specific-Rule"
                     ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "show result",
-            "identifier": "show_result",
-            "description": "Show the last result of a specific job",
-            "verbose": "Show the details of the last run of a specific visualping job, including a percent difference.",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {
-                "id": {
-                    "description": "ID of the job",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "column_name": "id",
-                    "column_order": 0,
-                    "example_values": [
-                        "3941f47390034e8"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Url: https://do.usembassy.gov/u-s-citizen-services/covid-19-information/, Description: Coronavirus Information for the Dominican Republic | U.S. Embassy in the Dominican Republic, Lastcheck: 2020-12-23 01:28:27, Percentdifference: 0.03"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -323,6 +258,37 @@
                     "example_values": [
                         1
                     ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "show result",
+            "description": "Show the last result of a specific job",
+            "verbose": "Show the details of the last run of a specific visualping job, including a percent difference.",
+            "type": "investigate",
+            "identifier": "show_result",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "ID of the job",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3941f47390034e8"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -335,7 +301,7 @@
                     "data_path": "action_result.data.*.url",
                     "data_type": "string",
                     "example_values": [
-                        "https://do.usembassy.gov/u-s-citizen-services/covid-19-information/"
+                        "https://example.com/"
                     ],
                     "contains": [
                         "url"
@@ -366,7 +332,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Coronavirus Information for the Dominican Republic | U.S. Embassy in the Dominican Republic"
+                        "Example description"
                     ]
                 },
                 {
@@ -377,10 +343,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Url: https://example.com/, Description: Example description, Lastcheck: 2020-12-23 01:28:27, Percentdifference: 0.03"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.url",
                     "data_type": "string",
                     "example_values": [
-                        "https://do.usembassy.gov/u-s-citizen-services/covid-19-information/"
+                        "https://example.com/"
                     ],
                     "contains": [
                         "url"
@@ -397,7 +380,7 @@
                     "data_path": "action_result.summary.description",
                     "data_type": "string",
                     "example_values": [
-                        "Coronavirus Information for the Dominican Republic | U.S. Embassy in the Dominican Republic"
+                        "Example description"
                     ]
                 },
                 {
@@ -405,57 +388,6 @@
                     "data_type": "string",
                     "example_values": [
                         "0.03"
-                    ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get images",
-            "identifier": "get_images",
-            "description": "Get the images from the last run of a specific job",
-            "verbose": "Get the images from the last run of a specific job, including the previous image and the diff.",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {
-                "id": {
-                    "description": "ID of the job",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "column_name": "id",
-                    "column_order": 0,
-                    "example_values": [
-                        "3941f47390034e8"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Created: 2021-01-01 02:33:29, Image previous: https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2020-12-31/2969557_1609374975789.png, Image diff: https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2021-01-01/2969557_1609464809592_diff.png"
                     ]
                 },
                 {
@@ -470,6 +402,37 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get images",
+            "description": "Get the images from the last run of a specific job",
+            "verbose": "Get the images from the last run of a specific job, including the previous image and the difference.",
+            "type": "investigate",
+            "identifier": "get_images",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "ID of the job",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3941f47390034e8"
                     ]
                 },
                 {
@@ -490,7 +453,7 @@
                     "data_path": "action_result.data.*.image_diff",
                     "data_type": "string",
                     "example_values": [
-                        "https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2021-01-01/2969557_1609464809592_diff.png"
+                        "https://example.com/2969557_1609464809592_diff.png"
                     ],
                     "contains": [
                         "url"
@@ -500,10 +463,27 @@
                     "data_path": "action_result.data.*.image_previous",
                     "data_type": "string",
                     "example_values": [
-                        "https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2020-12-31/2969557_1609374975789.png"
+                        "https://example.com/2969557_1609374975789.png"
                     ],
                     "contains": [
                         "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created: 2021-01-01 02:33:29, Image previous: https://example.com/2969557_1609374975789.png, Image diff: example.com/2969557_1609464809592_diff.png"
                     ]
                 },
                 {
@@ -517,7 +497,7 @@
                     "data_path": "action_result.summary.image_diff",
                     "data_type": "string",
                     "example_values": [
-                        "https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2021-01-01/2969557_1609464809592_diff.png"
+                        "https://example.com/2969557_1609464809592_diff.png"
                     ],
                     "contains": [
                         "url"
@@ -527,10 +507,24 @@
                     "data_path": "action_result.summary.image_previous",
                     "data_type": "string",
                     "example_values": [
-                        "https://s3.us-west-2.amazonaws.com/vp-files-ore/pictures/_vol_9/_data_924/924307/2020-12-31/2969557_1609374975789.png"
+                        "https://example.com/2969557_1609374975789.png"
                     ],
                     "contains": [
                         "url"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
