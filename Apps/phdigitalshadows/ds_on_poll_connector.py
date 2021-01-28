@@ -37,14 +37,14 @@ class DSOnPollConnector(object):
         self._poll_interval = config['ingest'].get('interval_mins')
         self._container_label = config['ingest']['container_label']
         self._history_days_interval = config['history_days_interval']
-        self._global_incident = config['global_incident']
-        self._private_incident = config['private_incident']
-        self._inc_typ_data_leakage = config['inc_typ_data_leakage']
-        self._inc_typ_brand_protection = config['inc_typ_brand_protection']
-        self._inc_typ_infrastructure = config['inc_typ_infrastructure']
-        self._inc_typ_physical_security = config['inc_typ_physical_security']
-        self._inc_typ_social_media_compliance = config['inc_typ_social_media_compliance']
-        self._inc_typ_cyber_threat = config['inc_typ_cyber_threat']
+        self._global_incident = config.get('global_incident', False)
+        self._private_incident = config.get('private_incident', False)
+        self._inc_typ_data_leakage = config.get('inc_typ_data_leakage', False)
+        self._inc_typ_brand_protection = config.get('inc_typ_brand_protection', False)
+        self._inc_typ_infrastructure = config.get('inc_typ_infrastructure', False)
+        self._inc_typ_physical_security = config.get('inc_typ_physical_security', False)
+        self._inc_typ_social_media_compliance = config.get('inc_typ_social_media_compliance', False)
+        self._inc_typ_cyber_threat = config.get('inc_typ_cyber_threat', False)
 
     def on_poll(self, param): # noqa
 
@@ -188,7 +188,6 @@ class DSOnPollConnector(object):
                 action_result.set_status(phantom.APP_SUCCESS)
             """
 
-        self._connector.add_action_result(action_result)
         return action_result.get_status()
 
     def _phantom_daterange(self, param):

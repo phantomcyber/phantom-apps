@@ -43,19 +43,17 @@
             "data_type": "boolean",
             "description": "A private incident is an event that could lead to loss of, or disruption to, an organization's operations, services, or functions",
             "default": false,
-            "order": 2,
-            "required":true
+            "order": 2
         },
         "global_incident": {
             "data_type": "boolean",
             "description": "A global incident is a type of event that can remotely lead to the loss of an organization's resources",
             "default": false,
-            "order": 3,
-            "required":true
+            "order": 3
         },
         "history_days_interval": {
             "data_type": "string",
-            "description": "Historical days for which data needs to be polled by the application. Example input - 10 (for last 10 days data)",
+            "description": "Historical days for which data needs to be polled by the application. Example input: 10 (for last 10 days data)",
             "order": 4,
             "required": true
         },
@@ -65,45 +63,39 @@
         },
         "inc_typ_data_leakage": {
             "data_type": "boolean",
-            "description": "The severity of this incident is based on the observation that sensitive client systems information, with credentials, is publicly available",
+            "description": "The severity of Data Leakage incident is based on the observation that sensitive client systems information, with credentials, is publicly available",
             "default": false,
-            "order": 6,
-            "required": true
+            "order": 6
         },
         "inc_typ_brand_protection": {
             "data_type": "boolean",
             "description": "Brand Protection is a type of incident in which attackers impersonate domains, social accounts, people, and mobile applications",
             "default": false,
-            "order": 7,
-            "required": true
+            "order": 7
         },
         "inc_typ_infrastructure": {
             "data_type": "boolean",
-            "description": "This type of incident occurs when an internal network protocol is exposed to the internet",
+            "description": "Infrastructure incident occurs when an internal network protocol is exposed to the internet",
             "default": false,
-            "order": 8,
-            "required": true
+            "order": 8
         },
         "inc_typ_physical_security": {
             "data_type": "boolean",
-            "description": "This type of incident occurs when the certificate of a domain has security issues",
+            "description": "Physical Security incident occurs when the certificate of a domain has security issues",
             "default": false,
-            "order": 9,
-            "required": true
+            "order": 9
         },
         "inc_typ_social_media_compliance": {
             "data_type": "boolean",
-            "description": "This type of incident consists of exploiting secured information such as passwords on social media",
+            "description": "Social Media Compliance incident consists of exploiting secured information such as passwords on social media",
             "default": false,
-            "order": 10,
-            "required": true
+            "order": 10
         },
         "inc_typ_cyber_threat": {
             "data_type": "boolean",
-            "description": "This type of incident usually consists of a company's account information to be sold and accessed by unauthorized personnel",
+            "description": "Cyber Threat incident usually consists of a company's account information to be sold and accessed by unauthorized personnel",
             "default": false,
-            "order": 11,
-            "required": true
+            "order": 11
         }
     },
     "actions": [
@@ -146,7 +138,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -322,7 +314,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Incident Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Incident Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -614,7 +606,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Intelligence Incident Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Intelligence Incident Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -912,7 +904,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Data Breach Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -1146,7 +1138,7 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Data Breach record Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Data Breach record Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -1156,7 +1148,7 @@
                     "order": 0
                 },
                 "domain_names": {
-                    "description": "Data Breach record domain names (comma separated). Example input - 'xyz.com, abc.org' ",
+                    "description": "Data Breach record domain names (comma separated). Example input: 'xyz.com, abc.org' ",
                     "data_type": "string",
                     "order": 1
                 },
@@ -1217,6 +1209,9 @@
                     "data_path": "action_result.parameter.domain_names",
                     "data_type": "string",
                     "column_name": "Data Breach Record Domain Names",
+                    "example_values": [
+                        "xyz.com, abc.org"
+                    ],
                     "column_order": 3
                 },
                 {
@@ -1397,7 +1392,7 @@
                     "order": 1
                 },
                 "published_date_range": {
-                    "description": "Published Date Range. Example input - P30D(for Past 30 Days)",
+                    "description": "Published Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
                     "order": 2
                 },
