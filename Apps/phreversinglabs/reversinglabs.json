@@ -10,16 +10,16 @@
     "product_vendor": "ReversingLabs",
     "product_name": "TitaniumCloud",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "Cloud, TitaniumCloud API api.reversinglabs.com/api, January 24, 2020"
+        "Cloud, TitaniumCloud API api.reversinglabs.com/api, January 28, 2021"
     ],
     "python_version": "3",
     "publisher": "Splunk",
     "consolidate_widgets": false,
     "logo": "logo_reversinglabs.svg",
     "logo_dark": "logo_reversinglabs_dark.svg",
-    "license": "Copyright (c) 2014-2020 Splunk Inc.",
+    "license": "Copyright (c) 2014-2021 Splunk Inc.",
     "configuration": {
         "username": {
             "description": "Username",
@@ -36,7 +36,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 1,
             "default": false
         }
@@ -81,6 +80,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.hash",
                     "data_type": "string",
                     "contains": [
@@ -91,23 +98,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.first_scanned_on",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.sha1",
-                    "data_type": "string",
-                    "contains": [
-                        "sha1"
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.first_seen_on",
@@ -122,15 +114,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.single_scan",
-                    "data_type": "boolean"
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.first_scanned_on",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.sample_type",
+                    "data_path": "action_result.data.*.ripemd160",
                     "data_type": "string"
                 },
                 {
@@ -138,12 +129,38 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.xref.*.scanner_match",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.sample_type",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.xref.*.scanner_count",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha384",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sha512",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.single_scan",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.results.*.result",
@@ -158,42 +175,24 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.xref.*.scanners.*.timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.xref.*.scanner_count",
+                    "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.xref.*.scanners.*.version",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.xref.*.scanner_match",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanners.*.name",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.sha384",
+                    "data_path": "action_result.data.*.xref.*.scanners.*.timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "sha256"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sha512",
+                    "data_path": "action_result.data.*.xref.*.scanners.*.version",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.ripemd160",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "md5"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.positives",
@@ -204,8 +203,8 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_positives",
-                    "data_type": "numeric"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -213,6 +212,10 @@
                 },
                 {
                     "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_positives",
                     "data_type": "numeric"
                 }
             ],
