@@ -8,7 +8,8 @@
 import sys
 import os
 import uuid
-import subprocess
+import pexpect
+from bs4 import UnicodeDammit
 
 zipexec = "/usr/bin/zip"
 
@@ -60,16 +61,15 @@ class zip_and_encrypt:
         cmd = [
             zipexec,
             "-j",
-            "-P",
-            self._password,
+            "-e",
             self.archive_path,
             filename,
         ]
+        command = " ".join(cmd)
+        command_output, exitstatus = pexpect.run(command, withexitstatus=True, events={"(?i)password: ": f"{self._password}\n"})
 
-        ret = subprocess.run(cmd, stdin=subprocess.DEVNULL, encoding='utf8', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self._output = str(ret.stdout) + str(ret.stderr)
-        if ret.returncode != 0:
-            raise Exception(self._output)
+        if exitstatus != 0:
+            raise Exception("Unable to perform zip and encryption on file. {}".format(UnicodeDammit(command_output).unicode_markup))
 
         return True
 

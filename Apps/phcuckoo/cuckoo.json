@@ -20,6 +20,18 @@
         "On prem, cuckoo-01 (version 2.0.3), December 12 2019"
     ],
     "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "pexpect",
+                "input_file": "wheels/pexpect-4.8.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "ptyprocess",
+                "input_file": "wheels/ptyprocess-0.7.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "server": {
             "description": "Server IP/Hostname",
