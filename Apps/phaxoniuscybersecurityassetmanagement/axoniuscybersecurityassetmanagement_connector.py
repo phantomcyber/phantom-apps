@@ -1,603 +1,577 @@
-# File: __init__.py
+# File: axoniuscybersecurityassetmanagement_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
-
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
-# Usage of the consts file is recommended
-# from axoniuscybersecurityassetmanagement_consts import *
-import requests
 import json
-from bs4 import BeautifulSoup
+import requests
+import os
+from typing import Any, List, Optional, Union
+
+import phantom.app as phantom
+from axonius_api_client import Connect
+from axonius_api_client.api.assets.asset_mixin import AssetMixin
+from axonius_api_client.tools import dt_parse, strip_left
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+from axoniuscybersecurityassetmanagement_consts import *
 
 
-class RetVal(tuple):
-    def __new__(cls, val1, val2=None):
-        return tuple.__new__(RetVal, (val1, val2))
+def get_str_arg(param: dict, key: str, required: bool = False, default: str = "") -> str:
+    """Get a key from a command arg and convert it into an str."""
+    value = param.get(key, default)
+
+    if not isinstance(value, str):
+        raise ValueError(f"Please provide a valid string value for the parameter {key!r}")
+
+    value = value.strip()
+
+    if not value and required:
+        raise ValueError(f"No value supplied for parameter {key!r}")
+
+    return value
 
 
-class AxoniusCybersecurityAssetManagementConnector(BaseConnector):
+def get_int_arg(param: dict, key: str, required: bool = False, default: Optional[Union[str, int]] = None) -> int:
+    """Get a key from a command arg and convert it into an int."""
+    param_val = param.get(key, default)
+
+    if param_val is None and required:
+        raise ValueError(f"No value supplied for argument {key!r}")
+
+    if param_val is not None:
+        try:
+            if not float(param_val).is_integer():
+                raise ValueError(VALID_INTEGER_MSG.format(key=key))
+            param_val = int(param_val)
+        except Exception:
+            raise ValueError(VALID_INTEGER_MSG.format(key=key))
+        if param_val < 0:
+            raise ValueError(NON_NEGATIVE_INTEGER_MSG.format(key=key))
+
+    return param_val
+
+
+def parse_kv(key: str, value: Any) -> Any:
+    """Parse time stamp into required format."""
+    for word in FIELDS_TIME:
+        if word in key:
+            try:
+                return dt_parse(value).isoformat()
+            except Exception:
+                return value
+    return value
+
+
+def parse_key(key: str) -> str:
+    """Parse fields into required format."""
+    if key.startswith("specific_data.data."):
+        # specific_data.data.hostname
+        # -> aggregated_hostname
+        key = strip_left(obj=key, fix="specific_data.data.")
+        key = f"aggregated_{key}"
+    if key.startswith("adapters_data."):
+        # adapters_data.aws_adapter.hostname
+        # -> aws_adapter_hostname
+        key = strip_left(obj=key, fix="adapters_data.")
+    key = key.replace(".", "_")
+    return key
+
+
+def parse_asset(asset: dict) -> dict:
+    """Initiate field format correction on assets."""
+    return {
+        parse_key(key=k): parse_kv(key=k, value=v)
+        for k, v in asset.items()
+        if k not in SKIPS
+    }
+
+
+class AxoniusConnector(BaseConnector):
+    """Connector for Axonius App."""
 
     def __init__(self):
+        """Axonius App Constructor."""
+        super(AxoniusConnector, self).__init__()
+        self._client: Connect = None
+        self._client_args: dict = {}
 
-        # Call the BaseConnectors init first
-        super(AxoniusCybersecurityAssetManagementConnector, self).__init__()
-
-        self._state = None
-
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
-        self._server_address = None
-        self._username = None
-        self._password = None
-
-    def _process_empty_reponse(self, response, action_result):
-
-        if response.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {})
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
-
-    def _process_html_response(self, response, action_result):
-
-        # An html response, treat it like an error
-        status_code = response.status_code
-
-        # Handle valid responses from ipinfo.io
-        if status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, response.text)
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
 
         try:
-            soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text
-            split_lines = error_text.split('\n')
-            split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_text = "Cannot parse error details"
-
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text.encode('utf-8'))
-
-        message = message.replace('{', '{{').replace('}', '}}')
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-
-    def _process_json_response(self, r, action_result):
-
-        # Try a json parse
-        try:
-            resp_json = r.json()
-        except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
-
-        # Please specify the status codes here
-        if 200 <= r.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
-
-        # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.encode('utf-8').replace('{', '{{').replace('}', '}}'))
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-
-    def _process_response(self, r, action_result):
-
-        # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text.encode('utf-8')})
-            action_result.add_debug_data({'r_headers': r.headers})
-        # Process each 'Content-Type' of response separately
-
-        # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
-            return self._process_json_response(r, action_result)
-
-        # Process an HTML resonse, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
-        if 'html' in r.headers.get('Content-Type', ''):
-            return self._process_html_response(r, action_result)
-
-        # it's not content-type that is to be parsed, handle an empty response
-        if not r.text:
-            return self._process_empty_reponse(r, action_result)
-
-        # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.encode('utf-8').replace('{', '{{').replace('}', '}}'))
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get"):
-
-        config = self.get_config()
-        resp_json = None
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            request_func = getattr(requests, method)
-        except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
 
-        # Create a URL to connect to
-        base_path = "/api/V1/" if endpoint != "api" else "/api/"
-        url = "https://" + self._server_address + base_path + endpoint
+        return error_text
 
+    def _create_client(self, action_result: phantom.ActionResult) -> bool:
+        """Create an instance of Axonius API Client."""
         try:
-            r = request_func(
-                            url,
-                            auth=(self._username, self._password),  # basic authentication
-                            data=data,
-                            headers=headers,
-                            verify=config.get('verify_server_cert', False),
-                            params=params)
-
-        except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-
-        return self._process_response(r, action_result)
-
-    def _handle_test_connectivity(self, param):
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
-        self.save_progress("Connecting to endpoint")
-        # make rest call
-        ret_val, response = self._make_rest_call('api', action_result, params=None, headers=None)
-
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.get_status()
-
-        # Return success
-        self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # self.save_progress("Test Connectivity Failed")
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_execute_action(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        # return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_delete_alerts(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        # make rest call
-        ret_val, response = self._make_rest_call('alerts', action_result, params=None, headers=None, data=param["alert_ids"].split(","))
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        # action_result.add_data(response)
-
-        action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_create_alert(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        # make rest call
-        ret_val, response = self._make_rest_call('alerts', action_result, params=None, headers=None, method="post",
-                                                 data=param["alert_object"])
-
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        # action_result.add_data(response)
-
-        action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_get_alerts(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        # make rest call
-        ret_val, response = self._make_rest_call('alerts', action_result, params=None, headers=None)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['alerts'] = response
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_get_user_by_id(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-        user_id = param["user_id"]
-
-        # make rest call
-        ret_val, response = self._make_rest_call("users/{0}".format(user_id), action_result, params=None,
-                                                 headers=None)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['users'] = response
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_get_users(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        # make rest call
-        ret_val, response = self._make_rest_call('users', action_result, params=param, headers=None)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['users'] = "value"
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_get_device_by_id(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-        device_id = param['device_id']
-
-        # make rest call
-        ret_val, response = self._make_rest_call('devices/{0}'.format(device_id), action_result, params=None,
-                                                 headers=None)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['devices'] = response
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def _handle_get_devices(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        """
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        required_parameter = param['required_parameter']
-
-        # Optional values should use the .get() function
-        optional_parameter = param.get('optional_parameter', 'default_value')
-        """
-
-        # make rest call
-        ret_val, response = self._make_rest_call('devices', action_result, params=param, headers=None)
-
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        # action_result.add_data({})
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary['devices'] = "value"
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
-    def handle_action(self, param):
-
-        ret_val = phantom.APP_SUCCESS
-
-        # Get the action that we are supposed to execute for this App Run
-        action_id = self.get_action_identifier()
-
-        self.debug_print("action_id", self.get_action_identifier())
-
-        if action_id == 'test_connectivity':
-            ret_val = self._handle_test_connectivity(param)
-
-        elif action_id == 'execute_action':
-            ret_val = self._handle_execute_action(param)
-
-        elif action_id == 'delete_alerts':
-            ret_val = self._handle_delete_alerts(param)
-
-        elif action_id == 'create_alert':
-            ret_val = self._handle_create_alert(param)
-
-        elif action_id == 'get_alerts':
-            ret_val = self._handle_get_alerts(param)
-
-        elif action_id == 'get_user_by_id':
-            ret_val = self._handle_get_user_by_id(param)
-
-        elif action_id == 'get_users':
-            ret_val = self._handle_get_users(param)
-
-        elif action_id == 'get_device_by_id':
-            ret_val = self._handle_get_device_by_id(param)
-
-        elif action_id == 'get_devices':
-            ret_val = self._handle_get_devices(param)
-
-        return ret_val
-
-    def initialize(self):
-
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
-        self._state = self.load_state()
-
-        # get the asset config
-        config = self.get_config()
-
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._server_address = config.get('server_address').encode('utf-8')
-        self._username = config.get('username')
-        self._password = config.get('password')
+            self.debug_print("Creating Axonius API Client")
+            self._client: Connect = Connect(**self._client_args)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Could not create Axonius API Client: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
 
         return phantom.APP_SUCCESS
 
-    def finalize(self):
+    def _start_client(self, action_result: phantom.ActionResult) -> bool:
+        """Create an instance of Axonius API Client and start it."""
+        if not self._create_client(action_result):
+            return action_result.get_status()
 
-        # Save the state, this data is saved accross actions and app upgrades
+        progress = f"Trying to login to Axonius instance at {self._url}"
+        self.save_progress(progress)
+
+        try:
+            self._client.start()
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to login to Axonius instance at {self._url}: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Successfully logged in to Axonius {self._client}"
+        self.save_progress(progress)
+
+        return phantom.APP_SUCCESS
+
+    def _handle_test_connectivity(self, param: dict) -> bool:
+        """Test that we can login to Axonius using the Axonius API Client."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
+
+        progress = f"Test Connectivity Passed {self._client}"
+        self.save_progress(progress)
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_devices_by_sq(self, param, obj_type) -> bool:
+        """Get devices by the name of a Saved Query in Axonius."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} from Saved Query {sq_name!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_saved_query(
+                name=sq_name, max_rows=max_rows, field_null=True, field_null_value=[]
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch Saved Query: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} from Saved Query {sq_name!r}"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_devices_by_hostname(self, param, obj_type) -> bool:
+        """Get devices by hostname."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            hostname: str = get_str_arg(key=HOSTNAME_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} with host name {hostname!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_value(
+                value=hostname,
+                field="specific_data.data.hostname",
+                max_rows=max_rows,
+                field_null=True,
+                field_null_value=[],
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} with {hostname!r} from Axonius"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_devices_by_ip(self, param, obj_type) -> bool:
+        """Get devices by IP address."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            ip: str = get_str_arg(key=IP_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} with IP address {ip!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_value(
+                value=ip,
+                field="specific_data.data.network_interfaces.ips",
+                max_rows=max_rows,
+                field_null=True,
+                field_null_value=[],
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} with {ip!r} from Axonius"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_devices_by_mac(self, param, obj_type) -> bool:
+        """Get devices by MAC address."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            mac: str = get_str_arg(key=MAC_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} with MAC address {mac!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_value(
+                value=mac,
+                field="specific_data.data.network_interfaces.mac",
+                max_rows=max_rows,
+                field_null=True,
+                field_null_value=[],
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch device: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} with {mac!r} from Axonius"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_users_by_sq(self, param, obj_type) -> bool:
+        """Get users by the name of a Saved Query in Axonius."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            sq_name: str = get_str_arg(key=SQ_NAME_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} from Saved Query {sq_name!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_saved_query(
+                name=sq_name, max_rows=max_rows, field_null=True, field_null_value=[]
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch Saved Query: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} from Saved Query {sq_name!r}"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_users_by_mail(self, param, obj_type) -> bool:
+        """Get users by email address in Axonius."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            mail: str = get_str_arg(key=MAIL_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} with email address {mail!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_value(
+                value=mail,
+                field="specific_data.data.mail",
+                max_rows=max_rows,
+                field_null=True,
+                field_null_value=[],
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch users: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} with {mail!r} from Axonius"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_users_by_username(self, param, obj_type) -> bool:
+        """Get users by username in Axonius."""
+        action_result: phantom.ActionResult = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        if not self._start_client(action_result):
+            return action_result.get_status()
+
+        try:
+            username: str = get_str_arg(key=USERNAME_KEY, param=param, required=True)
+            max_rows: int = get_int_arg(key=MAX_ROWS_KEY, param=param, default=MAX_ROWS)
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse parameters: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        try:
+            apiobj: AssetMixin = getattr(self._client, obj_type)
+        except AttributeError:
+            error_msg = "Error occurred while creating API object"
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        progress = f"Fetching {obj_type} with username {username!r}"
+        self.save_progress(progress)
+
+        try:
+            assets: List[dict] = apiobj.get_by_value(
+                value=username,
+                field="specific_data.data.username",
+                max_rows=max_rows,
+                field_null=True,
+                field_null_value=[],
+            )
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to fetch users: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
+        progress = f"Fetched {len(assets)} {obj_type} with {username!r} from Axonius"
+        self.save_progress(progress)
+
+        for asset in assets:
+            action_result.add_data(parse_asset(asset=asset))
+
+        summary: dict = action_result.update_summary({})
+        summary[f"total_{obj_type}"] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def handle_action(self, param: dict) -> bool:
+        """Launch point for Phantom actions."""
+        ret_val: bool = phantom.APP_SUCCESS
+        action_id: str = self.get_action_identifier()
+        self.debug_print("action_id: {}".format(action_id))
+
+        try:
+            if action_id == "test_connectivity":
+                ret_val = self._handle_test_connectivity(param)
+            elif action_id == "devices_by_sq":
+                ret_val = self._handle_devices_by_sq(param=param, obj_type="devices")
+            elif action_id == "devices_by_hostname":
+                ret_val = self._handle_devices_by_hostname(
+                    param=param, obj_type="devices"
+                )
+            elif action_id == "devices_by_ip":
+                ret_val = self._handle_devices_by_ip(param=param, obj_type="devices")
+            elif action_id == "devices_by_mac":
+                ret_val = self._handle_devices_by_mac(param=param, obj_type="devices")
+            elif action_id == "users_by_sq":
+                ret_val = self._handle_users_by_sq(param=param, obj_type="users")
+            elif action_id == "users_by_mail":
+                ret_val = self._handle_users_by_mail(param=param, obj_type="users")
+            elif action_id == "users_by_username":
+                ret_val = self._handle_users_by_username(param=param, obj_type="users")
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            progress = f"Exception in {action_id}: {err_msg}"
+            self.save_progress(progress)
+            ret_val = phantom.APP_ERROR
+
+        return ret_val
+
+    def initialize(self) -> bool:
+        """Initialize the Phantom integration."""
+        self._state: dict = self.load_state()
+        config: dict = self.get_config()
+
+        self._url: str = config[URL_KEY]
+
+        self._client_args: dict = {}
+        self._client_args["key"] = config[API_KEY]
+        self._client_args["secret"] = config[API_SECRET]
+        self._client_args["url"] = config[URL_KEY]
+        self._client_args["certverify"] = False
+        self._client_args["proxy"] = config.get(PROXY_URL_KEY)
+
+        env_vars: dict = config.get("_reserved_environment_variables", {})
+
+        # TBD Figure out a better way for this later
+        os.environ.pop("REQUESTS_CA_BUNDLE", None)
+        if "HTTPS_PROXY" in env_vars:
+            self._client_args["proxy"] = env_vars["HTTPS_PROXY"]["value"]
+
+        return phantom.APP_SUCCESS
+
+    def finalize(self) -> bool:
+        """Finalize the Phantom integration."""
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import pudb
     import argparse
@@ -606,9 +580,9 @@ if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -616,33 +590,33 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
-
+    if username is not None and password is None:
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = login_url
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -650,14 +624,14 @@ if __name__ == '__main__':
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = AxoniusCybersecurityAssetManagementConnector()
+        connector = AxoniusConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
-            in_json['user_session_token'] = session_id
-            connector._set_csrf_info(csrftoken, headers['Referer'])
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
