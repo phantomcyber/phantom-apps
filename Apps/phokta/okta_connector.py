@@ -865,7 +865,13 @@ class OktaConnector(BaseConnector):
         summary['result'] = response_verify_ack
 
         # Add the response into the data section
-        action_result.add_data(response_factor)
+        if isinstance(response_factor, dict):
+            action_result.add_data(response_factor)
+        elif isinstance(response_factor, list):
+            for factor in response_factor:
+                action_result.add_data(factor)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
