@@ -1156,7 +1156,7 @@
                     "order": 0
                 },
                 "domain_names": {
-                    "description": "Data Breach record domain names",
+                    "description": "Data Breach record domain names (comma separated). Example input - 'xyz.com, abc.org' ",
                     "data_type": "string",
                     "order": 1
                 },
