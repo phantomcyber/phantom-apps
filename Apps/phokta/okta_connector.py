@@ -54,8 +54,8 @@ class OktaConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            # Remove the script, style, footer, navigation and title from the HTML message
-            for element in soup(["script", "style", "footer", "nav", "title"]):
+            # Remove the script, style, footer and navigation from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
                 element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
@@ -131,7 +131,7 @@ class OktaConnector(BaseConnector):
                 return self._process_json_response_paginated(r, action_result)
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -170,7 +170,7 @@ class OktaConnector(BaseConnector):
         """
 
         try:
-            if e.args:
+            if hasattr(e, 'args'):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
@@ -182,6 +182,13 @@ class OktaConnector(BaseConnector):
                 error_msg = ERR_MSG_UNAVAILABLE
         except:
             error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
             error_msg = ERR_MSG_UNAVAILABLE
 
         try:
@@ -647,6 +654,9 @@ class OktaConnector(BaseConnector):
 
         query = param.get('query', '')
         type_param = param.get('type', '')
+        if type_param and type_param not in IDENTITY_PROVIDERS_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(IDENTITY_PROVIDERS_TYPE_VALUE_LIST, 'type'))
+
         ret_val, limit = self._validate_integer(action_result, param.get('limit'))
 
         if phantom.is_fail(ret_val):
@@ -812,16 +822,21 @@ class OktaConnector(BaseConnector):
                 self.save_progress("[-] send push notification (call verify) {} - {}".format(str(response_verify), factor_link_verify_uri))
                 return action_result.get_status()
 
-            transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
-            if not transaction_url:
-                if factor_type == "sms":
-                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'sms' factortype workflow")
-                elif factor_type == "token:software:totp":
-                    return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'token:software:totp' factortype workflow")
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the polling link for the 'push' factortype workflow")
+            try:
+                transaction_url = response_verify.get('_links', {}).get('poll', {}).get('href', {})
+                if not transaction_url:
+                    if factor_type == "sms":
+                        return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'sms' factortype workflow")
+                    elif factor_type == "token:software:totp":
+                        return action_result.set_status(phantom.APP_ERROR, "The action has not yet been implemented for the 'token:software:totp' factortype workflow")
+                    else:
+                        return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the polling link for the 'push' factortype workflow")
 
-            transaction_url = transaction_url.split('v1')[1]
+                transaction_url = transaction_url.split('v1')[1]
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error occurred while fetching the transaction_url for the 'send push notification' workflow. Error Details: {}".
+                    format(self._get_error_message_from_exception(e)))
 
             # response of verify
             ack_flag = False

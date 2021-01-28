@@ -56,7 +56,7 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 TYPE_ERR_MSG = "Error occurred while connecting to the Okta Server. Please check the asset configuration and|or the action parameters"
 
 # Constants relating to value_list check
-FACTOR_TYPE_VALUE_LIST = ["push", "sms", "token:software:totp"]
+FACTOR_TYPE_VALUE_LIST = ["push", "sms (not yet implemented)", "token:software:totp (not yet implemented)"]
 RECEIVE_TYPE_VALUE_LIST = ["Email", "UI"]
 IDENTITY_PROVIDERS_TYPE_VALUE_LIST = ["SAML2", "FACEBOOK", "GOOGLE", "LINKEDIN", "MICROSOFT"]
 ROLE_TYPE_VALUE_LIST = ["SUPER_ADMIN", "ORG_ADMIN", "API_ACCESS_MANAGEMENT_ADMIN", "APP_ADMIN", "USER_ADMIN", "MOBILE_ADMIN", "READ_ONLY_ADMIN"]

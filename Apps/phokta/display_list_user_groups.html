@@ -36,11 +36,9 @@
   width: initial;
   border: 1px solid;
   font-size: 12px;
-  width: 100%;
 }
 
 .okta-app .wf-table-horizontal th {
-  text-align: center;
   border: 1px solid;
   text-transform: uppercase;
   font-weight: normal;
@@ -51,7 +49,6 @@
   border: 1px solid;
   padding: 5px;
   padding-left: 4px;
-  text-align: center;
 }
 
 .okta-app .wf-h3-style {
@@ -80,6 +77,12 @@
     {% for curr_data in result.data %}
     <h3 class="wf-h3-style">{{ curr_data.profile.name }}</h3>
       <table class="wf-table-horizontal">
+        <tr><th>ID</th>
+          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta group id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
+              {{ curr_data.id }}
+              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a></td>
+        </tr>
         <tr><th>NAME</th>
           <td>{{ curr_data.profile.name }}
           </td>
@@ -91,12 +94,6 @@
         <tr><th>TYPE</th>
           <td>{{ curr_data.type }}
           </td>
-        </tr>
-        <tr><th>ID</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta group id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_data.id }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
         </tr>
       </table>
       <br>
