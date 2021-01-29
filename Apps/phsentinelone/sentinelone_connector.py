@@ -1,4 +1,8 @@
-#!/usr/bin/python
+# File: sentinelone_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
@@ -31,6 +35,38 @@ class SentineloneConnector(BaseConnector):
         self._log = kl.get_logger(app_name='phsentinelone', file_name='connector', log_level=logging.DEBUG, version='2.1.0')
         self._log.info('initialize_client=complete')
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
@@ -53,23 +89,24 @@ class SentineloneConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
         try:
             resp_json = r.json()
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)
                 ), None
             )
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -100,7 +137,7 @@ class SentineloneConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)),
                 resp_json
             )
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
         self._log.info(('action=make_rest_call url={}').format(url))
         try:
             r = request_func(
@@ -109,9 +146,10 @@ class SentineloneConnector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)
                 ), resp_json
             )
         return self._process_response(r, action_result)
@@ -127,10 +165,11 @@ class SentineloneConnector(BaseConnector):
                 }
         }
         ret_val, response = self._make_rest_call('/web/api/v2.1/users/login/by-api-token', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-        self.save_progress("response: {0}".format(response))
+        self.save_progress("Response: {0}".format(response))
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_message()))
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
+        self.save_progress("Test Connectivity Passed")
         self.save_progress("Login to SentinelOne Console/API was successful")
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -149,26 +188,30 @@ class SentineloneConnector(BaseConnector):
         params = {"value": hash, "type": "black_hash"}
         ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
         self.save_progress('Get Hash response: {ret_val}'.format(ret_val=ret_val))
-        if response['pagination']['totalItems'] != 0:
-            return action_result.set_status(phantom.APP_ERROR, "Hash already exists")
-        else:
-            body = {
-                "data": {
-                    "description": description,
-                    "osType": os_family,
-                    "type": "black_hash",
-                    "value": hash,
-                    "source": "phantom"
-                },
-                "filter": {
-                    "tenant": "true"
-                }
-            }
-            ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, method='post', data=json.dumps(body))
-            self.save_progress("response: {0}".format(response))
 
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
+        try:
+            if response.get('pagination', {}).get('totalItems') != 0:
+                return action_result.set_status(phantom.APP_ERROR, "Hash already exists")
+            else:
+                body = {
+                    "data": {
+                        "description": description,
+                        "osType": os_family,
+                        "type": "black_hash",
+                        "value": hash,
+                        "source": "phantom"
+                    },
+                    "filter": {
+                        "tenant": "true"
+                    }
+                }
+                ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, method='post', data=json.dumps(body))
+                self.save_progress("Response: {0}".format(response))
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Added Hash to Block List")
 
     def _handle_unblock_hash(self, param):
@@ -184,24 +227,28 @@ class SentineloneConnector(BaseConnector):
         params = {"value": hash, "type": "black_hash"}
         ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
         self.save_progress('Get Hash response: {ret_val}'.format(ret_val=ret_val))
-        if response['pagination']['totalItems'] == 0:
-            return action_result.set_status(phantom.APP_ERROR, "Hash not found")
-        elif response['pagination']['totalItems'] > 1:
-            return action_result.set_status(phantom.APP_ERROR, "Multiple IDs for {hash}: {total_items}".format(hash=hash, total_items=response['pagination']['totalItems']))
-        else:
-            hash_id = response['data'][0]['id']
-            body = {
-                "data": {
-                    "ids": [hash_id],
-                    "type": "black_hash"
-                }
-            }
-            ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, data=json.dumps(body), params=params, method='delete')
-            self.save_progress("Delete Hash response: {0}".format(response))
 
-        if phantom.is_fail(ret_val):
-            self.save_progress("Deleting Hash Failed.  Error: {0}".format(action_result.get_message()))
-            return action_result.get_status()
+        try:
+            if response['pagination']['totalItems'] == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Hash not found")
+            elif response['pagination']['totalItems'] > 1:
+                return action_result.set_status(phantom.APP_ERROR, "Multiple IDs for {hash}: {total_items}".format(hash=hash, total_items=response['pagination']['totalItems']))
+            else:
+                hash_id = response['data'][0]['id']
+                body = {
+                    "data": {
+                        "ids": [hash_id],
+                        "type": "black_hash"
+                    }
+                }
+                ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, data=json.dumps(body), params=params, method='delete')
+                self.save_progress("Delete Hash response: {0}".format(response))
+                if phantom.is_fail(ret_val):
+                    self.save_progress("Deleting Hash Failed.  Error: {0}".format(action_result.get_message()))
+                    return action_result.get_status()
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Deleted hash")
 
     def _handle_quarantine_device(self, param):
@@ -209,10 +256,10 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
         ret_val = self._get_agent_id(ip_hostname, action_result)
-        self.save_progress('Agent query: ' + ret_val)
-        if (ret_val == '0'):
+        self.save_progress('Agent query: {}'.format(ret_val))
+        if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
-        elif (ret_val == '99'):
+        elif ret_val == '99':
             return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
         else:
             summary = action_result.update_summary({})
@@ -228,11 +275,10 @@ class SentineloneConnector(BaseConnector):
                 }
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/disconnect', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-            self.save_progress("response: {0}".format(response))
-
-        if phantom.is_fail(ret_val):
-            self.save_progress("Quarantine Device Failed.  Error: {0}".format(action_result.get_message()))
-            return action_result.get_status()
+            self.save_progress("Response: {0}".format(response))
+            if phantom.is_fail(ret_val):
+                self.save_progress("Quarantine Device Failed.  Error: {0}".format(action_result.get_message()))
+                return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Quarantined device")
 
     def _handle_unquarantine_device(self, param):
@@ -240,10 +286,10 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
         ret_val = self._get_agent_id(ip_hostname, action_result)
-        self.save_progress('Agent query: ' + ret_val)
-        if (ret_val == '0'):
+        self.save_progress('Agent query: {}'.format(ret_val))
+        if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
-        elif (ret_val == '99'):
+        elif ret_val == '99':
             return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
         else:
             summary = action_result.update_summary({})
@@ -259,11 +305,10 @@ class SentineloneConnector(BaseConnector):
                 }
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/connect', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-            self.save_progress("response: {0}".format(response))
-
-        if phantom.is_fail(ret_val):
-            self.save_progress("Unquarantine Device Failed.  Error: {0}".format(action_result.get_message()))
-            return action_result.get_status()
+            self.save_progress("Response: {0}".format(response))
+            if phantom.is_fail(ret_val):
+                self.save_progress("Unquarantine Device Failed.  Error: {0}".format(action_result.get_message()))
+                return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Unquarantined device")
 
     def _handle_mitigate_threat(self, param):
@@ -283,15 +328,18 @@ class SentineloneConnector(BaseConnector):
                 "ids": [s1_threat_id],
             }
         }
-        ret_val, response = self._make_rest_call('/web/api/v2.1/threats/mitigate/' + action, action_result, headers=header, data=json.dumps(body), method='post')
-        self.save_progress("response: {0}".format(response))
+        ret_val, response = self._make_rest_call('/web/api/v2.1/threats/mitigate/{}'.format(action), action_result, headers=header, data=json.dumps(body), method='post')
+        self.save_progress("Response: {0}".format(response))
         action_result.add_data(response)
         if phantom.is_fail(ret_val):
-            self.save_progress("Failed to mitigate threat.  Error: {0}".format(action_result.get_message()))
+            self.save_progress("Failed to mitigate threat. Error: {0}".format(action_result.get_message()))
             return action_result.get_status()
-        if response['data']['affected'] == 0:
-            self.save_progress("Failed to mitigate threat. Threat ID not found.")
-            return action_result.set_status(phantom.APP_ERROR, "Failed to mitigate threat.  Threat ID not found.")
+        try:
+            if response.get('data', {}).get('affected') == 0:
+                self.save_progress("Failed to mitigate threat. Threat ID not found")
+                return action_result.set_status(phantom.APP_ERROR, "Failed to mitigate threat. Threat ID not found")
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully mitigated threat")
 
     def _handle_scan_endpoint(self, param):
@@ -299,11 +347,11 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
         ret_val = self._get_agent_id(ip_hostname, action_result)
-        self.save_progress('Agent query: ' + ret_val)
+        self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
-            return action_result.set_status(phantom.APP_SUCCESS, "Endpoint not found")
+            return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
         elif ret_val == '99':
-            return action_result.set_status(phantom.APP_SUCCESS, "More than one endpoint found")
+            return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
         else:
             summary = action_result.update_summary({})
             summary['ip_hostname'] = ip_hostname
@@ -318,7 +366,11 @@ class SentineloneConnector(BaseConnector):
                 }
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/initiate-scan', action_result, headers=header, data=json.dumps(body), method='post')
-            self.save_progress("response: {0}".format(response))
+            self.save_progress("Ret_val: {0}".format(ret_val))
+            self.save_progress("Response: {0}".format(response))
+            if phantom.is_fail(ret_val):
+                self.save_progress("Failed to scan endpoint. Error: {0}".format(action_result.get_message()))
+                return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_endpoint_info(self, param):
@@ -326,11 +378,11 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
         ret_val = self._get_agent_id(ip_hostname, action_result)
-        self.save_progress('Agent query: ' + ret_val)
+        self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
-            return action_result.set_status(phantom.APP_SUCCESS, "Endpoint not found")
+            return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
         elif ret_val == '99':
-            return action_result.set_status(phantom.APP_SUCCESS, "More than one endpoint found")
+            return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
         else:
             summary = action_result.update_summary({})
             summary['ip_hostname'] = ip_hostname
@@ -339,8 +391,12 @@ class SentineloneConnector(BaseConnector):
             header["Authorization"] = "APIToken %s" % self.token
             params = {"ids": [ret_val]}
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params)
-            self.save_progress("ret_val: {0}".format(ret_val))
-            self.save_progress("response: {0}".format(response))
+            self.save_progress("Ret_val: {0}".format(ret_val))
+            self.save_progress("Response: {0}".format(response))
+            action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                self.save_progress("Failed to mitigate threat.  Error: {0}".format(action_result.get_message()))
+                return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_threat_info(self, param):
@@ -353,8 +409,10 @@ class SentineloneConnector(BaseConnector):
         header["Authorization"] = "APIToken %s" % self.token
         params = {"ids": [s1_threat_id]}
         ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result, headers=header, params=params)
-        self.save_progress("ret_val: {0}".format(ret_val))
-        self.save_progress("response: {0}".format(response))
+        self.save_progress("Ret_val: {0}".format(ret_val))
+        self.save_progress("Response: {0}".format(response))
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -363,11 +421,11 @@ class SentineloneConnector(BaseConnector):
         header["Authorization"] = "APIToken %s" % self.token
         params = {"computerName": search_text}
         ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params, method='get')
-        self.save_progress("response: {0}".format(response))
-        if (phantom.is_fail(ret_val)):
+        self.save_progress("Response: {0}".format(response))
+        if phantom.is_fail(ret_val):
             return str(-1)
         endpoints_found = len(response['data'])
-        self.save_progress("Endpoints found: " + str(endpoints_found))
+        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
         action_result.add_data(response)
         if endpoints_found == 0:
             return '0'
@@ -381,7 +439,7 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
         end_time = int(time.time())
-        if (self.is_poll_now() or self._state.get("first_run", True)):
+        if self.is_poll_now() or self._state.get("first_run", True):
             start_time = end_time - SENTINELONE_24_HOUR_GAP
         else:
             start_time = self._state.get('last_ingestion_time', end_time - SENTINELONE_24_HOUR_GAP)
@@ -416,14 +474,17 @@ class SentineloneConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result=action_result, headers=header, params=params)
         if phantom.is_fail(ret_val):
             return (action_result.get_status(), None)
-        threats_list += response['data']
-        nextCursor = response['pagination']['nextCursor']
-        while nextCursor:
-            ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result=action_result, headers=header, params=params)
-            self.save_progress("ret_val: {0}".format(ret_val))
-            self.save_progress("response: {0}".format(response))
-            threats_list += response['data']
-            nextCursor = response['pagination']['nextCursor']
+        try:
+            threats_list += response.get('data')
+            nextCursor = response.get('pagination', {}).get('nextCursor')
+            while nextCursor:
+                ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result=action_result, headers=header, params=params)
+                self.save_progress("Ret_val: {0}".format(ret_val))
+                self.save_progress("Response: {0}".format(response))
+                threats_list += response.get('data')
+                nextCursor = response.get('pagination', {}).get('nextCursor')
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server"), None
         self.save_progress("total_threats_this_poll: {threats}".format(threats=len(threats_list)))
         return (phantom.APP_SUCCESS, threats_list)
 
@@ -434,12 +495,12 @@ class SentineloneConnector(BaseConnector):
         """
         container_dict = dict()
         self._log.info(('action=create_container threat={}').format(json.dumps(threat)))
-        agent_computer_name = threat['agentRealtimeInfo']['agentComputerName'] or "unknown"
-        confidence_level = threat['threatInfo']['confidenceLevel']
-        s1_threat_id = threat['threatInfo']['threatId']
-        threat_name = threat['threatInfo']['threatName']
+        agent_computer_name = threat.get('agentRealtimeInfo', {}).get('agentComputerName') or "unknown"
+        confidence_level = threat.get('threatInfo', {}).get('confidenceLevel')
+        s1_threat_id = threat.get('threatInfo', {}).get('threatId')
+        threat_name = threat.get('threatInfo', {}).get('threatName')
         severity = "Medium"
-        if threat['threatInfo']['confidenceLevel'] == 'malicious':
+        if threat.get('threatInfo', {}).get('confidenceLevel') == 'malicious':
             severity = "High"
         container_name = "{confidence_level} activity on {agent_computer_name} ({threat_name})".format(confidence_level=confidence_level,
             agent_computer_name=agent_computer_name,
@@ -448,7 +509,7 @@ class SentineloneConnector(BaseConnector):
         container_dict['source_data_identifier'] = s1_threat_id
         container_dict['label'] = "sentinelone"
         container_dict['severity'] = severity
-        tags = {'identified_at': threat['threatInfo']['identifiedAt']}
+        tags = {'identified_at': threat.get('threatInfo', {}).get('identifiedAt')}
         container_dict['tags'] = [('{}={}').format(x, tags[x]) for x in tags if tags[x] is not None]
         container_creation_status, container_creation_msg, container_id = self.save_container(container=container_dict)
         if phantom.is_fail(container_creation_status):
@@ -467,10 +528,10 @@ class SentineloneConnector(BaseConnector):
         """
         artifacts_list = []
         self._log.info(('action=create_artifacts threat={} container_id={}').format(json.dumps(threat), container_id))
-        agent_computer_name = threat['agentRealtimeInfo']['agentComputerName'] or "unknown"
-        confidence_level = threat['threatInfo']['confidenceLevel']
-        s1_threat_id = threat['threatInfo']['threatId']
-        threat_name = threat['threatInfo']['threatName']
+        agent_computer_name = threat.get('agentRealtimeInfo', {}).get('agentComputerName') or "unknown"
+        confidence_level = threat.get('threatInfo', {}).get('confidenceLevel')
+        s1_threat_id = threat.get('threatInfo', {}).get('threatId')
+        threat_name = threat.get('threatInfo', {}).get('threatName')
         artifact_dict = {}
         container_name = "{confidence_level} activity on {agent_computer_name} ({threat_name})".format(confidence_level=confidence_level,
             agent_computer_name=agent_computer_name,
@@ -481,18 +542,17 @@ class SentineloneConnector(BaseConnector):
         artifact_dict['container_id'] = container_id
         cef = threat
         # Add specific 'contains' objects to cef
-        cef['sourceHostName'] = threat['agentRealtimeInfo']['agentComputerName']
-        cef["s1_threat_id"] = threat['threatInfo']['threatId']
+        cef['sourceHostName'] = threat.get('agentRealtimeInfo', {}).get('agentComputerName')
+        cef["s1_threat_id"] = threat.get('threatInfo', {}).get('threatId')
         # TODO: Prevent SHA1 of command line parameters from being presented as a file hash
-        if threat['threatInfo']['maliciousProcessArguments'] != '':
-            cef['fileHashSha1'] = threat['threatInfo']['sha1']
+        if threat.get('threatInfo', {}).get('maliciousProcessArguments') != '':
+            cef['fileHashSha1'] = threat.get('threatInfo', {}).get('sha1')
         artifact_dict['cef'] = cef
         artifacts_list.append(artifact_dict)
         create_artifact_status, create_artifact_msg, _ = self.save_artifacts(artifacts_list)
         if phantom.is_fail(create_artifact_status):
             return (phantom.APP_ERROR, create_artifact_msg)
-        return (
-         phantom.APP_SUCCESS, 'Artifacts created successfully')
+        return (phantom.APP_SUCCESS, 'Artifacts created successfully')
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
