@@ -72,7 +72,6 @@ class ReversinglabsConnector(BaseConnector):
             r = requests.post(MAL_PRESENCE_API_URL, verify=config[phantom.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
         except Exception as e:
             self.set_status(phantom.APP_ERROR, 'Request to server failed', e)
-            self.save_progress(REVERSINGLABS_SUCC_CONNECTIVITY_TEST)
             return self.get_status()
 
         if (r.status_code != 200):
