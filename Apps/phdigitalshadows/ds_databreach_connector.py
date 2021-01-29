@@ -124,9 +124,9 @@ class DSDataBreachConnector(object):
         else:
             param_review_statuses = None
 
-        param_distinction = None if 'distinction' not in param else param.get('distinction')
-        param_user_name = None if 'user_name' not in param else param.get('user_name')
-        param_password = None if 'password' not in param else param.get('password')
+        param_distinction = param.get('distinction')
+        param_user_name = param.get('user_name')
+        param_password = param.get('password')
 
         try:
             breach_record_service = DataBreachRecordService(self._ds_api_key, self._ds_api_secret_key)
@@ -218,7 +218,7 @@ class DSDataBreachConnector(object):
         user_name = param['user_name']
         domain_names_param = None if 'domain_names' not in param else param['domain_names'].split(',')
         review_statuses_param = None if 'review_statuses' not in param else param['review_statuses'].split(',')
-        published_date_range = 'ALL' if 'published_date_range' not in param else param['published_date_range']
+        published_date_range = param.get('published_date_range', 'ALL')
 
         try:
             breach_record_view = DataBreachRecordService.data_breach_records_view(username=user_name, published=published_date_range,
