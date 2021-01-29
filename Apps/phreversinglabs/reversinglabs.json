@@ -12,7 +12,7 @@
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "Cloud, TitaniumCloud API api.reversinglabs.com/api, January 28, 2021"
+        "Cloud, TitaniumCloud API ticloud01.reversinglabs.com/api, January 28, 2021"
     ],
     "python_version": "3",
     "publisher": "Splunk",
@@ -95,48 +95,78 @@
                         "sha256",
                         "sha1",
                         "md5"
+                    ],
+                    "example_values": [
+                        "cb3b77181a200f9b066fd29e4431ad0f"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.first_scanned_on",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-27T09:40:03"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.first_seen_on",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-27T09:40:03"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.last_scanned_on",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-27T09:40:03"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.last_seen_on",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-27T09:40:03"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.md5",
                     "data_type": "string",
                     "contains": [
                         "md5"
+                    ],
+                    "example_values": [
+                        "cb3b77181a200f9b066fd29e4431ad0f"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ripemd160",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "d5ee47e066d891abdbf2757c3253f959f37cd337"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sample_size",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        139264
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sample_type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "PE32 executable (GUI)"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha1",
                     "data_type": "string",
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "0019eab68d15bf22a9e90345bf7281b4f0c11d5f"
                     ]
                 },
                 {
@@ -144,15 +174,24 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "d94aa8eba8dce581912552271b549bb8bcf04e8380fa68dc525c0d94236b761b"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sha384",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "fc66291d351a7eaaad5dd5e24d678ddaf96ac242da55751471552027f56c7cfc3636246bd828f861ed8a68c30c4b9b47"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha512",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "727c614587570ce6ecf1489dcce3fd0e7415f83937dd9b349a3b065f4568fcdd319978310c47c01dcb2bc151426807d0812579e922dee4ffc329e3e8117885e3"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.single_scan",
@@ -160,51 +199,87 @@
                 },
                 {
                     "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "SUSPICIOUS"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.results.*.result",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.GenericKD"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.results.*.scanner",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "defender"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanned_on",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-28T09:58:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanner_count",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanner_match",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanners.*.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "antivir"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanners.*.timestamp",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-28T07:55:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.xref.*.scanners.*.version",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "vdf_fusebundle.zip"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.positives",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_scans",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        20
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total scans: 29, Positives: 16"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
