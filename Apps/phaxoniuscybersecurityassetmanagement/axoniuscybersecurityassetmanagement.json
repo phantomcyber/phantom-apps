@@ -1,0 +1,844 @@
+{
+    "appid": "f2b8357e-53fa-4b2b-bd03-2218f7dec281",
+    "name": "Axonius Cybersecurity Asset Management",
+    "description": "This app integrates with the Axonius Cybersecurity Asset Management Platform to enrich asset data for investigations",
+    "type": "identity management",
+    "logo": "logo_axoniuscybersecurityassetmanagement.svg",
+    "product_vendor": "Axonius",
+    "logo_dark": "logo_axoniuscybersecurityassetmanagement_dark.svg",
+    "product_name": "Axonius",
+    "product_version_regex": ".*",
+    "publisher": "Axonius",
+    "license": "Copyright (c) Axonius, 2018-2021",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-01-25T11:58:28.000000Z",
+    "package_name": "phantom_axoniuscybersecurityassetmanagement",
+    "main_module": "axoniuscybersecurityassetmanagement_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API, February 3, 2020"
+    ],
+    "app_wizard_version": "1.0.0",
+    "pip3_dependencies": {
+        "pypi": [
+            {
+                "module": "axonius_api_client"
+            }
+        ]
+    },
+    "configuration": {
+        "api_key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "api_secret": {
+            "description": "API Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "url": {
+            "description": "Axonius Instance URL",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "proxy_url": {
+            "description": "HTTPS Proxy URL",
+            "data_type": "string",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "devices by sq",
+            "description": "Get devices by a saved query",
+            "type": "investigate",
+            "identifier": "devices_by_sq",
+            "read_only": true,
+            "parameters": {
+                "sq_name": {
+                    "description": "The name of the Axonius saved query",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.sq_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_macs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_os_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "devices by hostname",
+            "description": "Get devices by hostname",
+            "type": "investigate",
+            "identifier": "devices_by_hostname",
+            "read_only": true,
+            "parameters": {
+                "hostname": {
+                    "description": "The hostname of the Axonius asset",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_macs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_os_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "devices by ip",
+            "description": "Get devices by IP address",
+            "type": "investigate",
+            "identifier": "devices_by_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "The IP address of the Axonius asset",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_macs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_os_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "devices by mac",
+            "description": "Get devices by MAC address",
+            "type": "investigate",
+            "identifier": "devices_by_mac",
+            "read_only": true,
+            "parameters": {
+                "mac": {
+                    "description": "The MAC address of the Axonius asset",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.mac",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_macs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_network_interfaces_ips",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_os_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "users by sq",
+            "description": "Get users by a saved query",
+            "type": "investigate",
+            "identifier": "users_by_sq",
+            "read_only": true,
+            "parameters": {
+                "sq_name": {
+                    "description": "The name of the Axonius saved query",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.sq_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_is_admin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "users by mail",
+            "description": "Get users by email address",
+            "type": "investigate",
+            "identifier": "users_by_mail",
+            "read_only": true,
+            "parameters": {
+                "mail": {
+                    "description": "The email address of the Axonius user",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.mail",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_is_admin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "users by username",
+            "description": "Get users by username",
+            "type": "investigate",
+            "identifier": "users_by_username",
+            "read_only": true,
+            "parameters": {
+                "username": {
+                    "description": "The username of the Axonius user",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "max_rows": {
+                    "description": "The maximum number of rows to be returned by Axonius",
+                    "data_type": "numeric",
+                    "default": 25,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_rows",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapter_list_length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.adapters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.internal_axon_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.aggregated_is_admin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

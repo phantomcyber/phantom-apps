@@ -1,0 +1,373 @@
+{
+    "appid": "593ee99f-c8d2-4222-bd7f-79a0e8d2f065",
+    "name": "Greynoise",
+    "description": "This app implements investigate actions to fetch IP details using Greynoise API",
+    "type": "information",
+    "product_vendor": "Greynoise",
+    "logo": "logo_greynoise.svg",
+    "logo_dark": "logo_greynoise_dark.svg",
+    "product_name": "API",
+    "product_version_regex": ".*",
+    "publisher": "Domenico Perre",
+    "license": "Copyright (c) Domenico Perre, 2019",
+    "app_version": "1.0.0",
+    "utctime_updated": "2018-05-24T10:20:32.631303Z",
+    "package_name": "phantom_greynoise",
+    "main_module": "greynoise_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "apiKey": {
+            "description": "API Key for Greynoise",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "identifier": "ip_reputation",
+            "description": "Queries Greynoise for IP info",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to lookup",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "8.8.8.8",
+                        "208.67.222.222",
+                        "1.0.0.24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.actor",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-12"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0.24"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-02-25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "AS13335"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "hosting"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "California"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "USA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.country_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.os",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows XP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.tor",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.raw_data.scan.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        445
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.raw_data.scan.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.seen",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "SMB Scanner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0.24"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip: 1.0.0.24"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "identifier": "lookup_ip",
+            "description": "Check for the presence of an IP in a threat intelligence feed",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP Address",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "column_name": "ip",
+                    "column_order": 0,
+                    "example_values": [
+                        "8.8.8.8",
+                        "208.67.222.222",
+                        "1.0.0.24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x02"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code_meaning",
+                    "data_type": "string",
+                    "example_values": [
+                        "The IP has been observed scanning the GreyNoise sensor network, but has not completed a full connection, meaning this can be spoofed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0.24"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.noise",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.code_meaning",
+                    "data_type": "string",
+                    "example_values": [
+                        "The IP has been observed scanning the GreyNoise sensor network, but has not completed a full connection, meaning this can be spoofed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0.24"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ip: 1.0.0.24, Code meaning: The IP has been observed scanning the GreyNoise sensor network, but has not completed a full connection, meaning this can be spoofed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
