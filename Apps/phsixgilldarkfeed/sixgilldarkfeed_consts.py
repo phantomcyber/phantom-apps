@@ -20,7 +20,7 @@ SIXGILL_INDICATOR_TYPE = "Type"
 SIXGILL_INDICATOR_VALUE = "Value"
 PHANTOM_EVENT_TYPE = "Event"
 
-# Sixgill Darkfeed Attributess
+# Sixgill Darkfeed Attributes
 SIXGILL_FEED_ACTOR = "sixgill_actor"
 SIXGILL_FEED_CONFIDENCE = "sixgill_confidence"
 SIXGILL_FEED_FEEDID = "sixgill_feedid"

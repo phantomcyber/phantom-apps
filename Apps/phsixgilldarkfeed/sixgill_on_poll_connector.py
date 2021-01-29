@@ -100,26 +100,37 @@ class SixgillOnPollConnector(object):
                 bulk_size=self._limit,
             )
             indicator_object = darkfeed_client.get_bundle().get("objects")
-            sixgill_container = SixgillContainer(self._connector)
-            sixgill_artifact = SixgillArtifact(self._connector)
-            sixgill_utils = SixgillUtils(self._connector)
-            self._connector.save_progress("Ingesting Sixgill Darkfeed Intelligence ...")
-            failuer_indicator_list = []
-            if len(indicator_object) > 2:
-                for indicator in indicator_object:
-                    if sixgill.sixgill_utils.is_indicator(indicator):
-                        self._indicator_id = sixgill_utils.sixgill_delimit_id(indicator.get(SIXGILL_FEED_ID))
-                        indicator_list = self._sixgill_get_sixgill_pattern_type(indicator)
-                        container = sixgill_container.prepare_container(indicator)
+        except Exception as e:
+            err = self._connector._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
-                        # Search the phantom if the indicator from API does exist in the phantom SOAR platform
-                        # Retry search functionality for 5 times in case of a network issue
-                        for count in range(int(TRY_AGAIN)):
+        sixgill_container = SixgillContainer(self._connector)
+        sixgill_artifact = SixgillArtifact(self._connector)
+        sixgill_utils = SixgillUtils(self._connector)
+        self._connector.save_progress("Ingesting Sixgill Darkfeed Intelligence ...")
+        failuer_indicator_list = []
+        if len(indicator_object) > 2:
+            for indicator in indicator_object:
+                if sixgill.sixgill_utils.is_indicator(indicator):
+                    self._indicator_id = sixgill_utils.sixgill_delimit_id(indicator.get(SIXGILL_FEED_ID))
+                    try:
+                        indicator_list = self._sixgill_get_sixgill_pattern_type(indicator)
+                    except:
+                        self._connector.debug_print("Error occurred while processing sixgill indicator")
+                    container = sixgill_container.prepare_container(indicator)
+
+                    # Search the phantom if the indicator from API does exist in the phantom SOAR platform
+                    # Retry search functionality for 5 times in case of a network issue
+                    for count in range(int(TRY_AGAIN)):
+                        try:
                             feed_dict = sixgill_utils.search_feed(self._indicator_id)
                             if len(feed_dict) > 0:
                                 break
+                        except:
+                            self._connector.debug_print("Error occurred while searching for the feed")
 
-                        if feed_dict:
+                    if feed_dict:
+                        try:
                             # If the indicator includes a "revoked" = true flag, the indicator will get deleted from the phantom SOAR platform
                             sixgill_utils.delete_event(
                                 feed_dict, indicator, sixgill_container, sixgill_artifact, self._verify_ssl
@@ -134,31 +145,42 @@ class SixgillOnPollConnector(object):
                                 sixgill_artifact,
                                 self._verify_ssl,
                             )
-                            action_result.set_status(phantom.APP_SUCCESS)
-                        else:
+                        except:
+                            self._connector.debug_print("Error occurred while deleting or updating the event")
+                        action_result.set_status(phantom.APP_SUCCESS)
+                    else:
+                        try:
                             # Ingest the indicator in to the phantom if the indicator does not exist in the phantom SOAR platform
                             container_status, container_message, container_id = self._connector.save_container(container)
-                            if container_status == phantom.APP_SUCCESS:
-                                for indicator_dict in indicator_list:
+                        except:
+                            self._connector.debug_print("Error occurred while creating the container")
+
+                        if container_status == phantom.APP_SUCCESS:
+                            for indicator_dict in indicator_list:
+                                try:
                                     artifacts = sixgill_artifact.prepare_artifact(
                                         container_id, container["severity"], indicator, indicator_dict
                                     )
                                     artifact_status, artifact_message, artifact_id_list = self._connector.save_artifacts(
                                         artifacts
                                     )
-                                action_result.set_status(phantom.APP_SUCCESS)
-                            else:
-                                # Return error status if the indicator didn't get ingested
-                                action_result.set_status(phantom.APP_ERROR)
-            else:
-                self._connector.save_progress("There is no new Threat Intelligence available")
-                action_result.set_status(phantom.APP_SUCCESS)
-            self._connector.debug_print(f"Indicators Failed to ingest log: {failuer_indicator_list}")
-            self._connector.save_progress("Sixgill Darkfeed Intelligence ingested")
+                                except:
+                                    self._connector.debug_print("Error occurred while creating the artifact")
+                            action_result.set_status(phantom.APP_SUCCESS)
+                        else:
+                            # Return error status if the indicator didn't get ingested
+                            action_result.set_status(phantom.APP_ERROR)
+        else:
+            self._connector.save_progress("There is no new Threat Intelligence available")
+            action_result.set_status(phantom.APP_SUCCESS)
+        self._connector.debug_print(f"Indicators Failed to ingest log: {failuer_indicator_list}")
+        self._connector.save_progress("Sixgill Darkfeed Intelligence ingested")
 
+        try:
             # Indicators which got ingested into the Phantom SOAR platform will get commited to the Sixgill Darkfeed API end point
             darkfeed_client.commit_indicators()
-            return action_result.get_status()
         except Exception as e:
             err = self._connector._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, err)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while committing the indicator(s). {}".format(err))
+
+        return action_result.get_status()
