@@ -209,7 +209,6 @@ class SsmachineConnector(BaseConnector):
                 self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_ret[phantom.APP_JSON_HASH]))
                 return action_result.set_status(phantom.APP_ERROR, "Could not find specified vault ID in vault")
 
-            vault_meta_info = list(vault_meta_info)
             vault_path = vault_meta_info[0]['path']
             summary = {
                     phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
