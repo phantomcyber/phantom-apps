@@ -1958,7 +1958,7 @@ class JiraConnector(phantom.BaseConnector):
                 attachment_content = attachment.get()
                 f.write(attachment_content)
 
-            success, message, vault_id = phantom_rules.vault_add(file_location=tmp.name, container=container_id, file_name=filename)
+            success, message, vault_id = phantom_rules.vault_add(file_location=full_path, container=container_id)
             action_result.add_data({"vault_id": vault_id})
 
             if not success:
