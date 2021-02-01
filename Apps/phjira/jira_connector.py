@@ -1,5 +1,5 @@
 # File: jira_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -831,7 +831,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_DELETED)
 
-    def _create_ticket(self, param):
+    def _create_ticket(self, param):  # noqa: C901
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
@@ -1255,7 +1255,7 @@ class JiraConnector(phantom.BaseConnector):
 
         # Check for file in vault
         try:
-            _, _, vault_meta = phantom_rules.vault_info(vault_id=vault_id) # Vault IDs are unique
+            _, _, vault_meta = phantom_rules.vault_info(vault_id=vault_id)  # Vault IDs are unique
             if not vault_meta:
                 self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
                 return JIRA_ERR_FILE_NOT_IN_VAULT
