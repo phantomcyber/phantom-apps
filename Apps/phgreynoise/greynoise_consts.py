@@ -22,6 +22,7 @@ CODES = {
     "0x08": "This IP was classified as noise, but has not been observed engaging in Internet-wide scans or attacks in over 60 days"
 }
 SIZE_ACTION_PARAM = "'size' action parameter"
+ONPOLL_SIZE_CONFIG_PARAM = "'on_poll_size' config parameter"
 
 # Integer validation constants
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
@@ -31,3 +32,4 @@ NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+INVALID_COMMA_SEPARATED_VALUE_ERR_MSG = "Please provide valid comma-seprated value in the '{key}' action parameter"

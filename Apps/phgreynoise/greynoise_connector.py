@@ -32,6 +32,11 @@ class GreyNoiseConnector(BaseConnector):
         self._app_version = None
         self._api_key = None
 
+    def validate_parameters(self, param):
+        # Disable BaseConnector's validate functionality, since this App supports unicode domains and the
+        # validation routines don't
+        return phantom.APP_SUCCESS
+
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
@@ -109,11 +114,11 @@ class GreyNoiseConnector(BaseConnector):
         else:
             try:
                 response_json = r.json()
-                ret_val = action_result.set_status(phantom.APP_SUCCESS)
+                ret_val = phantom.APP_SUCCESS
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 ret_val = action_result.set_status(phantom.APP_ERROR,
-                                                   "Unable to parse JSON response. Error: {0}".format(err))
+                                                   "Unable to parse JSON response. Error: {0}".format(err_msg))
 
         return (ret_val, response_json, status_code)
 
@@ -131,10 +136,11 @@ class GreyNoiseConnector(BaseConnector):
 
         if response_json is None:
             self.save_progress("No response from API")
-            # response_json = json.dumps(response_json)
             return action_result.set_status(phantom.APP_ERROR, "No response from API")
-        elif response_json["message"] == "pong":
-            return action_result.set_status(phantom.APP_SUCCESS, "Validated API key")
+        elif response_json.get("message") == "pong":
+            self.save_progress("Validated API Key")
+            self.debug_print("Validated API Key")
+            return phantom.APP_SUCCESS
         else:
             self.save_progress("Invalid response from API")
             try:
@@ -169,6 +175,8 @@ class GreyNoiseConnector(BaseConnector):
             return ret_val
 
         result_data = {}
+        action_result.add_data(result_data)
+
         result_data.update(response_json)
 
         try:
@@ -179,8 +187,6 @@ class GreyNoiseConnector(BaseConnector):
                 result_data["code_meaning"] = "This code is unmapped"
         except KeyError:
             self.debug_print("Error occurred while processing API response")
-
-        action_result.add_data(result_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -200,13 +206,13 @@ class GreyNoiseConnector(BaseConnector):
             return ret_val
 
         result_data = {}
+        action_result.add_data(result_data)
+
         result_data.update(response_json)
         try:
             result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
         except KeyError:
             self.debug_print("Error occurred while processing API response")
-
-        action_result.add_data(result_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -243,11 +249,6 @@ class GreyNoiseConnector(BaseConnector):
                     params=(('query', param["query"]),
                             ('size', size))
                 )
-                if phantom.is_fail(ret_val):
-                    if is_poll:
-                        return ret_val, None
-                    else:
-                        return ret_val
                 full_response.update(response_json)
 
             if "scroll" in full_response:
@@ -270,11 +271,6 @@ class GreyNoiseConnector(BaseConnector):
                             ('size', size),
                             ('scroll', scroll_token))
                 )
-                if phantom.is_fail(ret_val):
-                    if is_poll:
-                        return ret_val, None
-                    else:
-                        return ret_val
                 full_response["complete"] = response_json["complete"]
                 if "scroll" in response_json:
                     full_response["scroll"] = response_json["scroll"]
@@ -291,16 +287,18 @@ class GreyNoiseConnector(BaseConnector):
             else:
                 remaining_results_flag = True
 
+        if phantom.is_fail(ret_val):
+            return ret_val
+
         result_data = {}
+        action_result.add_data(result_data)
         try:
             for entry in full_response["data"]:
-                result_data["visualization"] = VISUALIZATION_URL.format(ip=entry["ip"])
+                entry["visualization"] = VISUALIZATION_URL.format(ip=entry["ip"])
         except KeyError:
             self.debug_print("Error occurred while processing API response")
 
         result_data.update(full_response)
-
-        action_result.add_data(result_data)
 
         if is_poll:
             return ret_val, result_data
@@ -314,7 +312,12 @@ class GreyNoiseConnector(BaseConnector):
             return ret_val
 
         try:
-            ips_string = requote_uri(param["ips"])
+            ips = [x.strip() for x in param["ips"].split(",")]
+            ips = list(filter(None, ips))
+            if not ips:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_VALUE_ERR_MSG.format(key='ips'))
+            ips = ",".join(ips)
+            ips_string = requote_uri(ips)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             err_msg = "Error occurred while processing 'ips' action parameter. {0}".format(err)
@@ -330,6 +333,7 @@ class GreyNoiseConnector(BaseConnector):
             return ret_val
 
         result_data = []
+        action_result.add_data(result_data)
         try:
             for result in response_json:
                 if result["code"] in CODES:
@@ -340,7 +344,6 @@ class GreyNoiseConnector(BaseConnector):
                 result["visualization"] = VISUALIZATION_URL.format(ip=result["ip"])
                 result_data.append(result)
 
-            action_result.add_data(result_data)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -351,60 +354,66 @@ class GreyNoiseConnector(BaseConnector):
         # spawn container for every item returned
         if data and "count" in data:
             if data["count"] > 0:
-                for entry in data["data"]:
-                    ip = entry["ip"]
-                    self.save_progress("Processing IP address {}".format(ip))
-                    container = {
-                        "custom_fields": {},
-                        "data": {},
-                        "name": "",
-                        "description": "Container added by GreyNoise",
-                        "label": self.get_config().get("ingest", {}).get("container_label"),
-                        "sensitivity": "amber",
-                        "source_data_identifier": "",
-                        "tags": entry["tags"],
-                    }
+                try:
+                    for entry in data["data"]:
+                        ip = entry["ip"]
+                        self.save_progress("Processing IP address {}".format(ip))
+                        container = {
+                            "custom_fields": {},
+                            "data": {},
+                            "name": "",
+                            "description": "Container added by GreyNoise",
+                            "label": self.get_config().get("ingest", {}).get("container_label"),
+                            "sensitivity": "amber",
+                            "source_data_identifier": "",
+                            "tags": entry["tags"],
+                        }
 
-                    if entry["classification"] == "malicious":
-                        container["severity"] = "high"
-                    else:
-                        container["severity"] = "low"
+                        if entry["classification"] == "malicious":
+                            container["severity"] = "high"
+                        else:
+                            container["severity"] = "low"
 
-                    artifact_cef = {
-                        'ip': entry['ip'],
-                        'classification': entry['classification'],
-                        'first_seen': entry['first_seen'],
-                        'last_seen': entry['last_seen'],
-                        'actor': entry['actor'],
-                        'organization': entry['metadata']['organization'],
-                        'asn': entry['metadata']['asn']
-                    }
-                    if entry['metadata']['country']:
-                        artifact_cef['country'] = entry['metadata']['country']
-                    if entry['metadata']['city']:
-                        artifact_cef['city'] = entry['metadata']['city']
+                        artifact_cef = {
+                            'ip': entry['ip'],
+                            'classification': entry['classification'],
+                            'first_seen': entry['first_seen'],
+                            'last_seen': entry['last_seen'],
+                            'actor': entry['actor'],
+                            'organization': entry['metadata']['organization'],
+                            'asn': entry['metadata']['asn']
+                        }
+                        if entry['metadata']['country']:
+                            artifact_cef['country'] = entry['metadata']['country']
+                        if entry['metadata']['city']:
+                            artifact_cef['city'] = entry['metadata']['city']
 
-                    container["artifacts"] = [{
-                        "cef": artifact_cef,
-                        "description": "Artifact added by GreyNoise",
-                        "label": container["label"],
-                        "name": "GreyNoise Query Language Entry",
-                        "source_data_identifier": container["source_data_identifier"],
-                        "severity": container["severity"]
-                    }]
+                        container["artifacts"] = [{
+                            "cef": artifact_cef,
+                            "description": "Artifact added by GreyNoise",
+                            "label": container["label"],
+                            "name": "GreyNoise Query Language Entry",
+                            "source_data_identifier": container["source_data_identifier"],
+                            "severity": container["severity"]
+                        }]
 
-                    container["name"] = "GreyNoise Query Language Entry"
+                        container["name"] = "GreyNoise Query Language Entry"
 
-                    try:
-                        ret_val, _, container_id = self.save_container(container)
-                        self.save_progress("Created %s" % container_id)
-                    except:
-                        self.save_progress("Error occurred while saving the container")
-                        return phantom.APP_ERROR
-                    else:
-                        if phantom.is_fail(ret_val):
+                        try:
+                            ret_val, _, container_id = self.save_container(container)
+                            self.save_progress("Created %s" % container_id)
+                        except:
                             self.save_progress("Error occurred while saving the container")
                             return phantom.APP_ERROR
+                        else:
+                            if phantom.is_fail(ret_val):
+                                self.save_progress("Error occurred while saving the container")
+                                return phantom.APP_ERROR
+                except Exception as e:
+                    err = self._get_error_message_from_exception(e)
+                    err_msg = "Error occurred while processing query data. {}".format(err)
+                    self.debug_print(err_msg)
+                    return phantom.APP_ERROR
                 return phantom.APP_SUCCESS
             else:
                 self.save_progress("No results matching your GNQL query were found")
@@ -415,7 +424,6 @@ class GreyNoiseConnector(BaseConnector):
 
     def _on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-
         if self.is_poll_now():
             self.save_progress('Due to the nature of the API, the '
                                'artifact limits imposed by POLL NOW are '
@@ -426,9 +434,14 @@ class GreyNoiseConnector(BaseConnector):
         param["query"] = config.get("on_poll_query")
 
         if self.is_poll_now():
-            param["size"] = param.get(phantom.APP_JSON_CONTAINER_COUNT)
+            param["size"] = param.get(phantom.APP_JSON_CONTAINER_COUNT, 25)
         else:
-            param["size"] = config.get("on_poll_size")
+            on_poll_size = config.get("on_poll_size", 25)
+            # Validate 'on_poll_size' config parameter
+            ret_val, on_poll_size = self._validate_integer(action_result, on_poll_size, ONPOLL_SIZE_CONFIG_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            param["size"] = on_poll_size
 
         if param["query"] == "Please refer to the documentation":
             self.save_progress("Default on poll query unchanged, please enter a valid GNQL query")
