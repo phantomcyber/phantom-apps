@@ -1388,21 +1388,41 @@
                     ],
                     "primary": true
                 },
+                "parent_message_ts": {
+                    "description": "Parent message ts to reply in thread",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1,
+                    "contains": [
+                        "slack thread ts"
+                    ]
+                },
                 "file": {
                     "description": "Vault ID of file to upload",
                     "data_type": "string",
                     "primary": true,
-                    "required": true,
-                    "order": 1,
+                    "required": false,
+                    "order": 2,
                     "contains": [
                         "vault id",
                         "sha1"
                     ]
                 },
+                "content": {
+                    "description": "Contents of the file",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
                 "caption": {
                     "description": "Caption to add to the file",
                     "data_type": "string",
-                    "order": 2
+                    "order": 4
+                },
+                "filetype": {
+                    "description": "Filetype of the file (https://api.slack.com/types/file#file_types)",
+                    "data_type": "string",
+                    "order": 5
                 }
             },
             "render": {
