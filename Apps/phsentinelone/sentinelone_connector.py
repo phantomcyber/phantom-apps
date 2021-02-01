@@ -2,8 +2,6 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
-# !/usr/bin/python
-# -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
 import phantom.app as phantom
@@ -73,7 +71,7 @@ class SentineloneConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code {}. Error : Empty response and no information in the header".format(status_code)
             ), None
         )
 
@@ -81,6 +79,9 @@ class SentineloneConnector(BaseConnector):
         status_code = response.status_code
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -145,6 +146,9 @@ class SentineloneConnector(BaseConnector):
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             return RetVal(
@@ -165,7 +169,6 @@ class SentineloneConnector(BaseConnector):
                 }
         }
         ret_val, response = self._make_rest_call('/web/api/v2.1/users/login/by-api-token', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-        self.save_progress("Response: {0}".format(response))
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
@@ -184,10 +187,10 @@ class SentineloneConnector(BaseConnector):
         summary['description'] = description
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
-        header["Content-Type"] = "application/json"
         params = {"value": hash, "type": "black_hash"}
         ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
-        self.save_progress('Get Hash response: {ret_val}'.format(ret_val=ret_val))
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             if response.get('pagination', {}).get('totalItems') != 0:
@@ -206,7 +209,6 @@ class SentineloneConnector(BaseConnector):
                     }
                 }
                 ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, method='post', data=json.dumps(body))
-                self.save_progress("Response: {0}".format(response))
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
         except Exception:
@@ -222,11 +224,11 @@ class SentineloneConnector(BaseConnector):
         summary['hash'] = hash
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
-        header["Content-Type"] = "application/json"
         hash_id = ""
         params = {"value": hash, "type": "black_hash"}
         ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
-        self.save_progress('Get Hash response: {ret_val}'.format(ret_val=ret_val))
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             if response['pagination']['totalItems'] == 0:
@@ -242,7 +244,6 @@ class SentineloneConnector(BaseConnector):
                     }
                 }
                 ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, data=json.dumps(body), params=params, method='delete')
-                self.save_progress("Delete Hash response: {0}".format(response))
                 if phantom.is_fail(ret_val):
                     self.save_progress("Deleting Hash Failed.  Error: {0}".format(action_result.get_message()))
                     return action_result.get_status()
@@ -255,7 +256,10 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
-        ret_val = self._get_agent_id(ip_hostname, action_result)
+        try:
+            ret_val = self._get_agent_id(ip_hostname, action_result)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
@@ -275,7 +279,6 @@ class SentineloneConnector(BaseConnector):
                 }
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/disconnect', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-            self.save_progress("Response: {0}".format(response))
             if phantom.is_fail(ret_val):
                 self.save_progress("Quarantine Device Failed.  Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
@@ -285,7 +288,10 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
-        ret_val = self._get_agent_id(ip_hostname, action_result)
+        try:
+            ret_val = self._get_agent_id(ip_hostname, action_result)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
@@ -305,7 +311,6 @@ class SentineloneConnector(BaseConnector):
                 }
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/connect', action_result, params=None, headers=header, data=json.dumps(body), method='post')
-            self.save_progress("Response: {0}".format(response))
             if phantom.is_fail(ret_val):
                 self.save_progress("Unquarantine Device Failed.  Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
@@ -321,7 +326,6 @@ class SentineloneConnector(BaseConnector):
         summary['action'] = action
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
-        header["Content-Type"] = "application/json"
         body = {
             "data": {},
             "filter": {
@@ -329,11 +333,10 @@ class SentineloneConnector(BaseConnector):
             }
         }
         ret_val, response = self._make_rest_call('/web/api/v2.1/threats/mitigate/{}'.format(action), action_result, headers=header, data=json.dumps(body), method='post')
-        self.save_progress("Response: {0}".format(response))
-        action_result.add_data(response)
         if phantom.is_fail(ret_val):
             self.save_progress("Failed to mitigate threat. Error: {0}".format(action_result.get_message()))
             return action_result.get_status()
+        action_result.add_data(response)
         try:
             if response.get('data', {}).get('affected') == 0:
                 self.save_progress("Failed to mitigate threat. Threat ID not found")
@@ -346,7 +349,10 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
-        ret_val = self._get_agent_id(ip_hostname, action_result)
+        try:
+            ret_val = self._get_agent_id(ip_hostname, action_result)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
@@ -358,7 +364,6 @@ class SentineloneConnector(BaseConnector):
             summary['agent_id'] = ret_val
             header = self.HEADER
             header["Authorization"] = "APIToken %s" % self.token
-            header["Content-Type"] = "application/json"
             body = {
                 "data": {},
                 "filter": {
@@ -367,7 +372,6 @@ class SentineloneConnector(BaseConnector):
             }
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/actions/initiate-scan', action_result, headers=header, data=json.dumps(body), method='post')
             self.save_progress("Ret_val: {0}".format(ret_val))
-            self.save_progress("Response: {0}".format(response))
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to scan endpoint. Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
@@ -377,7 +381,10 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
-        ret_val = self._get_agent_id(ip_hostname, action_result)
+        try:
+            ret_val = self._get_agent_id(ip_hostname, action_result)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         self.save_progress('Agent query: {}'.format(ret_val))
         if ret_val == '0':
             return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
@@ -392,10 +399,8 @@ class SentineloneConnector(BaseConnector):
             params = {"ids": [ret_val]}
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params)
             self.save_progress("Ret_val: {0}".format(ret_val))
-            self.save_progress("Response: {0}".format(response))
-            action_result.add_data(response)
             if phantom.is_fail(ret_val):
-                self.save_progress("Failed to mitigate threat.  Error: {0}".format(action_result.get_message()))
+                self.save_progress("Failed to get the endpoint information.  Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -410,7 +415,6 @@ class SentineloneConnector(BaseConnector):
         params = {"ids": [s1_threat_id]}
         ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result, headers=header, params=params)
         self.save_progress("Ret_val: {0}".format(ret_val))
-        self.save_progress("Response: {0}".format(response))
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         action_result.add_data(response)
@@ -421,7 +425,6 @@ class SentineloneConnector(BaseConnector):
         header["Authorization"] = "APIToken %s" % self.token
         params = {"computerName": search_text}
         ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params, method='get')
-        self.save_progress("Response: {0}".format(response))
         if phantom.is_fail(ret_val):
             return str(-1)
         endpoints_found = len(response['data'])
@@ -480,12 +483,11 @@ class SentineloneConnector(BaseConnector):
             while nextCursor:
                 ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result=action_result, headers=header, params=params)
                 self.save_progress("Ret_val: {0}".format(ret_val))
-                self.save_progress("Response: {0}".format(response))
                 threats_list += response.get('data')
                 nextCursor = response.get('pagination', {}).get('nextCursor')
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server"), None
-        self.save_progress("total_threats_this_poll: {threats}".format(threats=len(threats_list)))
+        self.save_progress("Total threats found: {threats}".format(threats=len(threats_list)))
         return (phantom.APP_SUCCESS, threats_list)
 
     def _create_container(self, threat):

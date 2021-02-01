@@ -426,7 +426,8 @@
                     "data_type": "numeric",
                     "example_values":[
                         1
-                    ]                },
+                    ]                
+                },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
@@ -443,7 +444,7 @@
         {
             "action": "scan endpoint",
             "description": "Scan an endpoint for dormant threats",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "scan_endpoint",
             "read_only": false,
             "parameters": {
@@ -517,7 +518,7 @@
             "description": "Get detailed information about an endpoint/agent",
             "type": "investigate",
             "identifier": "get_endpoint_info",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "ip_hostname": {
                     "description": "The hostname of an endpoint to get information",
@@ -619,7 +620,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -656,7 +661,7 @@
             "description": "Get detailed information about a threat",
             "type": "investigate",
             "identifier": "get_threat_info",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "s1_threat_id": {
                     "description": "The S1 Threat ID for a specific threat",
@@ -840,7 +845,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -905,6 +914,9 @@
                 }
             },
             "output": [],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]
