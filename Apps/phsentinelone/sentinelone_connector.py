@@ -71,7 +71,7 @@ class SentineloneConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Status Code {}. Error : Empty response and no information in the header".format(status_code)
+                phantom.APP_ERROR, "Status Code {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 

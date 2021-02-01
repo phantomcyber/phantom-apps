@@ -353,7 +353,7 @@
         {
             "action": "mitigate threat",
             "description": "Mitigate an identified threat",
-            "verbose": "Mitigate threat such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>",
+            "verbose": "Mitigate threat such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
             "type": "correct",
             "identifier": "mitigate_threat",
             "read_only": false,
@@ -914,9 +914,6 @@
                 }
             },
             "output": [],
-            "render": {
-                "type": "table"
-            },
             "versions": "EQ(*)"
         }
     ]
