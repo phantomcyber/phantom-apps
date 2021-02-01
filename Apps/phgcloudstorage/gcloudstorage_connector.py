@@ -1,4 +1,10 @@
-#!/usr/bin/python
+# File: gcloudstorage_connector.py
+#
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Python 3 Compatibility imports
@@ -8,6 +14,7 @@ import json
 import os
 import tempfile
 import magic
+import requests
 
 # Phantom App imports
 import phantom.app as phantom
@@ -33,9 +40,59 @@ class GCloudStorageConnector(BaseConnector):
         super(GCloudStorageConnector, self).__init__()
         self._state = None
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _create_storage_client(self, action_result):
         config = self.get_config()
-        service_account_json = json.loads(config['key_json'])
+        try:
+            service_account_json = json.loads(config['key_json'])
+        except json.decoder.JSONDecodeError:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid JSON input.")
 
         try:
             credentials = service_account.Credentials.from_service_account_info(
@@ -49,7 +106,8 @@ class GCloudStorageConnector(BaseConnector):
             )
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create google api client: {0}".format(e))
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Could not create google api client: {0}".format(err))
 
         return phantom.APP_SUCCESS
 
@@ -57,7 +115,6 @@ class GCloudStorageConnector(BaseConnector):
         try:
             response = request.execute()
         except errors.HttpError as e:
-
             error_code = str(json.loads(e.content)["error"]["code"])
             error_reason = e._get_reason()
 
@@ -74,7 +131,7 @@ class GCloudStorageConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress("Could not create API client.")
             return action_result.get_status()
 
         project = self.get_config()['project']
@@ -122,6 +179,9 @@ class GCloudStorageConnector(BaseConnector):
         # Optional values should use the .get() function
         prefix = param.get('prefix', '')
         max_objects = param.get('max_objects', 1000)
+        ret_val, max_objects = self._validate_integer(self, max_objects, MAX_OBJECTS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
 
         request = self._client.objects().list(bucket=bucket, prefix=prefix, maxResults=max_objects)
         ret_val, response = self._send_request(request, action_result)
@@ -173,7 +233,8 @@ class GCloudStorageConnector(BaseConnector):
                 response["filename"] = os.path.basename(object)
                 action_result.set_summary({"created_vault_id": response["vault_id"]})
             except Exception as e:
-                ret_val = RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault', e), None)
+                err = self._get_error_message_from_exception(e)
+                ret_val = RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault', err), None)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -401,7 +462,8 @@ def main():
                                data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platform. Error: " + str(e))
+            err = self._get_error_message_from_exception(e)
+            print("Unable to get session id from the platform. Error: " + str(err))
             exit(1)
 
     with open(args.input_test_json) as f:
