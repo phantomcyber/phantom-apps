@@ -703,7 +703,14 @@ class SlackConnector(phantom.BaseConnector):
         if len(message) > consts.SLACK_MESSAGE_LIMIT:
             return (action_result.set_status(phantom.APP_ERROR, "Message too long. Please limit messages to {0} characters.".format(consts.SLACK_MESSAGE_LIMIT)))
 
-        params = {'channel': param['destination'], 'text': message, 'as_user': True}
+        params = {'channel': param['destination'], 'text': message}
+
+        if 'parent_message_ts' in param:
+            # Support for replying in thread
+            params['thread_ts'] = param['parent_message_ts']
+
+            if 'reply_broadcast' in param:
+                params['reply_broadcast'] = param['reply_broadcast']
 
         ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_SEND_MESSAGE, params)
 
