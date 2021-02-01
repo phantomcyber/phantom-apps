@@ -1732,6 +1732,7 @@
             "type": "contain",
             "identifier": "disable_user",
             "read_only": false,
+            "undo": "enable user",
             "parameters": {
                 "id": {
                     "description": "ID of user to disable",
@@ -1884,6 +1885,7 @@
             "type": "correct",
             "identifier": "enable_user",
             "read_only": false,
+            "undo": "disable user",
             "parameters": {
                 "id": {
                     "description": "ID of user to enable",
