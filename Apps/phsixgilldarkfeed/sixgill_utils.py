@@ -37,7 +37,7 @@ class SixgillUtils(object):
     def search_feed(self, indicator_id):
         feed_dict = dict()
         artifact_list = []
-        query_url = f"{BASE_URL}{REST_ARTIFACT_API}{SOURCE_FEED_ID}'{indicator_id}'"
+        query_url = f"{self._connector._get_phantom_base_url()}{REST_ARTIFACT_API}{SOURCE_FEED_ID}'{indicator_id}'"
         search_indicator = requests.get(query_url, headers=self._headers, verify=False)
         if search_indicator is not None and search_indicator.status_code == 200:
             event_dict = search_indicator.json()

@@ -50,11 +50,11 @@ class SixgillContainer(object):
 
     def update_container(self, container_id, container, verify_ssl):
         container = json.dumps(container, indent=4)
-        query_url = f"{BASE_URL}{REST_CONTAINER_API}{container_id}"
+        query_url = f"{self._connector._get_phantom_base_url()}{REST_CONTAINER_API}{container_id}"
         update_event = requests.post(query_url, headers=self._headers, verify=verify_ssl, data=container)
         return update_event
 
     def delete_container(self, container_id, verify_ssl):
-        query_url = f"{BASE_URL}{REST_CONTAINER_API}{container_id}"
+        query_url = f"{self._connector._get_phantom_base_url()}{REST_CONTAINER_API}{container_id}"
         delete_event = requests.delete(query_url, headers=self._headers, verify=verify_ssl)
         return delete_event

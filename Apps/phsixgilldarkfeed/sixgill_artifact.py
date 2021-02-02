@@ -63,11 +63,11 @@ class SixgillArtifact(object):
 
     def update_artifact(self, artifact_id, artifact, verify_ssl):
         artifact = json.dumps(artifact[0], indent=4)
-        query_url = f"{BASE_URL}{REST_ARTIFACT_API}{artifact_id}"
+        query_url = f"{self._connector._get_phantom_base_url()}{REST_ARTIFACT_API}{artifact_id}"
         update_artifact = requests.post(query_url, headers=self._headers, verify=verify_ssl, data=artifact)
         return update_artifact
 
     def delete_artifact(self, artifact_id, verify_ssl):
-        query_url = f"{BASE_URL}{REST_ARTIFACT_API}{artifact_id}"
+        query_url = f"{self._connector._get_phantom_base_url()}{REST_ARTIFACT_API}{artifact_id}"
         delete_artifact = requests.delete(query_url, headers=self._headers, verify=verify_ssl)
         return delete_artifact
