@@ -1819,6 +1819,491 @@
                 "height": 5
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup certificate hash",
+            "description": "Lookup certificate by hash",
+            "type": "investigate",
+            "identifier": "lookup_certificate_hash",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "SHA-1 hash of the certificate to retrieve",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "cf23df2207d99a74fbe169e3eba035e633b65d94"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 0,
+                    "example_values": [
+                        "Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup certificate",
+            "description": "Lookup certificate",
+            "type": "investigate",
+            "identifier": "lookup_certificate",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Field value for which to search certificates",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "required": true
+                },
+                "field": {
+                    "description": "Field for which to search certificates",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "required": true,
+                    "value_list": [
+                        "issuerSurname",
+                        "subjectOrganizationName",
+                        "issuerCountry",
+                        "issuerOrganizationUnitName",
+                        "fingerprint",
+                        "subjectOrganizationUnitName",
+                        "serialNumber",
+                        "subjectEmailAddress",
+                        "subjectCountry",
+                        "issuerGivenName",
+                        "subjectCommonName",
+                        "issuerCommonName",
+                        "issuerStateOrProvinceName",
+                        "issuerProvince",
+                        "subjectStateOrProvinceName",
+                        "sha1",
+                        "subjectStreetAddress",
+                        "subjectSerialNumber",
+                        "issuerOrganizationName",
+                        "subjectSurname",
+                        "subjectLocalityName",
+                        "issuerStreetAddress",
+                        "issuerLocalityName",
+                        "subjectGivenName",
+                        "subjectProvince",
+                        "issuerSerialNumber",
+                        "issuerEmailAddress",
+                        "name",
+                        "issuerAlternativeName",
+                        "subjectAlternativeName"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.field",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 0,
+                    "example_values": [
+                        "Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get host components",
+            "description": "Retrieves the host attribute components of a query",
+            "type": "investigate",
+            "identifier": "get_host_components",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "The domain or IP being queried",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "required": true
+                },
+                "from": {
+                    "description": "Start datetime (YYYY-mm-dd)",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": false,
+                    "required": false
+                },
+                "to": {
+                    "description": "End datetime (YYYY-mm-dd)",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": false,
+                    "required": false
+                },
+                "page": {
+                    "description": "Page number for paging through results, defaults to 0",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": false,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 0,
+                    "example_values": [
+                        "Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get host pairs",
+            "description": "Retrieves the host attribute pairs related to the query.",
+            "type": "investigate",
+            "identifier": "get_host_pairs",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "The domain or IP being queried",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "required": true
+                },
+                "direction": {
+                    "description": "Directionality of the search",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "required": true,
+                    "default": "children",
+                    "value_list": ["parents", "children"]
+                },
+                "from": {
+                    "description": "Start datetime (YYYY-mm-dd)",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": false,
+                    "required": false
+                },
+                "to": {
+                    "description": "End datetime (YYYY-mm-dd)",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": false,
+                    "required": false
+                },
+                "page": {
+                    "description": "Page number for paging through results, defaults to 0",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": false,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.direction",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 0,
+                    "example_values": [
+                        "Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
         }
     ]
 }

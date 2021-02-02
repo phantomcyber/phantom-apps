@@ -30,6 +30,8 @@ class PassivetotalConnector(BaseConnector):
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_LOOKUP_CERTIFICATE_HASH = "lookup_certificate_hash"
     ACTION_ID_LOOKUP_CERTIFICATE = "lookup_certificate"
+    ACTION_ID_GET_HOST_COMPONENTS = "get_host_components"
+    ACTION_ID_GET_HOST_PAIRS = "get_host_pairs"
 
     def __init__(self):
 
@@ -507,11 +509,132 @@ class PassivetotalConnector(BaseConnector):
 
     def _lookup_certificate_hash(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+        query = param[PASSIVETOTAL_JSON_QUERY]
+
+        if len(query) != 40:
+            # Superficial input validation whether the input is a potential SHA1 hash to catch common errors
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid SHA1 Hash')
+
+        extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
+
+        self.save_progress('Querying Certificate by Hash')
+        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/', {'query': query}, action_result)
+
+        if ret_val and response:
+            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATE] = response["results"]
+
+        self.save_progress('Querying Certificate History by Hash')
+        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/history', {'query': query}, action_result)
+
+        if ret_val and response:
+            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _lookup_certificate(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query = param[PASSIVETOTAL_JSON_QUERY]
+        field = param[PASSIVETOTAL_JSON_FIELD]
+
+        params = {
+            "query": query,
+            "field": field
+        }
+
+        extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
+
+        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/search', params, action_result)
+
+        if ret_val and response:
+            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_host_components(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query = param[PASSIVETOTAL_JSON_QUERY]
+        start_time = param.get(PASSIVETOTAL_JSON_FROM)
+        end_time = param.get(PASSIVETOTAL_JSON_TO)
+        page = param.get(PASSIVETOTAL_JSON_PAGE)
+
+        if start_time:
+            try:
+                datetime.strptime(start_time, '%Y-%m-%d')
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
+
+        if end_time:
+            try:
+                datetime.strptime(end_time, '%Y-%m-%d')
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+
+
+        params = {
+            "query": query,
+            "start": start_time,
+            "end": end_time,
+            "page": page
+        }
+        extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
+
+        ret_val, response, status_code = self._make_rest_call('/host-attributes/components', params, action_result)
+
+        if ret_val and response:
+            extra_data[PASSIVETOTAL_JSON_COMPONENTS] = response["results"]
+
+        if 'totalRecords' in response:
+            summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: response['totalRecords']})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_host_pairs(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query = param[PASSIVETOTAL_JSON_QUERY]
+        direction = param[PASSIVETOTAL_JSON_DIRECTION]
+        start_time = param.get(PASSIVETOTAL_JSON_FROM)
+        end_time = param.get(PASSIVETOTAL_JSON_TO)
+        page = param.get(PASSIVETOTAL_JSON_PAGE)
+
+        if start_time:
+            try:
+                datetime.strptime(start_time, '%Y-%m-%d')
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
+
+        if end_time:
+            try:
+                datetime.strptime(end_time, '%Y-%m-%d')
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+
+        params = {
+            "query": query,
+            "direction": direction,
+            "start": start_time,
+            "end": end_time,
+            "page": page
+        }
+        extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
+
+        ret_val, response, status_code = self._make_rest_call('/host-attributes/pairs', params, action_result)
+
+        if ret_val and response:
+            extra_data[PASSIVETOTAL_JSON_PAIRS] = response["results"]
+
+        if 'totalRecords' in response:
+            summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: response['totalRecords']})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -534,9 +657,11 @@ class PassivetotalConnector(BaseConnector):
 
         ret_val = phantom.APP_SUCCESS
 
-        if action == self.ACTION_ID_LOOKUP_CERTIFICATE:
+        if action == self.ACTION_ID_LOOKUP_CERTIFICATE_HASH:
+            ret_val = self._lookup_certificate_hash(param)
+        elif action == self.ACTION_ID_LOOKUP_CERTIFICATE:
             ret_val = self._lookup_certificate(param)
-        if action == self.ACTION_ID_LOOKUP_IP:
+        elif action == self.ACTION_ID_LOOKUP_IP:
             ret_val = self._lookup_ip(param)
         elif action == self.ACTION_ID_LOOKUP_DOMAIN:
             ret_val = self._lookup_domain(param)
@@ -544,6 +669,10 @@ class PassivetotalConnector(BaseConnector):
             ret_val = self._whois_ip(param)
         elif action == self.ACTION_ID_WHOIS_DOMAIN:
             ret_val = self._whois_domain(param)
+        elif action == self.ACTION_ID_GET_HOST_COMPONENTS:
+            ret_val = self._get_host_components(param)
+        elif action == self.ACTION_ID_GET_HOST_PAIRS:
+            ret_val = self._get_host_pairs(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
 
