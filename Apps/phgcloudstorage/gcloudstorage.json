@@ -483,13 +483,20 @@
                 "path": {
                     "description": "Path in the bucket where to place the object",
                     "data_type": "string",
-                    "order": 2
+                    "contains":[
+                        "file path"
+                    ],
+                    "order": 2,
+                    "primary": true
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.path",
                     "data_type": "string",
+                    "contains":[
+                        "file path"
+                    ],
                     "column_name": "Path",
                     "column_order": 0
                 },
