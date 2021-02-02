@@ -575,7 +575,6 @@ class PassivetotalConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR,
                                                 'Incorrect date format for end time, it should be YYYY-MM-DD')
 
-
         params = {
             "query": query,
             "start": start_time,
@@ -625,6 +624,7 @@ class PassivetotalConnector(BaseConnector):
             "end": end_time,
             "page": page
         }
+
         extra_data = action_result.add_data({})
         summary = action_result.update_summary({})
 
