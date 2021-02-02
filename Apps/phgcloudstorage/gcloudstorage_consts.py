@@ -4,14 +4,13 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Define your constants here
 STORAGE_SERVICE_NAME = 'storage'
 STORAGE_SERVICE_VERSION = 'v1'
 
 # Integer validation constants
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
-MAX_OBJECTS_KEY = "'max objects' configuration parameter"
+MAX_OBJECTS_KEY = "'max objects' action parameter"
 
 # Error message handling constants
 ERR_CODE_MSG = "Error code unavailable"

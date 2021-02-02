@@ -4,9 +4,6 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# !/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
@@ -21,6 +18,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+import phantom.rules as Rules
 
 from gcloudstorage_consts import *
 import googleapiclient.discovery
@@ -92,7 +90,7 @@ class GCloudStorageConnector(BaseConnector):
         try:
             service_account_json = json.loads(config['key_json'])
         except json.decoder.JSONDecodeError:
-            return action_result.set_status(phantom.APP_ERROR, "Invalid JSON input.")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in 'service account json' asset configuration parameter")
 
         try:
             credentials = service_account.Credentials.from_service_account_info(
@@ -118,11 +116,11 @@ class GCloudStorageConnector(BaseConnector):
             error_code = str(json.loads(e.content)["error"]["code"])
             error_reason = e._get_reason()
 
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API HTTP Error: ' + error_code, error_reason), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API HTTP Error: {}. {} '.format(error_code, error_reason)), None)
         except errors.Error as e:
             error_reason = e._get_reason()
 
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error', error_reason), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error. {}'.format(error_reason)), None)
 
         return phantom.APP_SUCCESS, response
 
@@ -131,7 +129,7 @@ class GCloudStorageConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         project = self.get_config()['project']
@@ -139,6 +137,7 @@ class GCloudStorageConnector(BaseConnector):
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
+            self.save_progress("Test Connectivity Failed")
             return ret_val
 
         self.save_progress("Test Connectivity Passed")
@@ -149,7 +148,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         # Required values can be accessed directly
@@ -170,7 +169,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         # Required values can be accessed directly
@@ -181,7 +180,7 @@ class GCloudStorageConnector(BaseConnector):
         max_objects = param.get('max_objects', 1000)
         ret_val, max_objects = self._validate_integer(self, max_objects, MAX_OBJECTS_KEY)
         if phantom.is_fail(ret_val):
-            return self.get_status()
+            return action_result.get_status()
 
         request = self._client.objects().list(bucket=bucket, prefix=prefix, maxResults=max_objects)
         ret_val, response = self._send_request(request, action_result)
@@ -203,7 +202,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         # Required values can be accessed directly
@@ -234,7 +233,7 @@ class GCloudStorageConnector(BaseConnector):
                 action_result.set_summary({"created_vault_id": response["vault_id"]})
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                ret_val = RetVal(action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault', err), None)
+                ret_val = action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault', err)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -248,7 +247,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         # Required values can be accessed directly
@@ -256,8 +255,28 @@ class GCloudStorageConnector(BaseConnector):
         bucket = param['bucket']
         vault_id = param['vault_id']
 
-        file_path = Vault.get_file_path(vault_id)
-        file_info = Vault.get_file_info(vault_id)
+        try:
+            self.debug_print('Rules.vault_info start')
+            success, message, vault_info = Rules.vault_info(vault_id=vault_id)
+            self.debug_print(
+                'Rules.vault_info results: success: {}, message: {}, info: {}'
+                .format(success, message, vault_info)
+            )
+        except requests.exceptions.HTTPError:
+            error_message = "Invalid Vault ID: %s" % (vault_id)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error opening file. {}".format(err))
+
+        try:
+            vault_info = list(vault_info)
+            file_info = vault_info[0]
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while getting 'File Info'. {}".format(err))
+
+        file_path = file_info['path']
         mime = magic.Magic(mime=True)
 
         file_mime_type = mime.from_file(file_path)
@@ -268,9 +287,9 @@ class GCloudStorageConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Could not find given vault ID in vault")
 
         if path:
-            target_path = os.path.join(path, file_info[0]["name"])
+            target_path = os.path.join(path, file_info["name"])
         else:
-            target_path = file_info[0]["name"]
+            target_path = file_info["name"]
         request = self._client.objects().insert(bucket=bucket, name=target_path, media_body=file)
         ret_val, response = self._send_request(request, action_result)
 
@@ -306,7 +325,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         config = self.get_config()
@@ -332,7 +351,7 @@ class GCloudStorageConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_storage_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         config = self.get_config()
@@ -397,15 +416,6 @@ class GCloudStorageConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = config.get('base_url')
 
@@ -462,8 +472,7 @@ def main():
                                data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            print("Unable to get session id from the platform. Error: " + str(err))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
