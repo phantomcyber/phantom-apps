@@ -120,6 +120,14 @@ class PassivetotalConnector(BaseConnector):
 
         return True
 
+    def _is_date(self, candidate):
+        """Checks if a given string can be parsed into a date"""
+        try:
+            datetime.strptime(candidate, '%Y-%m-%d')
+            return True
+        except ValueError:
+            return False
+
     def _make_rest_call(self, endpoint, request_params, action_result):
 
         # init the return values
@@ -204,19 +212,12 @@ class PassivetotalConnector(BaseConnector):
         start_time = param.get(PASSIVETOTAL_JSON_FROM)
         end_time = param.get(PASSIVETOTAL_JSON_TO)
 
-        if start_time:
-            try:
-                datetime.strptime(start_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
-
-        if end_time:
-            try:
-                datetime.strptime(end_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+        if start_time and not self._is_date(start_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
+        if end_time and not self._is_date(end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
 
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
@@ -465,19 +466,13 @@ class PassivetotalConnector(BaseConnector):
         if not self._is_ip(ip):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid IPV4 or IPV6 address')
 
-        if start_time:
-            try:
-                datetime.strptime(start_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
+        if start_time and not self._is_date(start_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
 
-        if end_time:
-            try:
-                datetime.strptime(end_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+        if end_time and not self._is_date(end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
 
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
@@ -491,7 +486,7 @@ class PassivetotalConnector(BaseConnector):
 
         ret_val = self._get_common_info(ip, extra_data, summary, action_result, param)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # SSL Certificates
@@ -525,7 +520,8 @@ class PassivetotalConnector(BaseConnector):
             extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATE] = response["results"]
 
         self.save_progress('Querying Certificate History by Hash')
-        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/history', {'query': query}, action_result)
+        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/history', {'query': query},
+                                                              action_result)
 
         if ret_val and response:
             extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
@@ -561,19 +557,13 @@ class PassivetotalConnector(BaseConnector):
         end_time = param.get(PASSIVETOTAL_JSON_TO)
         page = param.get(PASSIVETOTAL_JSON_PAGE)
 
-        if start_time:
-            try:
-                datetime.strptime(start_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
+        if start_time and not self._is_date(start_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
 
-        if end_time:
-            try:
-                datetime.strptime(end_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+        if end_time and not self._is_date(end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
 
         params = {
             "query": query,
@@ -603,19 +593,13 @@ class PassivetotalConnector(BaseConnector):
         end_time = param.get(PASSIVETOTAL_JSON_TO)
         page = param.get(PASSIVETOTAL_JSON_PAGE)
 
-        if start_time:
-            try:
-                datetime.strptime(start_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for start time, it should be YYYY-MM-DD')
+        if start_time and not self._is_date(start_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
 
-        if end_time:
-            try:
-                datetime.strptime(end_time, '%Y-%m-%d')
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                'Incorrect date format for end time, it should be YYYY-MM-DD')
+        if end_time and not self._is_date(end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
 
         params = {
             "query": query,
