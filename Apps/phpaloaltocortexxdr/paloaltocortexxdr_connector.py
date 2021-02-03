@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: paloaltocortexxdr_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -13,7 +12,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from test_consts import *
+from paloaltocortexxdr_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -43,6 +42,56 @@ class TestConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+        self._api_key = None
+        self._advanced = None
+        self._api_key_id = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -50,7 +99,7 @@ class TestConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {0}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -60,6 +109,8 @@ class TestConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -69,7 +120,7 @@ class TestConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -77,21 +128,18 @@ class TestConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
-                ), None
-            )
+            err = self._get_error_message_from_exception(e)
+            error_message = "Unable to parse JSON response. Error: {0}".format(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
+        error_message = r.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
-        )
+            r.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -129,9 +177,6 @@ class TestConnector(BaseConnector):
 
     def _make_rest_call(self, endpoint, action_result, method="post", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
-
-        config = self.get_config()
-
         resp_json = None
 
         try:
@@ -143,38 +188,39 @@ class TestConnector(BaseConnector):
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{0}{1}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
-                verify=config.get('verify_server_cert', False),
+                verify=self._verify,
                 **kwargs
             )
+        except requests.exceptions.InvalidURL:
+            error_message = "Error connecting to server. Invalid URL %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
-                ), resp_json
-            )
+            err = self._get_error_message_from_exception(e)
+            error_message = "Error Connecting to server. {0}".format(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
 
         return self._process_response(r, action_result)
 
     def authenticationHeaders(self):
-        config = self.get_config()
 
-        api_key = config['api_key']
-        advanced = config['advanced']
-        api_key_id = config['api_id']
-
-        if advanced:
+        if self._advanced:
             # Generate a 64 bytes random string
             nonce = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(64))
             # Get the current timestamp as milliseconds
             timestamp = int(datetime.now(timezone.utc).timestamp()) * 1000
             # Generate the auth key
-            auth_key = "%s%s%s" % (api_key, nonce, timestamp)
+            auth_key = "%s%s%s" % (self._api_key, nonce, timestamp)
             # Convert to bytes object
             auth_key = auth_key.encode("utf-8")
             # Calculate sha256
@@ -182,13 +228,13 @@ class TestConnector(BaseConnector):
             headers = {
                 "x-xdr-timestamp": str(timestamp),
                 "x-xdr-nonce": nonce,
-                "x-xdr-auth-id": str(api_key_id),
+                "x-xdr-auth-id": str(self._api_key_id),
                 "Authorization": api_key_hash
             }
         else:
             headers = {
-                "x-xdr-auth-id": str(api_key_id),
-                "Authorization": api_key
+                "x-xdr-auth-id": str(self._api_key_id),
+                "Authorization": self._api_key
             }
 
         return headers
@@ -223,13 +269,16 @@ class TestConnector(BaseConnector):
                 # the call to the 3rd party device or service failed, action result should contain all the error details
                 return action_result.get_status()
 
-            reply = response["reply"]
+            try:
+                reply = response["reply"]
 
-            if reply["total_count"] == 0:
-                break
+                if reply["total_count"] == 0:
+                    break
 
-            polled_count += reply["result_count"]
-            incidents += reply["incidents"]
+                polled_count += reply["result_count"]
+                incidents += reply["incidents"]
+            except Exception:
+                self.debug_print(ERR_PARSING_RESPONSE)
             self._state.update({"last_incident": incidents[-1]["creation_time"] + 1})
             self.save_state(self._state)
 
@@ -279,11 +328,11 @@ class TestConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            self.save_progress("Test failed")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
-        self.save_progress("Connected successfully, test passed")
+        self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_endpoints(self, param):
@@ -310,13 +359,16 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["endpoint_count"] = str(len(reply))
-        for x in range(len(reply)):
-            summary["endpoint_{0}".format(x + 1)] = reply[x]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["endpoint_count"] = str(len(reply))
+            for x in range(len(reply)):
+                summary["endpoint_{0}".format(x + 1)] = reply[x]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -351,11 +403,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["policy_name"] = reply["policy_name"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["policy_name"] = reply["policy_name"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -370,12 +425,13 @@ class TestConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         action_id = param["action_id"]
+        # Validate 'action_id' action parameter
+        ret_val, action_id = self._validate_integer(action_result, action_id, ACTIONID_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         request_data, parameters = {}, {}
-        if isinstance(action_id, int):
-            request_data["group_action_id"] = action_id
-        else:
-            return action_result.set_status(phantom.APP_ERROR, "Action ID must be an integer")
+        request_data["group_action_id"] = action_id
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -393,11 +449,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_status"] = reply["data"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_status"] = reply["data"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -437,7 +496,7 @@ class TestConnector(BaseConnector):
             macos.append(files_macos)
             files["macos"] = macos
         if not files:
-            return action_result.set_status(phantom.APP_ERROR, "Must provide at least one file path")
+            return action_result.set_status(phantom.APP_ERROR, "Please provide at least one file path")
         request_data["files"] = files
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
@@ -456,11 +515,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -475,12 +537,13 @@ class TestConnector(BaseConnector):
 
         # Access action parameters passed in the 'param' dictionary
         action_id = param["action_id"]
+        # Validate 'action_id' action parameter
+        ret_val, action_id = self._validate_integer(action_result, action_id, ACTIONID_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         request_data, parameters = {}, {}
-        if isinstance(action_id, int):
-            request_data["group_action_id"] = action_id
-        else:
-            return action_result.set_status(phantom.APP_ERROR, "Action ID must be an integer")
+        request_data["group_action_id"] = action_id
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -498,11 +561,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["file_url"] = reply["data"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["file_url"] = reply["data"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -547,11 +613,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -588,11 +657,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -615,10 +687,12 @@ class TestConnector(BaseConnector):
         if comment:
             request_data["comment"] = comment
         if incident_id:
-            if isinstance(incident_id, int):
-                request_data["incident_id"] = str(incident_id)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Incident ID must be an integer")
+            # Validate 'incident_id' action parameter
+            ret_val, incident_id = self._validate_integer(action_result, incident_id, INCIDENTID_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["incident_id"] = str(incident_id)
+
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -636,10 +710,13 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary["list_updated"] = response["reply"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            summary["list_updated"] = response["reply"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -662,10 +739,12 @@ class TestConnector(BaseConnector):
         if comment:
             request_data["comment"] = comment
         if incident_id:
-            if isinstance(incident_id, int):
-                request_data["incident_id"] = str(incident_id)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Incident ID must be an integer")
+            # Validate 'incident_id' action parameter
+            ret_val, incident_id = self._validate_integer(action_result, incident_id, INCIDENTID_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["incident_id"] = str(incident_id)
+
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -683,10 +762,13 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary["list_updated"] = response["reply"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            summary["list_updated"] = response["reply"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -721,11 +803,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -760,11 +845,14 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -778,7 +866,7 @@ class TestConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-        scan_all = param["scan_all"]
+        scan_all = param.get("scan_all", False)
         endpoint_id = param.get("endpoint_id")
         dist_name = param.get("dist_name")
         first_seen = param.get("first_seen")
@@ -787,7 +875,7 @@ class TestConnector(BaseConnector):
         group_name = param.get("group_name")
         platform = param.get("platform")
         alias = param.get("alias")
-        isolate = param.get("isolate")
+        isolate = param.get("isolate", False)
         hostname = param.get("hostname")
         scan_status = param.get("scan_status")
 
@@ -813,23 +901,25 @@ class TestConnector(BaseConnector):
                 obj["value"] = dists
                 filters.append(obj)
             if first_seen:
-                if isinstance(first_seen, int):
-                    obj = {}
-                    obj["field"] = "first_seen"
-                    obj["operator"] = "gte"
-                    obj["value"] = first_seen
-                    filters.append(obj)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, "First seen must be an integer")
+                # Validate 'first_seen' action parameter
+                ret_val, first_seen = self._validate_integer(action_result, first_seen, FIRSTSEEN_ACTION_PARAM)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+                obj = {}
+                obj["field"] = "first_seen"
+                obj["operator"] = "gte"
+                obj["value"] = first_seen
+                filters.append(obj)
             if last_seen:
-                if isinstance(last_seen, int):
-                    obj = {}
-                    obj["field"] = "last_seen"
-                    obj["operator"] = "gte"
-                    obj["value"] = last_seen
-                    filters.append(obj)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, "Last seen must be an integer")
+                # Validate 'last_seen' action parameter
+                ret_val, last_seen = self._validate_integer(action_result, last_seen, LASTSEEN_ACTION_PARAM)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+                obj = {}
+                obj["field"] = "last_seen"
+                obj["operator"] = "gte"
+                obj["value"] = last_seen
+                filters.append(obj)
             if ip_list:
                 ips = []
                 obj = {}
@@ -847,8 +937,7 @@ class TestConnector(BaseConnector):
                 obj["value"] = groups
                 filters.append(obj)
             if platform:
-                platforms = ["windows", "linux", "macos", "android"]
-                if any(value == platform for value in platforms):
+                if any(value == platform for value in PLATFORMS_LIST):
                     temp = []
                     obj = {}
                     temp.append(platform)
@@ -857,7 +946,7 @@ class TestConnector(BaseConnector):
                     obj["value"] = temp
                     filters.append(obj)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid platform")
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=PLATFORM_ACTION_PARAM))
             if alias:
                 aliases = []
                 obj = {}
@@ -886,8 +975,7 @@ class TestConnector(BaseConnector):
                 obj["value"] = hostnames
                 filters.append(obj)
             if scan_status:
-                statuses = ["none", "pending", "in_progress", "canceled", "aborted", "pending_cancellation", "success", "error"]
-                if any(value == scan_status for value in statuses):
+                if any(value == scan_status for value in SCAN_STATUSES):
                     status = []
                     obj = {}
                     status.append(scan_status)
@@ -896,10 +984,11 @@ class TestConnector(BaseConnector):
                     obj["value"] = status
                     filters.append(obj)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid platform")
-            request_data["filters"] = filters
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SCANSTATUS_ACTION_PARAM))
             if not filters:
-                return action_result.set_status(phantom.APP_ERROR, "Must provide at least one filter criterion")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide at least one filter criterion")
+            request_data["filters"] = filters
+
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -917,12 +1006,15 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["endpoint_scanning"] = reply["endpoints_count"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["endpoint_scanning"] = reply["endpoints_count"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -936,7 +1028,7 @@ class TestConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Access action parameters passed in the 'param' dictionary
-        scan_all = param["scan_all"]
+        scan_all = param.get("scan_all", False)
         endpoint_id = param.get("endpoint_id")
         dist_name = param.get("dist_name")
         first_seen = param.get("first_seen")
@@ -945,7 +1037,7 @@ class TestConnector(BaseConnector):
         group_name = param.get("group_name")
         platform = param.get("platform")
         alias = param.get("alias")
-        isolate = param.get("isolate")
+        isolate = param.get("isolate", False)
         hostname = param.get("hostname")
         scan_status = param.get("scan_status")
 
@@ -971,23 +1063,25 @@ class TestConnector(BaseConnector):
                 obj["value"] = dists
                 filters.append(obj)
             if first_seen:
-                if isinstance(first_seen, int):
-                    obj = {}
-                    obj["field"] = "first_seen"
-                    obj["operator"] = "gte"
-                    obj["value"] = first_seen
-                    filters.append(obj)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, "First seen must be an integer")
+                # Validate 'first_seen' action parameter
+                ret_val, first_seen = self._validate_integer(action_result, first_seen, FIRSTSEEN_ACTION_PARAM)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+                obj = {}
+                obj["field"] = "first_seen"
+                obj["operator"] = "gte"
+                obj["value"] = first_seen
+                filters.append(obj)
             if last_seen:
-                if isinstance(last_seen, int):
-                    obj = {}
-                    obj["field"] = "last_seen"
-                    obj["operator"] = "gte"
-                    obj["value"] = last_seen
-                    filters.append(obj)
-                else:
-                    return action_result.set_status(phantom.APP_ERROR, "Last seen must be an integer")
+                # Validate 'last_seen' action parameter
+                ret_val, last_seen = self._validate_integer(action_result, last_seen, LASTSEEN_ACTION_PARAM)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+                obj = {}
+                obj["field"] = "last_seen"
+                obj["operator"] = "gte"
+                obj["value"] = last_seen
+                filters.append(obj)
             if ip_list:
                 ips = []
                 obj = {}
@@ -1005,8 +1099,7 @@ class TestConnector(BaseConnector):
                 obj["value"] = groups
                 filters.append(obj)
             if platform:
-                platforms = ["windows", "linux", "macos", "android"]
-                if any(value == platform for value in platforms):
+                if any(value == platform for value in PLATFORMS_LIST):
                     temp = []
                     obj = {}
                     temp.append(platform)
@@ -1015,7 +1108,7 @@ class TestConnector(BaseConnector):
                     obj["value"] = temp
                     filters.append(obj)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid platform")
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=PLATFORM_ACTION_PARAM))
             if alias:
                 aliases = []
                 obj = {}
@@ -1044,8 +1137,7 @@ class TestConnector(BaseConnector):
                 obj["value"] = hostnames
                 filters.append(obj)
             if scan_status:
-                statuses = ["none", "pending", "in_progress", "canceled", "aborted", "pending_cancellation", "success", "error"]
-                if any(value == scan_status for value in statuses):
+                if any(value == scan_status for value in SCAN_STATUSES):
                     status = []
                     obj = {}
                     status.append(scan_status)
@@ -1054,10 +1146,11 @@ class TestConnector(BaseConnector):
                     obj["value"] = status
                     filters.append(obj)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid platform")
-            request_data["filters"] = filters
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SCANSTATUS_ACTION_PARAM))
             if not filters:
-                return action_result.set_status(phantom.APP_ERROR, "Must provide at least one filter criterion")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide at least one filter criterion")
+            request_data["filters"] = filters
+
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -1075,12 +1168,15 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["action_id"] = reply["action_id"]
-        summary["endpoint_cancelling"] = reply["endpoints_count"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["action_id"] = reply["action_id"]
+            summary["endpoint_cancelling"] = reply["endpoints_count"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1104,31 +1200,37 @@ class TestConnector(BaseConnector):
         status = param.get("status")
         search_from = param.get("search_from")
         search_to = param.get("search_to")
-        sort = param["sort"]
+        sort = param.get("sort", False)
         sort_field = param.get("sort_field", "creation_time")
         sort_order = param.get("sort_order", "desc")
 
         request_data, parameters = {}, {}
         filters = []
         if modification_time:
-            if isinstance(modification_time, int):
-                obj = {}
-                obj["field"] = "modification_time"
-                obj["operator"] = "gte"
-                obj["value"] = modification_time
-                filters.append(obj)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Modification time must be an integer")
+            # Validate 'modification_time' action parameter
+            ret_val, modification_time = self._validate_integer(action_result, modification_time, MODIFICATIONTIME_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            obj = {}
+            obj["field"] = "modification_time"
+            obj["operator"] = "gte"
+            obj["value"] = modification_time
+            filters.append(obj)
         if creation_time:
-            if isinstance(creation_time, int):
-                obj = {}
-                obj["field"] = "creation_time"
-                obj["operator"] = "gte"
-                obj["value"] = creation_time
-                filters.append(obj)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Creation time must be an integer")
+            # Validate 'creation_time' action parameter
+            ret_val, creation_time = self._validate_integer(action_result, creation_time, CREATIONTIME_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            obj = {}
+            obj["field"] = "creation_time"
+            obj["operator"] = "gte"
+            obj["value"] = creation_time
+            filters.append(obj)
         if incident_id:
+            # Validate 'incident_id' action parameter
+            ret_val, incident_id = self._validate_integer(action_result, incident_id, INCIDENTID_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             incidents = []
             obj = {}
             incidents.append(str(incident_id))
@@ -1159,32 +1261,33 @@ class TestConnector(BaseConnector):
                 obj["value"] = status
                 filters.append(obj)
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid status")
+                return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=STATUS_ACTION_PARAM))
         if filters:
             request_data["filters"] = filters
         if search_from:
-            if isinstance(search_from, int):
-                request_data["search_from"] = search_from
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Search from must be an integer")
+            # Validate 'search_from' action parameter
+            ret_val, search_from = self._validate_integer(action_result, search_from, SEARCHFROM_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["search_from"] = search_from
         if search_to:
-            if isinstance(search_to, int):
-                request_data["search_to"] = search_to
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Search to must be an integer")
+            # Validate 'search_to' action parameter
+            ret_val, search_to = self._validate_integer(action_result, search_to, SEARCHTO_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["search_to"] = search_to
         if sort:
             fields = ["modification_time", "creation_time"]
             if any(value == sort_field for value in fields):
-                orders = ["asc", "desc"]
-                if any(value == sort_order for value in orders):
+                if any(value == sort_order for value in SORT_ORDERS):
                     sorting = {}
                     sorting["field"] = sort_field
                     sorting["keyword"] = sort_order
                     request_data["sort"] = sorting
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid sort order")
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SORTORDER_ACTION_PARAM))
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid sort field")
+                return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SORTFIELD_ACTION_PARAM))
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -1202,15 +1305,18 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["total_count"] = reply["total_count"]
-        summary["result_count"] = reply["result_count"]
-        incidents = reply["incidents"]
-        for x in range(len(incidents)):
-            summary["result_{0}".format(x + 1)] = incidents[x]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["total_count"] = reply["total_count"]
+            summary["result_count"] = reply["result_count"]
+            incidents = reply["incidents"]
+            for x in range(len(incidents)):
+                summary["result_{0}".format(x + 1)] = incidents[x]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1228,12 +1334,17 @@ class TestConnector(BaseConnector):
         alerts_limit = param.get("alerts_limit")
 
         request_data, parameters = {}, {}
+        # Validate 'incident_id' action parameter
+        ret_val, incident_id = self._validate_integer(action_result, incident_id, INCIDENTID_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         request_data["incident_id"] = str(incident_id)
         if alerts_limit:
-            if isinstance(alerts_limit, int):
-                request_data["alerts_limit"] = alerts_limit
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Alerts limit must be an integer")
+            # Validate 'alerts_limit' action parameter
+            ret_val, alerts_limit = self._validate_integer(action_result, alerts_limit, ALERTSLIMIT_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["alerts_limit"] = alerts_limit
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -1251,14 +1362,17 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]["file_artifacts"]["data"][0]
-        summary["alert_count"] = reply["alert_count"]
-        summary["is_malicious"] = reply["is_malicious"]
-        summary["file_name"] = reply["file_name"]
-        summary["file_sha256"] = reply["file_sha256"]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]["file_artifacts"]["data"][0]
+            summary["alert_count"] = reply["alert_count"]
+            summary["is_malicious"] = reply["is_malicious"]
+            summary["file_name"] = reply["file_name"]
+            summary["file_sha256"] = reply["file_sha256"]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1278,23 +1392,24 @@ class TestConnector(BaseConnector):
         creation_time = param.get("creation_time")
         search_from = param.get("search_from")
         search_to = param.get("search_to")
-        sort = param["sort"]
+        sort = param.get("sort", False)
         sort_field = param.get("sort_field", "creation_time")
         sort_order = param.get("sort_order", "desc")
 
         request_data, parameters = {}, {}
         filters = []
         if alert_id:
-            if isinstance(alert_id, int):
-                alerts = []
-                obj = {}
-                alerts.append(alert_id)
-                obj["field"] = "alert_id_list"
-                obj["operator"] = "in"
-                obj["value"] = alerts
-                filters.append(obj)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Alert ID must be an integer")
+            # Validate 'alert_id' action parameter
+            ret_val, alert_id = self._validate_integer(action_result, alert_id, ALERTID_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            alerts = []
+            obj = {}
+            alerts.append(alert_id)
+            obj["field"] = "alert_id_list"
+            obj["operator"] = "in"
+            obj["value"] = alerts
+            filters.append(obj)
         if alert_source:
             sources = []
             obj = {}
@@ -1314,41 +1429,43 @@ class TestConnector(BaseConnector):
                 obj["value"] = temp
                 filters.append(obj)
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid severity")
+                return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SEVERITY_ACTION_PARAM))
         if creation_time:
-            if isinstance(creation_time, int):
-                obj = {}
-                obj["field"] = "creation_time"
-                obj["operator"] = "gte"
-                obj["value"] = creation_time
-                filters.append(obj)
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Creation time must be an integer")
+            # Validate 'creation_time' action parameter
+            ret_val, creation_time = self._validate_integer(action_result, creation_time, CREATIONTIME_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            obj = {}
+            obj["field"] = "creation_time"
+            obj["operator"] = "gte"
+            obj["value"] = creation_time
+            filters.append(obj)
         if filters:
             request_data["filters"] = filters
         if search_from:
-            if isinstance(search_from, int):
-                request_data["search_from"] = search_from
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Search from must be an integer")
+            # Validate 'search_from' action parameter
+            ret_val, search_from = self._validate_integer(action_result, search_from, SEARCHFROM_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["search_from"] = search_from
         if search_to:
-            if isinstance(search_to, int):
-                request_data["search_to"] = search_to
-            else:
-                return action_result.set_status(phantom.APP_ERROR, "Search to must be an integer")
+            # Validate 'search_to' action parameter
+            ret_val, search_to = self._validate_integer(action_result, search_to, SEARCHTO_ACTION_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            request_data["search_to"] = search_to
         if sort:
             fields = ["severity", "creation_time"]
             if any(value == sort_field for value in fields):
-                orders = ["asc", "desc"]
-                if any(value == sort_order for value in orders):
+                if any(value == sort_order for value in SORT_ORDERS):
                     sorting = {}
                     sorting["field"] = sort_field
                     sorting["keyword"] = sort_order
                     request_data["sort"] = sorting
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Invalid sort order")
+                    return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SORTORDER_ACTION_PARAM))
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid sort field")
+                return action_result.set_status(phantom.APP_ERROR, VALID_VALUE_MSG.format(key=SORTFIELD_ACTION_PARAM))
         parameters["request_data"] = request_data
         self.save_progress("Request JSON: {0}".format(parameters))
 
@@ -1366,22 +1483,25 @@ class TestConnector(BaseConnector):
         action_result.add_data(response)
         self.save_progress("Response JSON: {0}".format(response))
 
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        reply = response["reply"]
-        summary["total_count"] = reply["total_count"]
-        summary["result_count"] = reply["result_count"]
-        alerts = reply["alerts"]
-        event = alerts[0]["events"]
-        summary["process_name"] = event[0]["actor_process_image_name"]
-        summary["process_path"] = event[0]["actor_process_image_path"]
-        summary["process_sha256"] = event[0]["actor_process_image_sha256"]
-        summary["endpoint_id"] = alerts[0]["endpoint_id"]
-        summary["host_name"] = alerts[0]["host_name"]
-        summary["ip_address"] = alerts[0]["host_ip"]
-        for x in range(len(alerts)):
-            summary["Result {0}".format(x + 1)] = alerts[x]
-        summary["raw"] = response
+        try:
+            # Add a dictionary that is made up of the most important values from data into the summary
+            summary = action_result.update_summary({})
+            reply = response["reply"]
+            summary["total_count"] = reply["total_count"]
+            summary["result_count"] = reply["result_count"]
+            alerts = reply["alerts"]
+            event = alerts[0]["events"]
+            summary["process_name"] = event[0]["actor_process_image_name"]
+            summary["process_path"] = event[0]["actor_process_image_path"]
+            summary["process_sha256"] = event[0]["actor_process_image_sha256"]
+            summary["endpoint_id"] = alerts[0]["endpoint_id"]
+            summary["host_name"] = alerts[0]["host_name"]
+            summary["ip_address"] = alerts[0]["host_ip"]
+            for x in range(len(alerts)):
+                summary["Result {0}".format(x + 1)] = alerts[x]
+            summary["raw"] = response
+        except Exception:
+            self.debug_print(ERR_PARSING_RESPONSE)
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1459,8 +1579,11 @@ class TestConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        # self._base_url = "http://10.1.20.106:5000/api/{0}".format(config['fqdn'])
         self._base_url = "https://api-{0}/public_api/v1".format(config['fqdn'])
+        self._api_key = config['api_key']
+        self._advanced = config.get('advanced', False)
+        self._api_key_id = config['api_id']
+        self._verify = config.get('verify_server_cert', False)
 
         return phantom.APP_SUCCESS
 
@@ -1496,7 +1619,7 @@ def main():
 
     if username and password:
         try:
-            login_url = TestConnector._get_phantom_base_url() + '/login'
+            login_url = BaseConnector._get_phantom_base_url() + '/login'
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)

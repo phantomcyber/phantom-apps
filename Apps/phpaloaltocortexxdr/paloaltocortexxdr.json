@@ -4,8 +4,8 @@
     "description": "This app integrates with the Palo Alto Cortex XDR",
     "type": "endpoint",
     "product_vendor": "Palo Alto",
-    "logo": "paloaltocortexxdr.svg",
-    "logo_dark": "paloaltocortexxdr_dark.svg",
+    "logo": "logo_paloaltocortexxdr.svg",
+    "logo_dark": "logo_paloaltocortexxdr_dark.svg",
     "product_name": "Cortex XDR",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2021-01-15T08:19:08.941127Z",
     "package_name": "phantom_paloaltocortexxdr",
-    "main_module": "paloaltocortexxdr_connector.pyc",
+    "main_module": "paloaltocortexxdr_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -27,7 +27,6 @@
         "advanced": {
             "description": "Advanced Key",
             "data_type": "boolean",
-            "required": true,
             "default": false,
             "order": 1
         },
@@ -35,16 +34,12 @@
             "description": "API Key ID",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 2
         },
         "fqdn": {
             "description": "FQDN",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 3
         }
     },
@@ -65,34 +60,32 @@
                 "start_time": {
                     "data_type": "numeric",
                     "order": 1,
-                    "description": "Start of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is past 10 days"
+                    "description": "Start of time range, in epoch time (milliseconds)"
                 },
                 "end_time": {
                     "data_type": "numeric",
                     "order": 2,
-                    "description": "End of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is now"
+                    "description": "End of time range, in epoch time (milliseconds)"
                 },
                 "container_count": {
                     "data_type": "numeric",
                     "order": 3,
-                    "description": "Maximum number of container records to query for"
+                    "description": "The maximum number of container records to query for"
                 },
                 "artifact_count": {
                     "data_type": "numeric",
                     "order": 4,
-                    "description": "Maximum number of artifact records to query for"
+                    "description": "The maximum number of artifact records to query for"
                 }
-              },
+            },
             "output": [],
-            "versions":"EQ(*)"
+            "versions": "EQ(*)"
         },
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -100,37 +93,47 @@
         },
         {
             "action": "list endpoints",
-            "identifier": "list_endpoints",
             "description": "List all the endpoints/sensors configured on the device",
             "type": "investigate",
+            "identifier": "list_endpoints",
             "read_only": true,
             "parameters": {},
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -140,21 +143,19 @@
         },
         {
             "action": "get policy",
-            "identifier": "get_policy",
             "description": "Get the policy name for a specific endpoint",
             "type": "investigate",
+            "identifier": "get_policy",
             "read_only": true,
             "parameters": {
                 "endpoint_id": {
-                    "description": "Endpoint ID to get policy name",
+                    "description": "Endpoint ID to get the policy name for",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -165,34 +166,44 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -202,9 +213,9 @@
         },
         {
             "action": "get action status",
-            "identifier": "get_action_status",
             "description": "Retrieve the status of the requested actions according to the action ID",
             "type": "investigate",
+            "identifier": "get_action_status",
             "read_only": true,
             "parameters": {
                 "action_id": {
@@ -212,43 +223,57 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "cortex action id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.action_id",
-                    "data_type": "string",
-                    "column_name": "action_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cortex action id"
+                    ],
+                    "column_name": "Action ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -258,48 +283,34 @@
         },
         {
             "action": "retrieve file",
-            "identifier": "retrieve_file",
             "description": "Retrieve files from a specified endpoint",
-            "type": "generic",
-            "read_only": false,
+            "type": "investigate",
+            "identifier": "retrieve_file",
+            "read_only": true,
             "parameters": {
                 "endpoint_id": {
-                    "description": "Endpoint ID to retrieve the file",
+                    "description": "Endpoint ID to retrieve the files for",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "windows_path": {
                     "description": "File path in Windows",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "linux_path": {
                     "description": "File path in Linux",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "macos_path": {
                     "description": "File path in Mac OS",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 }
             },
@@ -310,52 +321,62 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.windows_path",
                     "data_type": "string",
-                    "column_name": "files_windows",
+                    "column_name": "Files Windows",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.linux_path",
                     "data_type": "string",
-                    "column_name": "files_linux",
+                    "column_name": "Files Linux",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.macos_path",
                     "data_type": "string",
-                    "column_name": "files_macos",
+                    "column_name": "Files Macos",
                     "column_order": 3
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -365,9 +386,9 @@
         },
         {
             "action": "retrieve file details",
-            "identifier": "retrieve_file_details",
-            "description": "View the file retrieved by the Retrieve File request according to the action ID",
+            "description": "View the file retrieved by the Retrieve File action according to the action ID",
             "type": "investigate",
+            "identifier": "retrieve_file_details",
             "read_only": true,
             "parameters": {
                 "action_id": {
@@ -375,43 +396,57 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "cortex action id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.action_id",
-                    "data_type": "string",
-                    "column_name": "action_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cortex action id"
+                    ],
+                    "column_name": "Action ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -421,30 +456,29 @@
         },
         {
             "action": "quarantine file",
-            "identifier": "quarantine_file",
             "description": "Quarantine file on a specified endpoint",
             "type": "contain",
+            "identifier": "quarantine_file",
             "read_only": false,
             "parameters": {
                 "endpoint_id": {
-                    "description": "Endpoint ID to quarantine the file",
+                    "description": "Endpoint ID where the file is present",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "file_path": {
                     "description": "Path of the file you want to quarantine",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ],
                     "order": 1
                 },
                 "file_hash": {
@@ -455,8 +489,6 @@
                     "contains": [
                         "sha256"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 }
             },
@@ -467,13 +499,16 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
                     "data_type": "string",
-                    "column_name": "file_path",
+                    "contains": [
+                        "file path"
+                    ],
+                    "column_name": "File Path",
                     "column_order": 1
                 },
                 {
@@ -482,34 +517,44 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "file_hash",
+                    "column_name": "File Hash",
                     "column_order": 2
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -519,33 +564,29 @@
         },
         {
             "action": "unquarantine file",
-            "identifier": "unquarantine_file",
             "description": "Restore a quarantined file on a specified endpoint",
             "type": "correct",
+            "identifier": "unquarantine_file",
             "read_only": false,
             "parameters": {
                 "file_hash": {
-                    "description": "File hash to restore",
+                    "description": "Hash of the file you want to restore",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "sha256"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "endpoint_id": {
-                    "description": "Endpoint ID to restore file",
+                    "description": "Endpoint ID to restore the file",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
@@ -556,7 +597,7 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "file_hash",
+                    "column_name": "File Hash",
                     "column_order": 0
                 },
                 {
@@ -565,34 +606,44 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -602,9 +653,10 @@
         },
         {
             "action": "block hash",
-            "identifier": "block_hash",
-            "description": "Add hash which does not exist in the allow or block lists to a block list",
+            "description": "Add a hash that does not exist in the allow or block list to a block list",
             "type": "contain",
+            "identifier": "block_hash",
+            "undo": "allow hash",
             "read_only": false,
             "parameters": {
                 "file_hash": {
@@ -615,29 +667,20 @@
                     "contains": [
                         "sha256"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "comment": {
-                    "description": "Additional information regarding the action",
+                    "description": "Additional information regarding this action",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "incident_id": {
                     "description": "Incident ID related to the file hash",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex incident id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 }
             },
@@ -648,13 +691,13 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "file_hash",
+                    "column_name": "File Hash",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "column_name": "comment",
+                    "column_name": "Comment",
                     "column_order": 1
                 },
                 {
@@ -663,34 +706,44 @@
                     "contains": [
                         "cortex incident id"
                     ],
-                    "column_name": "incident_id",
+                    "column_name": "Incident ID",
                     "column_order": 2
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -700,9 +753,10 @@
         },
         {
             "action": "allow hash",
-            "identifier": "allow_hash",
-            "description": "Add files which do not exist in the allow or block lists to an allow list",
+            "description": "Add files that do not exist in the allow or block list to an allow list",
             "type": "generic",
+            "identifier": "allow_hash",
+            "undo": "block hash",
             "read_only": false,
             "parameters": {
                 "file_hash": {
@@ -713,29 +767,20 @@
                     "contains": [
                         "sha256"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "comment": {
-                    "description": "Additional information regarding the action",
+                    "description": "Additional information regarding this action",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "incident_id": {
                     "description": "Incident ID related to the file hash",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex incident id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 }
             },
@@ -746,49 +791,59 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "hash",
+                    "column_name": "File Hash",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "column_name": "comment",
+                    "column_name": "Comment",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.incident_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "cortex incident id"
                     ],
-                    "column_name": "incident_id",
+                    "column_name": "Incident ID",
                     "column_order": 2
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -798,9 +853,10 @@
         },
         {
             "action": "quarantine device",
-            "identifier": "quarantine_device",
-            "description": "Quarantine the endpoint",
+            "description": "Quarantine a specified endpoint",
             "type": "contain",
+            "identifier": "quarantine_device",
+            "undo": "unquarantine device",
             "read_only": false,
             "parameters": {
                 "endpoint_id": {
@@ -811,8 +867,6 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -823,34 +877,44 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -860,9 +924,10 @@
         },
         {
             "action": "unquarantine device",
-            "identifier": "unquarantine_device",
-            "description": "Unquarantine the endpoint",
+            "description": "Unquarantine a specified endpoint",
             "type": "correct",
+            "identifier": "unquarantine_device",
+            "undo": "quarantine device",
             "read_only": false,
             "parameters": {
                 "endpoint_id": {
@@ -873,8 +938,6 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -885,34 +948,44 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -922,121 +995,82 @@
         },
         {
             "action": "scan endpoint",
-            "identifier": "scan_endpoint",
             "description": "Run a scan on selected endpoints",
-            "type": "investigate",
+            "type": "generic",
+            "identifier": "scan_endpoint",
+            "undo": "cancel scan endpoint",
             "read_only": false,
             "parameters": {
                 "scan_all": {
                     "description": "Scan all endpoints",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 0
                 },
                 "endpoint_id": {
                     "description": "Endpoint ID to scan",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "dist_name": {
                     "description": "Name of the distribution list",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "first_seen": {
                     "description": "When an endpoint was first seen",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 },
                 "last_seen": {
                     "description": "When an endpoint was last seen",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "ip_list": {
                     "description": "IP address to scan",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 5
                 },
                 "group_name": {
                     "description": "Name of endpoint group",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 6
                 },
                 "platform": {
                     "description": "Type of operating system",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "windows",
                         "linux",
                         "macos",
                         "android"
                     ],
-                    "default": "",
                     "order": 7
                 },
                 "alias": {
                     "description": "Endpoint alias name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 8
                 },
                 "isolate": {
                     "description": "If an endpoint has been isolated",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 9
                 },
                 "hostname": {
                     "description": "Name of host",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 10
                 },
                 "scan_status": {
                     "description": "Scan status of an endpoint (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "none",
                         "pending",
@@ -1047,7 +1081,6 @@
                         "success",
                         "error"
                     ],
-                    "default": "",
                     "order": 11
                 }
             },
@@ -1055,8 +1088,12 @@
                 {
                     "data_path": "action_result.parameter.scan_all",
                     "data_type": "boolean",
-                    "column_name": "scan_all",
-                    "column_order": 0
+                    "column_name": "Scan All",
+                    "column_order": 0,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.endpoint_id",
@@ -1064,94 +1101,108 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.dist_name",
                     "data_type": "string",
-                    "column_name": "dist_name",
+                    "column_name": "Distribution List Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.first_seen",
                     "data_type": "numeric",
-                    "column_name": "first_seen",
+                    "column_name": "First Seen",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.last_seen",
                     "data_type": "numeric",
-                    "column_name": "last_seen",
+                    "column_name": "Last Seen",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.ip_list",
                     "data_type": "string",
-                    "column_name": "ip_list",
+                    "column_name": "IP List",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
-                    "column_name": "group_name",
+                    "column_name": "Group Name",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
-                    "column_name": "platform",
+                    "column_name": "Platform",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.alias",
                     "data_type": "string",
-                    "column_name": "alias",
+                    "column_name": "Alias",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.parameter.isolate",
                     "data_type": "boolean",
-                    "column_name": "isolate",
-                    "column_order": 9
+                    "column_name": "Isolate",
+                    "column_order": 9,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
-                    "column_name": "hostname",
+                    "column_name": "Hostname",
                     "column_order": 10
                 },
                 {
                     "data_path": "action_result.parameter.scan_status",
                     "data_type": "string",
-                    "column_name": "hostname",
+                    "column_name": "Hostname",
                     "column_order": 11
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 12
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 12,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1161,121 +1212,82 @@
         },
         {
             "action": "cancel scan endpoint",
-            "identifier": "cancel_scan_endpoint",
             "description": "Cancel the scan of selected endpoints",
-            "type": "investigate",
+            "type": "generic",
+            "identifier": "cancel_scan_endpoint",
+            "undo": "scan endpoint",
             "read_only": false,
             "parameters": {
                 "scan_all": {
                     "description": "Cancel all endpoints",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 0
                 },
                 "endpoint_id": {
                     "description": "Endpoint ID to cancel the scan",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "dist_name": {
                     "description": "Name of the distribution list",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "first_seen": {
                     "description": "When an endpoint was first seen",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 },
                 "last_seen": {
                     "description": "When an endpoint was last seen",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "ip_list": {
-                    "description": "IP Address to cancel the scan",
+                    "description": "IP Address to cancel the scan for",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 5
                 },
                 "group_name": {
                     "description": "Name of endpoint group",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 6
                 },
                 "platform": {
                     "description": "Type of operating system",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "windows",
                         "linux",
                         "macos",
                         "android"
                     ],
-                    "default": "",
                     "order": 7
                 },
                 "alias": {
                     "description": "Endpoint alias name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 8
                 },
                 "isolate": {
                     "description": "If an endpoint has been isolated",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 9
                 },
                 "hostname": {
                     "description": "Name of host",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 10
                 },
                 "scan_status": {
                     "description": "Scan status of an endpoint (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "none",
                         "pending",
@@ -1286,7 +1298,6 @@
                         "success",
                         "error"
                     ],
-                    "default": "",
                     "order": 11
                 }
             },
@@ -1294,8 +1305,12 @@
                 {
                     "data_path": "action_result.parameter.scan_all",
                     "data_type": "boolean",
-                    "column_name": "scan_all",
-                    "column_order": 0
+                    "column_name": "Scan All",
+                    "column_order": 0,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.endpoint_id",
@@ -1303,94 +1318,108 @@
                     "contains": [
                         "cortex endpoint id"
                     ],
-                    "column_name": "endpoint_id",
+                    "column_name": "Endpoint ID",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.dist_name",
                     "data_type": "string",
-                    "column_name": "dist_name",
+                    "column_name": "Distribution List Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.first_seen",
                     "data_type": "numeric",
-                    "column_name": "first_seen",
+                    "column_name": "First Seen",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.last_seen",
                     "data_type": "numeric",
-                    "column_name": "last_seen",
+                    "column_name": "Last Seen",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.ip_list",
                     "data_type": "string",
-                    "column_name": "ip_list",
+                    "column_name": "IP List",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
-                    "column_name": "group_name",
+                    "column_name": "Group Name",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
-                    "column_name": "platform",
+                    "column_name": "Platform",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.alias",
                     "data_type": "string",
-                    "column_name": "alias",
+                    "column_name": "Alias",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.parameter.isolate",
                     "data_type": "boolean",
-                    "column_name": "isolate",
-                    "column_order": 9
+                    "column_name": "Isolate",
+                    "column_order": 9,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
-                    "column_name": "hostname",
+                    "column_name": "Hostname",
                     "column_order": 10
                 },
                 {
                     "data_path": "action_result.parameter.scan_status",
                     "data_type": "string",
-                    "column_name": "hostname",
+                    "column_name": "Hostname",
                     "column_order": 11
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 12
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 12,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1400,64 +1429,43 @@
         },
         {
             "action": "get incidents",
-            "identifier": "get_incidents",
             "description": "Get a list of incidents filtered by a list of incident IDs, modification time, or creation time",
             "type": "investigate",
+            "identifier": "get_incidents",
             "read_only": true,
             "parameters": {
                 "modification_time": {
                     "description": "Modification time of the incident in timestamp epoch milliseconds",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "creation_time": {
                     "description": "Creation time of the incident in timestamp epoch milliseconds",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "incident_id": {
                     "description": "Incident ID to be searched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex incident id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "description": {
                     "description": "Incident description to be searched",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 },
                 "alert_sources": {
                     "description": "Source which detected the alert",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "status": {
                     "description": "Status of the incident to be searched (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "new",
                         "under_investigation",
@@ -1467,40 +1475,27 @@
                         "resolved_other",
                         "resolved_auto"
                     ],
-                    "default": "",
                     "order": 5
                 },
                 "search_from": {
                     "description": "Starting offset within the query result set from which you want incidents returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 6
                 },
                 "search_to": {
                     "description": "End offset within the result set after which you do not want incidents returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 7
                 },
                 "sort": {
                     "description": "Sorting of the returned results",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 8
                 },
                 "sort_field": {
                     "description": "Sorting field (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "modification_time",
                         "creation_time"
@@ -1511,8 +1506,6 @@
                 "sort_order": {
                     "description": "Sorting order (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "asc",
                         "desc"
@@ -1525,13 +1518,13 @@
                 {
                     "data_path": "action_result.parameter.modification_time",
                     "data_type": "numeric",
-                    "column_name": "modification_time",
+                    "column_name": "Modification Time",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.creation_time",
                     "data_type": "numeric",
-                    "column_name": "creation_time",
+                    "column_name": "Creation Time",
                     "column_order": 1
                 },
                 {
@@ -1540,82 +1533,96 @@
                     "contains": [
                         "cortex incident id"
                     ],
-                    "column_name": "incident_id",
+                    "column_name": "Incident ID",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
-                    "column_name": "description",
+                    "column_name": "Description",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.alert_sources",
                     "data_type": "string",
-                    "column_name": "alert_sources",
+                    "column_name": "Alert Sources",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.status",
                     "data_type": "string",
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.search_from",
                     "data_type": "numeric",
-                    "column_name": "search_from",
+                    "column_name": "Search From",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.search_to",
                     "data_type": "numeric",
-                    "column_name": "search_to",
+                    "column_name": "Search To",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "boolean",
-                    "column_name": "sort",
-                    "column_order": 8
+                    "column_name": "Sort",
+                    "column_order": 8,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.sort_field",
                     "data_type": "string",
-                    "column_name": "sort_field",
+                    "column_name": "Sort Field",
                     "column_order": 9
                 },
                 {
                     "data_path": "action_result.parameter.sort_order",
                     "data_type": "string",
-                    "column_name": "sort_order",
+                    "column_name": "Sort Order",
                     "column_order": 10
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 11
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 11,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1625,10 +1632,10 @@
         },
         {
             "action": "get incident details",
-            "identifier": "get_incident_details",
             "description": "Get extra data fields of a specific incident including alerts and key artifacts",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "get_incident_details",
+            "read_only": true,
             "parameters": {
                 "incident_id": {
                     "description": "Incident ID to be investigated",
@@ -1638,56 +1645,46 @@
                     "contains": [
                         "cortex incident id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "alerts_limit": {
-                    "description": "Maximum unmber of related alerts to be returned",
+                    "description": "The maximum number of related alerts to be returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.incident_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "cortex incident id"
                     ],
-                    "column_name": "incident_id",
+                    "column_name": "Incident ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.alerts_limit",
-                    "data_type": "string",
-                    "column_name": "alerts_limit",
+                    "data_type": "numeric",
+                    "column_name": "Alerts Limit",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1696,7 +1693,11 @@
                 },
                 {
                     "data_path": "action_result.summary.is_malicious",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.file_name",
@@ -1705,6 +1706,20 @@
                 {
                     "data_path": "action_result.summary.file_sha256",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1714,37 +1729,28 @@
         },
         {
             "action": "get alerts",
-            "identifier": "get_alerts",
             "description": "Get a list of alerts with multiple events",
             "type": "investigate",
+            "identifier": "get_alerts",
             "read_only": true,
             "parameters": {
                 "alert_id": {
                     "description": "Alert ID to be searched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "cortex alert id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "alert_source": {
-                    "description": "Source which detected the alert",
+                    "description": "The source which detected the alert",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "severity": {
-                    "description": "Severity of the alert to be searched (select from defined values)",
+                    "description": "The severity of the alert to be searched (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "info",
                         "low",
@@ -1752,49 +1758,32 @@
                         "high",
                         "unknown"
                     ],
-                    "default": "",
                     "order": 2
                 },
                 "creation_time": {
                     "description": "Creation time of the alert in timestamp epoch milliseconds",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 },
                 "search_from": {
                     "description": "Starting offset within the query result set from which you want incidents returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "search_to": {
                     "description": "End offset within the result set after which you do not want incidents returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 5
                 },
                 "sort": {
                     "description": "Sorting of the returned results",
                     "data_type": "boolean",
-                    "required": true,
-                    "primary": false,
-                    "default": "",
+                    "default": false,
                     "order": 6
                 },
                 "sort_field": {
                     "description": "Sorting field (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "severity",
                         "creation_time"
@@ -1805,8 +1794,6 @@
                 "sort_order": {
                     "description": "Sorting order (select from defined values)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "asc",
                         "desc"
@@ -1822,82 +1809,96 @@
                     "contains": [
                         "cortex alert id"
                     ],
-                    "column_name": "alert_id",
+                    "column_name": "Alert ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.alert_source",
                     "data_type": "string",
-                    "column_name": "alert_source",
+                    "column_name": "Alert Source",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.severity",
                     "data_type": "string",
-                    "column_name": "severity",
+                    "column_name": "Severity",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.creation_time",
                     "data_type": "numeric",
-                    "column_name": "creation_time",
+                    "column_name": "Creation Time",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.search_from",
                     "data_type": "numeric",
-                    "column_name": "search_from",
+                    "column_name": "Search From",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.search_to",
                     "data_type": "numeric",
-                    "column_name": "search_to",
+                    "column_name": "Search To",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "boolean",
-                    "column_name": "sort",
-                    "column_order": 6
+                    "column_name": "Sort",
+                    "column_order": 6,
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.sort_field",
                     "data_type": "string",
-                    "column_name": "sort_field",
+                    "column_name": "Sort Field",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.sort_order",
                     "data_type": "string",
-                    "column_name": "sort_order",
+                    "column_name": "Sort Order",
                     "column_order": 8
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 9
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 9,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
