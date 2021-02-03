@@ -45,7 +45,7 @@
             "order": 2
         },
         "verify_ssl": {
-            "description": "Use/do not use SSL",
+            "description": "Verify SSL Certificate",
             "data_type": "boolean",
             "default": false,
             "order": 3
@@ -55,7 +55,6 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "Validate the asset configuration for connectivity using supplied configuration.",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -65,7 +64,7 @@
         },
         {
             "action": "on poll",
-            "description": "Scheduled/Automated ingestion of all new Darkfeed IOCs detected since last ingestion",
+            "description": "Scheduled/Automated ingestion of all the new Darkfeed IOCs detected since the last ingestion",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
@@ -102,7 +101,7 @@
         },
         {
             "action": "enrich ip",
-            "description": "Query the Sixgill Darkfeed for the specified IP and receive all IOCs matching that IP",
+            "description": "Query the Sixgill Darkfeed for the specified IP and receive all the IOCs matching that IP",
             "type": "investigate",
             "identifier": "enrich_ip",
             "read_only": true,
@@ -280,7 +279,7 @@
         },
         {
             "action": "enrich url",
-            "description": "Query the Sixgill Darkfeed for the specified URL and receive all IOCs matching that URL",
+            "description": "Query the Sixgill Darkfeed for the specified URL and receive all the IOCs matching that URL",
             "type": "investigate",
             "identifier": "enrich_url",
             "read_only": true,
@@ -458,7 +457,7 @@
         },
         {
             "action": "enrich domain",
-            "description": "Query the Sixgill Darkfeed for the specified domain and receive all IOCs matching that domain",
+            "description": "Query the Sixgill Darkfeed for the specified domain and receive all the IOCs matching that domain",
             "type": "investigate",
             "identifier": "enrich_domain",
             "read_only": true,
@@ -636,7 +635,7 @@
         },
         {
             "action": "enrich hash",
-            "description": "Query the Sixgill Darkfeed for the specified hash and receive all IOCs matching that hash",
+            "description": "Query the Sixgill Darkfeed for the specified hash and receive all the IOCs matching that hash",
             "type": "investigate",
             "identifier": "enrich_hash",
             "read_only": true,
@@ -814,7 +813,7 @@
         },
         {
             "action": "enrich post id",
-            "description": "Query the Sixgill Darkfeed for the specified Sixgill Post ID (i.e. unique identifier of a specific post shared in the underground) and receive all IOCs shared in that post",
+            "description": "Query the Sixgill Darkfeed for the specified Sixgill Post ID (i.e. unique identifier of a specific post shared in the underground) and receive all the IOCs shared in that post",
             "type": "investigate",
             "identifier": "enrich_post_id",
             "read_only": true,
@@ -985,7 +984,7 @@
         },
         {
             "action": "enrich threat actor",
-            "description": "Query the Sixgill Darkfeed and receive all IOCs shared by that threat actor",
+            "description": "Query the Sixgill Darkfeed for the specified threat actor and receive all the IOCs shared by that threat actor",
             "type": "investigate",
             "identifier": "enrich_threat_actor",
             "read_only": true,
