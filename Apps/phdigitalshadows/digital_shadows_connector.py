@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2020 Digital Shadows Ltd.
+# File: digital_shadows_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -28,7 +27,8 @@ class DigitalShadowsConnector(BaseConnector):
 
     def handle_action(self, param):
         action_id = self.get_action_identifier()
-        self.save_progress("Ingesting handle action in: " + str(param))
+        if param:
+            self.save_progress("Ingesting handle action in: {}".format(param))
         if action_id == 'test_connectivity':
             test_connectivity_connector = DSTestConnectivityConnector(self)
             return test_connectivity_connector.test_connectivity()
@@ -81,7 +81,8 @@ class DigitalShadowsConnector(BaseConnector):
             on_poll_connector = DSOnPollConnector(self)
             return on_poll_connector.on_poll(param)
         else:
-            return self.set_status_save_progress(phantom.APP_ERROR, DS_ACTION_NOT_SUPPORTED.format(action_id))
+            self.save_progress(DS_ACTION_NOT_SUPPORTED.format(action_id))
+            return self.set_status(phantom.APP_ERROR, DS_ACTION_NOT_SUPPORTED.format(action_id))
 
 
 if __name__ == '__main__':
@@ -89,7 +90,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 2:
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -100,6 +101,6 @@ if __name__ == '__main__':
         connector = DigitalShadowsConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
