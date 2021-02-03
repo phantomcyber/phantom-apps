@@ -7,7 +7,7 @@
     "app_version": "1.2.0",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
-    "utctime_updated": "2019-02-18T18:05:20.000000Z",
+    "utctime_updated": "2021-02-03T06:43:48.000000Z",
     "product_vendor": "Digital Shadows",
     "product_name": "Digital Shadows SearchLight",
     "product_version_regex": ".*",
@@ -246,7 +246,6 @@
                     "order": 0
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.incident_id",
@@ -570,7 +569,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -629,7 +627,6 @@
                     ]
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.date_range",
@@ -677,7 +674,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -761,7 +757,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -827,7 +822,6 @@
                     ]
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.intel_incident_id",
@@ -868,7 +862,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -951,7 +944,6 @@
                     "order": 4
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.date_range",
@@ -1017,7 +1009,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1063,7 +1054,6 @@
                     "order": 0
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.breach_id",
@@ -1102,7 +1092,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1185,7 +1174,6 @@
                     "order": 5
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.date_range",
@@ -1260,7 +1248,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1306,7 +1293,6 @@
                     "order": 0
                 }
             },
-            
             "output": [
                 {
                     "data_path": "action_result.parameter.breach_id",
@@ -1345,7 +1331,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1634,7 +1619,6 @@
                         "failed"
                     ]
                 },
-                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
