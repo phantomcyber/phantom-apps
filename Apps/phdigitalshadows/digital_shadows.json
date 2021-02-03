@@ -3,9 +3,11 @@
     "name": "Digital Shadows",
     "description": "The Digital Shadows SearchLight App allows users to create flexible and dynamic playbooks that fully harness the capabilities provided by the Digital Shadows SearchLight API",
     "type": "information",
-    "main_module": "digital_shadows_connector.pyc",
-    "app_version": "1.1.0",
-    "min_phantom_version": "4.6.19142",
+    "main_module": "digital_shadows_connector.py",
+    "app_version": "1.2.0",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "utctime_updated": "2019-02-18T18:05:20.000000Z",
     "product_vendor": "Digital Shadows",
     "product_name": "Digital Shadows SearchLight",
     "product_version_regex": ".*",
@@ -13,7 +15,7 @@
     "package_name": "phantom_digital_shadows",
     "logo": "logo_digital_shadows.svg",
     "logo_dark": "logo_digital_shadows_dark.svg",
-    "license": "Copyright (c) 2020 Digital Shadows Ltd.",
+    "license": "Copyright (c) 2020-2021 Digital Shadows Ltd.",
     "pip_dependencies": {
         "pypi": [
             {
@@ -27,72 +29,72 @@
     "configuration": {
         "ds_api_key": {
             "data_type": "string",
-            "description": "Digital Shadows API Key",
+            "description": "The account key of the Digital Shadows portal that is used to configure this app",
             "order": 0,
+            "required": true
+        },
+        "ds_api_secret_key": {
+            "data_type": "password",
+            "description": "A secured key that is linked with the API key used to configure this app",
+            "order": 1,
+            "required": true
+        },
+        "private_incident": {
+            "data_type": "boolean",
+            "description": "A private incident is an event that could lead to loss of, or disruption to, an organization's operations, services, or functions",
+            "default": false,
+            "order": 2
+        },
+        "global_incident": {
+            "data_type": "boolean",
+            "description": "A global incident is a type of event that can remotely lead to the loss of an organization's resources",
+            "default": false,
+            "order": 3
+        },
+        "history_days_interval": {
+            "data_type": "string",
+            "description": "Historical days for which data needs to be polled by the application. Example input: 10 (for last 10 days data)",
+            "order": 4,
             "required": true
         },
         "ph": {
             "data_type": "ph",
             "order": 5
         },
-        "ds_api_secret_key": {
-            "data_type": "password",
-            "description": "Digital Shadows API Secret Key",
-            "order": 1,
-            "required": true
-        },
-        "history_days_interval": {
-            "data_type": "string",
-            "description": "History Data Interval (in days)",
-            "order": 4,
-            "required": true
-        },
-        "private_incident": {
-            "default": false,
-            "order": 2,
-            "data_type": "boolean",
-            "description": "Private Incidents for Ingest"
-        },
-        "global_incident": {
-            "default": false,
-            "order": 3,
-            "data_type": "boolean",
-            "description": "Global Incidents for Ingest (Subscribed intelligence incidents will be pushed through private incident queue)"
-        },
         "inc_typ_data_leakage": {
             "data_type": "boolean",
+            "description": "The severity of Data Leakage incident is based on the observation that sensitive client systems information, with credentials, is publicly available",
             "default": false,
-            "description": "Data Leakage",
             "order": 6
         },
         "inc_typ_brand_protection": {
             "data_type": "boolean",
+            "description": "Brand Protection is a type of incident in which attackers impersonate domains, social accounts, people, and mobile applications",
             "default": false,
-            "description": "Brand Protection",
             "order": 7
         },
         "inc_typ_infrastructure": {
             "data_type": "boolean",
+            "description": "Infrastructure incident occurs when an internal network protocol is exposed to the internet",
             "default": false,
-            "description": "Infrastructure",
             "order": 8
         },
         "inc_typ_physical_security": {
             "data_type": "boolean",
+            "description": "Physical Security incident occurs when the certificate of a domain has security issues",
             "default": false,
-            "description": "Physical Security",
             "order": 9
         },
         "inc_typ_social_media_compliance": {
             "data_type": "boolean",
+            "description": "Social Media Compliance incident consists of exploiting secured information such as passwords on social media",
             "default": false,
-            "description": "Social Media Compliance",
             "order": 10
         },
         "inc_typ_cyber_threat": {
             "data_type": "boolean",
+            "description": "Cyber Threat incident usually consists of a company's account information to be sold and accessed by unauthorized personnel",
             "default": false,
-            "description": "Cyber Threat",
             "order": 11
         }
     },
@@ -115,14 +117,14 @@
             "read_only": true,
             "parameters": {
                 "start_time": {
+                    "description": "Start of the polling time range for which the app will fetch all the events after this time. It should be in epoch time (milliseconds). Example - 1611587778000",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Start of time range, in epoch time (milliseconds)"
+                    "order": 0
                 },
                 "end_time": {
+                    "description": "End of the polling time range for which the app will fetch all the events before this time. It should be in epoch time (milliseconds). Example - 1611587778000",
                     "data_type": "numeric",
-                    "order": 1,
-                    "description": "End of time range, in epoch time (milliseconds)"
+                    "order": 1
                 }
             },
             "output": [],
@@ -131,40 +133,38 @@
         {
             "action": "search all records",
             "identifier": "search_entities",
-            "description": "Search across all Digital Shadow's entities including incidents, threat profiles and our closed data stores",
+            "description": "Search across all Digital Shadow's entities including incidents, threat profiles, and our closed data stores",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "date_range": {
-                    "description": "Date range (EX:- P30D)",
+                    "description": "Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "query": {
                     "description": "Search string",
                     "data_type": "string",
-                    "required": true
+                    "required": true,
+                    "order": 1
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 5,
-                "height": 5,
-                "title": "Digital Shadows String Search"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.date_range",
                     "data_type": "string",
                     "column_name": "Date Range",
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 0
                 },
                 {
@@ -187,7 +187,19 @@
                     "data_path": "action_result.summary.entity_found",
                     "data_type": "boolean",
                     "column_name": "Entity Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -208,42 +220,41 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 5,
+                "height": 5,
+                "title": "Digital Shadows String Search"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get incident",
             "identifier": "get_incident_by_id",
-            "description": "Retrieve a single incident and it's details, identified by its unique integer identifier",
+            "description": "Retrieve a single incident and its details, identified by its unique integer identifier",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "incident_id": {
+                    "description": "Digital Shadows Incident ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Digital Shadows incident ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Incident",
-                "required": true
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "numeric",
                     "column_name": "Incident ID Queried",
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
                     "column_order": 1
                 },
                 {
@@ -254,7 +265,19 @@
                     "data_path": "action_result.summary.incident_found",
                     "data_type": "boolean",
                     "column_name": "Incident Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -275,25 +298,35 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Incident"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "search incidents",
             "identifier": "get_incident_list",
-            "description": "Search incidents based on filters. The On Poll also uses this endpoint to collect incidents for a given time range/interval",
+            "description": "Search incidents based on filters. The On Poll action also uses this endpoint to collect incidents for a given time range/interval",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "date_range": {
+                    "description": "Incident Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Incident date range (EX:- P30D)",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "incident_types": {
+                    "description": "Incident Types",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Incident types",
                     "value_list": [
                         "DATA_LEAKAGE",
                         "BRAND_PROTECTION",
@@ -304,25 +337,17 @@
                     ]
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Incidents"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.date_range",
                     "data_type": "string",
                     "column_name": "Incident Date Range",
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -345,7 +370,19 @@
                     "data_path": "action_result.summary.incident_found",
                     "data_type": "boolean",
                     "column_name": "Incident Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -366,6 +403,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Incidents"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -376,31 +419,24 @@
             "read_only": true,
             "parameters": {
                 "incident_id": {
+                    "description": "Digital Shadows Incident ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Digital Shadows incident ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Incident Review"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "numeric",
                     "column_name": "Incident ID Queried",
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -417,7 +453,19 @@
                     "data_path": "action_result.summary.incident_reviews_found",
                     "data_type": "boolean",
                     "column_name": "Incident Review Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -438,6 +486,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Incident Review"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -448,43 +502,36 @@
             "read_only": false,
             "parameters": {
                 "incident_id": {
-                    "data_type": "numeric",
-                    "order": 0,
                     "description": "Incident ID",
-                    "required": true
+                    "data_type": "numeric",
+                    "required": true,
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "review_note": {
+                    "description": "Incident Review Note",
                     "data_type": "string",
-                    "order": 1,
-                    "description": "Incident review note",
-                    "required": true
+                    "required": true,
+                    "order": 1
                 },
                 "review_status": {
+                    "description": "Incident Review Status",
                     "data_type": "string",
-                    "order": 2,
-                    "description": "Incident review status",
-                    "required": true
+                    "required": true,
+                    "order": 2
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Incident Review by ID"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "numeric",
                     "column_name": "Incident ID Queried",
+                    "contains": [
+                        "digital shadows incident id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -516,6 +563,15 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -534,6 +590,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Incident Review by ID"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -544,15 +606,19 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
+                    "description": "Intelligence Incident Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Intelligence incident date range (EX:- P30D)",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "incident_types": {
+                    "description": "Incident Types",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Incident types",
                     "value_list": [
                         "DATA_LEAKAGE",
                         "BRAND_PROTECTION",
@@ -563,25 +629,18 @@
                     ]
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows intelligence Incidents list"
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.date_range",
                     "data_type": "string",
                     "column_name": "Incident Date Range",
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -604,8 +663,21 @@
                     "data_path": "action_result.summary.intelligence_incident_found",
                     "data_type": "boolean",
                     "column_name": "Intelligence Incident Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -625,41 +697,40 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Intelligence Incidents List"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get intelligence incident",
             "identifier": "get_intelligence_incident_by_id",
-            "description": "Retrieve a single intelligence incident and it's details, identified by its unique integer identifier",
+            "description": "Retrieve a single intelligence incident and its details, identified by its unique integer identifier",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "intel_incident_id": {
+                    "description": "Digital Shadows Intelligence Incident ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Digital Shadows intelligence incident ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows intelligence incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get intelligence Incident"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.intel_incident_id",
                     "data_type": "numeric",
                     "column_name": "Intelligence Incident ID",
+                    "contains": [
+                        "digital shadows intelligence incident id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -676,8 +747,21 @@
                     "data_path": "action_result.summary.intelligence_incident_found",
                     "data_type": "boolean",
                     "column_name": "Intelligence Incident Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -697,6 +781,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get intelligence Incident"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -707,15 +797,19 @@
             "read_only": true,
             "parameters": {
                 "intel_incident_id": {
+                    "description": "Digital Shadows Intelligence Incident IoCs ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Digital Shadows intelligence incident IoCs ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows intelligence incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "types": {
+                    "description": "Types",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Types",
                     "value_list": [
                         "IP",
                         "IPV4",
@@ -733,24 +827,14 @@
                     ]
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get intelligence Incident IoCs"
-            },
+            
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.intel_incident_id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "digital shadows intelligence incident id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.types",
@@ -770,8 +854,21 @@
                     "data_path": "action_result.summary.intelligence_incident_ioc_found",
                     "data_type": "boolean",
                     "column_name": "Intelligence Incident IoCs Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -791,6 +888,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get intelligence Incident IoCs"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -801,24 +904,28 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
+                    "description": "Data Breach Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Data breach date range (EX:- P30D)",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "reposted_credentials": {
+                    "description": "Data Breach reposted Credentials",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Data breach reposted credentials",
                     "value_list": [
                         "ORIGINAL",
                         "REPOST"
                     ]
                 },
                 "severities": {
+                    "description": "Severities",
                     "data_type": "string",
                     "order": 2,
-                    "description": "Severities",
                     "value_list": [
                         "VERY_HIGH",
                         "HIGH",
@@ -829,9 +936,9 @@
                     ]
                 },
                 "statuses": {
+                    "description": "Statuses",
                     "data_type": "string",
                     "order": 3,
-                    "description": "Statuses",
                     "value_list": [
                         "UNREAD",
                         "READ",
@@ -839,30 +946,23 @@
                     ]
                 },
                 "user_name": {
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
-                    "order": 4,
-                    "description": "User Name (use '*' for wildcard matching)"
+                    "order": 4
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get Data Breaches"
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.date_range",
                     "data_type": "string",
                     "column_name": "Published Date Range",
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -886,7 +986,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "User Name",
+                    "column_name": "Username",
                     "column_order": 6
                 },
                 {
@@ -903,8 +1003,21 @@
                     "data_path": "action_result.summary.data_breach_found",
                     "data_type": "boolean",
                     "column_name": "Data Breach Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -924,41 +1037,41 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get Data Breaches"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get data breach",
             "identifier": "get_data_breach_by_id",
-            "description": "Retrieve a single data breach and it's details, identified by its unique integer identifier. The records associated with the breach must be retrieved using a separate operation",
+            "description": "Retrieve a single data breach and its details, identified by its unique integer identifier. The records associated with the breach must be retrieved using a separate operation",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "breach_id": {
+                    "description": "Data Breach ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Data breach ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows breach id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get Data Breach"
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.breach_id",
                     "data_type": "numeric",
                     "column_name": "Data Breach ID",
+                    "contains": [
+                        "digital shadows breach id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -975,8 +1088,21 @@
                     "data_path": "action_result.summary.data_breach_found",
                     "data_type": "boolean",
                     "column_name": "Data Breach Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -996,6 +1122,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get Data Breach"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1006,20 +1138,24 @@
             "read_only": true,
             "parameters": {
                 "date_range": {
+                    "description": "Data Breach record Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "Data breach record date range (EX:- P30D)",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "primary": true,
+                    "order": 0
                 },
                 "domain_names": {
+                    "description": "Data Breach record domain names (comma separated). Example input: 'xyz.com, abc.org' ",
                     "data_type": "string",
-                    "order": 1,
-                    "description": "Data breach record domain names"
+                    "order": 1
                 },
                 "review_statuses": {
+                    "description": "Review Statuses",
                     "data_type": "string",
                     "order": 2,
-                    "description": "Review statuses",
                     "value_list": [
                         "OPEN",
                         "CLOSED",
@@ -1027,9 +1163,9 @@
                     ]
                 },
                 "distinction": {
+                    "description": "Distinction",
                     "data_type": "string",
                     "order": 3,
-                    "description": "Distinction",
                     "value_list": [
                         "NEW_USERNAME",
                         "EXISTING_USERNAME",
@@ -1039,35 +1175,28 @@
                     ]
                 },
                 "user_name": {
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
-                    "order": 4,
-                    "description": "User name (use '*' for wildcard matching)"
+                    "order": 4
                 },
                 "password": {
+                    "description": "Password (use '*' for wildcard matching)",
                     "data_type": "string",
-                    "order": 5,
-                    "description": "Password (use '' for wildcard matching)"
+                    "order": 5
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get Data Breach Records"
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.date_range",
                     "data_type": "string",
                     "column_name": "Data Breach Record Date Range",
+                    "contains": [
+                        "digital shadows date range"
+                    ],
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -1080,6 +1209,9 @@
                     "data_path": "action_result.parameter.domain_names",
                     "data_type": "string",
                     "column_name": "Data Breach Record Domain Names",
+                    "example_values": [
+                        "xyz.com, abc.org"
+                    ],
                     "column_order": 3
                 },
                 {
@@ -1097,7 +1229,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "User Name",
+                    "column_name": "Username",
                     "column_order": 6
                 },
                 {
@@ -1114,8 +1246,21 @@
                     "data_path": "action_result.summary.data_breach_record_found",
                     "data_type": "boolean",
                     "column_name": "Data Breach Record Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1135,6 +1280,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get Data Breach Records"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1145,31 +1296,25 @@
             "read_only": true,
             "parameters": {
                 "breach_id": {
+                    "description": "Data Breach ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Data breach ID",
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "digital shadows breach id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Get Data Breach Record"
-            },
+            
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.breach_id",
                     "data_type": "numeric",
                     "column_name": "Data Breach ID",
+                    "contains": [
+                        "digital shadows breach id"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -1186,8 +1331,21 @@
                     "data_path": "action_result.summary.data_breach_record_found",
                     "data_type": "boolean",
                     "column_name": "Data Breach Record Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
                 },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
@@ -1207,52 +1365,44 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Get Data Breach Record"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get breachrecord byuser",
             "identifier": "get_data_breach_record_by_username",
-            "description": "This command allows you to search breach records based on the domain, review status, or full or partial strings from username",
+            "description": "This action allows you to search breach records based on the domain, review status, or full/partial strings from the username",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "user_name": {
+                    "description": "Username (use '*' for wildcard matching)",
                     "data_type": "string",
-                    "order": 0,
-                    "description": "User name (use '*' for wildcard matching)",
-                    "required": true
+                    "required": true,
+                    "order": 0
                 },
                 "domain_names": {
+                    "description": "Domain Names (comma separated)",
                     "data_type": "string",
-                    "order": 1,
-                    "description": "Domain names (comma separated)"
+                    "order": 1
                 },
                 "published_date_range": {
+                    "description": "Published Date Range. Example input: P30D(for Past 30 Days)",
                     "data_type": "string",
-                    "order": 2,
-                    "description": "Published date range (ex:- P30M)"
+                    "order": 2
                 },
                 "review_statuses": {
+                    "description": "Review Statuses (comma separated). Example: open, read, closed",
                     "data_type": "string",
-                    "order": 3,
-                    "description": "Review statuses (comma separated)"
+                    "order": 3
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Data Breach Records"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.domain_names",
                     "data_type": "string",
@@ -1263,6 +1413,9 @@
                     "data_path": "action_result.parameter.published_date_range",
                     "data_type": "string",
                     "column_name": "Data Breach Record Published Date Range",
+                    "example_values": [
+                        "P30D"
+                    ],
                     "column_order": 4
                 },
                 {
@@ -1274,7 +1427,7 @@
                 {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
-                    "column_name": "Data Breach Record User Name",
+                    "column_name": "Data Breach Record Username",
                     "column_order": 2
                 },
                 {
@@ -1291,7 +1444,19 @@
                     "data_path": "action_result.summary.data_breach_record_found",
                     "data_type": "boolean",
                     "column_name": "Data Breach Record Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1312,6 +1477,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Data Breach Records"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1322,27 +1493,13 @@
             "read_only": true,
             "parameters": {
                 "breach_record_id": {
+                    "description": "Digital Shadows Breach Record ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Digital Shadows breach record ID",
-                    "required": true
+                    "required": true,
+                    "order": 0
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Breach Record Review"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.breach_record_id",
                     "data_type": "numeric",
@@ -1363,7 +1520,19 @@
                     "data_path": "action_result.summary.breach_record_reviews_found",
                     "data_type": "boolean",
                     "column_name": "Breach Record Review Found",
+                    "example_values": [
+                        true,
+                        false
+                    ],
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1384,53 +1553,45 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Breach Record Review"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "post breachrecord review",
             "identifier": "post_breach_record_review",
-            "description": "Update an individual breach record's notes or status using this command",
+            "description": "Update an individual breach record's notes or status using this action",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "breach_record_id": {
+                    "description": "Data Breach Record ID",
                     "data_type": "numeric",
-                    "order": 0,
-                    "description": "Data breach record ID",
-                    "required": true
+                    "required": true,
+                    "order": 0
                 },
                 "review_note": {
+                    "description": "Update an individual breach record's notes using this action",
                     "data_type": "string",
-                    "order": 1,
-                    "description": "Breach record review note",
-                    "required": true
+                    "required": true,
+                    "order": 1
                 },
                 "review_status": {
+                    "description": "Update an individual breach record's status using this action",
                     "data_type": "string",
+                    "required": true,
                     "order": 2,
-                    "description": "Breach record review status",
                     "value_list": [
                         "OPEN",
                         "CLOSED"
-                    ],
-                    "required": true
+                    ]
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 1,
-                "height": 5,
-                "title": "Digital Shadows Breach Record Review by ID"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.breach_record_id",
                     "data_type": "numeric",
@@ -1466,6 +1627,15 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -1484,8 +1654,13 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 1,
+                "height": 5,
+                "title": "Digital Shadows Breach Record Review by ID"
+            },
             "versions": "EQ(*)"
         }
-    ],
-    "utctime_updated": "2019-02-18T18:05:20.000000Z"
+    ]
 }

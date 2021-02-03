@@ -1,10 +1,9 @@
-#
-# Copyright (c) 2020 Digital Shadows Ltd.
+# File: ds_on_poll_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 from datetime import datetime
 from unidecode import unidecode
 # import time
@@ -12,18 +11,15 @@ from unidecode import unidecode
 import phantom.app as phantom
 from phantom.action_result import ActionResult
 
-from digital_shadows_consts import DS_API_KEY_CFG, DS_API_SECRET_KEY_CFG
-# from digital_shadows_consts import DS_POLL_BREACH_COMPLETE
-from digital_shadows_consts import DS_POLL_INCIDENT_COMPLETE
-from digital_shadows_consts import DS_DL_SUBTYPE, DS_BP_SUBTYPE, DS_INFR_SUBTYPE, DS_PS_SUBTYPE, DS_SMC_SUBTYPE
+from digital_shadows_consts import *
 
 # from dsapi.service.data_breach_service import DataBreachService
 from dsapi.service.data_breach_record_service import DataBreachRecordService
 from dsapi.service.incident_service import IncidentService
 from dsapi.service.intelligence_incident_service import IntelligenceIncidentService
+from exception_handling_functions import ExceptionHandling
 
 from dsapi.config import ds_api_host
-from bs4 import UnicodeDammit
 import json
 
 
@@ -34,45 +30,38 @@ class DSOnPollConnector(object):
         :param connector: DigitalShadowsConnector
         """
         self._connector = connector
-        # self._connector.save_progress("interval"+str(self))
+        self._handle_exception_object = ExceptionHandling()
         config = connector.get_config()
-        # self._connector.save_progress("Config : " + str(config))
-        self._ds_api_key = UnicodeDammit(config[DS_API_KEY_CFG]).unicode_markup.encode('utf-8')
+        self._ds_api_key = config[DS_API_KEY_CFG]
         self._ds_api_secret_key = config[DS_API_SECRET_KEY_CFG]
         self._poll_interval = config['ingest'].get('interval_mins')
         self._container_label = config['ingest']['container_label']
-        self._history_days_interval = UnicodeDammit(config['history_days_interval']).unicode_markup.encode('utf-8')
-        self._global_incident = config['global_incident']
-        self._private_incident = config['private_incident']
-        self._inc_typ_data_leakage = config['inc_typ_data_leakage']
-        self._inc_typ_brand_protection = config['inc_typ_brand_protection']
-        self._inc_typ_infrastructure = config['inc_typ_infrastructure']
-        self._inc_typ_physical_security = config['inc_typ_physical_security']
-        self._inc_typ_social_media_compliance = config['inc_typ_social_media_compliance']
-        self._inc_typ_cyber_threat = config['inc_typ_cyber_threat']
+        self._history_days_interval = config['history_days_interval']
+        self._global_incident = config.get('global_incident', False)
+        self._private_incident = config.get('private_incident', False)
+        self._inc_typ_data_leakage = config.get('inc_typ_data_leakage', False)
+        self._inc_typ_brand_protection = config.get('inc_typ_brand_protection', False)
+        self._inc_typ_infrastructure = config.get('inc_typ_infrastructure', False)
+        self._inc_typ_physical_security = config.get('inc_typ_physical_security', False)
+        self._inc_typ_social_media_compliance = config.get('inc_typ_social_media_compliance', False)
+        self._inc_typ_cyber_threat = config.get('inc_typ_cyber_threat', False)
 
-    def on_poll(self, param):
+    def on_poll(self, param): # noqa
 
-        # self._connector.save_progress("Ingesting param"+str(param))
         self._connector.debug_print(param)
         action_result = ActionResult(dict(param))
         self._connector.add_action_result(action_result)
 
         start_time, end_time = self._phantom_daterange(param)
-
         if start_time is None or end_time is None:
             action_result.set_status(phantom.APP_ERROR, status_message='start time or end time not specified')
         else:
             self._connector.save_progress("Start creating incident")
-            # self._connector.save_progress("interval in "+self._poll_interval)
-            # status, message = self._save_incident()
-            # self._connector.save_progress("incident status {} message {}.".format(str(status),str(message)))
-
-            self._connector.save_progress("incident interval_days: " + self._history_days_interval)
-            # self._connector.save_progress("incident interval timedelta: " + timedelta(days=self._history_days_interval) )
-            # interval_startdate = date.today() - timedelta(int(self._history_days_interval))
-            # self._connector.save_progress("incident interval_startdate: " + str(interval_startdate))
-            date_range = 'P' + self._history_days_interval + 'D'
+            # Validate 'history_days_interval' configuration parameter
+            ret_val, self._history_days_interval = self._handle_exception_object.validate_integer(action_result, self._history_days_interval, HISTORY_DAYS_INTERVAL_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            date_range = "P{}D".format(self._history_days_interval)
 
             incident_types = []
             if self._inc_typ_data_leakage:
@@ -89,10 +78,15 @@ class DSOnPollConnector(object):
                 incident_types.append({'type': 'CYBER_THREAT'})
 
             if self._private_incident:
-                incident_service = IncidentService(self._ds_api_key, self._ds_api_secret_key)
+                try:
+                    incident_service = IncidentService(self._ds_api_key, self._ds_api_secret_key)
 
-                incident_view = IncidentService.incidents_view(date_range=date_range, date_range_field='published', statuses=['READ', 'UNREAD'], types=incident_types)
-                self._connector.save_progress("incident req view: {}".format(json.dumps(incident_view, ensure_ascii=False)))
+                    incident_view = IncidentService.incidents_view(date_range=date_range, date_range_field='published', statuses=['READ', 'UNREAD'], types=incident_types)
+                    self._connector.save_progress("incident req view: {}".format(json.dumps(incident_view, ensure_ascii=False)))
+                except Exception as e:
+                    error_message = self._handle_exception_object.get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
+
                 try:
                     incident_pages = incident_service.find_all_pages(view=incident_view)
                     j = 0
@@ -100,10 +94,11 @@ class DSOnPollConnector(object):
                 except StopIteration:
                     error_message = 'No Incident objects retrieved from the Digital Shadows API in page groups'
                     return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+                except Exception as e:
+                    error_message = self._handle_exception_object.get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
                 for incident_page in incident_pages:
                     for incident in incident_page:
-                        # self._connector.save_progress("incident: " + str(incident))
-                        # time.sleep(15)
                         status, message = self._save_incident(incident)
                         if status == phantom.APP_SUCCESS:
                             j += 1
@@ -122,10 +117,15 @@ class DSOnPollConnector(object):
                     action_result.set_status(phantom.APP_SUCCESS)
 
             if self._global_incident:
-                intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
-                intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_range,
-                                                                              date_range_field='published', types=incident_types)
-                self._connector.save_progress('intelligence_incident_view: {}'.format(json.dumps(intelligence_incident_view, ensure_ascii=False)))
+                try:
+                    intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
+                    intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_range,
+                                                                                  date_range_field='published', types=incident_types)
+                    self._connector.save_progress('intelligence_incident_view: {}'.format(json.dumps(intelligence_incident_view, ensure_ascii=False)))
+                except Exception as e:
+                    error_message = self._handle_exception_object.get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
+
                 try:
                     intelligence_incident_pages = intelligence_incident_service.find_all_pages(view=intelligence_incident_view)
                     k = 0
@@ -133,12 +133,13 @@ class DSOnPollConnector(object):
                 except StopIteration:
                     error_message = 'No IntelligenceIncident objects retrieved from the Digital Shadows API in page groups'
                     return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
-                # self._connector.save_progress('intelligence_incident_pages: ' + str(intelligence_incident_pages))
+                except Exception as e:
+                    error_message = self._handle_exception_object.get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
 
                 for intelligence_incident_page in intelligence_incident_pages:
                     for intelligence_incident in intelligence_incident_page:
                         self._connector.save_progress('count: {}'.format(k))
-                        # self._connector.save_progress('record : {}'.format(str(intelligence_incident)))
                         status, message = self._save_intel_incident(intelligence_incident)
                         if status == phantom.APP_SUCCESS:
                             k += 1
@@ -187,7 +188,6 @@ class DSOnPollConnector(object):
                 action_result.set_status(phantom.APP_SUCCESS)
             """
 
-        self._connector.add_action_result(action_result)
         return action_result.get_status()
 
     def _phantom_daterange(self, param):
@@ -232,7 +232,6 @@ class DSOnPollConnector(object):
     def _save_intel_incident(self, intelligence_incident):
         container = self._prepare_intel_incident_container(intelligence_incident)
         status, message, container_id = self._connector.save_container(container)
-        # self._connector.save_progress("intelligence incident status {} message {}.".format(str(status), str(message)))
         if status == phantom.APP_SUCCESS and message != 'Duplicate container found':
             intel_incident_artifacts = self._prepare_intel_incident_artifact(container_id, container['severity'], intelligence_incident)
             self._connector.save_artifact(intel_incident_artifacts)
@@ -333,13 +332,10 @@ class DSOnPollConnector(object):
 
     def _save_incident(self, incident):
         container = self._prepare_incident_container(incident)
-        # self._connector.save_progress(" print container: " + str(container))
         status, message, container_id = self._connector.save_container(container)
 
-        # self._connector.save_progress("incident status {} message {}.".format(str(status), str(message)))
         if status == phantom.APP_SUCCESS and message != 'Duplicate container found':
             incident_artifacts = self._prepare_incident_artifact(container_id, container['severity'], incident)
-            # self._connector.save_progress("incident_artifacts :{}".format(incident_artifacts))
             self._connector.save_artifact(incident_artifacts)
             self._connector.save_progress("Created the incident successfully")
             return status, message
@@ -352,7 +348,6 @@ class DSOnPollConnector(object):
         """
         # now = datetime.now()
         container = dict()
-        # self._connector.save_progress(" print container: " + str(container))
         container['label'] = self._container_label
         container['name'] = '{} - {}'.format(incident.payload['type'].title().replace('_', ' '), unidecode(incident.payload['title']))
         incident_desc = unidecode(incident.payload['title'])
@@ -419,14 +414,19 @@ class DSOnPollConnector(object):
         if 'dataBreach' in incident.payload['entitySummary']:
             artifact['cef']['deviceExternalId'] = incident.payload['entitySummary']['dataBreach']['id']
 
-        artifact['cef'][' Internal'] = incident.payload['internal']
-        artifact['cef'][' Restricted'] = incident.payload['restrictedContent']
+        if 'internal' in incident.payload:
+            artifact['cef'][' Internal'] = incident.payload['internal']
+        if 'restrictedContent' in incident.payload:
+            artifact['cef'][' Restricted'] = incident.payload['restrictedContent']
         artifact['cef']['Dates'] = dict()
         if 'alerted' in incident.payload:
             artifact['cef']['Dates']['alerted'] = incident.payload['alerted']
-        artifact['cef']['Dates']['verified'] = incident.payload['verified']
-        artifact['cef']['Dates']['occurred'] = incident.payload['occurred']
-        artifact['cef']['Dates']['modified'] = incident.payload['modified']
+        if 'verified' in incident.payload:
+            artifact['cef']['Dates']['verified'] = incident.payload['verified']
+        if 'occurred' in incident.payload:
+            artifact['cef']['Dates']['occurred'] = incident.payload['occurred']
+        if 'modified' in incident.payload:
+            artifact['cef']['Dates']['modified'] = incident.payload['modified']
         # artifact['cef']['Dates']['published'] = incident.payload['published']
         artifact['cef']['deviceCustomeDate1'] = incident.payload['published']
 
