@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: intelligence_incident.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -47,6 +46,6 @@ class IntelligenceIncident(DSModel):
 
     @classmethod
     def from_json(cls, json):
-        incident_id = DSModel.cast(json.get('id'), long)
+        incident_id = DSModel.cast(json.get('id'), int)
         return cls(incident_id, json)
 

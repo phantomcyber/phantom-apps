@@ -5,21 +5,21 @@
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "3.0.0",
-    "utctime_updated": "2020-05-26T17:49:43.000000Z",
+    "app_version": "3.0.1",
+    "utctime_updated": "2021-02-03T05:40:49.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
         "On prem v7.1.9",
-        "Cloud Copyright (c) 2002 - 2020 Atlassian Corporation Pty Ltd."
+        "Cloud Copyright (c) 2002 - 2021 Atlassian Corporation Pty Ltd."
     ],
     "python_version": "3",
     "logo": "logo_atlassian.svg",
     "logo_dark": "logo_atlassian_dark.svg",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {
@@ -77,34 +77,29 @@
         "project_key": {
             "data_type": "string",
             "order": 4,
-            "description": "Project key to ingest tickets (issues) from",
-            "required": false
+            "description": "Project key to ingest tickets (issues) from"
         },
         "query": {
             "description": "Additional parameters to query for during ingestion in JQL",
             "data_type": "string",
-            "order": 5,
-            "required": false
+            "order": 5
         },
         "first_run_max_tickets": {
             "data_type": "numeric",
             "order": 6,
             "description": "Maximum tickets (issues) to poll first time",
-            "required": false,
             "default": 1000
         },
         "max_tickets": {
             "data_type": "numeric",
             "order": 7,
             "description": "Maximum tickets (issues) for scheduled polling",
-            "required": false,
             "default": 100
         },
         "custom_fields": {
             "data_type": "string",
             "order": 8,
-            "description": "JSON formatted list of names of custom fields (case-sensitive) to be ingested",
-            "required": false
+            "description": "JSON formatted list of names of custom fields (case-sensitive) to be ingested"
         },
         "timezone": {
             "data_type": "timezone",
@@ -152,8 +147,7 @@
                 "description": {
                     "description": "Description of the issue",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false
+                    "order": 2
                 },
                 "issue_type": {
                     "description": "Type of the issue (case-sensitive)",
@@ -169,7 +163,6 @@
                     "description": "Priority of the issue",
                     "data_type": "string",
                     "order": 4,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "jira ticket priority"
@@ -179,7 +172,6 @@
                     "description": "Assignee username (required for Jira on-prem, assign required permissions)",
                     "data_type": "string",
                     "order": 5,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "user name"
@@ -189,7 +181,6 @@
                     "description": "Assignee user account ID (required for Jira cloud, assign required permissions)",
                     "data_type": "string",
                     "order": 6,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "jira user account id"
@@ -198,14 +189,12 @@
                 "fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
-                    "required": false,
                     "order": 7
                 },
                 "vault_id": {
                     "description": "Vault ID of attachment",
                     "data_type": "string",
                     "order": 8,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "vault id"
@@ -348,19 +337,19 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.fields.Domain Test",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.fields.Epic Link",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.fields.Severity",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.fields.Domain Test",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fields.Sprint",
@@ -1453,6 +1442,22 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "234"
+                    ],
+                    "column_name": "Container ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.extension_filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "txt,png,exe"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
@@ -1471,26 +1476,41 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "234"
-                    ],
-                    "column_name": "Container ID",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.parameter.extension_filter",
-                    "data_type": "string",
-                    "example_values": [
-                        "txt,png,exe"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.container",
                     "data_type": "numeric",
                     "example_values": [
                         "2446"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        501
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "231003"
                     ]
                 },
                 {
@@ -1512,37 +1532,6 @@
                     ],
                     "column_name": "Vault ID",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "md5"
-                    ],
-                    "example_values": [
-                        "9c03244555e41685dc5f03ec7d9de1c6db26c318"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        501
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "231003"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1604,7 +1593,7 @@
                     ]
                 }
             },
-            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/jiradev/jira-apis/jira-rest-apis/jira-rest-api-tutorials/updating-an-issue-via-the-jira-rest-apis\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to update fields related with user resources in the the Jira ticket using username for Jira cloud, we will use user's account_id to update fields related with user resources. Use 'lookup users' action to find out user's account_id. Use 'get ticket' action results to obtain the [update_fields] parameters. Please find out below mentioned examples for the [update_fields] parameter which related with user resources.<ul><li>Add assignee to the Jira ticket for Jira on-prem:<br>{\"fields\":{\"assignee\" : {\"name\": \"username\"}}}</li><li>Add assignee to the Jira ticket for Jira cloud:<br>{\"fields\":{\"assignee\" : {\"accountId\": \"6d1ef6xy52z7360c267f27bb\"}}}</li></ul>",
+            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/#editing-an-issue-examples\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to update fields related with user resources in the Jira ticket using username for Jira cloud, we will use user's account_id to update fields related with user resources. Use 'lookup users' action to find out user's account_id. Use 'get ticket' action results to obtain the [update_fields] parameters. Please find out below mentioned examples for the [update_fields] parameter which related with user resources.<ul><li>Add assignee to the Jira ticket for Jira on-prem:<br>{\"fields\":{\"assignee\" : {\"name\": \"username\"}}}</li><li>Add assignee to the Jira ticket for Jira cloud:<br>{\"fields\":{\"assignee\" : {\"accountId\": \"6d1ef6xy52z7360c267f27bb\"}}}</li></ul>",
             "render": {
                 "type": "custom",
                 "view": "jira_view.display_view"
@@ -1662,14 +1651,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Epic Link",
+                    "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Domain Test",
+                    "data_path": "action_result.data.*.fields.Epic Link",
                     "data_type": "string",
                     "example_values": [
                         ""
@@ -5743,7 +5732,6 @@
                     "contains": [
                         "user name"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "display_name": {
@@ -5753,7 +5741,6 @@
                     "contains": [
                         "jira user display name"
                     ],
-                    "required": false,
                     "primary": true
                 },
                 "max_results": {
@@ -5777,18 +5764,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.displayName",
+                    "data_path": "action_result.parameter.display_name",
                     "data_type": "string",
                     "example_values": [
-                        "Test Name",
-                        "test3.test"
+                        "Test Name"
                     ],
                     "contains": [
                         "jira user display name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.name",
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.username",
                     "data_type": "string",
                     "example_values": [
                         "test"
@@ -5798,17 +5791,35 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.locale",
+                    "data_path": "action_result.data.*.accountId",
                     "data_type": "string",
                     "example_values": [
-                        "en_US"
+                        "5d2ef6aa6637260c19b78dfd"
+                    ],
+                    "contains": [
+                        "jira user account id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.self",
+                    "data_path": "action_result.data.*.accountType",
                     "data_type": "string",
                     "example_values": [
-                        "http://10.1.16.180:8080/rest/api/2/user?username=test"
+                        "atlassian"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.avatarUrls.16x16",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=16"
                     ],
                     "contains": [
                         "url"
@@ -5825,10 +5836,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.avatarUrls.16x16",
+                    "data_path": "action_result.data.*.avatarUrls.32x32",
                     "data_type": "string",
                     "example_values": [
-                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=16"
+                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=32"
                     ],
                     "contains": [
                         "url"
@@ -5845,13 +5856,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.avatarUrls.32x32",
+                    "data_path": "action_result.data.*.displayName",
                     "data_type": "string",
                     "example_values": [
-                        "http://www.gravatar.com/avatar/da0ebe3acdd83aa3d82d1dbd1a15a3e1?d=mm&s=32"
+                        "Test Name",
+                        "test3.test"
                     ],
                     "contains": [
-                        "url"
+                        "jira user display name"
                     ]
                 },
                 {
@@ -5872,11 +5884,30 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.active",
-                    "data_type": "boolean",
+                    "data_path": "action_result.data.*.locale",
+                    "data_type": "string",
                     "example_values": [
-                        true,
-                        false
+                        "en_US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://10.1.16.180:8080/rest/api/2/user?username=test"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -5887,35 +5918,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total users: 1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.username",
-                    "data_type": "string",
-                    "example_values": [
-                        "test"
-                    ],
-                    "contains": [
-                        "user name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.max_results",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1000
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_users",
                     "data_type": "numeric",
                     "example_values": [
                         1,
                         4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
                     ]
                 },
                 {
@@ -5930,33 +5944,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.accountType",
-                    "data_type": "string",
-                    "example_values": [
-                        "atlassian"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.accountId",
-                    "data_type": "string",
-                    "example_values": [
-                        "5d2ef6aa6637260c19b78dfd"
-                    ],
-                    "contains": [
-                        "jira user account id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.display_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Test Name"
-                    ],
-                    "contains": [
-                        "jira user display name"
                     ]
                 }
             ],
@@ -6019,15 +6006,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Epic Link",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.Epic Link",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.fields.Sprint",
@@ -7923,7 +7910,6 @@
                     "data_type": "string",
                     "order": 2,
                     "description": "Resolution to set",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "jira ticket resolution"
@@ -7932,8 +7918,7 @@
                 "comment": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "Comment to set",
-                    "required": false
+                    "description": "Comment to set"
                 }
             },
             "render": {
@@ -8001,15 +7986,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.fields.Epic Link",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.fields.Domain Test",
                     "data_type": "string",
                     "example_values": [
                         ""
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.fields.Epic Link",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.fields.Sprint",
@@ -9518,8 +9503,7 @@
                 "comment": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "Comment to add",
-                    "required": false
+                    "description": "Comment to add"
                 },
                 "comment_visibility_type": {
                     "data_type": "string",
@@ -9528,14 +9512,12 @@
                         "group",
                         "role"
                     ],
-                    "description": "How to limit the comment visibility",
-                    "required": false
+                    "description": "How to limit the comment visibility"
                 },
                 "comment_visibility_name": {
                     "data_type": "string",
                     "order": 5,
-                    "description": "Name of group/role able to see the comment",
-                    "required": false
+                    "description": "Name of group/role able to see the comment"
                 }
             },
             "render": {
@@ -9674,7 +9656,6 @@
                 "username": {
                     "description": "Username of the user to add to the watchers list (required for Jira on-prem)",
                     "data_type": "string",
-                    "required": false,
                     "contains": [
                         "user name"
                     ],
@@ -9684,7 +9665,6 @@
                 "user_account_id": {
                     "description": "Account ID of the user to add to the watchers list (required for Jira cloud)",
                     "data_type": "string",
-                    "required": false,
                     "contains": [
                         "jira user account id"
                     ],
@@ -9716,18 +9696,6 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.username",
-                    "data_type": "string",
-                    "example_values": [
-                        "admin-2"
-                    ],
-                    "contains": [
-                        "user name"
-                    ],
-                    "column_name": "Username",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.user_account_id",
                     "data_type": "string",
                     "example_values": [
@@ -9738,6 +9706,18 @@
                     ],
                     "column_name": "Account ID",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin-2"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
@@ -9799,7 +9779,6 @@
                 "username": {
                     "description": "Username of the user to remove from watchers list (required for Jira on-prem)",
                     "data_type": "string",
-                    "required": false,
                     "contains": [
                         "user name"
                     ],
@@ -9809,7 +9788,6 @@
                 "user_account_id": {
                     "description": "Account ID of the user to remove from the watchers list (required for Jira cloud)",
                     "data_type": "string",
-                    "required": false,
                     "contains": [
                         "jira user account id"
                     ],
@@ -9841,18 +9819,6 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.username",
-                    "data_type": "string",
-                    "example_values": [
-                        "admin-2"
-                    ],
-                    "contains": [
-                        "user name"
-                    ],
-                    "column_name": "Username",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.user_account_id",
                     "data_type": "string",
                     "example_values": [
@@ -9863,6 +9829,18 @@
                     ],
                     "column_name": "Account ID",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin-2"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
@@ -9928,7 +9906,6 @@
                 "container_count": {
                     "data_type": "numeric",
                     "description": "Maximum number of tickets to be ingested during poll now",
-                    "required": false,
                     "default": 1,
                     "order": 3
                 },
