@@ -1,7 +1,7 @@
 # --
 # File: cuckoo_connector.py
 #
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -12,7 +12,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as Rules
 
 from cuckoo_consts import *
 import math
@@ -279,6 +279,14 @@ class CuckooConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val, None
 
+        task_ids = response.get('task_ids')
+        if type(task_ids) == list:
+            if len(task_ids) > 0:
+                return phantom.APP_SUCCESS, task_ids
+
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Retrieved zero length task id list"), []
+
         try:
             return phantom.APP_SUCCESS, response['task_id']
         except KeyError:
@@ -345,14 +353,30 @@ class CuckooConnector(BaseConnector):
 
         vault_id = param['vault_id']
         file_name = param.get('file_name')
+        dozip = param.get("zip_and_encrypt", False)
+        zip_password = param.get("zip_password") or "infected"
 
-        vault_info = Vault.get_file_info(vault_id=vault_id)
+        try:
+            self.debug_print('Rules.vault_info start')
+            success, message, vault_info = Rules.vault_info(vault_id=vault_id)
+            self.debug_print(
+                'Rules.vault_info results: success: {}, message: {}, info: {}'
+                .format(success, message, vault_info)
+            )
+        except requests.exceptions.HTTPError:
+            error_message = "Invalid Vault ID: %s" % (vault_id)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error opening file. {}".format(err))
+
         if not vault_info:
             return action_result.set_status(
                 phantom.APP_ERROR, "Invalid Vault ID"
             )
 
         try:
+            vault_info = list(vault_info)
             file_info = vault_info[0]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -374,6 +398,17 @@ class CuckooConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error opening file. {}".format(err))
+
+        if dozip:
+            try:
+                import zip_and_encrypt as z
+                zae = z.zip_and_encrypt("/tmp/phcuckoo_app_", zip_password)
+                zae.add(file_path)
+                payload = zae.archive_fp
+
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err)
 
         files = {
             'file': (file_name, payload)
@@ -402,6 +437,25 @@ class CuckooConnector(BaseConnector):
             return action_result.get_status()
 
         return self._poll_for_task(action_result, task_id, key=url)
+
+    def _handle_submit_strings(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_version(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        strings = "\n".join(map(lambda x: x.strip(), param['url'].split()))
+        strings = "\n".join(map(lambda x: x.strip(), strings.split(",")))
+        strings = list(map(lambda x: x.strip(), strings.split("\n")))
+
+        if len(strings) == 0 or len(strings[0]) == 0:
+            return action_result.set_status(phantom.APP_ERROR, "Empty 'url' parameter")
+
+        files = { 'strings': (None, strings[0]) }
+        ret_val, task_ids = self._queue_analysis(action_result, 'submit', files=files)
+        if phantom.is_fail(ret_val):
+            return ret_val
+        return self._poll_for_task(action_result, task_ids[0], key=strings[0])
 
     def _handle_get_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -433,12 +487,16 @@ class CuckooConnector(BaseConnector):
         elif action_id == 'detonate_url':
             ret_val = self._handle_detonate_url(param)
 
+        elif action_id == 'submit_strings':
+            ret_val = self._handle_submit_strings(param)
+
         return ret_val
 
 
 if __name__ == '__main__':
 
     import pudb
+    import sys
     import argparse
 
     pudb.set_trace()
@@ -455,13 +513,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = BaseConnector._get_phantom_base_url() + "/login"
             print("Accessing the Login page")
@@ -484,7 +542,7 @@ if __name__ == '__main__':
             print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         exit(0)
 
