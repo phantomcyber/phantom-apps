@@ -1,0 +1,46 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<html>
+  <head></head>
+  <body>
+
+    <h2>Licensing details for the app</h2>
+      <p><h3>M2Crypto</h3>
+        This app uses the M2Crypto module, which is licensed under the MIT License (MIT), Copyright (c) Ng Pheng Siong.
+      </p>
+      <p><h3>typing</h3>
+        This app uses the typing module, which is licensed under the Python Software Foundation License (PSF), Copyright (c) Guido van Rossum, Jukka Lehtosalo, Lukasz Langa, Ivan Levkivskyi.
+      </p>
+
+    <h2><a id="Requirements_2"></a>Requirements</h2>
+      <p>Supported OS is CentOS 7+</p>
+      <p>Access your Phantom instance via Terminal and install following OS dependencies</p>
+      <pre>
+        <code class="language-bash">
+        <span class="hljs-comment"># Install library and its dependencies</span>
+        $~ sudo yum install python-devel openssl-devel gcc gcc-c++
+        </code>
+      </pre>
+
+    <h2><a id="Keys_and_Certificates_3"></a>Keys and Certificates</h2>
+      <p>To use this app you need to provide an RSA key pair (this consists of a
+        public key and a private key) and an X.509 certificate of said public key.</p>
+      <p>To generate a new RSA key pair, you could install and use OpenSSL on a CentOS 7
+        instance. Once properly installed, execute the following commands
+        to create key pairs and certificates.</p>
+      <pre>
+        <code class="language-bash">
+        <span class="hljs-comment"># Create a pair of keys</span>
+        $~ openssl req -newkey rsa:1024 -nodes -x509 -days 365 -out cert.pem
+
+        <span class="hljs-comment"># Rename the private key</span>
+        $~ mv privkey.pem key.pem
+        </code>
+      </pre>
+      <p>The generated keys and certificates will be used to configure a S/MIME Phantom asset.</p>
+  </body>
+</html>

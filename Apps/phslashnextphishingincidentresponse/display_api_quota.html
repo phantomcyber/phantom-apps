@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_api_quota.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -37,6 +37,7 @@ em{font-style: normal}
 .fs-17{font-size:17px!important}
 .fs-13{font-size:13px!important}
 .fs-11{font-size:11px!important}
+.wf-h4-style{font-size:16px}
 .br-top-3{border-top:3px solid #535454;}
 .br-gray{border:1px solid #D8D8D8;}
 .br-gray-bottom{border-bottom:1px solid #D8D8D8;}
@@ -97,14 +98,35 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 <div style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
 	<div class="mainCont">
 
-		<section class="mb-20 mt-20">
-			<!-- API Quota section -->
-			<h2 class="mb-10">SlashNext Phishing Incident Response - API Quota</h2>
+		{% for result in results %} <!-- Loop for each result -->
 
-			<h3 class="mb-5">action = api quota</h3>
-			<h3 class="mb-5">Coming soon…</h3>
+			{% if not result.data %}
+				<h4 class="wf-h4-style">No data found</h4>
+			{% else %}
+				<section class="mb-20 mt-20">
+					<!-- API Quota section -->
+					<h2 class="mb-10">SlashNext Phishing Incident Response - API Quota</h2>
 
-		</section>
+					<h3 class="mb-5">action = api quota</h3>
+
+					{% if result.data.errorNo == 0 %} <!-- API Quota success condition -->
+						<div class="mb-5 blockDiv">
+							<div class="blockRow blockRow3">
+								<div><label>Licensed Quota</label><span>{{result.data.quotaDetails.licensedQuota}}</span></div>
+								<div><label>Remaining Quota</label><span>{{result.data.quotaDetails.remainingQuota}}</span></div>
+								<div><label>Expiration Date</label><span>{{result.data.quotaDetails.expiryDate}}</span></div>
+							</div>
+						</div>
+						<h3 class="mb-5 cr-blue1">Note: {{result.data.quotaDetails.note}}</h3>
+					{% else %} <!-- API Quota error condition -->
+						<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+						<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+					{% endif %} <!-- API Quota success condition -->
+
+				</section>
+			{% endif %}	
+
+		{% endfor %} <!-- Loop for each result end -->
 
 	</div>
 </div> <!-- Main Div -->
@@ -112,6 +134,3 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/eqcss/1.9.2/EQCSS.min.js"></script>
 
 {% endblock %} <!-- Main Start Block -->
-
-
-
