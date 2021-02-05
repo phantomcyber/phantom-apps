@@ -1,0 +1,22 @@
+<!-- File: readme.html
+  Copyright (c) 2020 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<p>This app implements actions that manage an Cisco Umbrella domain list. Cisco allows third party implementations like Phantom Enterprise to create and manage a list of domains (i.e. add, delete) via what it calls 'custom integrations'. The Phantom OpenDNS Umbrella App requires such an integration to be pre-configured on OpenDNS Umbrella. The steps to do this are outlined below:</p>
+<ul>
+<li>Login to your Cisco dashboard and go to Configuration &gt; System Settings &gt; Integrations and click the &quot;add a new custom integration&quot; button.</li>
+<li>Set the name of the custom integration to be &quot;Phantom Orchestration Feed&quot;</li>
+<li>The UI will then present an integration URL. For example: <b>https://s-platform.api.opendns.com/1.0/events?customerKey=bac2bfa7-d134-4b85-a5ed-b1ffec027a91</b> One of the parameters to this URL is the customer key (GUID format). This value will be required while configuring the OpenDNS Umbrella asset on Phantom. The OpenDNS Umbrella App on Phantom will use this customer key while adding, listing and deleting domains.</li>
+<li>Cisco Umbrella needs to be told to <em>block</em> the domain list that is managed by Phantom.</li>
+<li>Go to Configuration &gt; Policy Settings &gt; Security Settings and click on the relevant Security Setting. Scroll down and choose 'Block' requests from the 'Phantom Orchestration Feed'</li>
+</ul>
+<p>At the end of the above steps Cisco Umbrella has been configured to:<br> 
+<ul>
+  <li>Create a 'custom integration' domain list with a <em>customerKey</em> for Phantom to use </li>
+  <li>Use the domains belonging to the 'Phantom Orchestration Feed' to block DNS requests.</li>
+</ul>
+</p>
+<p>Next step is to configure an 'Cisco Umbrella' asset on Phantom and specify the 'customerKey' and hit 'Test Connectivity' to validate the configuration.</p>
+<p>More information about 'custom integrations' can be found <a href="ihttps://www.opendns.com/enterprise-security/threat-enforcement/features/custom-integrations/">here</a>.<br />A support article on the OpenDNS site about configuring custom integration can be found <a href="https://support.opendns.com/entries/67200684-OpenDNS-Umbrella-The-Umbrella-Enforcement-API-for-Custom-Integrations">here</a></p>
