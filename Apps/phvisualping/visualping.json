@@ -62,13 +62,20 @@
                 {
                     "data_path": "action_result.data.*.jobs.active.*.id",
                     "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
                     "example_values": [
                         "bd84977cdd2b45c"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.jobs.active.*.url",
                     "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
                     "example_values": [
                         "https://example.com/"
                     ],
@@ -93,6 +100,8 @@
                 {
                     "data_path": "action_result.data.*.jobs.active.*.jobid",
                     "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 2,
                     "example_values": [
                         "3003726"
                     ]
@@ -121,6 +130,8 @@
                 {
                     "data_path": "action_result.data.*.jobs.active.*.interval",
                     "data_type": "string",
+                    "column_name": "Interval",
+                    "column_order": 3,
                     "example_values": [
                         "1440"
                     ]
@@ -150,8 +161,6 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
                     "example_values": [
                         "success",
                         "failed"
@@ -161,7 +170,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Active jobs: [{'jobid': '3003726', 'id': 'bd84977cdd2b45c', 'created': '2020-12-21 15:27:48', 'url': 'https://example.com/', 'description': 'Entry-Specific-Rule', 'runs': '3', 'trigger': '1', 'interval': '1440', 'mode': 'WEB', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 16:30:19'}, {'jobid': '2969557', 'id': '3941f47390034e8', 'created': '2020-11-24 16:17:17', 'url': 'https://example.com/', 'description': 'Example description', 'runs': '29', 'trigger': '1', 'interval': '1440', 'mode': 'TEXT', 'favicon': 'metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png', 'last_run': '2020-12-23 01:28:27'}]"
+                        "Example message"
                     ]
                 },
                 {
@@ -169,6 +178,9 @@
                     "data_type": "string",
                     "example_values": [
                         "bd84977cdd2b45c"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
@@ -276,6 +288,10 @@
                     "description": "ID of the job",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "visualping job id"
+                    ],
                     "order": 0
                 }
             },
@@ -283,22 +299,30 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "ID",
-                    "column_order": 0,
                     "example_values": [
                         "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
                     "example_values": [
                         "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.url",
                     "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
                     "example_values": [
                         "https://example.com/"
                     ],
@@ -309,6 +333,8 @@
                 {
                     "data_path": "action_result.data.*.jobid",
                     "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 2,
                     "example_values": [
                         "2969557"
                     ]
@@ -316,6 +342,8 @@
                 {
                     "data_path": "action_result.data.*.interval",
                     "data_type": "string",
+                    "column_name": "Interval",
+                    "column_order": 3,
                     "example_values": [
                         "1440"
                     ]
@@ -323,6 +351,8 @@
                 {
                     "data_path": "action_result.data.*.lastcheck",
                     "data_type": "string",
+                    "column_name": "Last Check",
+                    "column_order": 4,
                     "example_values": [
                         "2020-12-23 01:28:27"
                     ]
@@ -337,6 +367,8 @@
                 {
                     "data_path": "action_result.data.*.PercentDifference",
                     "data_type": "string",
+                    "column_name": "Percent Difference",
+                    "column_order": 5,
                     "example_values": [
                         "0.03"
                     ]
@@ -344,8 +376,6 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
@@ -355,7 +385,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Url: https://example.com/, Description: Example description, Lastcheck: 2020-12-23 01:28:27, Percentdifference: 0.03"
+                        "Example message"
                     ]
                 },
                 {
@@ -421,6 +451,10 @@
                     "description": "ID of the job",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "visualping job id"
+                    ],
                     "order": 0
                 }
             },
@@ -428,17 +462,23 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "ID",
-                    "column_order": 0,
                     "example_values": [
                         "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.job_id",
                     "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 0,
                     "example_values": [
                         "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
                     ]
                 },
                 {
@@ -451,6 +491,8 @@
                 {
                     "data_path": "action_result.data.*.image_diff",
                     "data_type": "string",
+                    "column_name": "Image Diff",
+                    "column_order": 1,
                     "example_values": [
                         "https://example.com/2969557_1609464809592_diff.png"
                     ],
@@ -461,6 +503,8 @@
                 {
                     "data_path": "action_result.data.*.image_previous",
                     "data_type": "string",
+                    "column_name": "Image Previous",
+                    "column_order": 2,
                     "example_values": [
                         "https://example.com/2969557_1609374975789.png"
                     ],
@@ -471,8 +515,6 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
@@ -482,7 +524,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Created: 2021-01-01 02:33:29, Image previous: https://example.com/2969557_1609374975789.png, Image diff: example.com/2969557_1609464809592_diff.png"
+                        "Example message"
                     ]
                 },
                 {

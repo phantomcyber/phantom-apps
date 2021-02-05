@@ -227,9 +227,9 @@ class VisualpingConnector(BaseConnector):
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("Connecting to endpoint")
+        self.save_progress("Connecting to {}{} endpoint".format(self._base_url, HEALTH_ENDPOINT))
         # make rest call
-        ret_val, response = self._make_rest_call('/api/status/health', action_result, params=None, headers=None)
+        ret_val, response = self._make_rest_call(HEALTH_ENDPOINT, action_result, params=None, headers=None)
 
         # Return success
         if 'healthy' in str(response):
@@ -258,7 +258,15 @@ class VisualpingConnector(BaseConnector):
         action_result.add_data(response)
         try:
             jobs = response['jobs']
-            active_jobs = jobs['active']
+            if not jobs:
+                return action_result.set_status(phantom.APP_SUCCESS, "No jobs found")
+            if isinstance(jobs, dict):
+                if "active" in jobs:
+                    active_jobs = jobs['active']
+                else:
+                    return action_result.set_status(phantom.APP_SUCCESS, "No active jobs found")
+            else:
+                return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             self.debug_print("Error message: {}".format(error_message))
@@ -268,7 +276,7 @@ class VisualpingConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary['active_jobs'] = active_jobs
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched the job(s)")
 
     def _handle_show_result(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -283,6 +291,9 @@ class VisualpingConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "Couldn't find data for the specified ID")
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -299,7 +310,7 @@ class VisualpingConnector(BaseConnector):
             self.debug_print("Error message: {}".format(error_message))
             return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched the result")
 
     def _handle_get_images(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -313,6 +324,10 @@ class VisualpingConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        if isinstance(response, dict) and "success" in response:
+            if not response["success"]:
+                return action_result.set_status(phantom.APP_ERROR, "Couldn't find data for the specified ID")
 
         # Add the response into the data section
         action_result.add_data(response)
@@ -328,7 +343,7 @@ class VisualpingConnector(BaseConnector):
             self.debug_print("Error message: {}".format(error_message))
             return action_result.set_status(phantom.APP_ERROR, UNEXPECTED_RESPONSE_MSG)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched the images")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS

@@ -9,3 +9,4 @@ ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configu
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 UNEXPECTED_RESPONSE_MSG = "Received unexpected response from the server"
+HEALTH_ENDPOINT = "/api/status/health"
