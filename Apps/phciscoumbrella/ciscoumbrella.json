@@ -108,7 +108,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total domains: 21"
+                    ]
+
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -128,7 +132,7 @@
             "identifier": "block_domain",
             "read_only": false,
             "undo": "unblock domain",
-            "verbose": "Cisco has many safeguards in place before adding a domain to a block list. These are present to protect against accidentally submitting domains for highly popular or known sites like google.com. If 'disable_safeguards' parameter is set to True (or checked), those safeguards will be bypassed. This could potentially allow adding a well-known domain like google.com to a domain block list.",
+            "verbose": "Cisco has many safeguards in place before adding a domain to a block list. These are present to protect against accidentally submitting domains for highly popular or known sites like google.com. If the 'disable_safeguards' parameter is set to True (or checked), those safeguards will be bypassed. This could potentially allow adding a well-known domain like google.com to a domain block list.",
             "parameters": {
                 "domain": {
                     "description": "Domain to block",
@@ -143,8 +147,7 @@
                 "disable_safeguards": {
                     "description": "Disable safeguards while blocking the domain",
                     "data_type": "boolean",
-                    "order": 1,
-                    "value": false
+                    "order": 1
                 }
             },
             "render": {
@@ -166,7 +169,12 @@
                 },
                 {
                     "data_path": "action_result.parameter.disable_safeguards",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+
                 },
                 {
                     "data_path": "action_result.parameter.domain",
@@ -175,7 +183,11 @@
                         "domain"
                     ],
                     "column_name": "Domain",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "test.com"
+                    ]
+
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -189,7 +201,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "REST API returned success with id: a4070f26,4cfc,4a5f,9a17-532c093ca151"
+                    ]
+
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -245,7 +261,11 @@
                         "domain"
                     ],
                     "column_name": "Domain",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "test.com"
+                    ]
+
                 },
                 {
                     "data_path": "action_result.data",
@@ -257,7 +277,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain successfully unblocked"
+                    ]
+
                 },
                 {
                     "data_path": "summary.total_objects",
